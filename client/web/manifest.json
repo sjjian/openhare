@@ -1,6 +1,6 @@
 {
-    "name": "app",
-    "short_name": "app",
+    "name": "client",
+    "short_name": "client",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
