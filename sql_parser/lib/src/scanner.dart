@@ -3,7 +3,7 @@ class Pos {
   int line = 1;
   int row = 0;
 
-  Pos.init(); 
+  Pos.init();
 
   Pos(this.cursor, this.line, this.row);
 
@@ -32,33 +32,57 @@ class Scanner {
       : buf = content,
         length = content.length;
 
-  bool hasNext() {
-    return pos.cursor < length - 1;
+  bool hasNextN(int count) {
+    return pos.cursor + count <= length - 1;
   }
 
-  bool next() {
-    var yes = hasNext();
-    pos.offset(1);
+  bool nextN(int count) {
+    var yes = hasNextN(count);
+    pos.offset(count);
     return yes;
   }
 
+  bool hasNext() {
+    return hasNextN(1);
+  }
+
+  bool next() {
+    return nextN(1);
+  }
+
   int curChar() {
-    if (pos.cursor == -1 || pos.cursor > length -1) {
+    if (pos.cursor == -1 || pos.cursor > length - 1) {
       return 0;
     }
     return buf.codeUnitAt(pos.cursor);
   }
 
-  int nextChar() {
-    if (pos.cursor + 1 >= length) {
-      return 0;
+  int nextCharN(int count) {
+    if (hasNextN(count)) {
+      return buf.codeUnitAt(pos.cursor + count);
     }
-    return buf.codeUnitAt(pos.cursor + 1);
+    return 0;
+  }
+
+  int nextChar() {
+    return nextCharN(1);
+  }
+
+  bool startWith(String prefix) {
+    if (prefix.isEmpty) {
+      return false;
+    }
+    if (prefix.length == 1 || hasNextN(prefix.length - 1)) {
+      var sub = buf.substring(pos.cursor, pos.cursor + prefix.length);
+      return ( sub == prefix);
+    } else {
+      return false;
+    }
   }
 
   seek(Pos pos) {
     if (pos.cursor <= length) {
-      this.pos = pos;
+      this.pos = pos.copy();
     }
   }
 

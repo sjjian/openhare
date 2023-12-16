@@ -1,5 +1,4 @@
-import "package:sql_parser/src/token.dart";
-
+import "token.dart";
 import "scanner.dart";
 
 class LexerContext {
@@ -18,11 +17,22 @@ class LexerContext {
     return Token(
         tok, scanner.subString(lastPos, scanner.pos), lastPos, scanner.pos);
   }
+
+  String subString() {
+    return scanner.subString(lastPos, scanner.pos);
+  }
 }
 
 class Lexer {
-  static TokenBuilder builder =
-      TokenRooter(<TokenBuilder>[IdentTokenBuilder()]);
+  static Set<String> keywords = {"select", "update"};
+
+  static TokenBuilder builder = TokenRooter(<TokenBuilder>[
+    SpaceTokenBuilder(),
+    KeyWordTokenBuilder(Lexer.keywords),
+    SingleQValueTokenBuilder(),
+    DoubleQValueTokenBuilder(),
+    BackQValueTokenBuilder()
+  ]);
 
   LexerContext ctx;
 
