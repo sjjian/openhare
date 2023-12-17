@@ -8,6 +8,8 @@ enum TokenType {
   invalid,
   keyword,
   ident,
+  number,
+  punctuation,
   doubleQValue, // 双引号字符串, "hello".
   singleQValue, // 单引号字符串, 'hello'.
   backQValue, // 反引号字符串, `hello`.
@@ -75,11 +77,18 @@ class IdentTokenBuilder implements TokenBuilder {
 
   @override
   (bool, TokenType?) matchToken(LexerContext ctx) {
+    var onlyDigit = true;
+    if (!Char.isDigit(ctx.scanner.curChar())) {
+      onlyDigit = false;
+    }
     if (!isIdentChar(ctx.scanner.curChar())) {
       return (false, null);
     }
     while (ctx.scanner.hasNext() && isIdentChar(ctx.scanner.nextChar())) {
       ctx.scanner.next();
+    }
+    if (onlyDigit) {
+      return (false, null);
     }
     return (true, TokenType.ident);
   }
@@ -143,4 +152,58 @@ class DoubleQValueTokenBuilder extends BetweenTokenBuilder {
 
 class BackQValueTokenBuilder extends BetweenTokenBuilder {
   BackQValueTokenBuilder() : super(TokenType.backQValue, "`", "`", false);
+}
+
+class PunctuationTokenBuilder implements TokenBuilder {
+  PunctuationTokenBuilder();
+
+  @override
+  (bool, TokenType?) matchToken(LexerContext ctx) {
+    if (Char.isPunctuation(ctx.scanner.curChar())) {
+      return (true, TokenType.punctuation);
+    }
+    return (false, null);
+  }
+}
+
+class NumberTokenBuilder implements TokenBuilder {
+  NumberTokenBuilder();
+
+  (bool, TokenType?) matchFloat(LexerContext ctx, bool needDigit) {
+    var hasDigit = false;
+    while (ctx.scanner.hasNext() && Char.isDigit(ctx.scanner.nextChar())) {
+      hasDigit = true;
+      ctx.scanner.next();
+    }
+    if (needDigit && !hasDigit) {
+      return (false, null);
+    }
+    return (true, TokenType.number);
+  }
+
+  (bool, TokenType?) matchInt(LexerContext ctx) {
+    while (ctx.scanner.hasNext()) {
+      if (Char.isDigit(ctx.scanner.nextChar())) {
+        ctx.scanner.next();
+        continue;
+      } else if (ctx.scanner.nextChar() == Char.period) {
+        ctx.scanner.next();
+        return matchFloat(ctx, false);
+      } else {
+        break;
+      }
+    }
+    return (true, TokenType.number);
+  }
+
+  @override
+  (bool, TokenType?) matchToken(LexerContext ctx) {
+    if (ctx.scanner.curChar() == Char.period) {
+      return matchFloat(ctx, true);
+    }
+    if (Char.isDigit(ctx.scanner.curChar())) {
+      return matchInt(ctx);
+    }
+    return (false, null);
+  }
 }

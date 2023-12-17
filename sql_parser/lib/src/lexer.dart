@@ -29,9 +29,12 @@ class Lexer {
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
     SpaceTokenBuilder(),
     KeyWordTokenBuilder(Lexer.keywords),
+    NumberTokenBuilder(),
     SingleQValueTokenBuilder(),
     DoubleQValueTokenBuilder(),
-    BackQValueTokenBuilder()
+    BackQValueTokenBuilder(),
+    NumberTokenBuilder(),
+    PunctuationTokenBuilder()
   ]);
 
   LexerContext ctx;

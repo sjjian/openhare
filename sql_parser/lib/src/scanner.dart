@@ -87,7 +87,7 @@ class Scanner {
   }
 
   String subString(Pos start, Pos end) {
-    if (start.cursor >= end.cursor) {
+    if (start.cursor > length -1 || start.cursor > end.cursor) {
       return "";
     }
     return buf.substring(start.cursor, end.cursor + 1);
