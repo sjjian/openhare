@@ -1,5 +1,5 @@
 name: client
-description: "A new Flutter project."
+description: "Flea SQL client."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -30,6 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^6.1.1
+  pluto_grid: ^7.0.2
+  code_text_field: ^1.1.0
+  window_manager: ^0.3.7
 
 
   # The following adds the Cupertino Icons font to your application.
