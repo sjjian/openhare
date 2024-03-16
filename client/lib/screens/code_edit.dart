@@ -32,17 +32,40 @@ class _CodeEditorState extends State<CodeEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-      child: CodeTheme(
-        data: const CodeThemeData(styles: a11yLightTheme),
-        child: CodeField(
-          minLines: 20,
-          maxLines: 20,
-          controller: _codeController!,
-          textStyle: const TextStyle(fontFamily: 'SourceCode'),
+    return LayoutBuilder(builder: (ctx, c) {
+      Widget codeField = Expanded(
+          child: Container(
+        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+        child: CodeTheme(
+          data: const CodeThemeData(styles: a11yLightTheme),
+          child: CodeField(
+            expands: true,
+            controller: _codeController!,
+            textStyle: const TextStyle(fontFamily: 'SourceCode'),
+          ),
         ),
-      ),
-    );
+      ));
+
+      Widget codeButton = Container(
+        constraints: const BoxConstraints(maxHeight: 40),
+        decoration: const BoxDecoration(
+            border: Border(
+                right: BorderSide(color: Colors.black),
+                left: BorderSide(color: Colors.black),
+                bottom: BorderSide(color: Colors.black))),
+        child: const Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Icon(Icons.play_arrow_rounded, size: 36, color: Colors.green)
+        ]),
+      );
+
+      if (c.maxHeight <= 40) {
+        codeButton = Expanded(child: codeButton);
+        return Column(children: [codeButton]);
+      } else {
+        return Column(
+          children: [codeField, codeButton],
+        );
+      }
+    });
   }
 }

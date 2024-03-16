@@ -1,6 +1,8 @@
 import 'package:client/screens/code_edit.dart';
 import 'package:client/screens/instance_list.dart';
+import 'package:client/widgets/split_view.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_split_view/multi_split_view.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
 class SQLEditPage extends StatefulWidget {
@@ -14,37 +16,22 @@ class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      const SizedBox(width: 200, child: InstanceList()),
-      const VerticalDivider(
-        width: 10,
-        thickness: 0.5,
-        color: Colors.black,
-      ),
-      Expanded(
-          child: Column(
-        children: [
-          const CodeEditor(),
-          Container(
-              height: 40,
-              decoration:
-                  BoxDecoration(border: Border.all(color: Colors.black)),
-              child: const Row(children: [
-                Icon(Icons.play_arrow_rounded, size: 36, color: Colors.green)
-              ])),
-          const Divider(
-            height: 10,
-            thickness: 0.5,
-            color: Colors.black,
-          ),
-          const Expanded(
-            child: SqlResultTable(),
-          ),
-          SizedBox(height: 30)
-        ],
-      )),
-      SizedBox(width: 5),
+      SplitView(
+          controller: MultiSplitViewController(areas: [Area(size: 200)]),
+          children: const [
+            SizedBox(width: 200, child: InstanceList()),
+            Column(
+              children: [
+                SplitView(axis: Axis.vertical, children: [
+                  Expanded(child: CodeEditor()),
+                  Expanded(child: SqlResultTable()),
+                ]),
+                SizedBox(height: 30)
+              ],
+            ),
+          ]),
+      const SizedBox(width: 5),
     ]);
-    // return const SqlResultTable();
   }
 }
 
@@ -125,9 +112,11 @@ class _SqlResultTableState extends State<SqlResultTable> {
   ];
   @override
   Widget build(BuildContext context) {
-    return PlutoGrid(
-      columns: columns,
-      rows: rows,
-    );
+    return LayoutBuilder(builder: (context, contraints) {
+      return PlutoGrid(
+        columns: columns,
+        rows: rows,
+      );
+    });
   }
 }

@@ -49,10 +49,17 @@ class InstanceInfo extends StatefulWidget {
 class _InstanceInfoState extends State<InstanceInfo> {
   @override
   Widget build(BuildContext context) {
-    return const Card(
+    return Card(
+      clipBehavior: Clip.hardEdge,
       // width: 200,
       // height: 100,
-      child: Text('192.168.1.1:3306'),
+      child: LayoutBuilder(builder: (context, contraints) {
+        if (contraints.maxWidth < 40) {
+          return Text("123");
+        } else {
+          return Text("10.186.62.16:3306");
+        }
+      }),
     );
   }
 }

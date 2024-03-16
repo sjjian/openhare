@@ -15,7 +15,6 @@ class FleaSQLApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
-
       ),
       home: const HomePage(title: 'Flea SQL'),
       debugShowCheckedModeBanner: false,
