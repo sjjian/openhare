@@ -35,7 +35,7 @@ class _CodeEditorState extends State<CodeEditor> {
     return LayoutBuilder(builder: (ctx, c) {
       Widget codeField = Expanded(
           child: Container(
-        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+        decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
         child: CodeTheme(
           data: const CodeThemeData(styles: a11yLightTheme),
           child: CodeField(
@@ -50,9 +50,9 @@ class _CodeEditorState extends State<CodeEditor> {
         constraints: const BoxConstraints(maxHeight: 40),
         decoration: const BoxDecoration(
             border: Border(
-                right: BorderSide(color: Colors.black),
-                left: BorderSide(color: Colors.black),
-                bottom: BorderSide(color: Colors.black))),
+                right: BorderSide(color: Colors.grey),
+                left: BorderSide(color: Colors.grey),
+                bottom: BorderSide(color: Colors.grey))),
         child: const Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Icon(Icons.play_arrow_rounded, size: 36, color: Colors.green)
         ]),

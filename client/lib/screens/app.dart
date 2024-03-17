@@ -41,10 +41,11 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             const LeftNavigation(),
             const VerticalDivider(
-              width: 10,
-              thickness: 0.5,
-              color: Colors.black,
+              width: 1.0,
+              // thickness: 0.5,
+              color: Colors.grey,
             ),
+            const SizedBox(width: 3),
             Expanded(
                 child: Column(
               children: [
