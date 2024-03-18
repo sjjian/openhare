@@ -19,12 +19,20 @@ class _SQLEditPageState extends State<SQLEditPage> {
       SplitView(
           controller: MultiSplitViewController(areas: [Area(size: 200)]),
           children: const [
-            SizedBox(width: 200, child: InstanceList()),
             Column(
               children: [
+                SizedBox(
+                  height: 30,
+                ),
+                InstanceList()
+              ],
+            ),
+            Column(
+              children: [
+                SizedBox(height: 30),
                 SplitView(axis: Axis.vertical, children: [
-                  Expanded(child: CodeEditor()),
-                  Expanded(child: SqlResultTable()),
+                  CodeEditor(),
+                  SqlResultTable(),
                 ]),
                 SizedBox(height: 30)
               ],

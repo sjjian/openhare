@@ -30,9 +30,11 @@ class _LeftNavigationState extends State<LeftNavigation> {
                     },
                     isSelected: page.page == 0,
                     icon: const Icon(Icons.auto_awesome_mosaic_outlined,
-                        size: 36),
-                    selectedIcon:
-                        const Icon(Icons.auto_awesome_mosaic, size: 36)),
+                        color: Colors.grey, size: 36),
+                    selectedIcon: const Icon(
+                      Icons.auto_awesome_mosaic,
+                      size: 36,
+                    )),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -42,7 +44,11 @@ class _LeftNavigationState extends State<LeftNavigation> {
                           page.toSettingPage();
                         },
                         isSelected: page.page == 1,
-                        icon: const Icon(Icons.settings_outlined, size: 36),
+                        icon: const Icon(
+                          Icons.settings_outlined,
+                          size: 36,
+                          color: Colors.grey,
+                        ),
                         selectedIcon: const Icon(Icons.settings, size: 36),
                       ),
                     ],
