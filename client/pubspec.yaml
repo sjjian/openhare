@@ -40,6 +40,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   multi_split_view: ^2.4.0
+  mysql_client: ^0.0.27
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:client/models/connection.dart';
 import 'package:client/screens/code_edit.dart';
 import 'package:client/screens/instance_list.dart';
 import 'package:client/widgets/split_view.dart';
@@ -50,6 +51,14 @@ class SqlResultTable extends StatefulWidget {
 }
 
 class _SqlResultTableState extends State<SqlResultTable> {
+  late Future<SQLResultModel> result;
+
+  @override
+  void initState() {
+    super.initState();
+    result = ConnectionModel().query("select * from dms.users");
+  }
+
   List<PlutoColumn> columns = [
     /// Text Column definition
     PlutoColumn(
@@ -121,10 +130,32 @@ class _SqlResultTableState extends State<SqlResultTable> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, contraints) {
-      return PlutoGrid(
-        columns: columns,
-        rows: rows,
-      );
+      return FutureBuilder<SQLResultModel>(
+          future: result,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return PlutoGrid(
+                columns: snapshot.data!.columns,
+                rows: snapshot.data!.rows,
+              );
+            } else if (snapshot.hasError) {
+              return Container(
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.grey)),
+                  child: Text('${snapshot.error}'));
+            }
+
+            return Container(
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.grey)),
+                child: const Center(
+                  child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: CircularProgressIndicator(),
+                  ),
+                ));
+          });
     });
   }
 }
