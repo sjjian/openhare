@@ -25,7 +25,7 @@ class ConnectionModel {
     await conn.connect();
     IResultSet results = await conn.execute(query);
 
-    List<PlutoColumn> columns = List.empty();
+    List<PlutoColumn> columns = List.empty(growable: true);
     for (final column in results.cols) {
       columns.add(PlutoColumn(
           title: column.name,
@@ -33,7 +33,7 @@ class ConnectionModel {
           type: PlutoColumnType.text()));
     }
 
-    List<PlutoRow> rows = List.empty();
+    List<PlutoRow> rows = List.empty(growable: true);
     for (final result in results) {
       // for every result set
       for (final row in result.rows) {

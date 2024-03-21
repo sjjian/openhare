@@ -10,9 +10,11 @@ void main() async {
 
   WindowOptions windowOptions = const WindowOptions(
     title: "Flea SQL",
-    // size: Size(800, 600),
+    size: Size(1400, 1000),
     center: true,
-    backgroundColor: Colors.transparent,
+    // titleBarStyle: TitleBarStyle.hidden,
+    // backgroundColor: Colors.transparent,
+    backgroundColor: Colors.grey,
     skipTaskbar: false,
     // titleBarStyle: TitleBarStyle.hidden,
     windowButtonVisibility: false,

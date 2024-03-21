@@ -53,9 +53,18 @@ class _CodeEditorState extends State<CodeEditor> {
                 right: BorderSide(color: Colors.grey),
                 left: BorderSide(color: Colors.grey),
                 bottom: BorderSide(color: Colors.grey))),
-        child: const Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          Icon(Icons.play_arrow_rounded, size: 36, color: Colors.green)
-        ]),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
+                alignment:Alignment.center,
+                  onPressed: () {
+                    _codeController?.insertStr("1");
+                  },
+                  icon: Icon(Icons.play_arrow_rounded,
+                      size: 36, color: Colors.green))
+            ]),
       );
 
       if (c.maxHeight <= 40) {
