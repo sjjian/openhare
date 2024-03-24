@@ -1,48 +1,87 @@
+// import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
-class SessionWindowNotifier with ChangeNotifier {
-  String text = "select * from db1.t1;";
+class SessionModel with ChangeNotifier {
+  // CodeController? codeCtr;
 
-  List<SQLResultModel>? results;
-}
+  // MySQLConnection conn;
 
-class SQLResultModel {
-  List<PlutoColumn> columns;
-  List<PlutoRow> rows;
+  // List<Future<SQLResultModel>>? results;
+  SQLResultModel? result;
 
-  SQLResultModel(this.columns, this.rows);
-}
+  // SessionModel(this.conn, this.codeCtr);
 
-class ConnectionModel {
-  Future<SQLResultModel> query(String query) async {
-    final conn = await MySQLConnection.createConnection(
-        host: "10.186.62.16",
-        port: 3306,
-        userName: "root",
-        password: "mysqlpass");
-    await conn.connect();
-    IResultSet results = await conn.execute(query);
+  SessionModel();
 
-    List<PlutoColumn> columns = List.empty(growable: true);
-    for (final column in results.cols) {
-      columns.add(PlutoColumn(
-          title: column.name,
-          field: column.name,
-          type: PlutoColumnType.text()));
-    }
+  Future<void> query(String query) async {
+    result = SQLResultModel(query);
+    notifyListeners();
 
-    List<PlutoRow> rows = List.empty(growable: true);
-    for (final result in results) {
-      // for every result set
-      for (final row in result.rows) {
-        Map<String, PlutoCell> cells = row
-            .assoc()
-            .map((key, value) => MapEntry(key, PlutoCell(value: value)));
-        rows.add(PlutoRow(cells: cells));
+    try {
+      final conn = await MySQLConnection.createConnection(
+          host: "10.186.62.16",
+          port: 3306,
+          userName: "root",
+          password: "mysqlpass");
+      await conn.connect();
+      IResultSet resultSet = await conn.execute(query);
+
+      List<PlutoColumn> columns = List.empty(growable: true);
+      for (final column in resultSet.cols) {
+        columns.add(PlutoColumn(
+            title: column.name,
+            field: column.name,
+            type: PlutoColumnType.text()));
       }
+
+      List<PlutoRow> rows = List.empty(growable: true);
+      for (final result in resultSet) {
+        for (final row in result.rows) {
+          Map<String, PlutoCell> cells = row
+              .assoc()
+              .map((key, value) => MapEntry(key, PlutoCell(value: value)));
+          rows.add(PlutoRow(cells: cells));
+        }
+      }
+      result?.setDone(columns, rows);
+    } catch (e) {
+      result?.setError(e);
+    } finally {
+      notifyListeners();
     }
-    return SQLResultModel(columns, rows);
   }
+}
+
+enum SQLResultState { padding, done, error }
+
+class SQLResultModel with ChangeNotifier {
+  SQLResultState state = SQLResultState.padding;
+  String query;
+  Exception? error;
+  List<PlutoColumn>? columns;
+  List<PlutoRow>? rows;
+
+  SQLResultModel(this.query);
+
+  void setDone(columns, rows) {
+    state = SQLResultState.done;
+    this.columns = columns;
+    this.rows = rows;
+  }
+
+  void setError(error) {
+    state = SQLResultState.error;
+    this.error = error;
+  }
+}
+
+class ConnMetaModel {
+  String host;
+  int port;
+  String user;
+  String password;
+
+  ConnMetaModel(this.host, this.port, this.user, this.password);
 }

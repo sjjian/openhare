@@ -1,7 +1,9 @@
+import 'package:client/models/connection.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:highlight/languages/sql.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
+import 'package:provider/provider.dart';
 
 class CodeEditor extends StatefulWidget {
   const CodeEditor({super.key});
@@ -17,7 +19,6 @@ class _CodeEditorState extends State<CodeEditor> {
   void initState() {
     super.initState();
     const source = "select * from db1.t1;";
-    // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
       language: sql,
@@ -55,14 +56,17 @@ class _CodeEditorState extends State<CodeEditor> {
                 bottom: BorderSide(color: Colors.grey))),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconButton(
-                alignment:Alignment.center,
+                  alignment: Alignment.topLeft,
                   onPressed: () {
-                    _codeController?.insertStr("1");
+                    final query = _codeController?.text.toString();
+                    if (query != null) {
+                      context.read<SessionModel>().query(query);
+                    }
                   },
-                  icon: Icon(Icons.play_arrow_rounded,
+                  icon: const Icon(Icons.play_arrow_rounded,
                       size: 36, color: Colors.green))
             ]),
       );
