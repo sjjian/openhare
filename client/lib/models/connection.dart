@@ -1,22 +1,68 @@
-// import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
+enum SQLExecuteState { executing, done, error }
+
 class SessionModel with ChangeNotifier {
-  // CodeController? codeCtr;
+  SQLExecuteState state = SQLExecuteState.executing;
 
-  // MySQLConnection conn;
+  List<SQLResultModel> results = [];
 
-  // List<Future<SQLResultModel>>? results;
-  SQLResultModel? result;
-
-  // SessionModel(this.conn, this.codeCtr);
+  SQLResultModel? currentResult;
 
   SessionModel();
 
+  void deleteResultByIndex(int index) {
+    final result = results.removeAt(index);
+
+    // 如果删除了选中的result，则默认选中前一个
+    if (currentResult == result) {
+      if (results.isEmpty) {
+        currentResult = null;
+      } else {
+        currentResult = index > 0 ? results[index - 1] : null;
+      }
+    }
+
+    notifyListeners();
+  }
+
+  void selectResultByIndex(int index) {
+    final result = results[index];
+    currentResult = result;
+    notifyListeners();
+  }
+
+  void reorderResult(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      // removing the item at oldIndex will shorten the list by 1.
+      newIndex -= 1;
+    }
+    final SQLResultModel element = results.removeAt(oldIndex);
+    results.insert(newIndex, element);
+    notifyListeners();
+  }
+
+  SQLResultModel? getCurrentSQLResult() {
+    return currentResult;
+  }
+
+  int genSQLResultId() {
+    return results.isEmpty
+        ? 0
+        : results.fold(
+                0,
+                (previousId, element) =>
+                    previousId < element.id ? element.id : previousId) +
+            1;
+  }
+
   Future<void> query(String query) async {
-    result = SQLResultModel(query);
+    final result = SQLResultModel(genSQLResultId(), query);
+    results.add(result);
+    currentResult = result;
+    state = SQLExecuteState.executing;
     notifyListeners();
 
     try {
@@ -45,34 +91,35 @@ class SessionModel with ChangeNotifier {
           rows.add(PlutoRow(cells: cells));
         }
       }
-      result?.setDone(columns, rows);
+      result.setDone(columns, rows);
+      state = SQLExecuteState.done;
     } catch (e) {
-      result?.setError(e);
+      result.setError(e);
+      state = SQLExecuteState.error;
     } finally {
       notifyListeners();
     }
   }
 }
 
-enum SQLResultState { padding, done, error }
-
 class SQLResultModel with ChangeNotifier {
-  SQLResultState state = SQLResultState.padding;
+  int id;
+  SQLExecuteState state = SQLExecuteState.executing;
   String query;
   Exception? error;
   List<PlutoColumn>? columns;
   List<PlutoRow>? rows;
 
-  SQLResultModel(this.query);
+  SQLResultModel(this.id, this.query);
 
   void setDone(columns, rows) {
-    state = SQLResultState.done;
+    state = SQLExecuteState.done;
     this.columns = columns;
     this.rows = rows;
   }
 
   void setError(error) {
-    state = SQLResultState.error;
+    state = SQLExecuteState.error;
     this.error = error;
   }
 }

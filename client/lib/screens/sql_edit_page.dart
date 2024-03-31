@@ -5,7 +5,6 @@ import 'package:client/widgets/split_view.dart';
 import 'package:client/widgets/sql_result_table.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_split_view/multi_split_view.dart';
-import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 
 class SQLEditPage extends StatefulWidget {
@@ -32,14 +31,24 @@ class _SQLEditPageState extends State<SQLEditPage> {
             ),
             ChangeNotifierProvider(
                 create: (_) => SessionModel(),
-                child: const Column(
+                child: Column(
                   children: [
-                    SizedBox(height: 30),
-                    SplitView(axis: Axis.vertical, children: [
-                      CodeEditor(),
-                      SqlResultTables(),
-                    ]),
-                    SizedBox(height: 30)
+                    const SizedBox(height: 30),
+                    Expanded(
+                      child: Container(
+                          alignment: Alignment.topLeft,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey)),
+                          child: const Column(
+                            children: [
+                              SplitView(axis: Axis.vertical, children: [
+                                CodeEditor(),
+                                Expanded(child: SqlResultTables()),
+                              ]),
+                            ],
+                          )),
+                    ),
+                    const SizedBox(height: 30)
                   ],
                 ))
           ]),
@@ -59,57 +68,52 @@ class _SqlResultTablesState extends State<SqlResultTables> {
   @override
   Widget build(BuildContext context) {
     return Consumer<SessionModel>(builder: (context, sessionModel, _) {
-      final result = sessionModel.result;
-      if (result == null) {
-        return Container(
-            decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-            child: const Text('no data'));
-      } else {
-        return SqlResultTable(result: result);
-      }
+      return Column(
+        children: [
+          Container(
+            alignment: Alignment.centerLeft,
+            constraints: const BoxConstraints(maxHeight: 40),
+            decoration: const BoxDecoration(
+                border: Border(
+                    top: BorderSide(color: Colors.grey),
+                    bottom: BorderSide(color: Colors.grey))),
+            child: ReorderableListView(
+                buildDefaultDragHandles: false,
+                scrollDirection: Axis.horizontal,
+                onReorder: (oldIndex, newIndex) {
+                  sessionModel.reorderResult(oldIndex, newIndex);
+                },
+                children: sessionModel.results.map((result) {
+                  final index = sessionModel.results.indexOf(result);
+                  return ReorderableDragStartListener(
+                      index: index,
+                      key: ValueKey(index),
+                      child: RawChip(
+                        backgroundColor: Colors.grey.withOpacity(0.3),
+                        selectedColor: Colors.white,
+                        selected: result == sessionModel.currentResult,
+                        avatar: const Icon(
+                          Icons.grid_on,
+                          color: Colors.black,
+                        ),
+                        label: Text("${result.id + 1}"),
+                        deleteIcon: const Icon(
+                          Icons.close,
+                          size: 16,
+                        ),
+                        onDeleted: () {
+                          sessionModel.deleteResultByIndex(index);
+                        },
+                        onPressed: () {
+                          sessionModel.selectResultByIndex(index);
+                        },
+                      ));
+                }).toList()),
+          ),
+          Expanded(
+              child: SqlResultTable(result: sessionModel.getCurrentSQLResult()))
+        ],
+      );
     });
   }
 }
-
-// class SqlResultTable extends StatefulWidget {
-//   const SqlResultTable({super.key});
-//   @override
-//   State<SqlResultTable> createState() => _SqlResultTableState();
-// }
-
-// class _SqlResultTableState extends State<SqlResultTable> {
-//   @override
-//   void initState() {
-//     super.initState();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Consumer<SessionModel>(
-//       builder: (context, sessionModel, _) {
-//         final result = sessionModel.result;
-//         return SqlResultTable(result)
-//         if (result?.state == SQLResultState.done) {
-//           return PlutoGrid(
-//             columns: result!.columns!,
-//             rows: result.rows!,
-//           );
-//         } else if (result?.state == SQLResultState.error) {
-//           return Container(
-//               decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-//               child: Text('${result!.error}'));
-//         } else {
-//           return Container(
-//               decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-//               child: const Center(
-//                 child: SizedBox(
-//                   height: 40,
-//                   width: 40,
-//                   child: CircularProgressIndicator(),
-//                 ),
-//               ));
-//         }
-//       },
-//     );
-//   }
-// }

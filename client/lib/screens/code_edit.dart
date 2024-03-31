@@ -36,7 +36,6 @@ class _CodeEditorState extends State<CodeEditor> {
     return LayoutBuilder(builder: (ctx, c) {
       Widget codeField = Expanded(
           child: Container(
-        decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
         child: CodeTheme(
           data: const CodeThemeData(styles: a11yLightTheme),
           child: CodeField(
@@ -51,24 +50,24 @@ class _CodeEditorState extends State<CodeEditor> {
         constraints: const BoxConstraints(maxHeight: 40),
         decoration: const BoxDecoration(
             border: Border(
-                right: BorderSide(color: Colors.grey),
-                left: BorderSide(color: Colors.grey),
+                top: BorderSide(color: Colors.grey),
                 bottom: BorderSide(color: Colors.grey))),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            // crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IconButton(
-                  alignment: Alignment.topLeft,
-                  onPressed: () {
-                    final query = _codeController?.text.toString();
-                    if (query != null) {
-                      context.read<SessionModel>().query(query);
-                    }
-                  },
-                  icon: const Icon(Icons.play_arrow_rounded,
-                      size: 36, color: Colors.green))
-            ]),
+        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Consumer<SessionModel>(builder: (context, sessionModel, _) {
+            return IconButton(
+                alignment: Alignment.topLeft,
+                onPressed: sessionModel.state == SQLExecuteState.executing
+                    ? null
+                    : () {
+                        final query = _codeController?.text.toString();
+                        if (query != null) {
+                          context.read<SessionModel>().query(query);
+                        }
+                      },
+                icon: Icon(Icons.play_arrow_rounded,
+                    size: 36, color: sessionModel.state == SQLExecuteState.executing? Colors.grey: Colors.green));
+          })
+        ]),
       );
 
       if (c.maxHeight <= 40) {

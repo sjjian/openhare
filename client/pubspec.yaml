@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.1
-  pluto_grid: ^7.0.2
+  pluto_grid: ^8.0.0
   code_text_field: ^1.1.0
   window_manager: ^0.3.7
 
