@@ -3,15 +3,30 @@ import 'package:mysql_client/mysql_client.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
 enum SQLExecuteState { executing, done, error }
+enum SQLConnectState {connecting, connected, failed}
+
+class ConnMetaModel {
+  String host;
+  int port;
+  String user;
+  String password;
+
+  ConnMetaModel(this.host, this.port, this.user, this.password);
+}
 
 class SessionModel with ChangeNotifier {
-  SQLExecuteState state = SQLExecuteState.executing;
+  MySQLConnection? conn;
+  SQLConnectState? connState;
+
+  SQLExecuteState? state;
 
   List<SQLResultModel> results = [];
 
   SQLResultModel? currentResult;
 
   SessionModel();
+
+  void connect() {}
 
   void deleteResultByIndex(int index) {
     final result = results.removeAt(index);
@@ -124,11 +139,3 @@ class SQLResultModel with ChangeNotifier {
   }
 }
 
-class ConnMetaModel {
-  String host;
-  int port;
-  String user;
-  String password;
-
-  ConnMetaModel(this.host, this.port, this.user, this.password);
-}

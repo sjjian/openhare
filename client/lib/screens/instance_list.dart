@@ -65,11 +65,14 @@ class _InstanceInfoState extends State<InstanceInfo> {
           // borderRadius: BorderRadius.circular(10),
         ),
         child: ListTile(
+          dense: true,
           titleAlignment: ListTileTitleAlignment.center,
           title: const Text("test1", overflow: TextOverflow.ellipsis),
           subtitle:
               const Text("10.186.62.16:3306", overflow: TextOverflow.ellipsis),
           leading: Image.asset("assets/icons/mysql_icon.png"),
+          trailing: Icon(Icons.more_vert_outlined),
+          contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
         ));
   }
 }

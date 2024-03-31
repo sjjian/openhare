@@ -36,16 +36,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final page = Provider.of<PageNotifier>(context);
     return Scaffold(
-        // backgroundColor: Theme.of(context).colorScheme.background,
         backgroundColor: Color.fromARGB(255, 243, 242, 242),
         body: Row(
           children: <Widget>[
             const LeftNavigation(),
-            // const VerticalDivider(
-            //   width: 1.0,
-            //   // thickness: 0.5,
-            //   color: Colors.grey,
-            // ),
             const SizedBox(width: 3),
             Expanded(
                 child: Column(
