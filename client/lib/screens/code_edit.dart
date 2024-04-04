@@ -1,4 +1,4 @@
-import 'package:client/models/connection.dart';
+import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:highlight/languages/sql.dart';
@@ -9,7 +9,7 @@ class CodeEditor extends StatefulWidget {
   const CodeEditor({super.key});
 
   @override
-  _CodeEditorState createState() => _CodeEditorState();
+  State<CodeEditor> createState() => _CodeEditorState();
 }
 
 class _CodeEditorState extends State<CodeEditor> {
@@ -18,7 +18,7 @@ class _CodeEditorState extends State<CodeEditor> {
   @override
   void initState() {
     super.initState();
-    const source = "select * from db1.t1;";
+    const source = "select * from db1.t12;";
     _codeController = CodeController(
       text: source,
       language: sql,
@@ -53,19 +53,20 @@ class _CodeEditorState extends State<CodeEditor> {
                 top: BorderSide(color: Colors.grey),
                 bottom: BorderSide(color: Colors.grey))),
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          Consumer<SessionModel>(builder: (context, sessionModel, _) {
+          Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+            final canQuery = sessionProvider.canQuery();
             return IconButton(
                 alignment: Alignment.topLeft,
-                onPressed: sessionModel.state == SQLExecuteState.executing
-                    ? null
-                    : () {
+                onPressed: canQuery
+                    ? () {
                         final query = _codeController?.text.toString();
                         if (query != null) {
-                          context.read<SessionModel>().query(query);
+                          sessionProvider.query(query);
                         }
-                      },
+                      }
+                    : null,
                 icon: Icon(Icons.play_arrow_rounded,
-                    size: 36, color: sessionModel.state == SQLExecuteState.executing? Colors.grey: Colors.green));
+                    size: 36, color: canQuery ? Colors.green : Colors.grey));
           })
         ]),
       );

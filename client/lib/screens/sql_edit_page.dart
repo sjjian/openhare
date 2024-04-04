@@ -1,6 +1,7 @@
-import 'package:client/models/connection.dart';
+import 'package:client/models/sessions.dart';
+import 'package:client/providers/sessions.dart';
 import 'package:client/screens/code_edit.dart';
-import 'package:client/screens/instance_list.dart';
+import 'package:client/screens/session_tile.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:client/widgets/sql_result_table.dart';
 import 'package:flutter/material.dart';
@@ -17,21 +18,25 @@ class SQLEditPage extends StatefulWidget {
 class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      SplitView(
-          controller: MultiSplitViewController(areas: [Area(size: 200)]),
-          children: [
-            const Column(
+    final sessions = SessionsModel();
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => SessionProvider(sessions)),
+          ChangeNotifierProvider(create: (_) => SessionTileProvider(sessions)),
+        ],
+        child: Row(children: [
+          SplitView(
+              controller: MultiSplitViewController(areas: [Area(size: 200)]),
               children: [
-                SizedBox(
-                  height: 30,
+                const Column(
+                  children: [
+                    SizedBox(
+                      height: 30,
+                    ),
+                    SessionTileList(),
+                  ],
                 ),
-                InstanceList()
-              ],
-            ),
-            ChangeNotifierProvider(
-                create: (_) => SessionModel(),
-                child: Column(
+                Column(
                   children: [
                     const SizedBox(height: 30),
                     Expanded(
@@ -50,10 +55,10 @@ class _SQLEditPageState extends State<SQLEditPage> {
                     ),
                     const SizedBox(height: 30)
                   ],
-                ))
-          ]),
-      const SizedBox(width: 5),
-    ]);
+                )
+              ]),
+          const SizedBox(width: 5),
+        ]));
   }
 }
 
@@ -61,59 +66,66 @@ class SqlResultTables extends StatefulWidget {
   const SqlResultTables({Key? key}) : super(key: key);
 
   @override
-  _SqlResultTablesState createState() => _SqlResultTablesState();
+  State<SqlResultTables> createState() => _SqlResultTablesState();
 }
 
 class _SqlResultTablesState extends State<SqlResultTables> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<SessionModel>(builder: (context, sessionModel, _) {
-      return Column(
-        children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            constraints: const BoxConstraints(maxHeight: 40),
-            decoration: const BoxDecoration(
-                border: Border(
-                    top: BorderSide(color: Colors.grey),
-                    bottom: BorderSide(color: Colors.grey))),
-            child: ReorderableListView(
-                buildDefaultDragHandles: false,
-                scrollDirection: Axis.horizontal,
-                onReorder: (oldIndex, newIndex) {
-                  sessionModel.reorderResult(oldIndex, newIndex);
-                },
-                children: sessionModel.results.map((result) {
-                  final index = sessionModel.results.indexOf(result);
-                  return ReorderableDragStartListener(
-                      index: index,
-                      key: ValueKey(index),
-                      child: RawChip(
-                        backgroundColor: Colors.grey.withOpacity(0.3),
-                        selectedColor: Colors.white,
-                        selected: result == sessionModel.currentResult,
-                        avatar: const Icon(
-                          Icons.grid_on,
-                          color: Colors.black,
-                        ),
-                        label: Text("${result.id + 1}"),
-                        deleteIcon: const Icon(
-                          Icons.close,
-                          size: 16,
-                        ),
-                        onDeleted: () {
-                          sessionModel.deleteResultByIndex(index);
-                        },
-                        onPressed: () {
-                          sessionModel.selectResultByIndex(index);
-                        },
-                      ));
-                }).toList()),
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.centerLeft,
+          constraints: const BoxConstraints(maxHeight: 40),
+          decoration: const BoxDecoration(
+              border: Border(
+                  top: BorderSide(color: Colors.grey),
+                  bottom: BorderSide(color: Colors.grey))),
+          child: Consumer<SessionProvider>(
+            builder: (context, sessionProvider, _) {
+              final results = sessionProvider.getAllSQLResult();
+              final currentResult = sessionProvider.getCurrentSQLResult();
+              if (results == null) {
+                return const Spacer();
+              }
+              return ReorderableListView(
+                  buildDefaultDragHandles: false,
+                  scrollDirection: Axis.horizontal,
+                  onReorder: (oldIndex, newIndex) {
+                    sessionProvider.reorderSQLResult(oldIndex, newIndex);
+                  },
+                  children: results.map((result) {
+                    final index = results.indexOf(result);
+                    return ReorderableDragStartListener(
+                        index: index,
+                        key: ValueKey(index),
+                        child: RawChip(
+                          backgroundColor: Colors.grey.withOpacity(0.3),
+                          selectedColor: Colors.white,
+                          selected: result == currentResult,
+                          avatar: const Icon(
+                            Icons.grid_on,
+                            color: Colors.black,
+                          ),
+                          label: Text("${result.id + 1}"),
+                          deleteIcon: const Icon(
+                            Icons.close,
+                            size: 16,
+                          ),
+                          onDeleted: () {
+                            sessionProvider.deleteSQLResultByIndex(index);
+                          },
+                          onPressed: () {
+                            sessionProvider.selectSQLResultByIndex(index);
+                          },
+                        ));
+                  }).toList());
+            },
           ),
-          Expanded(
-              child: SqlResultTable(result: sessionModel.getCurrentSQLResult()))
-        ],
-      );
-    });
+        ),
+        const Expanded(child: SqlResultTable())
+      ],
+    );
+    ;
   }
 }

@@ -14,7 +14,7 @@ class SplitView extends StatefulWidget {
   final MultiSplitViewController? controller;
 
   @override
-  _SplitViewState createState() => _SplitViewState();
+  State<SplitView> createState() => _SplitViewState();
 }
 
 class _SplitViewState extends State<SplitView> {
