@@ -1,5 +1,6 @@
 import 'package:client/models/connection.dart';
 import 'package:client/models/sql_result.dart';
+import 'package:client/utils/reorder_list.dart';
 
 class SessionsModel {
   SessionModel? current;
@@ -30,55 +31,55 @@ class SessionModel {
 
   SQLExecuteState? state;
 
-  List<SQLResultModel> results = [];
+  ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 
-  SQLResultModel? currentResult;
+  // SQLResultModel? currentResult;
 
   SessionModel(this.id, this.conn);
 
-  void deleteResultByIndex(int index) {
-    final result = results.removeAt(index);
+  // void deleteResultByIndex(int index) {
+  //   final result = results.removeAt(index);
 
-    // 如果删除了选中的result，则默认选中前一个
-    if (currentResult == result) {
-      if (results.isEmpty) {
-        currentResult = null;
-      } else {
-        currentResult = index > 0 ? results[index - 1] : null;
-      }
-    }
-  }
+  //   // 如果删除了选中的result，则默认选中前一个
+  //   if (currentResult == result) {
+  //     if (results.isEmpty) {
+  //       currentResult = null;
+  //     } else {
+  //       currentResult = index > 0 ? results[index - 1] : null;
+  //     }
+  //   }
+  // }
 
-  void selectResultByIndex(int index) {
-    final result = results[index];
-    currentResult = result;
-  }
+  // void selectResultByIndex(int index) {
+  //   final result = results[index];
+  //   currentResult = result;
+  // }
 
-  void reorderResult(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      // removing the item at oldIndex will shorten the list by 1.
-      newIndex -= 1;
-    }
-    final SQLResultModel element = results.removeAt(oldIndex);
-    results.insert(newIndex, element);
-  }
+  // void reorderResult(int oldIndex, int newIndex) {
+  //   if (oldIndex < newIndex) {
+  //     // removing the item at oldIndex will shorten the list by 1.
+  //     newIndex -= 1;
+  //   }
+  //   final SQLResultModel element = results.removeAt(oldIndex);
+  //   results.insert(newIndex, element);
+  // }
 
-  SQLResultModel? getCurrentSQLResult() {
-    return currentResult;
-  }
+  // SQLResultModel? getCurrentSQLResult() {
+  //   return currentResult;
+  // }
 
   int genSQLResultId() {
-    return results.isEmpty
+    return sqlResults.isEmpty
         ? 0
-        : results.fold(
+        : sqlResults.fold(
                 0,
                 (previousId, element) =>
                     previousId < element.id ? element.id : previousId) +
             1;
   }
 
-  void addSQLResult(SQLResultModel result) {
-    results.add(result);
-    currentResult = result;
-  }
+  // void addSQLResult(SQLResultModel result) {
+  //   results.add(result);
+  //   currentResult = result;
+  // }
 }

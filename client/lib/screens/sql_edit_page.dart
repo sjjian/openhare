@@ -19,10 +19,13 @@ class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
     final sessions = SessionsModel();
+    final sessionProvider = SessionProvider(sessions.current);
+    final sessionTileProvider = SessionTileProvider(sessionProvider, sessions);
+
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => SessionProvider(sessions)),
-          ChangeNotifierProvider(create: (_) => SessionTileProvider(sessions)),
+          ChangeNotifierProvider.value(value: sessionProvider),
+          ChangeNotifierProvider.value(value: sessionTileProvider),
         ],
         child: Row(children: [
           SplitView(

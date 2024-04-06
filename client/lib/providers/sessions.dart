@@ -7,17 +7,20 @@ import 'package:mysql_client/mysql_client.dart';
 
 class InitializedProvider with ChangeNotifier {}
 
-class SessionTileProvider with ChangeNotifier {
+class SessionTileProvider with ChangeNotifier {   SessionProvider sessionProvider;
   SessionsModel sessions;
 
-  SessionTileProvider(this.sessions);
+  SessionTileProvider(this.sessionProvider, this.sessions);
 
   Future<void> connect(int sessionId) async {
     // todo
     for (final session in sessions.data) {
-     if (session.id == sessionId) {
+      if (session.id == sessionId) {
         await session.conn.connect();
         notifyListeners();
+        if (session == sessionProvider._session) {
+          sessionProvider.update(session);
+        }
         return;
       }
     }
@@ -26,9 +29,12 @@ class SessionTileProvider with ChangeNotifier {
   Future<void> close(int sessionId) async {
     // todo
     for (final session in sessions.data) {
-     if (session.id == sessionId) {
+      if (session.id == sessionId) {
         await session.conn.close();
         notifyListeners();
+        if (session == sessionProvider._session) {
+          sessionProvider.update(session);
+        }
         return;
       }
     }
@@ -36,72 +42,76 @@ class SessionTileProvider with ChangeNotifier {
 }
 
 class SessionProvider with ChangeNotifier {
-  final SessionsModel _sessions;
+  SessionModel? _session;
 
-  SessionProvider(this._sessions);
+  SessionProvider(this._session);
+
+  void update(SessionModel session) {
+    _session = session;
+    notifyListeners();
+  }
 
   void deleteSQLResultByIndex(int index) {
-    if (_sessions.current == null) {
+    if (_session == null) {
       return;
     }
-    _sessions.current!.deleteResultByIndex(index);
+    _session!.sqlResults.removeAt(index);
     notifyListeners();
   }
 
   void selectSQLResultByIndex(int index) {
-    if (_sessions.current == null) {
+    if (_session == null) {
       return;
     }
-    _sessions.current!.selectResultByIndex(index);
+    _session!.sqlResults.select(index);
     notifyListeners();
   }
 
   void reorderSQLResult(int oldIndex, int newIndex) {
-    if (_sessions.current == null) {
+    if (_session == null) {
       return;
     }
-    _sessions.current!.reorderResult(oldIndex, newIndex);
+    _session!.sqlResults.reorder(oldIndex, newIndex);
     notifyListeners();
   }
 
   SQLResultModel? getCurrentSQLResult() {
-    if (_sessions.current == null) {
+    if (_session == null) {
       return null;
     }
-    return _sessions.current!.getCurrentSQLResult();
+    return _session!.sqlResults.selected();
   }
 
   List<SQLResultModel>? getAllSQLResult() {
-    if (_sessions.current == null) {
+    if (_session == null) {
       return null;
     }
-    return _sessions.current!.results;
+    return _session!.sqlResults;
   }
 
   bool canQuery() {
-    if (_sessions.current == null) {
+    if (_session == null) {
       return false;
     }
-    return (_sessions.current!.state != SQLExecuteState.executing &&
-        _sessions.current!.conn.state == SQLConnectState.connected);
+    return (_session!.state != SQLExecuteState.executing &&
+        _session!.conn.state == SQLConnectState.connected);
   }
 
   Future<void> query(String query) async {
-    if (_sessions.current == null) {
+    if (_session == null) {
       return;
     }
-    final current = _sessions.current!;
-    if (current.conn.state != SQLConnectState.connected) {
+    if (_session!.conn.state != SQLConnectState.connected) {
       return;
     }
 
-    final result = SQLResultModel(current.genSQLResultId(), query);
-    current.addSQLResult(result);
-    current.state = SQLExecuteState.executing;
+    final result = SQLResultModel(_session!.genSQLResultId(), query);
+    _session!.sqlResults.add(result);
+    _session!.state = SQLExecuteState.executing;
     notifyListeners();
 
     try {
-      IResultSet resultSet = await current.conn.conn!.execute(query);
+      IResultSet resultSet = await _session!.conn.conn!.execute(query);
 
       List<PlutoColumn> columns = List.empty(growable: true);
       for (final column in resultSet.cols) {
@@ -121,10 +131,10 @@ class SessionProvider with ChangeNotifier {
         }
       }
       result.setDone(columns, rows);
-      current.state = SQLExecuteState.done;
+      _session!.state = SQLExecuteState.done;
     } catch (e) {
       result.setError(e);
-      current.state = SQLExecuteState.error;
+      _session!.state = SQLExecuteState.error;
     } finally {
       notifyListeners();
     }
