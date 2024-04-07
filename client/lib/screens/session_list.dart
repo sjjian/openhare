@@ -4,41 +4,66 @@ import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SessionTileList extends StatefulWidget {
-  const SessionTileList({Key? key}) : super(key: key);
+class SessionList extends StatefulWidget {
+  const SessionList({Key? key}) : super(key: key);
 
   @override
-  State<SessionTileList> createState() => _SessionTileListState();
+  State<SessionList> createState() => _SessionListState();
 }
 
-class _SessionTileListState extends State<SessionTileList> {
+class _SessionListState extends State<SessionList> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Consumer<SessionTileProvider>(
-          builder: (context, sessionTileProvider, _) {
+      child: Consumer<SessionListProvider>(
+          builder: (context, sessionListProvider, _) {
         return ListView(
-            padding: const EdgeInsets.only(right: 10, left: 5),
-            children: sessionTileProvider.sessions.data.map((session) {
-              return SessionTile(
-                session: session,
-              );
-            }).toList());
+          padding: const EdgeInsets.only(right: 10, left: 5),
+          children: [
+            for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
+              SessionTile(
+                index: i,
+                selected: sessionListProvider.sessions.data
+                    .isSelected(sessionListProvider.sessions.data[i]),
+                session: sessionListProvider.sessions.data[i],
+              )
+          ],
+        );
       }),
     );
   }
 }
 
 class SessionTile extends StatefulWidget {
+  final int index;
+  final bool selected;
   final SessionModel session; // todo
 
-  const SessionTile({Key? key, required this.session}) : super(key: key);
+  const SessionTile(
+      {Key? key,
+      required this.index,
+      required this.selected,
+      required this.session})
+      : super(key: key);
 
   @override
   State<SessionTile> createState() => _SessionTileState();
 }
 
 class _SessionTileState extends State<SessionTile> {
+  Color getTrailingColor() {
+    switch (widget.session.conn.state) {
+      case SQLConnectState.connected:
+        return Colors.green;
+      case SQLConnectState.connecting:
+        return Colors.yellow;
+      case SQLConnectState.failed:
+        return Colors.red;
+      default:
+        return Colors.black;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -47,7 +72,9 @@ class _SessionTileState extends State<SessionTile> {
             color: Colors.grey.withOpacity(0.2), //边框颜色
             width: 1, //边框宽度
           ), // 边色与边宽度
-          color: Colors.white, // 底色
+          color: widget.selected
+              ? Colors.grey.withOpacity(0.2)
+              : Colors.white, // 底色
           boxShadow: [
             BoxShadow(
               blurRadius: 1, //阴影范围
@@ -58,10 +85,14 @@ class _SessionTileState extends State<SessionTile> {
           // borderRadius: BorderRadius.circular(10),
         ),
         child: InkWell(
-          hoverColor: Colors.blue,
-          onTap: () {
-            print(1);
-          },
+          hoverColor: Colors.grey.withOpacity(0.1),
+          onTap: widget.selected
+              ? null
+              : () {
+                  context
+                      .read<SessionListProvider>()
+                      .selectSessionByIndex(widget.index);
+                },
           child: ListTile(
             dense: true,
             titleAlignment: ListTileTitleAlignment.center,
@@ -76,10 +107,10 @@ class _SessionTileState extends State<SessionTile> {
               onSelected: (value) {
                 if (value == "a") {
                   context
-                      .read<SessionTileProvider>()
+                      .read<SessionListProvider>()
                       .connect(widget.session.id);
                 } else if (value == "b") {
-                  context.read<SessionTileProvider>().close(widget.session.id);
+                  context.read<SessionListProvider>().close(widget.session.id);
                 }
               },
               itemBuilder: (context) => <PopupMenuEntry>[
@@ -103,9 +134,7 @@ class _SessionTileState extends State<SessionTile> {
               ],
               child: Icon(
                 Icons.more_vert_outlined,
-                color: widget.session.conn.state == SQLConnectState.connected
-                    ? Colors.green
-                    : Colors.black,
+                color: getTrailingColor(),
               ),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 6.0),

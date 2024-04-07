@@ -1,16 +1,18 @@
 import 'package:client/models/connection.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
+import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:mysql_client/mysql_client.dart';
 
 class InitializedProvider with ChangeNotifier {}
 
-class SessionTileProvider with ChangeNotifier {   SessionProvider sessionProvider;
-  SessionsModel sessions;
+class SessionListProvider with ChangeNotifier {
+  SessionProvider sessionProvider;
+  final SessionsModel sessions;
 
-  SessionTileProvider(this.sessionProvider, this.sessions);
+  SessionListProvider(this.sessionProvider, this.sessions);
 
   Future<void> connect(int sessionId) async {
     // todo
@@ -39,6 +41,13 @@ class SessionTileProvider with ChangeNotifier {   SessionProvider sessionProvide
       }
     }
   }
+
+  void selectSessionByIndex(int index) {
+    if (sessions.data.select(index)) {
+      notifyListeners();
+      sessionProvider.update(sessions.data.selected());
+    }
+  }
 }
 
 class SessionProvider with ChangeNotifier {
@@ -46,7 +55,7 @@ class SessionProvider with ChangeNotifier {
 
   SessionProvider(this._session);
 
-  void update(SessionModel session) {
+  void update(SessionModel? session) {
     _session = session;
     notifyListeners();
   }
@@ -139,4 +148,6 @@ class SessionProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  CodeController getSQLEditCode() => _session!.code;
 }

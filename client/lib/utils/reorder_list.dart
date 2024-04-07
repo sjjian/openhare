@@ -27,7 +27,7 @@ class ReorderSelectedList<E> extends DelegatingList<E> {
   @override
   E removeAt(int index) {
     final element = _data.removeAt(index);
-        // 如果删除了选中的result，则默认选中前一个
+    // 如果删除了选中的result，则默认选中前一个
     if (_selected == element) {
       if (_data.isEmpty) {
         _selected = null;
@@ -38,9 +38,14 @@ class ReorderSelectedList<E> extends DelegatingList<E> {
     return element;
   }
 
-  void select(int index) {
+  bool select(int index) {
     final result = _data[index];
-    _selected = result;
+    if (_selected == result) {
+      return false;
+    } else {
+      _selected = result;
+      return true;
+    }
   }
 
   E? selected() {

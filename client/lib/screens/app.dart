@@ -1,6 +1,6 @@
 import 'package:client/screens/left_navigation.dart';
 import 'package:client/screens/settings.dart';
-import 'package:client/screens/sql_edit_page.dart';
+import 'package:client/screens/session.dart';
 import 'package:flutter/material.dart';
 import 'package:client/models/test.dart';
 import 'package:provider/provider.dart';

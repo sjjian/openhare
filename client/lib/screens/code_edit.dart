@@ -6,43 +6,25 @@ import 'package:flutter_highlight/themes/a11y-light.dart';
 import 'package:provider/provider.dart';
 
 class CodeEditor extends StatefulWidget {
-  const CodeEditor({super.key});
+  final CodeController codeController;
+
+  const CodeEditor({super.key, required this.codeController});
 
   @override
   State<CodeEditor> createState() => _CodeEditorState();
 }
 
 class _CodeEditorState extends State<CodeEditor> {
-  CodeController? _codeController;
-
-  @override
-  void initState() {
-    super.initState();
-    const source = "select * from db1.t12;";
-    _codeController = CodeController(
-      text: source,
-      language: sql,
-    );
-  }
-
-  @override
-  void dispose() {
-    _codeController?.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, c) {
       Widget codeField = Expanded(
-          child: Container(
-        child: CodeTheme(
-          data: const CodeThemeData(styles: a11yLightTheme),
-          child: CodeField(
-            expands: true,
-            controller: _codeController!,
-            textStyle: const TextStyle(fontFamily: 'SourceCode'),
-          ),
+          child: CodeTheme(
+        data: const CodeThemeData(styles: a11yLightTheme),
+        child: CodeField(
+          expands: true,
+          controller: widget.codeController,
+          textStyle: const TextStyle(fontFamily: 'SourceCode'),
         ),
       ));
 
@@ -59,8 +41,8 @@ class _CodeEditorState extends State<CodeEditor> {
                 alignment: Alignment.topLeft,
                 onPressed: canQuery
                     ? () {
-                        final query = _codeController?.text.toString();
-                        if (query != null) {
+                        final query = widget.codeController.text.toString();
+                        if (query.isNotEmpty) {
                           sessionProvider.query(query);
                         }
                       }

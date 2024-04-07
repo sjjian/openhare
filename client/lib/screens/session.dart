@@ -1,7 +1,7 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/code_edit.dart';
-import 'package:client/screens/session_tile.dart';
+import 'package:client/screens/session_list.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:client/widgets/sql_result_table.dart';
 import 'package:flutter/material.dart';
@@ -19,13 +19,13 @@ class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
     final sessions = SessionsModel();
-    final sessionProvider = SessionProvider(sessions.current);
-    final sessionTileProvider = SessionTileProvider(sessionProvider, sessions);
+    final sessionProvider = SessionProvider(sessions.data.selected());
+    final sessionListProvider = SessionListProvider(sessionProvider, sessions);
 
     return MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: sessionProvider),
-          ChangeNotifierProvider.value(value: sessionTileProvider),
+          ChangeNotifierProvider.value(value: sessionListProvider),
         ],
         child: Row(children: [
           SplitView(
@@ -36,7 +36,7 @@ class _SQLEditPageState extends State<SQLEditPage> {
                     SizedBox(
                       height: 30,
                     ),
-                    SessionTileList(),
+                    SessionList(),
                   ],
                 ),
                 Column(
@@ -47,11 +47,18 @@ class _SQLEditPageState extends State<SQLEditPage> {
                           alignment: Alignment.topLeft,
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey)),
-                          child: const Column(
+                          child: Column(
                             children: [
                               SplitView(axis: Axis.vertical, children: [
-                                CodeEditor(),
-                                Expanded(child: SqlResultTables()),
+                                Consumer<SessionProvider>(
+                                  builder: (context, sessionProvider, _) {
+                                    return CodeEditor(
+                                        key: UniqueKey(),
+                                        codeController:
+                                            sessionProvider.getSQLEditCode());
+                                  },
+                                ),
+                                const Expanded(child: SqlResultTables()),
                               ]),
                             ],
                           )),
@@ -97,32 +104,32 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                   onReorder: (oldIndex, newIndex) {
                     sessionProvider.reorderSQLResult(oldIndex, newIndex);
                   },
-                  children: results.map((result) {
-                    final index = results.indexOf(result);
-                    return ReorderableDragStartListener(
-                        index: index,
-                        key: ValueKey(index),
-                        child: RawChip(
-                          backgroundColor: Colors.grey.withOpacity(0.3),
-                          selectedColor: Colors.white,
-                          selected: result == currentResult,
-                          avatar: const Icon(
-                            Icons.grid_on,
-                            color: Colors.black,
-                          ),
-                          label: Text("${result.id + 1}"),
-                          deleteIcon: const Icon(
-                            Icons.close,
-                            size: 16,
-                          ),
-                          onDeleted: () {
-                            sessionProvider.deleteSQLResultByIndex(index);
-                          },
-                          onPressed: () {
-                            sessionProvider.selectSQLResultByIndex(index);
-                          },
-                        ));
-                  }).toList());
+                  children: [
+                    for (var i = 0; i < results.length; i++)
+                      ReorderableDragStartListener(
+                          index: i,
+                          key: ValueKey(i),
+                          child: RawChip(
+                            backgroundColor: Colors.grey.withOpacity(0.3),
+                            selectedColor: Colors.white,
+                            selected: results[i] == currentResult,
+                            avatar: const Icon(
+                              Icons.grid_on,
+                              color: Colors.black,
+                            ),
+                            label: Text("${results[i].id + 1}"),
+                            deleteIcon: const Icon(
+                              Icons.close,
+                              size: 16,
+                            ),
+                            onDeleted: () {
+                              sessionProvider.deleteSQLResultByIndex(i);
+                            },
+                            onPressed: () {
+                              sessionProvider.selectSQLResultByIndex(i);
+                            },
+                          ))
+                  ]);
             },
           ),
         ),
