@@ -18,6 +18,7 @@ class SQLEditPage extends StatefulWidget {
 class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
+    print("sql edit page");
     final sessions = SessionsModel();
     final sessionProvider = SessionProvider(sessions.data.selected());
     final sessionListProvider = SessionListProvider(sessionProvider, sessions);

@@ -1,7 +1,7 @@
+import 'package:client/providers/pages.dart';
 import 'package:client/screens/app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'models/test.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -24,6 +24,5 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(ChangeNotifierProvider(
-      create: (_) => PageNotifier(), child: const FleaSQLApp()));
+  runApp(const FleaSQLApp());
 }
