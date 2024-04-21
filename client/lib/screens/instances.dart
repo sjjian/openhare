@@ -124,15 +124,18 @@ class _InstancesPageState extends State<InstancesPage> {
   }
 
   Future<void> addInstance(BuildContext context) {
+    // todo: 释放资源
     TextEditingController nameCtrl = TextEditingController();
     TextEditingController descCtrl = TextEditingController();
     TextEditingController addrCtrl = TextEditingController();
     TextEditingController portCtrl = TextEditingController(text: "3306");
     TextEditingController userCtrl = TextEditingController();
     TextEditingController passwordCtrl = TextEditingController();
+    final _formKey = GlobalKey<FormState>();
 
     return showDialog<void>(
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return Dialog(
               alignment: Alignment.center,
@@ -155,7 +158,9 @@ class _InstancesPageState extends State<InstancesPage> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      context.pop();
+                                    },
                                     icon: const Icon(Icons.close))
                               ],
                             ))
@@ -165,93 +170,114 @@ class _InstancesPageState extends State<InstancesPage> {
                       Container(
                         padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
                         child: Form(
+                            key: _formKey,
                             child: Column(
-                          children: [
-                            Container(
-                              constraints: const BoxConstraints(minHeight: 80),
-                              child: TextFormField(
-                                controller: nameCtrl,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(5)),
-                                    labelText: "名称",
-                                    contentPadding: const EdgeInsets.all(10)),
-                              ),
-                            ),
-                            Container(
-                              constraints: const BoxConstraints(minHeight: 90),
-                              child: TextFormField(
-                                controller: descCtrl,
-                                maxLength: 50,
-                                maxLines: 2,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(5)),
-                                    labelText: "描述",
-                                    contentPadding: const EdgeInsets.all(10)),
-                              ),
-                            ),
-                            Container(
-                              constraints: const BoxConstraints(minHeight: 80),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: addrCtrl,
-                                      decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          labelText: "地址",
-                                          contentPadding:
-                                              const EdgeInsets.all(10)),
-                                    ),
+                              children: [
+                                Container(
+                                  constraints:
+                                      const BoxConstraints(minHeight: 80),
+                                  child: TextFormField(
+                                    controller: nameCtrl,
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        labelText: "名称",
+                                        contentPadding:
+                                            const EdgeInsets.all(10)),
                                   ),
-                                  const SizedBox(
-                                    width: 5,
+                                ),
+                                Container(
+                                  constraints:
+                                      const BoxConstraints(minHeight: 90),
+                                  child: TextFormField(
+                                    controller: descCtrl,
+                                    maxLength: 50,
+                                    maxLines: 2,
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        labelText: "描述",
+                                        contentPadding:
+                                            const EdgeInsets.all(10)),
                                   ),
-                                  Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 120),
-                                    child: TextFormField(
-                                      controller: portCtrl,
-                                      decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          labelText: "端口",
-                                          contentPadding:
-                                              const EdgeInsets.all(10)),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Container(
-                              constraints: const BoxConstraints(minHeight: 80),
-                              child: TextFormField(
-                                controller: userCtrl,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(5)),
-                                    labelText: "帐号",
-                                    contentPadding: const EdgeInsets.all(10)),
-                              ),
-                            ),
-                            Container(
-                              constraints: const BoxConstraints(minHeight: 80),
-                              child: TextFormField(
-                                controller: passwordCtrl,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(5)),
-                                    labelText: "密码",
-                                    contentPadding: const EdgeInsets.all(10)),
-                              ),
-                            ),
-                          ],
-                        )),
+                                ),
+                                Container(
+                                  constraints:
+                                      const BoxConstraints(minHeight: 80),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: addrCtrl,
+                                          decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              labelText: "地址",
+                                              contentPadding:
+                                                  const EdgeInsets.all(10)),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Container(
+                                        constraints:
+                                            const BoxConstraints(maxWidth: 120),
+                                        child: TextFormField(
+                                          controller: portCtrl,
+                                          decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              labelText: "端口",
+                                              contentPadding:
+                                                  const EdgeInsets.all(10)),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  constraints:
+                                      const BoxConstraints(minHeight: 80),
+                                  child: TextFormField(
+                                    controller: userCtrl,
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        labelText: "帐号",
+                                        contentPadding:
+                                            const EdgeInsets.all(10)),
+                                  ),
+                                ),
+                                Container(
+                                  constraints:
+                                      const BoxConstraints(minHeight: 80),
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "密码不能为空";
+                                      }
+                                      return null;
+                                    },
+                                    controller: passwordCtrl,
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        labelText: "密码",
+                                        contentPadding:
+                                            const EdgeInsets.all(10)),
+                                  ),
+                                ),
+                              ],
+                            )),
                       ),
                       Expanded(
                           child: Column(
@@ -265,16 +291,18 @@ class _InstancesPageState extends State<InstancesPage> {
                               children: [
                                 TextButton(
                                     onPressed: () {
-                                      context
-                                          .read<InstancesProvider>()
-                                          .addInstance(InstanceModel(
-                                              name: nameCtrl.text,
-                                              addr: nameCtrl.text,
-                                              port: 3306,
-                                              user: nameCtrl.text,
-                                              password: nameCtrl.text));
+                                      if (_formKey.currentState!.validate()) {
+                                        context
+                                            .read<InstancesProvider>()
+                                            .addInstance(InstanceModel(
+                                                name: nameCtrl.text,
+                                                addr: nameCtrl.text,
+                                                port: 3306,
+                                                user: nameCtrl.text,
+                                                password: nameCtrl.text));
 
-                                      context.pop();
+                                        context.pop();
+                                      }
                                     },
                                     child: const Text("提交"))
                               ],
