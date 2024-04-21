@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:provider/provider.dart';
 
+final multiSplitViewCtrl1 = MultiSplitViewController(areas: [Area(size: 200)]);
+final multiSplitViewCtrl2 = MultiSplitViewController();
+
 class SQLEditPage extends StatefulWidget {
   const SQLEditPage({super.key});
 
@@ -18,58 +21,49 @@ class SQLEditPage extends StatefulWidget {
 class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
-    print("sql edit page");
-    final sessions = SessionsModel();
-    final sessionProvider = SessionProvider(sessions.data.selected());
-    final sessionListProvider = SessionListProvider(sessionProvider, sessions);
-
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: sessionProvider),
-          ChangeNotifierProvider.value(value: sessionListProvider),
-        ],
-        child: Row(children: [
-          SplitView(
-              controller: MultiSplitViewController(areas: [Area(size: 200)]),
-              children: [
-                const Column(
-                  children: [
-                    SizedBox(
-                      height: 30,
-                    ),
-                    SessionList(),
-                  ],
-                ),
-                Column(
-                  children: [
-                    const SizedBox(height: 30),
-                    Expanded(
-                      child: Container(
-                          alignment: Alignment.topLeft,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey)),
-                          child: Column(
-                            children: [
-                              SplitView(axis: Axis.vertical, children: [
-                                Consumer<SessionProvider>(
-                                  builder: (context, sessionProvider, _) {
-                                    return CodeEditor(
-                                        key: UniqueKey(),
-                                        codeController:
-                                            sessionProvider.getSQLEditCode());
-                                  },
-                                ),
-                                const Expanded(child: SqlResultTables()),
-                              ]),
-                            ],
-                          )),
-                    ),
-                    const SizedBox(height: 30)
-                  ],
-                )
-              ]),
-          const SizedBox(width: 5),
-        ]));
+    return Row(children: [
+      SplitView(controller: multiSplitViewCtrl1, children: [
+        const Column(
+          children: [
+            SizedBox(
+              height: 30,
+            ),
+            SessionList(),
+          ],
+        ),
+        Column(
+          children: [
+            const SizedBox(height: 30),
+            Expanded(
+              child: Container(
+                  alignment: Alignment.topLeft,
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.grey)),
+                  child: Column(
+                    children: [
+                      SplitView(
+                          controller: multiSplitViewCtrl2,
+                          axis: Axis.vertical,
+                          children: [
+                            Consumer<SessionProvider>(
+                              builder: (context, sessionProvider, _) {
+                                return CodeEditor(
+                                    key: UniqueKey(),
+                                    codeController:
+                                        sessionProvider.getSQLEditCode());
+                              },
+                            ),
+                            const Expanded(child: SqlResultTables()),
+                          ]),
+                    ],
+                  )),
+            ),
+            const SizedBox(height: 30)
+          ],
+        )
+      ]),
+      const SizedBox(width: 5),
+    ]);
   }
 }
 

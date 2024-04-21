@@ -1,8 +1,13 @@
+import 'package:client/models/sessions.dart';
+import 'package:client/providers/instances.dart';
+import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances.dart';
+import 'package:client/screens/session_list.dart';
 import 'package:client/screens/settings.dart';
 import 'package:client/screens/session.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -36,18 +41,10 @@ class _FleaSQLAppState extends State<FleaSQLApp> {
                     const NoTransitionPage<void>(child: SQLEditPage()),
               ),
               GoRoute(
-                  path: '/instances',
-                  pageBuilder: (context, state) =>
-                      NoTransitionPage<void>(child: DataTablePage()),
-                  routes: [
-                    GoRoute(
-                      parentNavigatorKey: _shellNavigatorKey,
-                        path: "create",
-                        pageBuilder: (context, state) =>
-                            const NoTransitionPage<void>(
-                              child: CreateInstance(),
-                            ))
-                  ]),
+                path: '/instances',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage<void>(child: InstancesPage()),
+              ),
               GoRoute(
                 path: '/settings',
                 pageBuilder: (context, state) =>
@@ -58,14 +55,25 @@ class _FleaSQLAppState extends State<FleaSQLApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flea SQL',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+    final sessions = SessionsModel();
+    final sessionProvider = SessionProvider(sessions.data.selected());
+    final sessionListProvider = SessionListProvider(sessionProvider, sessions);
+    final instancesProvider = InstancesProvider();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: sessionProvider),
+        ChangeNotifierProvider.value(value: sessionListProvider),
+        ChangeNotifierProvider.value(value: instancesProvider)
+      ],
+      child: MaterialApp.router(
+        title: 'Flea SQL',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        routerConfig: _router,
+        debugShowCheckedModeBanner: false,
       ),
-      routerConfig: _router,
-      debugShowCheckedModeBanner: false,
     );
   }
 }
