@@ -65,7 +65,15 @@ class InstancesProvider extends ChangeNotifier {
 
   void addInstance(InstanceModel instance) {
     instancesModel.add(instance);
-    print(123);
     notifyListeners();
+  }
+
+  bool isInstanceExist(String name) {
+    for (var instance in instances) {
+      if (instance.name == name) {
+        return true;
+      }
+    }
+    return false;
   }
 }

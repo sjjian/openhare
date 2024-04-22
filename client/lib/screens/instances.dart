@@ -178,6 +178,19 @@ class _InstancesPageState extends State<InstancesPage> {
                                       const BoxConstraints(minHeight: 80),
                                   child: TextFormField(
                                     controller: nameCtrl,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "名称不能为空";
+                                      }
+                                      if (context
+                                          .read<InstancesProvider>()
+                                          .isInstanceExist(value)) {
+                                        return "名称已存在";
+                                      }
+                                      return null;
+                                    },
                                     decoration: InputDecoration(
                                         border: OutlineInputBorder(
                                             borderRadius:
@@ -260,6 +273,12 @@ class _InstancesPageState extends State<InstancesPage> {
                                   constraints:
                                       const BoxConstraints(minHeight: 80),
                                   child: TextFormField(
+                                    onChanged: (value) {
+                                      // if
+                                      print(value);
+                                    },
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return "密码不能为空";
@@ -296,10 +315,10 @@ class _InstancesPageState extends State<InstancesPage> {
                                             .read<InstancesProvider>()
                                             .addInstance(InstanceModel(
                                                 name: nameCtrl.text,
-                                                addr: nameCtrl.text,
+                                                addr: addrCtrl.text,
                                                 port: 3306,
-                                                user: nameCtrl.text,
-                                                password: nameCtrl.text));
+                                                user: userCtrl.text,
+                                                password: passwordCtrl.text));
 
                                         context.pop();
                                       }
