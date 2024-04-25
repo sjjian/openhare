@@ -5,6 +5,7 @@ import 'package:client/screens/instances.dart';
 import 'package:client/screens/session_list.dart';
 import 'package:client/screens/settings.dart';
 import 'package:client/screens/session.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -103,14 +104,31 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
             _onItemTapped(value, context);
           },
           extended: extended,
-          leading: GestureDetector(
-            onTap: () {
-              setState(() {
-                extended = !extended;
-              });
-            },
-            child:
-                extended ? const Icon(Icons.menu_open) : const Icon(Icons.menu),
+          leading: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    extended = !extended;
+                  });
+                },
+                child: extended
+                    ? const Icon(Icons.menu_open)
+                    : const Icon(Icons.menu),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              FloatingActionButton.small(
+                elevation: 2,
+                onPressed: () => print(1),
+                child: const Icon(Icons.add),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+            ],
           ),
           destinations: const [
             NavigationRailDestination(

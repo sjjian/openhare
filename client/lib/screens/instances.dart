@@ -17,8 +17,19 @@ class InstancesPage extends StatefulWidget {
 }
 
 class _InstancesPageState extends State<InstancesPage> {
+  Set<InstanceModel> selectedInstances = {};
+
   @override
   Widget build(BuildContext context) {
+    const column = [
+      DataColumn(label: Text("名称")),
+      DataColumn(label: Text("描述")),
+      DataColumn(label: Text("地址")),
+      DataColumn(label: Text("端口")),
+      DataColumn(label: Text("用户名")),
+      DataColumn(label: Text("操作"))
+    ];
+
     return Row(
       children: [
         Expanded(
@@ -28,25 +39,26 @@ class _InstancesPageState extends State<InstancesPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                        bottom:
-                            BorderSide(color: Colors.grey.withOpacity(0.5)))),
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                decoration: BoxDecoration(
+                    border: Border(bottom: Divider.createBorderSide(context))),
                 child: Row(
                   children: [
+                   
                     const Text(
                       "数据源列表",
                       style: TextStyle(fontSize: 20),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    IconButton(
+                     ElevatedButton(
                         onPressed: () {
                           addInstance(context);
-                          // GoRouter.of(context).go('/instances/create');
                         },
-                        icon: const Icon(Icons.add))
+                        child: const Icon(Icons.add)),
+                    ElevatedButton(
+                        onPressed: () {},
+                        style: ButtonStyle(),
+                        child: const Text("批量删除")),
                   ],
                 ),
               ),
@@ -54,68 +66,78 @@ class _InstancesPageState extends State<InstancesPage> {
                   child: Scrollbar(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: DataTableTheme(
-                    data: DataTableThemeData(
-                        dataRowColor: MaterialStateProperty.all(Colors.white),
-                        headingRowColor:
-                            MaterialStateProperty.all(Colors.white)),
-                    child: Consumer<InstancesProvider>(
-                      builder: (context, instancesProvider, _) {
-                        return DataTable(
-                            checkboxHorizontalMargin: 0,
-                            columns: const [
-                              DataColumn(label: Text("名称")),
-                              DataColumn(label: Text("描述")),
-                              DataColumn(label: Text("地址")),
-                              DataColumn(label: Text("端口")),
-                              DataColumn(label: Text("用户名")),
-                              DataColumn(label: Text("操作"))
-                            ],
-                            rows: instancesProvider.instancesModel
-                                .map((instance) {
-                              return DataRow(
-                                  onSelectChanged: (value) {},
-                                  cells: [
-                                    DataCell(Text(instance.name)),
-                                    DataCell(Text(instance.desc ?? "-")),
-                                    DataCell(Text(instance.addr)),
-                                    DataCell(Text("${instance.port}")),
-                                    DataCell(Text(instance.user)),
-                                    DataCell(Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            print(1);
-                                          },
-                                          icon: const Icon(Icons.edit),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            print(2);
-                                          },
-                                          icon: const Icon(Icons.delete),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            print(3);
-                                          },
-                                          icon: const Icon(
-                                              Icons.more_vert_outlined),
-                                        )
-                                      ],
-                                    ))
-                                  ]);
-                            }).toList(),
-                            sortAscending: false,
-                            showCheckboxColumn: true,
-                            onSelectAll: (state) {}
-                            // setState(() => _instances.selectAll(state!)),
-                            );
-                      },
-                    ),
+                  child: Consumer<InstancesProvider>(
+                    builder: (context, instancesProvider, _) {
+                      return DataTable(
+                          checkboxHorizontalMargin: 0,
+                          showBottomBorder: true,
+                          columns: column,
+                          rows:
+                              instancesProvider.instancesModel.map((instance) {
+                            return DataRow(
+                                selected: selectedInstances.contains(instance),
+                                onSelectChanged: (state) {
+                                  setState(() {
+                                    if (state == null || !state) {
+                                      selectedInstances.remove(instance);
+                                    } else {
+                                      selectedInstances.add(instance);
+                                    }
+                                  });
+                                },
+                                cells: [
+                                  DataCell(Text(instance.name)),
+                                  DataCell(Text(instance.desc ?? "-")),
+                                  DataCell(Text(instance.addr)),
+                                  DataCell(Text("${instance.port}")),
+                                  DataCell(Text(instance.user)),
+                                  DataCell(Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.edit),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          context
+                                              .read<InstancesProvider>()
+                                              .deleteInstance(instance.name);
+                                        },
+                                        icon: const Icon(Icons.delete),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(
+                                            Icons.more_vert_outlined),
+                                      )
+                                    ],
+                                  ))
+                                ]);
+                          }).toList(),
+                          sortAscending: false,
+                          showCheckboxColumn: true,
+                          onSelectAll: (state) {
+                            setState(() {
+                              if (state == null || !state) {
+                                selectedInstances.clear();
+                              } else {
+                                selectedInstances
+                                    .addAll(instancesProvider.instancesModel);
+                              }
+                            });
+                          }
+                          // setState(() => _instances.selectAll(state!)),
+                          );
+                    },
                   ),
                 ),
-              ))
+              )),
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Row(
+                  children: [],
+                ),
+              )
             ],
           ),
         )),
