@@ -1,4 +1,3 @@
-import 'package:client/models/sessions.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/code_edit.dart';
 import 'package:client/screens/session_list.dart';

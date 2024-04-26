@@ -1,11 +1,10 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:client/screens/add_instance.dart';
 import 'package:client/screens/instances.dart';
-import 'package:client/screens/session_list.dart';
 import 'package:client/screens/settings.dart';
 import 'package:client/screens/session.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -122,7 +121,8 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               ),
               FloatingActionButton.small(
                 elevation: 2,
-                onPressed: () => print(1),
+                onPressed: () =>
+                    {AddInstancePage.showAddInstanceDialog(context)},
                 child: const Icon(Icons.add),
               ),
               const SizedBox(
