@@ -14,32 +14,42 @@ class SessionList extends StatefulWidget {
 class _SessionListState extends State<SessionList> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Consumer<SessionListProvider>(
-          builder: (context, sessionListProvider, _) {
-        return ListView(
-          padding: const EdgeInsets.only(right: 10, left: 5),
-          children: [
-            for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
-              SessionTile(
-                index: i,
-                selected: sessionListProvider.sessions.data
-                    .isSelected(sessionListProvider.sessions.data[i]),
-                session: sessionListProvider.sessions.data[i],
+    return Consumer<SessionListProvider>(
+        builder: (context, sessionListProvider, _) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
+        child: SizedBox(
+          height: 40,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
+                SessionTab(
+                  key: GlobalKey(),
+                  index: i,
+                  selected: sessionListProvider.sessions.data
+                      .isSelected(sessionListProvider.sessions.data[i]),
+                  session: sessionListProvider.sessions.data[i],
+                ),
+              const Expanded(
+                child: Spacer(),
               )
-          ],
-        );
-      }),
-    );
+            ],
+          ),
+        ),
+      );
+    });
   }
 }
 
-class SessionTile extends StatefulWidget {
+class SessionTab extends StatefulWidget {
   final int index;
   final bool selected;
-  final SessionModel session; // todo
-
-  const SessionTile(
+  final SessionModel session;
+  const SessionTab(
       {Key? key,
       required this.index,
       required this.selected,
@@ -47,98 +57,88 @@ class SessionTile extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<SessionTile> createState() => _SessionTileState();
+  State<SessionTab> createState() => _SessionTabState();
 }
 
-class _SessionTileState extends State<SessionTile> {
-  Color getTrailingColor() {
-    switch (widget.session.conn.state) {
-      case SQLConnectState.connected:
-        return Colors.green;
-      case SQLConnectState.connecting:
-        return Colors.yellow;
-      case SQLConnectState.failed:
-        return Colors.red;
-      default:
-        return Colors.black;
-    }
-  }
-
+class _SessionTabState extends State<SessionTab> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.2), //边框颜色
-            width: 1, //边框宽度
-          ), // 边色与边宽度
-          color: widget.selected
-              ? Colors.grey.withOpacity(0.2)
-              : Colors.white, // 底色
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 1, //阴影范围
-              spreadRadius: 0.1, //阴影浓度
-              color: Colors.grey.withOpacity(0.2), //阴影颜色
+    return GestureDetector(
+      onTap: () {
+        context.read<SessionListProvider>().selectSessionByIndex(widget.index);
+      },
+      onSecondaryTapUp: (detail) {
+        final position = detail.globalPosition;
+        final RenderBox overlay =
+            Overlay.of(context).context.findRenderObject() as RenderBox;
+        final overlayPos = overlay.localToGlobal(Offset.zero);
+
+        showMenu(
+            context: context,
+            position: RelativeRect.fromLTRB(
+              position.dx - overlayPos.dx,
+              position.dy - overlayPos.dy,
+              position.dx - overlayPos.dx,
+              position.dy - overlayPos.dy,
             ),
-          ],
-          // borderRadius: BorderRadius.circular(10),
-        ),
-        child: InkWell(
-          hoverColor: Colors.grey.withOpacity(0.1),
-          onTap: widget.selected
-              ? null
-              : () {
-                  context
-                      .read<SessionListProvider>()
-                      .selectSessionByIndex(widget.index);
+            items: <PopupMenuEntry>[
+              PopupMenuItem<String>(
+                height: 30,
+                value: "a",
+                onTap: () {
+                  context.read<SessionListProvider>().connect(widget.session.id);;
                 },
-          child: ListTile(
-            dense: true,
-            titleAlignment: ListTileTitleAlignment.center,
-            title: const Text("test1", overflow: TextOverflow.ellipsis),
-            subtitle: Text(
-                "${widget.session.conn.meta.host}:${widget.session.conn.meta.port}",
-                overflow: TextOverflow.ellipsis),
-            leading: Image.asset("assets/icons/mysql_icon.png"),
-            trailing: PopupMenuButton(
-              offset: const Offset(35, 0),
-              surfaceTintColor: Colors.white,
-              onSelected: (value) {
-                if (value == "a") {
-                  context
-                      .read<SessionListProvider>()
-                      .connect(widget.session.id);
-                } else if (value == "b") {
+                child: Text("连接"),
+              ),
+              const PopupMenuDivider(height: 0.1),
+              PopupMenuItem<String>(
+                height: 30,
+                value: "b",
+                onTap:() {
                   context.read<SessionListProvider>().close(widget.session.id);
-                }
-              },
-              itemBuilder: (context) => <PopupMenuEntry>[
-                const PopupMenuItem<String>(
-                  height: 30,
-                  value: "a",
-                  child: Text("连接"),
-                ),
-                const PopupMenuDivider(height: 0.1),
-                const PopupMenuItem<String>(
-                  height: 30,
-                  value: "b",
-                  child: Text("断开"),
-                ),
-                const PopupMenuDivider(height: 0.1),
-                const PopupMenuItem<String>(
-                  height: 30,
-                  value: "c",
-                  child: Text("关闭"),
-                ),
-              ],
-              child: Icon(
-                Icons.more_vert_outlined,
-                color: getTrailingColor(),
+                },
+                child: const Text("断开"),
+              ),
+              const PopupMenuDivider(height: 0.1),
+              const PopupMenuItem<String>(
+                height: 30,
+                value: "c",
+                child: Text("关闭"),
+              ),
+            ]);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        width: 150,
+        height: 35,
+        decoration: BoxDecoration(
+            color: widget.selected? Theme.of(context).colorScheme.surfaceContainer: Theme.of(context).colorScheme.surfaceContainerHigh,
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(5), topRight: Radius.circular(5))),
+        child: Row(
+          children: [
+            Image.asset(width: 20, height: 20, "assets/icons/mysql_icon.png"),
+            Container(
+              constraints: const BoxConstraints(maxWidth: 50),
+              child: Text(
+                widget.session.conn.meta.host,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 6.0),
-          ),
-        ));
+            const Expanded(child: Spacer()),
+            Container(
+                constraints: const BoxConstraints(maxHeight: 30, maxWidth: 30),
+                child: IconButton(
+                  alignment: Alignment.center,
+                  constraints: const BoxConstraints(minHeight: 100),
+                  onPressed: () {
+                    print(1);
+                  },
+                  icon: const Icon(size: 10, Icons.close),
+                ))
+          ],
+        ),
+      ),
+    );
   }
 }

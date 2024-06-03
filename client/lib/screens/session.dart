@@ -1,8 +1,10 @@
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/code_edit.dart';
 import 'package:client/screens/session_list.dart';
+// import 'package:client/screens/session_list.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:client/widgets/sql_result_table.dart';
+import 'package:client/widgets/tab.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:provider/provider.dart';
@@ -20,49 +22,75 @@ class SQLEditPage extends StatefulWidget {
 class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      SplitView(controller: multiSplitViewCtrl1, children: [
-        const Column(
-          children: [
-            SizedBox(
-              height: 30,
-            ),
-            SessionList(),
-          ],
-        ),
-        Column(
-          children: [
-            const SizedBox(height: 30),
-            Expanded(
-              child: Container(
-                  alignment: Alignment.topLeft,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.grey)),
-                  child: Column(
-                    children: [
-                      SplitView(
-                          controller: multiSplitViewCtrl2,
-                          axis: Axis.vertical,
-                          children: [
-                            Consumer<SessionProvider>(
-                              builder: (context, sessionProvider, _) {
-                                return CodeEditor(
-                                    key: UniqueKey(),
-                                    codeController:
-                                        sessionProvider.getSQLEditCode());
-                              },
-                            ),
-                            const Expanded(child: SqlResultTables()),
-                          ]),
-                    ],
-                  )),
-            ),
-            const SizedBox(height: 30)
-          ],
-        )
-      ]),
-      const SizedBox(width: 5),
-    ]);
+    return Column(
+      children: [
+        const SessionList(),
+        // Container(
+        //   padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        //   decoration: BoxDecoration(
+        //     color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        //   ),
+        //   child: const SizedBox(
+        //     height: 40,
+        //     child: Row(
+        //       crossAxisAlignment: CrossAxisAlignment.end,
+        //       children: [
+        //         SessionTab(),
+        //         SessionTab(),
+        //         Expanded(
+        //           child: Spacer(),
+        //         )
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        Expanded(
+            //     child: Row(children: [
+            //   SplitView(controller: multiSplitViewCtrl1, children: [
+            //     const SessionList(),
+
+            //   ]),
+            //   const SizedBox(width: 10),
+            // ]))
+            child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+          child: Column(
+            children: [
+              // const SizedBox(height: 10),
+              Expanded(
+                child: Container(
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerLowest,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Column(
+                      children: [
+                        SplitView(
+                            controller: multiSplitViewCtrl2,
+                            axis: Axis.vertical,
+                            children: [
+                              Consumer<SessionProvider>(
+                                builder: (context, sessionProvider, _) {
+                                  return CodeEditor(
+                                      key: UniqueKey(),
+                                      codeController:
+                                          sessionProvider.getSQLEditCode());
+                                },
+                              ),
+                              const Expanded(child: SqlResultTables()),
+                            ]),
+                      ],
+                    )),
+              ),
+              const SizedBox(height: 30)
+            ],
+          ),
+        )),
+      ],
+    );
   }
 }
 
@@ -130,6 +158,5 @@ class _SqlResultTablesState extends State<SqlResultTables> {
         const Expanded(child: SqlResultTable())
       ],
     );
-    ;
   }
 }

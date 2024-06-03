@@ -30,10 +30,6 @@ class _CodeEditorState extends State<CodeEditor> {
 
       Widget codeButton = Container(
         constraints: const BoxConstraints(maxHeight: 40),
-        decoration: const BoxDecoration(
-            border: Border(
-                top: BorderSide(color: Colors.grey),
-                bottom: BorderSide(color: Colors.grey))),
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
             final canQuery = sessionProvider.canQuery();

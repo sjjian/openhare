@@ -68,6 +68,7 @@ class _FleaSQLAppState extends State<FleaSQLApp> {
       child: MaterialApp.router(
         title: 'Flea SQL',
         theme: ThemeData(
+          
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
@@ -93,11 +94,12 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         body: Row(
       children: <Widget>[
         NavigationRail(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
           useIndicator: true,
-          elevation: 10,
           selectedIndex: _calculateSelectedIndex(context),
           onDestinationSelected: (value) {
             _onItemTapped(value, context);
