@@ -1,7 +1,6 @@
 import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:highlight/languages/sql.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +28,7 @@ class _CodeEditorState extends State<CodeEditor> {
       ));
 
       Widget codeButton = Container(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         constraints: const BoxConstraints(maxHeight: 40),
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Consumer<SessionProvider>(builder: (context, sessionProvider, _) {

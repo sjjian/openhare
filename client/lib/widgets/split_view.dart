@@ -28,10 +28,8 @@ class _SplitViewState extends State<SplitView> {
 
     MultiSplitViewTheme theme = MultiSplitViewTheme(
       data: MultiSplitViewThemeData(
-        // dividerThickness: 5,
         dividerPainter: DividerPainters.background(
-          // color: Colors.indigo[100]!,
-          // highlightedColor: Colors.indigo[900]!,
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
         ),
       ),
       child: mv,

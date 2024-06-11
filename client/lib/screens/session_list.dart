@@ -1,6 +1,6 @@
-import 'package:client/models/connection.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:client/widgets/tab_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,12 +27,43 @@ class _SessionListState extends State<SessionList> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
-                SessionTab(
-                  key: GlobalKey(),
-                  index: i,
+                CommonTab(
+                  onTap: () {
+                    sessionListProvider.selectSessionByIndex(i);
+                  },
+                  items: <PopupMenuEntry>[
+                    PopupMenuItem<String>(
+                      height: 30,
+                      onTap: () {
+                        sessionListProvider
+                            .connect(sessionListProvider.sessions.data[i].id);
+                      },
+                      child: const Text("连接"),
+                    ),
+                    const PopupMenuDivider(height: 0.1),
+                    PopupMenuItem<String>(
+                      height: 30,
+                      onTap: () {
+                        sessionListProvider
+                            .close(sessionListProvider.sessions.data[i].id);
+                      },
+                      child: const Text("断开"),
+                    ),
+                    const PopupMenuDivider(height: 0.1),
+                    const PopupMenuItem<String>(
+                      height: 30,
+                      child: Text("关闭"),
+                    ),
+                  ],
+                  avatar: Image.asset("assets/icons/mysql_icon.png"),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  selectedColor:
+                      Theme.of(context).colorScheme.surfaceContainerLow,
+                  hoverColor:
+                      Theme.of(context).colorScheme.surfaceContainerHigh,
+                  label: sessionListProvider.sessions.data[i].conn.meta.host,
                   selected: sessionListProvider.sessions.data
                       .isSelected(sessionListProvider.sessions.data[i]),
-                  session: sessionListProvider.sessions.data[i],
                 ),
               const Expanded(
                 child: Spacer(),
@@ -86,7 +117,10 @@ class _SessionTabState extends State<SessionTab> {
                 height: 30,
                 value: "a",
                 onTap: () {
-                  context.read<SessionListProvider>().connect(widget.session.id);;
+                  context
+                      .read<SessionListProvider>()
+                      .connect(widget.session.id);
+                  ;
                 },
                 child: Text("连接"),
               ),
@@ -94,7 +128,7 @@ class _SessionTabState extends State<SessionTab> {
               PopupMenuItem<String>(
                 height: 30,
                 value: "b",
-                onTap:() {
+                onTap: () {
                   context.read<SessionListProvider>().close(widget.session.id);
                 },
                 child: const Text("断开"),
@@ -112,7 +146,9 @@ class _SessionTabState extends State<SessionTab> {
         width: 150,
         height: 35,
         decoration: BoxDecoration(
-            color: widget.selected? Theme.of(context).colorScheme.surfaceContainer: Theme.of(context).colorScheme.surfaceContainerHigh,
+            color: widget.selected
+                ? Theme.of(context).colorScheme.surfaceContainer
+                : Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(5), topRight: Radius.circular(5))),
         child: Row(

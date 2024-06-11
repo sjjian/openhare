@@ -24,18 +24,18 @@ class _SqlResultTableState extends State<SqlResultTable> {
       if (result == null) {
         return Container(
             alignment: Alignment.topLeft,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             child: const Text('no data'));
       }
       if (result.state == SQLExecuteState.done) {
         return PlutoGrid(
           key: ValueKey(result.id),
-          configuration: const PlutoGridConfiguration(
-            localeText: PlutoGridLocaleText.china(),
+          configuration:  PlutoGridConfiguration(
+            localeText: const PlutoGridLocaleText.china(),
             style: PlutoGridStyleConfig(
                 rowHeight: 30,
                 columnHeight: 36,
-                gridBorderColor: Colors.white,
+                gridBorderColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                 enableGridBorderShadow: true),
           ),
           columns: result.columns!,
@@ -44,12 +44,12 @@ class _SqlResultTableState extends State<SqlResultTable> {
       } else if (result.state == SQLExecuteState.error) {
         return Container(
             alignment: Alignment.topLeft,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             child: Text('${result.error}'));
       } else {
         return Container(
             alignment: Alignment.topLeft,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             child: const Center(
               child: SizedBox(
                 height: 40,
