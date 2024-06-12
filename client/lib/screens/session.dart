@@ -100,6 +100,17 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                         index: i,
                         key: ValueKey(i),
                         child: CommonTab(
+                          style: CommonTabStyle(
+                            selectedColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerLowest,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerLow,
+                            hoverColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerLow,
+                          ),
                           label: "${results[i].id + 1}",
                           selected: results[i] == currentResult,
                           onTap: () {
@@ -111,9 +122,6 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                           avatar: const Icon(
                             Icons.grid_on,
                           ),
-                          selectedColor:  Theme.of(context).colorScheme.surfaceContainerLowest,
-                          color:  Theme.of(context).colorScheme.surfaceContainerLow,
-                          hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
                         ),
                       )
                   ]);

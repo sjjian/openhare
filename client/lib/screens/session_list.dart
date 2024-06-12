@@ -16,62 +16,50 @@ class _SessionListState extends State<SessionList> {
   Widget build(BuildContext context) {
     return Consumer<SessionListProvider>(
         builder: (context, sessionListProvider, _) {
-      return Container(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        ),
-        child: SizedBox(
-          height: 40,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
-                CommonTab(
+      return CommonTabBar(tabs: [
+        for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
+          CommonTabBuilder(builder: (ctx) {
+            return CommonTab(
+              style: CommonTabStyle(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                selectedColor:
+                    Theme.of(context).colorScheme.surfaceContainerLow,
+                hoverColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+              ),
+              onTap: () {
+                sessionListProvider.selectSessionByIndex(i);
+              },
+              items: <PopupMenuEntry>[
+                PopupMenuItem<String>(
+                  height: 30,
                   onTap: () {
-                    sessionListProvider.selectSessionByIndex(i);
+                    sessionListProvider
+                        .connect(sessionListProvider.sessions.data[i].id);
                   },
-                  items: <PopupMenuEntry>[
-                    PopupMenuItem<String>(
-                      height: 30,
-                      onTap: () {
-                        sessionListProvider
-                            .connect(sessionListProvider.sessions.data[i].id);
-                      },
-                      child: const Text("连接"),
-                    ),
-                    const PopupMenuDivider(height: 0.1),
-                    PopupMenuItem<String>(
-                      height: 30,
-                      onTap: () {
-                        sessionListProvider
-                            .close(sessionListProvider.sessions.data[i].id);
-                      },
-                      child: const Text("断开"),
-                    ),
-                    const PopupMenuDivider(height: 0.1),
-                    const PopupMenuItem<String>(
-                      height: 30,
-                      child: Text("关闭"),
-                    ),
-                  ],
-                  avatar: Image.asset("assets/icons/mysql_icon.png"),
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  selectedColor:
-                      Theme.of(context).colorScheme.surfaceContainerLow,
-                  hoverColor:
-                      Theme.of(context).colorScheme.surfaceContainerHigh,
-                  label: sessionListProvider.sessions.data[i].conn.meta.host,
-                  selected: sessionListProvider.sessions.data
-                      .isSelected(sessionListProvider.sessions.data[i]),
+                  child: const Text("连接"),
                 ),
-              const Expanded(
-                child: Spacer(),
-              )
-            ],
-          ),
-        ),
-      );
+                const PopupMenuDivider(height: 0.1),
+                PopupMenuItem<String>(
+                  height: 30,
+                  onTap: () {
+                    sessionListProvider
+                        .close(sessionListProvider.sessions.data[i].id);
+                  },
+                  child: const Text("断开"),
+                ),
+                const PopupMenuDivider(height: 0.1),
+                const PopupMenuItem<String>(
+                  height: 30,
+                  child: Text("关闭"),
+                ),
+              ],
+              avatar: Image.asset("assets/icons/mysql_icon.png"),
+              label: sessionListProvider.sessions.data[i].conn.meta.host,
+              selected: sessionListProvider.sessions.data
+                  .isSelected(sessionListProvider.sessions.data[i]),
+            );
+          })
+      ]);
     });
   }
 }
