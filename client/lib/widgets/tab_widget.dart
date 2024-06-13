@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class CommonTabBar extends StatefulWidget {
-  final List<CommonTabBuilder>? tabs;
+  final List<CommonTabWrap>? tabs;
   final ReorderCallback? onReorder;
   final Color? color;
+  final CommonTabStyle? tabStyle;
 
-  const CommonTabBar({Key? key, this.tabs, this.onReorder, this.color})
+  const CommonTabBar(
+      {Key? key, this.tabs, this.onReorder, this.color, this.tabStyle})
       : super(key: key);
 
   @override
@@ -29,7 +31,14 @@ class _CommonTabBarState extends State<CommonTabBar> {
             children: [
               if (widget.tabs != null)
                 for (var i = 0; i < widget.tabs!.length; i++)
-                  widget.tabs![i].builder(ctx),
+                  CommonTab(
+                    avatar: widget.tabs![i].avatar,
+                    label: widget.tabs![i].label,
+                    selected: widget.tabs![i].selected,
+                    style: widget.tabStyle,
+                    onTap: widget.tabs![i].onTap,
+                    onDeleted: widget.tabs![i].onDeleted,
+                  ),
               const Expanded(
                 child: Spacer(),
               )
@@ -41,27 +50,36 @@ class _CommonTabBarState extends State<CommonTabBar> {
   }
 }
 
-class CommonTabBuilder extends StatefulWidget {
-  final Widget Function(BuildContext context) builder;
+class CommonTabWrap {
+  final Widget? avatar; // image or icon
+  final String label;
+  final List<PopupMenuEntry>? items;
+  final bool selected;
 
-  const CommonTabBuilder({Key? key, required this.builder}) : super(key: key);
+  final GestureTapCallback? onTap;
+  final VoidCallback? onDeleted;
 
-  @override
-  State<CommonTabBuilder> createState() => _CommonTabBuilderState();
-}
-
-class _CommonTabBuilderState extends State<CommonTabBuilder> {
-  @override
-  build(BuildContext context) => widget.builder(context);
+  CommonTabWrap(
+      {this.avatar,
+      required this.label,
+      this.items,
+      required this.selected,
+      this.onTap,
+      this.onDeleted});
 }
 
 class CommonTabStyle {
   final double? maxWidth;
+  final double? width;
   final Color? color;
   final Color? selectedColor;
   final Color? hoverColor;
   CommonTabStyle(
-      {this.maxWidth, this.color, this.selectedColor, this.hoverColor});
+      {this.maxWidth,
+      this.width,
+      this.color,
+      this.selectedColor,
+      this.hoverColor});
 }
 
 class CommonTab extends StatefulWidget {
