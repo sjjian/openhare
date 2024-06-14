@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+
+const double defaultTabMaxWidth = 100;
 
 class CommonTabBar extends StatefulWidget {
   final List<CommonTabWrap>? tabs;
@@ -18,6 +22,10 @@ class _CommonTabBarState extends State<CommonTabBar> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, c) {
+      CommonTabStyle style = widget.tabStyle ?? CommonTabStyle();
+      double width = min(c.maxWidth / widget.tabs!.length,
+          style.maxWidth ?? defaultTabMaxWidth);
+
       return Container(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         decoration: BoxDecoration(
@@ -32,10 +40,12 @@ class _CommonTabBarState extends State<CommonTabBar> {
               if (widget.tabs != null)
                 for (var i = 0; i < widget.tabs!.length; i++)
                   CommonTab(
+                    width: width,
                     avatar: widget.tabs![i].avatar,
                     label: widget.tabs![i].label,
                     selected: widget.tabs![i].selected,
-                    style: widget.tabStyle,
+                    items: widget.tabs![i].items,
+                    style: style,
                     onTap: widget.tabs![i].onTap,
                     onDeleted: widget.tabs![i].onDeleted,
                   ),
@@ -70,16 +80,11 @@ class CommonTabWrap {
 
 class CommonTabStyle {
   final double? maxWidth;
-  final double? width;
   final Color? color;
   final Color? selectedColor;
   final Color? hoverColor;
   CommonTabStyle(
-      {this.maxWidth,
-      this.width,
-      this.color,
-      this.selectedColor,
-      this.hoverColor});
+      {this.maxWidth, this.color, this.selectedColor, this.hoverColor});
 }
 
 class CommonTab extends StatefulWidget {
@@ -87,6 +92,7 @@ class CommonTab extends StatefulWidget {
   final String label;
   final List<PopupMenuEntry>? items;
   final bool selected;
+  final double? width;
   final CommonTabStyle? style;
 
   final GestureTapCallback? onTap;
@@ -94,13 +100,14 @@ class CommonTab extends StatefulWidget {
 
   const CommonTab({
     Key? key,
+    this.avatar,
     required this.label,
     required this.selected,
+    this.items,
     this.onTap,
     this.onDeleted,
-    this.items,
-    this.avatar,
     this.style,
+    this.width,
   }) : super(key: key);
 
   @override
@@ -166,7 +173,7 @@ class _CommonTabState extends State<CommonTab> {
                 },
           child: Container(
             padding: const EdgeInsets.all(5),
-            width: 150,
+            width: widget.width,
             height: 35,
             decoration: BoxDecoration(
                 color: color(),
@@ -179,15 +186,15 @@ class _CommonTabState extends State<CommonTab> {
                   height: 20,
                   child: widget.avatar,
                 ),
-                Container(
+                Expanded(child: Container(
                   padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   constraints: const BoxConstraints(maxWidth: 50),
                   child: Text(
                     widget.label,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const Expanded(child: Spacer()),
+                ),),
+                // const Expanded(child: Spacer()),
                 Container(
                     constraints:
                         const BoxConstraints(maxHeight: 30, maxWidth: 30),

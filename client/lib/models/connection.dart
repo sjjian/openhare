@@ -30,6 +30,7 @@ class SQLConnModel {
       this.conn = conn;
       state = SQLConnectState.connected;
     } catch (e) {
+      print(e);
       state = SQLConnectState.failed;
     }
   }
