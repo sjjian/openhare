@@ -29,7 +29,7 @@ class _SplitViewState extends State<SplitView> {
     MultiSplitViewTheme theme = MultiSplitViewTheme(
       data: MultiSplitViewThemeData(
         dividerPainter: DividerPainters.background(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
         ),
       ),
       child: mv,

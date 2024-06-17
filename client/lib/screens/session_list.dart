@@ -54,6 +54,9 @@ class _SessionListState extends State<SessionList> {
                 onTap: () {
                   sessionListProvider.selectSessionByIndex(i);
                 },
+                onDeleted: () {
+                  
+                },
                 selected: sessionListProvider.sessions.data
                     .isSelected(sessionListProvider.sessions.data[i]),
               )
@@ -108,7 +111,7 @@ class _SessionTabState extends State<SessionTab> {
                       .connect(widget.session.id);
                   ;
                 },
-                child: Text("连接"),
+                child: const Text("连接"),
               ),
               const PopupMenuDivider(height: 0.1),
               PopupMenuItem<String>(

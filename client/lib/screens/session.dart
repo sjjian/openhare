@@ -75,6 +75,13 @@ class SqlResultTables extends StatefulWidget {
 class _SqlResultTablesState extends State<SqlResultTables> {
   @override
   Widget build(BuildContext context) {
+    CommonTabStyle style = CommonTabStyle(
+      maxWidth: 100,
+      labelAlign: TextAlign.center,
+      selectedColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
+    );
     return Column(
       children: [
         Container(
@@ -88,29 +95,24 @@ class _SqlResultTablesState extends State<SqlResultTables> {
               if (results == null) {
                 return const Spacer();
               }
-              return ReorderableListView(
-                  buildDefaultDragHandles: false,
-                  scrollDirection: Axis.horizontal,
-                  onReorder: (oldIndex, newIndex) {
-                    sessionProvider.reorderSQLResult(oldIndex, newIndex);
-                  },
-                  children: [
-                    for (var i = 0; i < results.length; i++)
-                      ReorderableDragStartListener(
-                        index: i,
-                        key: ValueKey(i),
-                        child: CommonTab(
-                          style: CommonTabStyle(
-                            selectedColor: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLowest,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLow,
-                            hoverColor: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLow,
-                          ),
+              return Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                CommonTab(
+                  label: "执行记录",
+                  selected: true,
+                  width: 100,
+                  style: style,
+                ),
+                Expanded(
+                    child: CommonTabBar(
+                        color:
+                            Theme.of(context).colorScheme.surfaceContainerLow,
+                        tabStyle: style,
+                        onReorder: (oldIndex, newIndex) {
+                          sessionProvider.reorderSQLResult(oldIndex, newIndex);
+                        },
+                        tabs: [
+                      for (var i = 0; i < results.length; i++)
+                        CommonTabWrap(
                           label: "${results[i].id + 1}",
                           selected: results[i] == currentResult,
                           onTap: () {
@@ -122,9 +124,9 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                           avatar: const Icon(
                             Icons.grid_on,
                           ),
-                        ),
-                      )
-                  ]);
+                        )
+                    ]))
+              ]);
             },
           ),
         ),

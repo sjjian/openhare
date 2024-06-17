@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-const double defaultTabMaxWidth = 100;
+const double defaultTabMaxWidth = 200;
 
 class CommonTabBar extends StatefulWidget {
   final List<CommonTabWrap>? tabs;
@@ -27,33 +27,43 @@ class _CommonTabBarState extends State<CommonTabBar> {
           style.maxWidth ?? defaultTabMaxWidth);
 
       return Container(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
         decoration: BoxDecoration(
           color: widget.color ??
               Theme.of(context).colorScheme.surfaceContainerHighest,
         ),
         child: SizedBox(
-          height: 40,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (widget.tabs != null)
-                for (var i = 0; i < widget.tabs!.length; i++)
-                  CommonTab(
-                    width: width,
-                    avatar: widget.tabs![i].avatar,
-                    label: widget.tabs![i].label,
-                    selected: widget.tabs![i].selected,
-                    items: widget.tabs![i].items,
-                    style: style,
-                    onTap: widget.tabs![i].onTap,
-                    onDeleted: widget.tabs![i].onDeleted,
-                  ),
-              const Expanded(
-                child: Spacer(),
-              )
-            ],
-          ),
+          // height: 40,
+          child: widget.onReorder != null
+              ? ReorderableListView(
+                  buildDefaultDragHandles: false,
+                  scrollDirection: Axis.horizontal,
+                  onReorder: widget.onReorder!,
+                  children: [
+                    if (widget.tabs != null)
+                      for (var i = 0; i < widget.tabs!.length; i++)
+                        ReorderableDragStartListener(
+                          index: i,
+                          key: ValueKey(i),
+                          child: CommonTab.fromWarp(
+                              warp: widget.tabs![i],
+                              width: width,
+                              style: style),
+                        ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (widget.tabs != null)
+                      for (var i = 0; i < widget.tabs!.length; i++)
+                        CommonTab.fromWarp(
+                            warp: widget.tabs![i], width: width, style: style),
+                    const Expanded(
+                      child: Spacer(),
+                    )
+                  ],
+                ),
         ),
       );
     });
@@ -83,8 +93,13 @@ class CommonTabStyle {
   final Color? color;
   final Color? selectedColor;
   final Color? hoverColor;
+  final TextAlign? labelAlign;
   CommonTabStyle(
-      {this.maxWidth, this.color, this.selectedColor, this.hoverColor});
+      {this.maxWidth,
+      this.color,
+      this.selectedColor,
+      this.hoverColor,
+      this.labelAlign});
 }
 
 class CommonTab extends StatefulWidget {
@@ -109,6 +124,15 @@ class CommonTab extends StatefulWidget {
     this.style,
     this.width,
   }) : super(key: key);
+
+  CommonTab.fromWarp(
+      {super.key, required CommonTabWrap warp, this.style, this.width})
+      : avatar = warp.avatar,
+        label = warp.label,
+        items = warp.items,
+        onTap = warp.onTap,
+        onDeleted = warp.onDeleted,
+        selected = warp.selected;
 
   @override
   State<CommonTab> createState() => _CommonTabState();
@@ -172,8 +196,8 @@ class _CommonTabState extends State<CommonTab> {
                   );
                 },
           child: Container(
-            padding: const EdgeInsets.all(5),
-            width: widget.width,
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            width: widget.width ?? defaultTabMaxWidth,
             height: 35,
             decoration: BoxDecoration(
                 color: color(),
@@ -181,29 +205,30 @@ class _CommonTabState extends State<CommonTab> {
                     topLeft: Radius.circular(5), topRight: Radius.circular(5))),
             child: Row(
               children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: widget.avatar,
-                ),
-                Expanded(child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  constraints: const BoxConstraints(maxWidth: 50),
-                  child: Text(
-                    widget.label,
-                    overflow: TextOverflow.ellipsis,
+                if (widget.avatar != null)
+                  SizedBox(
+                    width: 20,
+                    child: widget.avatar,
                   ),
-                ),),
-                // const Expanded(child: Spacer()),
-                Container(
-                    constraints:
-                        const BoxConstraints(maxHeight: 30, maxWidth: 30),
-                    child: IconButton(
-                      alignment: Alignment.center,
-                      constraints: const BoxConstraints(minHeight: 100),
-                      onPressed: widget.onDeleted,
-                      icon: const Icon(size: 10, Icons.close),
-                    ))
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    constraints: const BoxConstraints(maxWidth: 50),
+                    child: Text(
+                      widget.label,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: widget.style?.labelAlign,
+                    ),
+                  ),
+                ),
+                if (widget.onDeleted != null)
+                  Container(
+                      child: IconButton(
+                    alignment: Alignment.center,
+                    constraints: const BoxConstraints(minHeight: 100),
+                    onPressed: widget.onDeleted,
+                    icon: const Icon(size: 15, Icons.close),
+                  ))
               ],
             ),
           ),
