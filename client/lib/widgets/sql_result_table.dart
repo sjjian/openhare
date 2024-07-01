@@ -21,9 +21,15 @@ class _SqlResultTableState extends State<SqlResultTable> {
   Widget build(BuildContext context) {
     return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
       final result = sessionProvider.getCurrentSQLResult();
+      if (sessionProvider.showRecord) {
+        return Container(
+            alignment: Alignment.center,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            child: const Text('执行记录'));
+      }
       if (result == null) {
         return Container(
-            alignment: Alignment.topLeft,
+            alignment: Alignment.center,
             color: Theme.of(context).colorScheme.surfaceContainerLowest,
             child: const Text('no data'));
       }

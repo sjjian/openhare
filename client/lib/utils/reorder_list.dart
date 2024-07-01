@@ -27,12 +27,12 @@ class ReorderSelectedList<E> extends DelegatingList<E> {
   @override
   E removeAt(int index) {
     final element = _data.removeAt(index);
-    // 如果删除了选中的result，则默认选中前一个
     if (_selected == element) {
       if (_data.isEmpty) {
         _selected = null;
       } else {
-        _selected = index > 0 ? _data[index - 1] : null;
+        // 删除的元素是当前选中的，则要切换选中元素；
+        _selected = _data[index];
       }
     }
     return element;

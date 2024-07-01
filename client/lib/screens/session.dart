@@ -92,15 +92,19 @@ class _SqlResultTablesState extends State<SqlResultTables> {
             builder: (context, sessionProvider, _) {
               final results = sessionProvider.getAllSQLResult();
               final currentResult = sessionProvider.getCurrentSQLResult();
+              final showRecord = sessionProvider.showRecord;
               if (results == null) {
                 return const Spacer();
               }
               return Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 CommonTab(
                   label: "执行记录",
-                  selected: true,
+                  selected: showRecord,
                   width: 100,
                   style: style,
+                  onTap: () {
+                    sessionProvider.selectToRecord();
+                  },
                 ),
                 Expanded(
                     child: CommonTabBar(
@@ -114,7 +118,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                       for (var i = 0; i < results.length; i++)
                         CommonTabWrap(
                           label: "${results[i].id + 1}",
-                          selected: results[i] == currentResult,
+                          selected: !showRecord && results[i] == currentResult,
                           onTap: () {
                             sessionProvider.selectSQLResultByIndex(i);
                           },

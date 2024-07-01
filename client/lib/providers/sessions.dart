@@ -52,6 +52,7 @@ class SessionListProvider with ChangeNotifier {
 
 class SessionProvider with ChangeNotifier {
   SessionModel? _session;
+  bool showRecord = true;
 
   SessionProvider(this._session);
 
@@ -60,11 +61,17 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void selectToRecord() {
+    showRecord = true;
+    notifyListeners();
+  }
+
   void deleteSQLResultByIndex(int index) {
     if (_session == null) {
       return;
     }
     _session!.sqlResults.removeAt(index);
+    if (_session!.sqlResults.isEmpty) showRecord = true;
     notifyListeners();
   }
 
@@ -72,6 +79,7 @@ class SessionProvider with ChangeNotifier {
     if (_session == null) {
       return;
     }
+    showRecord = false;
     _session!.sqlResults.select(index);
     notifyListeners();
   }
@@ -116,6 +124,7 @@ class SessionProvider with ChangeNotifier {
 
     final result = SQLResultModel(_session!.genSQLResultId(), query);
     _session!.sqlResults.add(result);
+    showRecord = false; // 如果执行query创建了新的tab则跳转过去
     _session!.state = SQLExecuteState.executing;
     notifyListeners();
 
