@@ -26,6 +26,12 @@ class _CommonTabBarState extends State<CommonTabBar> {
       double width = min(c.maxWidth / widget.tabs!.length,
           style.maxWidth ?? defaultTabMaxWidth);
 
+      Widget addTab = Container(
+          height: 35,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          child: Icon(Icons.add,
+              size: 20, color: Theme.of(context).colorScheme.onSurface));
+
       return Container(
         padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
         decoration: BoxDecoration(
@@ -33,9 +39,9 @@ class _CommonTabBarState extends State<CommonTabBar> {
               Theme.of(context).colorScheme.surfaceContainerHighest,
         ),
         child: SizedBox(
-          // height: 40,
           child: widget.onReorder != null
               ? ReorderableListView(
+                  footer: addTab,
                   buildDefaultDragHandles: false,
                   scrollDirection: Axis.horizontal,
                   onReorder: widget.onReorder!,
@@ -59,6 +65,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
                       for (var i = 0; i < widget.tabs!.length; i++)
                         CommonTab.fromWarp(
                             warp: widget.tabs![i], width: width, style: style),
+                    addTab,
                     const Expanded(
                       child: Spacer(),
                     )
