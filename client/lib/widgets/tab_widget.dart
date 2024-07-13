@@ -7,11 +7,17 @@ const double defaultTabMaxWidth = 200;
 class CommonTabBar extends StatefulWidget {
   final List<CommonTabWrap>? tabs;
   final ReorderCallback? onReorder;
+  final VoidCallback? addTab;
   final Color? color;
   final CommonTabStyle? tabStyle;
 
   const CommonTabBar(
-      {Key? key, this.tabs, this.onReorder, this.color, this.tabStyle})
+      {Key? key,
+      this.tabs,
+      this.onReorder,
+      this.addTab,
+      this.color,
+      this.tabStyle})
       : super(key: key);
 
   @override
@@ -26,11 +32,18 @@ class _CommonTabBarState extends State<CommonTabBar> {
       double width = min(c.maxWidth / widget.tabs!.length,
           style.maxWidth ?? defaultTabMaxWidth);
 
-      Widget addTab = Container(
+      Widget addTabWidget = Container(
           height: 35,
           padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-          child: Icon(Icons.add,
-              size: 20, color: Theme.of(context).colorScheme.onSurface));
+          child: IconButton(
+            alignment: Alignment.center,
+            constraints: const BoxConstraints(),
+            onPressed: widget.addTab,
+            icon: Icon(
+                size: 20,
+                Icons.add,
+                color: Theme.of(context).colorScheme.onSurface),
+          ));
 
       return Container(
         padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
@@ -41,7 +54,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
         child: SizedBox(
           child: widget.onReorder != null
               ? ReorderableListView(
-                  footer: addTab,
+                  footer: widget.addTab != null ? addTabWidget : null,
                   buildDefaultDragHandles: false,
                   scrollDirection: Axis.horizontal,
                   onReorder: widget.onReorder!,
@@ -65,7 +78,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
                       for (var i = 0; i < widget.tabs!.length; i++)
                         CommonTab.fromWarp(
                             warp: widget.tabs![i], width: width, style: style),
-                    addTab,
+                    if (widget.addTab != null) addTabWidget,
                     const Expanded(
                       child: Spacer(),
                     )
@@ -230,12 +243,14 @@ class _CommonTabState extends State<CommonTab> {
                 ),
                 if (widget.onDeleted != null)
                   Container(
+                      padding: const EdgeInsets.all(5),
                       child: IconButton(
-                    alignment: Alignment.center,
-                    constraints: const BoxConstraints(minHeight: 100),
-                    onPressed: widget.onDeleted,
-                    icon: const Icon(size: 15, Icons.close),
-                  ))
+                        alignment: Alignment.center,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(5),
+                        onPressed: widget.onDeleted,
+                        icon: const Icon(size: 15, Icons.close),
+                      ))
               ],
             ),
           ),

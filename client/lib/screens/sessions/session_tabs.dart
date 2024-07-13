@@ -3,14 +3,14 @@ import 'package:client/widgets/tab_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SessionList extends StatefulWidget {
-  const SessionList({Key? key}) : super(key: key);
+class SessionTabs extends StatefulWidget {
+  const SessionTabs({Key? key}) : super(key: key);
 
   @override
-  State<SessionList> createState() => _SessionListState();
+  State<SessionTabs> createState() => _SessionTabsState();
 }
 
-class _SessionListState extends State<SessionList> {
+class _SessionTabsState extends State<SessionTabs> {
   @override
   Widget build(BuildContext context) {
     return Consumer<SessionListProvider>(
@@ -21,11 +21,12 @@ class _SessionListState extends State<SessionList> {
             selectedColor: Theme.of(context).colorScheme.surfaceContainerLow,
             hoverColor: Theme.of(context).colorScheme.surfaceContainerHigh,
           ),
+          addTab: (){},
           tabs: [
             for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
               CommonTabWrap(
                 avatar: Image.asset("assets/icons/mysql_icon.png"),
-                label: sessionListProvider.sessions.data[i].conn.meta.host,
+                label: sessionListProvider.sessions.data[i].conn != null? sessionListProvider.sessions.data[i].conn!.meta.host: "new",
                 items: <PopupMenuEntry>[
                   PopupMenuItem<String>(
                     height: 30,

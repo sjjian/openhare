@@ -1,10 +1,10 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/add_instance.dart';
-import 'package:client/screens/instances.dart';
-import 'package:client/screens/settings.dart';
-import 'package:client/screens/session.dart';
+import 'package:client/screens/instances/add_instance.dart';
+import 'package:client/screens/instances/instances.dart';
+import 'package:client/screens/settings/settings.dart';
+import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';

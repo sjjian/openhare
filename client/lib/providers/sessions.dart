@@ -18,7 +18,7 @@ class SessionListProvider with ChangeNotifier {
     // todo
     for (final session in sessions.data) {
       if (session.id == sessionId) {
-        await session.conn.connect();
+        await session.conn!.connect();
         notifyListeners();
         if (session == sessionProvider._session) {
           sessionProvider.update(session);
@@ -32,7 +32,7 @@ class SessionListProvider with ChangeNotifier {
     // todo
     for (final session in sessions.data) {
       if (session.id == sessionId) {
-        await session.conn.close();
+        await session.conn?.close();
         notifyListeners();
         if (session == sessionProvider._session) {
           sessionProvider.update(session);
@@ -111,14 +111,18 @@ class SessionProvider with ChangeNotifier {
       return false;
     }
     return (_session!.state != SQLExecuteState.executing &&
-        _session!.conn.state == SQLConnectState.connected);
+        _session!.conn?.state == SQLConnectState.connected);
+  }
+
+  bool selectedConn() {
+    return _session!.conn != null;
   }
 
   Future<void> query(String query) async {
     if (_session == null) {
       return;
     }
-    if (_session!.conn.state != SQLConnectState.connected) {
+    if (_session!.conn?.state != SQLConnectState.connected) {
       return;
     }
 
@@ -129,7 +133,7 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      IResultSet resultSet = await _session!.conn.conn!.execute(query);
+      IResultSet resultSet = await _session!.conn!.conn!.execute(query);
 
       List<PlutoColumn> columns = List.empty(growable: true);
       for (final column in resultSet.cols) {
