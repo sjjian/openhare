@@ -1,4 +1,6 @@
+import 'package:client/models/connection.dart';
 import 'package:client/providers/instances.dart';
+import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,11 +16,22 @@ class _AddSessionState extends State<AddSession> {
   Widget build(BuildContext context) {
     InstancesProvider instances = Provider.of<InstancesProvider>(context);
     return Container(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      width: 300,
       child: Align(
-        child: ListView(children: [
-          for (var inst in instances.instancesModel)
-            Text(inst.name)
-        ],),
+        child: ListView(
+          children: [
+            for (var inst in instances.instancesModel)
+              TextButton(
+                  onPressed: () {
+                    SessionProvider session =
+                        Provider.of<SessionProvider>(context, listen: false);
+                    session.setConn(SQLConnModel(SQLConnMetaModel(
+                        inst.addr, inst.port, inst.user, inst.password))); //todo: 统一inst和conn meta
+                  },
+                  child: Text(inst.name))
+          ],
+        ),
       ),
     );
   }

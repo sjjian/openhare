@@ -21,7 +21,12 @@ class _SessionTabsState extends State<SessionTabs> {
             selectedColor: Theme.of(context).colorScheme.surfaceContainerLow,
             hoverColor: Theme.of(context).colorScheme.surfaceContainerHigh,
           ),
-          addTab: (){},
+          addTab: (){
+            sessionListProvider.addSession();
+          },
+          // onReorder: (oldIndex, newIndex) {
+          //   sessionListProvider.reorderSession(oldIndex, newIndex);
+          // },
           tabs: [
             for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
               CommonTabWrap(
@@ -32,7 +37,7 @@ class _SessionTabsState extends State<SessionTabs> {
                     height: 30,
                     onTap: () {
                       sessionListProvider
-                          .connect(sessionListProvider.sessions.data[i].id);
+                          .connect(sessionListProvider.sessions.data[i]);
                     },
                     child: const Text("连接"),
                   ),
@@ -41,7 +46,7 @@ class _SessionTabsState extends State<SessionTabs> {
                     height: 30,
                     onTap: () {
                       sessionListProvider
-                          .close(sessionListProvider.sessions.data[i].id);
+                          .close(sessionListProvider.sessions.data[i]);
                     },
                     child: const Text("断开"),
                   ),
@@ -54,7 +59,9 @@ class _SessionTabsState extends State<SessionTabs> {
                 onTap: () {
                   sessionListProvider.selectSessionByIndex(i);
                 },
-                onDeleted: () {},
+                onDeleted: () {
+                  sessionListProvider.removeSession(sessionListProvider.sessions.data[i]);
+                },
                 selected: sessionListProvider.sessions.data
                     .isSelected(sessionListProvider.sessions.data[i]),
               )

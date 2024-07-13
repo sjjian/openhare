@@ -10,18 +10,16 @@ class SessionsModel {
 
   SessionsModel() {
     data.add(SessionModel(
-        id: 1,
         conn: SQLConnModel(
             SQLConnMetaModel("10.186.62.16", 3306, "root", "mysqlpass"))));
     data.add(SessionModel(
-      id: 2,
     ));
     data.select(0);
   }
 }
 
 class SessionModel {
-  int id;
+  // String id;
 
   SQLConnModel? conn;
 
@@ -34,7 +32,7 @@ class SessionModel {
     language: sql,
   );
 
-  SessionModel({required this.id, this.conn});
+  SessionModel({this.conn});
 
   int genSQLResultId() {
     return sqlResults.isEmpty

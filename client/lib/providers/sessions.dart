@@ -14,10 +14,10 @@ class SessionListProvider with ChangeNotifier {
 
   SessionListProvider(this.sessionProvider, this.sessions);
 
-  Future<void> connect(int sessionId) async {
+  Future<void> connect(SessionModel session) async {
     // todo
-    for (final session in sessions.data) {
-      if (session.id == sessionId) {
+    for (final s in sessions.data) {
+      if (s == session) {
         await session.conn!.connect();
         notifyListeners();
         if (session == sessionProvider._session) {
@@ -28,10 +28,10 @@ class SessionListProvider with ChangeNotifier {
     }
   }
 
-  Future<void> close(int sessionId) async {
+  Future<void> close(SessionModel session) async {
     // todo
-    for (final session in sessions.data) {
-      if (session.id == sessionId) {
+    for (final s in sessions.data) {
+      if (s == session) {
         await session.conn?.close();
         notifyListeners();
         if (session == sessionProvider._session) {
@@ -47,6 +47,28 @@ class SessionListProvider with ChangeNotifier {
       notifyListeners();
       sessionProvider.update(sessions.data.selected());
     }
+  }
+
+  void deleteSessionByIndex(int index) {
+    sessions.data.removeAt(index);
+    notifyListeners();
+  }
+
+  void reorderSession(int oldIndex, int newIndex) {
+    sessions.data.reorder(oldIndex, newIndex);
+    notifyListeners();
+  }
+
+  void addSession() {
+    SessionModel session = SessionModel();
+    sessions.data.add(session);
+    notifyListeners();
+    sessionProvider.update(session);
+  }
+
+  void removeSession(SessionModel session) {
+    sessions.data.remove(session);
+    notifyListeners();
   }
 }
 
@@ -116,6 +138,11 @@ class SessionProvider with ChangeNotifier {
 
   bool selectedConn() {
     return _session!.conn != null;
+  }
+
+  void setConn(SQLConnModel conn) {
+    _session!.conn = conn;
+    notifyListeners();
   }
 
   Future<void> query(String query) async {
