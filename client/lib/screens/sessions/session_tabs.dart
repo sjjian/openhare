@@ -21,17 +21,19 @@ class _SessionTabsState extends State<SessionTabs> {
             selectedColor: Theme.of(context).colorScheme.surfaceContainerLow,
             hoverColor: Theme.of(context).colorScheme.surfaceContainerHigh,
           ),
-          addTab: (){
+          addTab: () {
             sessionListProvider.addSession();
           },
-          // onReorder: (oldIndex, newIndex) {
-          //   sessionListProvider.reorderSession(oldIndex, newIndex);
-          // },
+          onReorder: (oldIndex, newIndex) {
+            sessionListProvider.reorderSession(oldIndex, newIndex);
+          },
           tabs: [
             for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
               CommonTabWrap(
                 avatar: Image.asset("assets/icons/mysql_icon.png"),
-                label: sessionListProvider.sessions.data[i].conn != null? sessionListProvider.sessions.data[i].conn!.meta.host: "new",
+                label: sessionListProvider.sessions.data[i].conn != null
+                    ? sessionListProvider.sessions.data[i].conn!.meta.host
+                    : "new",
                 items: <PopupMenuEntry>[
                   PopupMenuItem<String>(
                     height: 30,
@@ -51,16 +53,21 @@ class _SessionTabsState extends State<SessionTabs> {
                     child: const Text("断开"),
                   ),
                   const PopupMenuDivider(height: 0.1),
-                  const PopupMenuItem<String>(
+                  PopupMenuItem<String>(
                     height: 30,
-                    child: Text("关闭"),
+                    onTap: () {
+                      sessionListProvider
+                          .deleteSessionByIndex(i);
+                    },
+                    child: const Text("关闭"),
                   ),
                 ],
                 onTap: () {
                   sessionListProvider.selectSessionByIndex(i);
                 },
                 onDeleted: () {
-                  sessionListProvider.removeSession(sessionListProvider.sessions.data[i]);
+                  sessionListProvider
+                      .deleteSessionByIndex(i);
                 },
                 selected: sessionListProvider.sessions.data
                     .isSelected(sessionListProvider.sessions.data[i]),

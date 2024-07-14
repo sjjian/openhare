@@ -46,6 +46,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
           ));
 
       return Container(
+        constraints: const BoxConstraints(maxHeight: 40),
         padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
         decoration: BoxDecoration(
           color: widget.color ??

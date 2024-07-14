@@ -49,11 +49,6 @@ class SessionListProvider with ChangeNotifier {
     }
   }
 
-  void deleteSessionByIndex(int index) {
-    sessions.data.removeAt(index);
-    notifyListeners();
-  }
-
   void reorderSession(int oldIndex, int newIndex) {
     sessions.data.reorder(oldIndex, newIndex);
     notifyListeners();
@@ -66,9 +61,11 @@ class SessionListProvider with ChangeNotifier {
     sessionProvider.update(session);
   }
 
-  void removeSession(SessionModel session) {
-    sessions.data.remove(session);
+  void deleteSessionByIndex(int index) {
+    SessionModel session = sessions.data.removeAt(index);
+    session.conn?.close();
     notifyListeners();
+    sessionProvider.update(sessions.data.selected());
   }
 }
 

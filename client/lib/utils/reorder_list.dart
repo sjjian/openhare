@@ -32,7 +32,7 @@ class ReorderSelectedList<E> extends DelegatingList<E> {
         _selected = null;
       } else {
         // 删除的元素是当前选中的，则要切换选中元素；
-        _selected = _data[index];
+        _selected = index == _data.length - 1 ? _data[index] : _data[index - 1];
       }
     }
     return element;
