@@ -1,4 +1,5 @@
-import 'package:client/models/connection.dart';
+import 'package:client/core/connection/sql.dart';
+import 'package:client/models/instances.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +27,7 @@ class _AddSessionState extends State<AddSession> {
                   onPressed: () {
                     SessionProvider session =
                         Provider.of<SessionProvider>(context, listen: false);
-                    session.setConn(SQLConnModel(SQLConnMetaModel(
-                        inst.addr, inst.port, inst.user, inst.password))); //todo: 统一inst和conn meta
+                    session.setConn(SQLConnection(inst)); //todo: 统一inst和conn meta
                   },
                   child: Text(inst.name))
           ],

@@ -1,4 +1,4 @@
-import 'package:client/models/connection.dart';
+import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:code_text_field/code_text_field.dart';
@@ -137,7 +137,7 @@ class SessionProvider with ChangeNotifier {
     return _session!.conn != null;
   }
 
-  void setConn(SQLConnModel conn) {
+  void setConn(SQLConnection conn) {
     _session!.conn = conn;
     notifyListeners();
   }

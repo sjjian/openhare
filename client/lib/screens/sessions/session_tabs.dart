@@ -32,7 +32,7 @@ class _SessionTabsState extends State<SessionTabs> {
               CommonTabWrap(
                 avatar: Image.asset("assets/icons/mysql_icon.png"),
                 label: sessionListProvider.sessions.data[i].conn != null
-                    ? sessionListProvider.sessions.data[i].conn!.meta.host
+                    ? sessionListProvider.sessions.data[i].conn!.instance.addr
                     : "new",
                 items: <PopupMenuEntry>[
                   PopupMenuItem<String>(
