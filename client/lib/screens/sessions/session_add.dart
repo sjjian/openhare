@@ -15,14 +15,14 @@ class AddSession extends StatefulWidget {
 class _AddSessionState extends State<AddSession> {
   @override
   Widget build(BuildContext context) {
-    InstancesProvider instances = Provider.of<InstancesProvider>(context);
+    InstancesProvider instancesProvider = Provider.of<InstancesProvider>(context);
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       width: 300,
       child: Align(
         child: ListView(
           children: [
-            for (var inst in instances.instancesModel)
+            for (var inst in instancesProvider.st.instances!)
               TextButton(
                   onPressed: () {
                     SessionProvider session =

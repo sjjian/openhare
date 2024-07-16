@@ -1,3 +1,4 @@
+import 'package:client/core/storages/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
@@ -55,10 +56,13 @@ class _FleaSQLAppState extends State<FleaSQLApp> {
 
   @override
   Widget build(BuildContext context) {
+    final storage = Storage();
+    storage.load();
     final sessions = SessionsModel();
     final sessionProvider = SessionProvider(sessions.data.selected());
     final sessionListProvider = SessionListProvider(sessionProvider, sessions);
-    final instancesProvider = InstancesProvider();
+    final instancesProvider = InstancesProvider(storage);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: sessionProvider),
