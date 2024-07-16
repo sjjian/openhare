@@ -16,6 +16,7 @@ class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SessionTabs(),
         Expanded(
@@ -23,15 +24,15 @@ class _SQLEditPageState extends State<SQLEditPage> {
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
             children: [
-              Expanded(child: Consumer<SessionProvider>(
+              Consumer<SessionProvider>(
                   builder: (context, sessionProvider, _) {
                 final selectedConn = sessionProvider.selectedConn();
                 if (selectedConn) {
-                  return SqlEditor();
+                  return  const Expanded(child: SqlEditor()) ;
                 } else {
-                  return AddSession();
+                  return const AddSession();
                 }
-              })),
+              }),
               SizedBox(height: 30)
             ],
           ),

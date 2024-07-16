@@ -36,11 +36,11 @@ class _InstancesPageState extends State<InstancesPage> {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
                 decoration: BoxDecoration(
                     border: Border(bottom: Divider.createBorderSide(context))),
-                child: const Row(
+                child: Row(
                   children: [
                     Text(
                       "数据源列表",
-                      style: TextStyle(fontSize: 20),
+                      style:  Theme.of(context).textTheme.titleLarge,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

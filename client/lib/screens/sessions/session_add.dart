@@ -15,24 +15,73 @@ class AddSession extends StatefulWidget {
 class _AddSessionState extends State<AddSession> {
   @override
   Widget build(BuildContext context) {
-    InstancesProvider instancesProvider = Provider.of<InstancesProvider>(context);
+    InstancesProvider instancesProvider =
+        Provider.of<InstancesProvider>(context);
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      width: 300,
-      child: Align(
-        child: ListView(
-          children: [
-            for (var inst in instancesProvider.st.instances!)
-              TextButton(
-                  onPressed: () {
-                    SessionProvider session =
-                        Provider.of<SessionProvider>(context, listen: false);
-                    session.setConn(SQLConnection(inst)); //todo: 统一inst和conn meta
-                  },
-                  child: Text(inst.name))
-          ],
-        ),
+      padding: const EdgeInsets.all(10),
+      // color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      width: 1000,
+      child: Row(
+        children: [
+          const Expanded(child: Spacer()),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "最近使用：",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Container(
+                width: 400,
+                height: 400,
+                child: ListView(
+                  children: [
+                    for (var inst in instancesProvider.st.instances!)
+                      TextButton(
+                          onPressed: () {
+                            SessionProvider session =
+                                Provider.of<SessionProvider>(context,
+                                    listen: false);
+                            session.setConn(
+                                SQLConnection(inst)); //todo: 统一inst和conn meta
+                          },
+                          child: Text(inst.name))
+                  ],
+                ),
+              )
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "数据源列表：",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Container(
+                width: 400,
+                height: 400,
+                child: ListView(
+                  children: [
+                    for (var inst in instancesProvider.st.instances!)
+                      TextButton(
+                          onPressed: () {
+                            SessionProvider session =
+                                Provider.of<SessionProvider>(context,
+                                    listen: false);
+                            session.setConn(
+                                SQLConnection(inst)); //todo: 统一inst和conn meta
+                          },
+                          child: Text(inst.name))
+                  ],
+                ),
+              )
+            ],
+          ),
+          const Expanded(child: Spacer()),
+        ],
       ),
+      // child: ,
     );
   }
 }
