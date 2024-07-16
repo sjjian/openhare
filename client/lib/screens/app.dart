@@ -15,14 +15,14 @@ final GlobalKey<NavigatorState> _rootNavigatorKey =
 final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'shell');
 
-class FleaSQLApp extends StatefulWidget {
-  const FleaSQLApp({super.key});
+class App extends StatefulWidget {
+  const App({super.key});
 
   @override
-  State<FleaSQLApp> createState() => _FleaSQLAppState();
+  State<App> createState() => _AppState();
 }
 
-class _FleaSQLAppState extends State<FleaSQLApp> {
+class _AppState extends State<App> {
   final GoRouter _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: '/sessions',
@@ -70,7 +70,7 @@ class _FleaSQLAppState extends State<FleaSQLApp> {
         ChangeNotifierProvider.value(value: instancesProvider)
       ],
       child: MaterialApp.router(
-        title: 'Flea SQL',
+        title: 'Intro Data',
         theme: ThemeData(
           
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),

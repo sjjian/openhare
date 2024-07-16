@@ -7,7 +7,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = const WindowOptions(
-    title: "Flea SQL",
+    title: "Intro Data",
     size: Size(1400, 1000),
     center: true,
     skipTaskbar: false,
@@ -18,5 +18,5 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(const FleaSQLApp());
+  runApp(const App());
 }
