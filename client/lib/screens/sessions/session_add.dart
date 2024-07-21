@@ -28,33 +28,36 @@ class _AddSessionState extends State<AddSession> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "最近使用：",
+                "最近使用",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Container(
-                width: 400,
-                height: 400,
-                child: ListView(
-                  children: [
-                    for (var inst in instancesProvider.st.instances!)
-                      TextButton(
-                          onPressed: () {
-                            SessionProvider session =
-                                Provider.of<SessionProvider>(context,
-                                    listen: false);
-                            session.setConn(
-                                SQLConnection(inst)); //todo: 统一inst和conn meta
-                          },
-                          child: Text(inst.name))
-                  ],
-                ),
-              )
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+                  width: 900,
+                  // height: 400,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      for (var inst in instancesProvider.st.instances!)
+                        Text(inst.name)
+                    ],
+                  )
+                  // child: ListView(
+                  //   children: [
+                  //     for (var inst in instancesProvider.st.instances!)
+                  //       TextButton(
+                  //           onPressed: () {
+                  //             SessionProvider session =
+                  //                 Provider.of<SessionProvider>(context,
+                  //                     listen: false);
+                  //             session.setConn(
+                  //                 SQLConnection(inst)); //todo: 统一inst和conn meta
+                  //           },
+                  //           child: Text(inst.name))
+                  //   ],
+                  // ),
+                  ),
+                  Text(
                 "数据源列表：",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -78,6 +81,13 @@ class _AddSessionState extends State<AddSession> {
               )
             ],
           ),
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+              
+              
+          //   ],
+          // ),
           const Expanded(child: Spacer()),
         ],
       ),
