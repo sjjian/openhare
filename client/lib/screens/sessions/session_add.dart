@@ -19,7 +19,6 @@ class _AddSessionState extends State<AddSession> {
         Provider.of<InstancesProvider>(context);
     return Container(
       padding: const EdgeInsets.all(10),
-      // color: Theme.of(context).colorScheme.surfaceContainerHighest,
       width: 1000,
       child: Row(
         children: [
@@ -29,7 +28,7 @@ class _AddSessionState extends State<AddSession> {
             children: [
               Text(
                 "最近使用",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Container(
                   width: 900,
@@ -39,55 +38,46 @@ class _AddSessionState extends State<AddSession> {
                     children: [
                       const Divider(),
                       for (var inst in instancesProvider.st.instances!)
-                        Text(inst.name)
+                        TextButton(
+                            onPressed: () {
+                              SessionProvider session =
+                                  Provider.of<SessionProvider>(context,
+                                      listen: false);
+                              session.setConn(
+                                  SQLConnection(inst)); //todo: 统一inst和conn meta
+                            },
+                            child: Text(inst.name))
                     ],
-                  )
-                  // child: ListView(
-                  //   children: [
-                  //     for (var inst in instancesProvider.st.instances!)
-                  //       TextButton(
-                  //           onPressed: () {
-                  //             SessionProvider session =
-                  //                 Provider.of<SessionProvider>(context,
-                  //                     listen: false);
-                  //             session.setConn(
-                  //                 SQLConnection(inst)); //todo: 统一inst和conn meta
-                  //           },
-                  //           child: Text(inst.name))
-                  //   ],
-                  // ),
-                  ),
-                  Text(
-                "数据源列表：",
-                style: Theme.of(context).textTheme.titleLarge,
+                  )),
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                "数据源列表",
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Container(
-                width: 400,
-                height: 400,
-                child: ListView(
-                  children: [
-                    for (var inst in instancesProvider.st.instances!)
-                      TextButton(
-                          onPressed: () {
-                            SessionProvider session =
-                                Provider.of<SessionProvider>(context,
-                                    listen: false);
-                            session.setConn(
-                                SQLConnection(inst)); //todo: 统一inst和conn meta
-                          },
-                          child: Text(inst.name))
-                  ],
-                ),
-              )
+                  width: 900,
+                  // height: 400,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      for (var inst in instancesProvider.st.instances!)
+                        TextButton(
+                            onPressed: () {
+                              SessionProvider session =
+                                  Provider.of<SessionProvider>(context,
+                                      listen: false);
+                              session.setConn(
+                                  SQLConnection(inst)); //todo: 统一inst和conn meta
+                            },
+                            child: Text(inst.name))
+                    ],
+                  )
+                  )
             ],
           ),
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-              
-              
-          //   ],
-          // ),
           const Expanded(child: Spacer()),
         ],
       ),
