@@ -1,3 +1,4 @@
+import 'package:client/models/sessions.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class _SessionTabsState extends State<SessionTabs> {
             hoverColor: Theme.of(context).colorScheme.surfaceContainerHigh,
           ),
           addTab: () {
-            sessionListProvider.addSession();
+            sessionListProvider.addSession(SessionModel());
           },
           onReorder: (oldIndex, newIndex) {
             sessionListProvider.reorderSession(oldIndex, newIndex);

@@ -9,17 +9,7 @@ import 'package:flutter_highlight/themes/a11y-light.dart';
 class SessionsModel {
   ReorderSelectedList<SessionModel> data = ReorderSelectedList();
 
-  SessionsModel() {
-    data.add(SessionModel(
-        conn: SQLConnection(InstanceModel(
-            name: "test",
-            addr: "10.186.62.16",
-            port: 3306,
-            user: "root",
-            password: "mysqlpass"))));
-    data.add(SessionModel());
-    data.select(0);
-  }
+  // SessionsModel() {}
 }
 
 class SessionModel {

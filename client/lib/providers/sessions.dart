@@ -54,8 +54,7 @@ class SessionListProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addSession() {
-    SessionModel session = SessionModel();
+  void addSession(SessionModel session) {
     sessions.data.add(session);
     notifyListeners();
     sessionProvider.update(session);
@@ -66,6 +65,14 @@ class SessionListProvider with ChangeNotifier {
     session.conn?.close();
     notifyListeners();
     sessionProvider.update(sessions.data.selected());
+  }
+
+  void refresh() {
+    notifyListeners();
+  }
+
+  bool exist(SessionModel session) {
+    return sessions.data.contains(session);
   }
 }
 
@@ -133,14 +140,20 @@ class SessionProvider with ChangeNotifier {
         _session!.conn?.state == SQLConnectState.connected);
   }
 
-  bool selectedConn() {
-    return _session!.conn != null;
+  bool initialized() {
+    return _session != null && _session!.conn != null;
   }
 
   void setConn(SQLConnection conn) {
-    _session!.conn = conn;
+    if (_session == null) {
+      _session = SessionModel(conn: conn);
+    } else {
+      _session!.conn = conn;
+    }
     notifyListeners();
   }
+
+  SessionModel? get session => _session;
 
   Future<void> query(String query) async {
     if (_session == null) {

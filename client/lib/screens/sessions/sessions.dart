@@ -26,14 +26,13 @@ class _SQLEditPageState extends State<SQLEditPage> {
             children: [
               Consumer<SessionProvider>(
                   builder: (context, sessionProvider, _) {
-                final selectedConn = sessionProvider.selectedConn();
-                if (selectedConn) {
+                if ( sessionProvider.initialized()) {
                   return  const Expanded(child: SqlEditor()) ;
                 } else {
                   return const AddSession();
                 }
               }),
-              SizedBox(height: 30)
+              const SizedBox(height: 30)
             ],
           ),
         )),
