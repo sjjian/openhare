@@ -7,6 +7,11 @@ class InstancesProvider extends ChangeNotifier {
 
   InstancesProvider(this.st);
 
+  Future<void> loadInstance() async {
+    await st.load();
+    notifyListeners();
+  }
+
   void addInstance(InstanceModel instance) {
     st.instances?.add(instance);
     st.save();

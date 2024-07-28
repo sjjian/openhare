@@ -57,11 +57,11 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     final storage = Storage();
-    storage.load();
+    final instancesProvider = InstancesProvider(storage);
+    instancesProvider.loadInstance();
     final sessions = SessionsModel();
     final sessionProvider = SessionProvider(sessions.data.selected());
     final sessionListProvider = SessionListProvider(sessionProvider, sessions);
-    final instancesProvider = InstancesProvider(storage);
 
     return MultiProvider(
       providers: [
@@ -72,7 +72,6 @@ class _AppState extends State<App> {
       child: MaterialApp.router(
         title: 'Intro Data',
         theme: ThemeData(
-          
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
@@ -98,84 +97,85 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
         body: Row(
-      children: <Widget>[
-        NavigationRail(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-          useIndicator: true,
-          selectedIndex: _calculateSelectedIndex(context),
-          onDestinationSelected: (value) {
-            _onItemTapped(value, context);
-          },
-          extended: extended,
-          leading: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    extended = !extended;
-                  });
-                },
-                child: extended
-                    ? const Icon(Icons.menu_open)
-                    : const Icon(Icons.menu),
+          children: <Widget>[
+            NavigationRail(
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
+              useIndicator: true,
+              selectedIndex: _calculateSelectedIndex(context),
+              onDestinationSelected: (value) {
+                _onItemTapped(value, context);
+              },
+              extended: extended,
+              leading: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        extended = !extended;
+                      });
+                    },
+                    child: extended
+                        ? const Icon(Icons.menu_open)
+                        : const Icon(Icons.menu),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  FloatingActionButton.small(
+                    elevation: 2,
+                    onPressed: () =>
+                        {AddInstancePage.showAddInstanceDialog(context)},
+                    child: const Icon(Icons.add),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 15,
-              ),
-              FloatingActionButton.small(
-                elevation: 2,
-                onPressed: () =>
-                    {AddInstancePage.showAddInstanceDialog(context)},
-                child: const Icon(Icons.add),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-            ],
-          ),
-          destinations: const [
-            NavigationRailDestination(
-              icon: Icon(Icons.personal_video),
-              label: Text(
-                "工作台",
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.auto_awesome_mosaic_outlined),
-              label: Center(
-                child: Text(
-                  "数据源",
-                  style: TextStyle(fontSize: 16),
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.personal_video),
+                  label: Text(
+                    "工作台",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.auto_awesome_mosaic_outlined),
+                  label: Center(
+                    child: Text(
+                      "数据源",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.settings),
+                  label: Center(
+                    child: Text(
+                      "设置",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                )
+              ],
+              trailing: const Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: FlutterLogo(),
+                  ),
                 ),
               ),
             ),
-            NavigationRailDestination(
-              icon: Icon(Icons.settings),
-              label: Center(
-                child: Text(
-                  "设置",
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            )
+            Expanded(child: widget.child)
           ],
-          trailing: const Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
-                child: FlutterLogo(),
-              ),
-            ),
-          ),
-        ),
-        Expanded(child: widget.child)
-      ],
-    ));
+        ));
   }
 
   static int _calculateSelectedIndex(BuildContext context) {

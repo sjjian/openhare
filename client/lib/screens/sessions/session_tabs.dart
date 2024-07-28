@@ -33,7 +33,7 @@ class _SessionTabsState extends State<SessionTabs> {
               CommonTabWrap(
                 avatar: Image.asset("assets/icons/mysql_icon.png"),
                 label: sessionListProvider.sessions.data[i].conn != null
-                    ? sessionListProvider.sessions.data[i].conn!.instance.addr
+                    ? sessionListProvider.sessions.data[i].conn!.instance.name
                     : "new",
                 items: <PopupMenuEntry>[
                   PopupMenuItem<String>(
@@ -57,8 +57,7 @@ class _SessionTabsState extends State<SessionTabs> {
                   PopupMenuItem<String>(
                     height: 30,
                     onTap: () {
-                      sessionListProvider
-                          .deleteSessionByIndex(i);
+                      sessionListProvider.deleteSessionByIndex(i);
                     },
                     child: const Text("关闭"),
                   ),
@@ -67,8 +66,7 @@ class _SessionTabsState extends State<SessionTabs> {
                   sessionListProvider.selectSessionByIndex(i);
                 },
                 onDeleted: () {
-                  sessionListProvider
-                      .deleteSessionByIndex(i);
+                  sessionListProvider.deleteSessionByIndex(i);
                 },
                 selected: sessionListProvider.sessions.data
                     .isSelected(sessionListProvider.sessions.data[i]),
