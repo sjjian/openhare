@@ -170,7 +170,9 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      IResultSet resultSet = await _session!.conn!.conn!.execute(query);
+      DateTime start = DateTime.now();
+      IResultSet resultSet = await _session!.conn!.execute(query);
+      DateTime end = DateTime.now();
 
       List<PlutoColumn> columns = List.empty(growable: true);
       for (final column in resultSet.cols) {
@@ -189,12 +191,15 @@ class SessionProvider with ChangeNotifier {
           rows.add(PlutoRow(cells: cells));
         }
       }
-      result.setDone(columns, rows);
+      result.setDone(
+          columns, rows, resultSet.affectedRows, end.difference(start));
       _session!.state = SQLExecuteState.done;
     } catch (e) {
       result.setError(e);
       _session!.state = SQLExecuteState.error;
     } finally {
+      print(
+          "effect rows: ${result.effectRows}, execute time: ${result.executeTime}");
       notifyListeners();
     }
   }

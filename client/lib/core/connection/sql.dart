@@ -39,4 +39,9 @@ class SQLConnection {
       // todo: handler error;
     }
   }
+
+  Future<IResultSet> execute(String query) async {
+    IResultSet resultSet =  await conn!.execute(query);
+    return resultSet;
+  }
 }
