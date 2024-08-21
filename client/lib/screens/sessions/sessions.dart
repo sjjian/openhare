@@ -1,3 +1,4 @@
+import 'package:client/models/sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_add.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
@@ -24,15 +25,32 @@ class _SQLEditPageState extends State<SQLEditPage> {
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
             children: [
-              Consumer<SessionProvider>(
-                  builder: (context, sessionProvider, _) {
-                if ( sessionProvider.initialized()) {
-                  return  const Expanded(child: SqlEditor()) ;
+              Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+                if (sessionProvider.initialized()) {
+                  return const Expanded(child: SqlEditor());
                 } else {
                   return const AddSession();
                 }
               }),
-              const SizedBox(height: 30)
+              Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+                if (sessionProvider.initialized() &&
+                    !sessionProvider.showRecord &&
+                    sessionProvider.getCurrentSQLResult() != null) {
+                  SQLResultModel result =
+                      sessionProvider.getCurrentSQLResult()!;
+                  return SizedBox(
+                    height: 30,
+                    child: Row(
+                      children: [
+                        Text('effect rows: ${result.effectRows}'),
+                        Text('duration: ${result.executeTime!.inSeconds}'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox(height: 30);
+                }
+              }),
             ],
           ),
         )),
