@@ -1,0 +1,55 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:client/providers/sessions.dart';
+import 'package:client/models/sql_result.dart';
+
+class SessionStatus extends StatefulWidget {
+  const SessionStatus({Key? key}) : super(key: key);
+
+  @override
+  State<SessionStatus> createState() => _SessionStatusState();
+}
+
+class _SessionStatusState extends State<SessionStatus> {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+      if (sessionProvider.initialized() &&
+          !sessionProvider.showRecord &&
+          sessionProvider.getCurrentSQLResult() != null) {
+        SQLResultModel? result = sessionProvider.getCurrentSQLResult();
+        if (result == null) {
+          return const SizedBox(height: 30);
+        }
+        if (result.state == SQLExecuteState.done) {
+          return SizedBox(
+            height: 30,
+            child: Row(
+              children: [
+                Tooltip(
+                    message: 'effect rows: ${result.effectRows}',
+                    child: Text('effect rows: ${result.effectRows}')),
+                const Text("  |  "),
+                Tooltip(
+                    message: 'duration: ${result.executeTime!.inSeconds}',
+                    child: Text('duration: ${result.executeTime!.inSeconds}')),
+                const Text("  |  "),
+                Tooltip(
+                  message: result.query,
+                  child: SizedBox(
+                      width: 200,
+                      child: Text("query: ${result.query}",
+                          overflow: TextOverflow.ellipsis)),
+                )
+              ],
+            ),
+          );
+        } else {
+          return const SizedBox(height: 30);
+        }
+      } else {
+        return const SizedBox(height: 30);
+      }
+    });
+  }
+}

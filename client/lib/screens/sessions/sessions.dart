@@ -2,6 +2,7 @@ import 'package:client/models/sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_add.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
+import 'package:client/screens/sessions/session_status.dart';
 import 'package:client/screens/sessions/session_tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,25 +33,7 @@ class _SQLEditPageState extends State<SQLEditPage> {
                   return const AddSession();
                 }
               }),
-              Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-                if (sessionProvider.initialized() &&
-                    !sessionProvider.showRecord &&
-                    sessionProvider.getCurrentSQLResult() != null) {
-                  SQLResultModel result =
-                      sessionProvider.getCurrentSQLResult()!;
-                  return SizedBox(
-                    height: 30,
-                    child: Row(
-                      children: [
-                        Text('effect rows: ${result.effectRows}'),
-                        Text('duration: ${result.executeTime!.inSeconds}'),
-                      ],
-                    ),
-                  );
-                } else {
-                  return const SizedBox(height: 30);
-                }
-              }),
+              const SessionStatus(),
             ],
           ),
         )),
