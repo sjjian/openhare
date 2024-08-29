@@ -1,5 +1,6 @@
 import "token.dart";
 import "scanner.dart";
+import "token_builder.dart";
 
 class LexerContext {
   Pos lastPos;
@@ -29,7 +30,6 @@ class Lexer {
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
     SpaceTokenBuilder(),
     KeyWordTokenBuilder(Lexer.keywords),
-    NumberTokenBuilder(),
     SingleQValueTokenBuilder(),
     DoubleQValueTokenBuilder(),
     BackQValueTokenBuilder(),
