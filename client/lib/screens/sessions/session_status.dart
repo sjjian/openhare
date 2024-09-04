@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/models/sql_result.dart';
+import 'package:client/utils/duration_extend.dart';
 
 class SessionStatus extends StatefulWidget {
   const SessionStatus({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class _SessionStatusState extends State<SessionStatus> {
                 const Text("  |  "),
                 Tooltip(
                     message: 'duration: ${result.executeTime!.inSeconds}',
-                    child: Text('duration: ${result.executeTime!.inSeconds}')),
+                    child: Text('duration: ${result.executeTime!.format()}')),
                 const Text("  |  "),
                 Tooltip(
                   message: result.query,
