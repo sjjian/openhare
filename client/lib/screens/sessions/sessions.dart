@@ -1,6 +1,8 @@
+import 'package:client/models/sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_add.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
+import 'package:client/screens/sessions/session_status.dart';
 import 'package:client/screens/sessions/session_tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,15 +26,14 @@ class _SQLEditPageState extends State<SQLEditPage> {
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
             children: [
-              Consumer<SessionProvider>(
-                  builder: (context, sessionProvider, _) {
-                if ( sessionProvider.initialized()) {
-                  return  const Expanded(child: SqlEditor()) ;
+              Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+                if (sessionProvider.initialized()) {
+                  return const Expanded(child: SqlEditor());
                 } else {
                   return const AddSession();
                 }
               }),
-              const SizedBox(height: 30)
+              const SessionStatus(),
             ],
           ),
         )),
