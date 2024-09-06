@@ -37,7 +37,7 @@ class _SessionStatusState extends State<SessionStatus> {
                   message: result.query,
                   child: SizedBox(
                       width: 200,
-                      child: Text("query: ${result.query}",
+                      child: Text("query: ${result.query.trimLeft().split("\n")[0]}",
                           overflow: TextOverflow.ellipsis)),
                 )
               ],
