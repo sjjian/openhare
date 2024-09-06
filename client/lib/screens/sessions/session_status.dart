@@ -14,14 +14,12 @@ class SessionStatus extends StatefulWidget {
 class _SessionStatusState extends State<SessionStatus> {
   @override
   Widget build(BuildContext context) {
+    // todo: 采用更通用的形式
     return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
       if (sessionProvider.initialized() &&
           !sessionProvider.showRecord &&
           sessionProvider.getCurrentSQLResult() != null) {
-        SQLResultModel? result = sessionProvider.getCurrentSQLResult();
-        if (result == null) {
-          return const SizedBox(height: 30);
-        }
+        SQLResultModel result = sessionProvider.getCurrentSQLResult()!;
         if (result.state == SQLExecuteState.done) {
           return SizedBox(
             height: 30,
