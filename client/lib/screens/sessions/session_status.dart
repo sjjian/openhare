@@ -30,7 +30,7 @@ class _SessionStatusState extends State<SessionStatus> {
                     child: Text('effect rows: ${result.effectRows}')),
                 const Text("  |  "),
                 Tooltip(
-                    message: 'duration: ${result.executeTime!.inSeconds}',
+                    message: 'duration: ${result.executeTime!.format()}',
                     child: Text('duration: ${result.executeTime!.format()}')),
                 const Text("  |  "),
                 Tooltip(
