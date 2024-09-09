@@ -1,7 +1,7 @@
 class Pos {
-  int cursor = -1;
-  int line = 1;
-  int row = 0;
+  int cursor = 0; // 记录偏移值，对应字符串文本的数组下标
+  int line = 1; // 记录偏移的行数
+  int row = 0; // 记录当前行的偏移值
 
   Pos.init();
 
@@ -74,7 +74,7 @@ class Scanner {
     }
     if (prefix.length == 1 || hasNextN(prefix.length - 1)) {
       var sub = buf.substring(pos.cursor, pos.cursor + prefix.length);
-      return ( sub == prefix);
+      return (sub == prefix);
     } else {
       return false;
     }
@@ -87,7 +87,7 @@ class Scanner {
   }
 
   String subString(Pos start, Pos end) {
-    if (start.cursor > length -1 || start.cursor > end.cursor) {
+    if (start.cursor > length - 1 || start.cursor > end.cursor) {
       return "";
     }
     return buf.substring(start.cursor, end.cursor + 1);
