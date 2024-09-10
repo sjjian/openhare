@@ -182,3 +182,15 @@ class NumberTokenBuilder implements TokenBuilder {
     return (false, null);
   }
 }
+
+class EOFTokenBuilder implements TokenBuilder {
+  EOFTokenBuilder();
+
+  @override
+  (bool, TokenType?) matchToken(LexerContext ctx) {
+    if (ctx.scanner.curChar() == 0) {
+      return (true, TokenType.eof);
+    }
+    return (false, null);
+  }
+}

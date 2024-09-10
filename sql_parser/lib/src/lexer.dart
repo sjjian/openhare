@@ -28,13 +28,14 @@ class Lexer {
   static Set<String> keywords = {"select", "update"};
 
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
+    EOFTokenBuilder(),
     SpaceTokenBuilder(),
     KeyWordTokenBuilder(Lexer.keywords),
     SingleQValueTokenBuilder(),
     DoubleQValueTokenBuilder(),
     BackQValueTokenBuilder(),
     NumberTokenBuilder(),
-    PunctuationTokenBuilder()
+    PunctuationTokenBuilder(),
   ]);
 
   LexerContext ctx;
@@ -42,10 +43,10 @@ class Lexer {
   Lexer(String content) : ctx = LexerContext(content);
 
   Token scan() {
-    if (!ctx.scanner.next()) {
-      ctx = LexerContext.from(ctx);
-      return ctx.genToken(TokenType.eof);
-    }
+    // if (!ctx.scanner.next()) {
+    //   ctx = LexerContext.from(ctx);
+    //   return ctx.genToken(TokenType.eof);
+    // }
     ctx = LexerContext.from(ctx);
     var (match, tok) = builder.matchToken(ctx);
     if (!match || tok == null) {

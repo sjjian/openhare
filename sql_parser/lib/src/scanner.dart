@@ -51,7 +51,7 @@ class Scanner {
   }
 
   int curChar() {
-    if (pos.cursor == -1 || pos.cursor > length - 1) {
+    if (pos.cursor > length - 1) {
       return 0;
     }
     return buf.codeUnitAt(pos.cursor);
