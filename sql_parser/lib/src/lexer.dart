@@ -3,28 +3,15 @@ import "scanner.dart";
 import "token_builder.dart";
 
 class LexerContext {
-  Pos lastPos;
+  Pos startPos;
   Scanner scanner;
 
   LexerContext(String content)
       : scanner = Scanner(content),
-        lastPos = Pos.init();
-
-  LexerContext.from(LexerContext parent)
-      : scanner = parent.scanner,
-        lastPos = parent.scanner.pos.copy();
-
-  Token genToken(TokenType tok) {
-    return Token(
-        tok, scanner.subString(lastPos, scanner.pos), lastPos, scanner.pos);
-  }
-
-  String subString() {
-    return scanner.subString(lastPos, scanner.pos);
-  }
+        startPos = Pos.init();
 }
 
-class Lexer {
+class Lexer extends LexerContext {
   static Set<String> keywords = {"select", "update"};
 
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
@@ -38,21 +25,26 @@ class Lexer {
     PunctuationTokenBuilder(),
   ]);
 
-  LexerContext ctx;
-
-  Lexer(String content) : ctx = LexerContext(content);
+  Lexer(String content) : super(content);
 
   Token scan() {
-    // if (!ctx.scanner.next()) {
-    //   ctx = LexerContext.from(ctx);
-    //   return ctx.genToken(TokenType.eof);
-    // }
-    ctx = LexerContext.from(ctx);
-    var (match, tok) = builder.matchToken(ctx);
+    var (match, tok) = builder.matchToken(this);
     if (!match || tok == null) {
-      return ctx.genToken(TokenType.invalid);
+      return genToken(TokenType.invalid);
     } else {
-      return ctx.genToken(tok);
+      Token token = genToken(tok);
+      scanner.next();
+      startPos = scanner.pos;
+      return token;
     }
   }
+
+  Token genToken(TokenType tok) {
+    return Token(tok, scanner.subString(startPos, scanner.pos), startPos.copy(),
+        scanner.pos.copy());
+  }
+
+  //   String subString() {
+  //   return scanner.subString(startPos, scanner.pos);
+  // }
 }

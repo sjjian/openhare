@@ -18,7 +18,7 @@ class TokenRooter implements TokenBuilder {
       if (match) {
         return (match, tok);
       }
-      ctx.scanner.seek(ctx.lastPos);
+      ctx.scanner.seek(ctx.startPos);
     }
     return (false, null);
   }
@@ -78,7 +78,7 @@ class KeyWordTokenBuilder extends IdentTokenBuilder {
   (bool, TokenType?) matchToken(LexerContext ctx) {
     var (match, tok) = super.matchToken(ctx);
     // 设计的不合理
-    if (match && keywords.contains(ctx.subString().toLowerCase())) {
+    if (match && keywords.contains(ctx.scanner.subString(ctx.startPos, ctx.scanner.pos).toLowerCase())) {
       return (match, TokenType.keyword);
     }
     return (match, tok);

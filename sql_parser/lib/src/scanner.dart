@@ -24,6 +24,7 @@ class Pos {
 
 class Scanner {
   final String buf;
+  // bool eof;
   final int length;
 
   Pos pos = Pos.init();
@@ -31,6 +32,7 @@ class Scanner {
   Scanner(final String content)
       : buf = content,
         length = content.length;
+        // eof = false;
 
   bool hasNextN(int count) {
     return pos.cursor + count <= length - 1;
@@ -38,7 +40,7 @@ class Scanner {
 
   bool nextN(int count) {
     var yes = hasNextN(count);
-    pos.offset(count);
+    if (yes) pos.offset(count);
     return yes;
   }
 
@@ -87,7 +89,7 @@ class Scanner {
   }
 
   String subString(Pos start, Pos end) {
-    if (start.cursor > length - 1 || start.cursor > end.cursor) {
+    if (start.cursor > length - 1|| end.cursor > length - 1 || start.cursor > end.cursor) {
       return "";
     }
     return buf.substring(start.cursor, end.cursor + 1);

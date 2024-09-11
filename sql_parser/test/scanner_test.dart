@@ -72,7 +72,13 @@ void main() {
   test('test sub string', () {
     Scanner s = Scanner("test sub string");
     expect(s.subString(Pos(0, 0, 0), Pos(0, 0, 0)), "t");
+    expect(s.subString(Pos(1, 0, 0), Pos(1, 0, 0)), "e");
+    expect(s.subString(Pos(14, 0, 0), Pos(14, 0, 0)), "g");
     expect(s.subString(Pos(0, 0, 0), Pos(1, 0, 1)), "te");
     expect(s.subString(Pos(0, 0, 0), Pos(14, 0, 14)), "test sub string");
+
+    expect(s.subString(Pos(0, 0, 0), Pos(15, 0, 0)), "");
+    expect(s.subString(Pos(15, 0, 0), Pos(14, 0, 0)), "");
+    expect(s.subString(Pos(4, 0, 0), Pos(3, 0, 0)), "");
   });
 }
