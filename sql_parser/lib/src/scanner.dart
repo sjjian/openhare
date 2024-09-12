@@ -5,6 +5,8 @@ class Pos {
 
   Pos.init();
 
+  Pos.none() : this(-1, -1, -1);
+
   Pos(this.cursor, this.line, this.row);
 
   Pos copy() {
@@ -24,7 +26,6 @@ class Pos {
 
 class Scanner {
   final String buf;
-  // bool eof;
   final int length;
 
   Pos pos = Pos.init();
@@ -32,7 +33,6 @@ class Scanner {
   Scanner(final String content)
       : buf = content,
         length = content.length;
-        // eof = false;
 
   bool hasNextN(int count) {
     return pos.cursor + count <= length - 1;
@@ -89,7 +89,9 @@ class Scanner {
   }
 
   String subString(Pos start, Pos end) {
-    if (start.cursor > length - 1|| end.cursor > length - 1 || start.cursor > end.cursor) {
+    if (start.cursor > length - 1 ||
+        end.cursor > length - 1 ||
+        start.cursor > end.cursor) {
       return "";
     }
     return buf.substring(start.cursor, end.cursor + 1);

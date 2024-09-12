@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:sql_parser/src/lexer.dart';
 import 'package:sql_parser/src/scanner.dart';
 import 'package:sql_parser/src/token.dart';
@@ -12,13 +14,25 @@ class SqlSplitter {
   List<String> split() {
     List<String> sqlList = List.empty(growable: true);
     // int pos = 0;
-    Pos startPos = Pos.init();
+    int startPos = 0;
+    Int endPos = 0;
     while (true) {
       Token tok = lexer.scan();
-      print("[${tok.id}][${tok.content}][${tok.endPos.cursor}]");
-      if ((tok.id == TokenType.punctuation && tok.content == ';') ||
+      if (tok.id != TokenType.eof) {
+        endPos = tok.endPos;
+      }
+      if ((tok.id == TokenType.punctuation && tok.content == ';')) {
+          String data = lexer.scanner.subString(startPos, tok.endPos);
+          sqlList.add(data);
+          startPos = lexer.startPos;
+      }
+
+      if (
           tok.id == TokenType.eof) {
-        sqlList.add(lexer.scanner.subString(startPos, tok.endPos));
+        print("[${tok.content}]");
+
+        print(data);
+        
         startPos = lexer.startPos;
       }
       if (tok.id == TokenType.eof) {
