@@ -27,8 +27,7 @@ class Lexer extends LexerContext {
   ]);
 
   Lexer(String content) : super(content);
- 
-  // 考虑使用迭代器
+
   Token scan() {
     if (eof) {
       return Token(TokenType.eof, "", Pos.none(), Pos.none());
@@ -41,6 +40,14 @@ class Lexer extends LexerContext {
     // 如果scanner next 失败, 则代表已经偏移结束了
     scanner.next() ? startPos = scanner.pos : eof = true;
     return token;
+  }
+
+  Token? scanWhere(bool Function(Token token) check) {
+    while (!eof) {
+      Token token = scan();
+      if (check(token)) return token;
+    }
+    return null;
   }
 
   Token genToken(TokenType tok) {

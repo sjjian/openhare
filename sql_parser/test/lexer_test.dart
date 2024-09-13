@@ -94,4 +94,17 @@ void main() {
     expect(tok.id, TokenType.eof);
     expect(tok.content, "");
   });
+  test('test lexer scanwhere', () {
+    var l = Lexer(
+        "aaa_123 \"abc\"   \"a\\\"bc\" 'abc' select a\$aa `\"abc` 123 123.1abc.1 ;");
+
+    Token? token = l.scanWhere((token) =>(token.id == TokenType.number && token.content=="123.1"));
+    expect(token!.id, TokenType.number);
+
+    token = l.scanWhere((token) =>(token.id == TokenType.punctuation && token.content==";"));
+    expect(token!.id, TokenType.punctuation);
+
+    token = l.scanWhere((token) =>(token.id == TokenType.ident && token.content=="no"));
+    expect(token, null);
+  });
 }
