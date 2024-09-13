@@ -78,8 +78,13 @@ class _CodeEditorState extends State<CodeEditor> {
                 alignment: Alignment.topLeft,
                 onPressed: canQuery
                     ? () {
-                        final query = widget.codeController.text.toString();
-                        if (query.isNotEmpty) {
+                        // todo: 实现切分执行和多SQL执行
+                        TextSelection s = widget.codeController.selection;
+                        var query = widget.codeController.text.toString();
+                        if (!s.isCollapsed) {
+                          query = widget.codeController.text.toString().substring(s.start, s.end);
+                        }
+                        if (query.trim().isNotEmpty) {
                           sessionProvider.query(query);
                         }
                       }
