@@ -4,8 +4,7 @@
 library;
 
 export 'src/lexer.dart';
-import 'package:build/build.dart';
-import 'package:sql_parser/src/character.dart';
+export 'src/splitter.dart';
 
 // class MyBuilder implements Builder {
 //     @override

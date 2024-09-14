@@ -1,12 +1,12 @@
 import 'package:sql_parser/src/lexer.dart';
 import 'package:sql_parser/src/token.dart';
 
-class SqlSplitter {
+class Splitter {
   String content;
 
   String delimiter;
 
-  SqlSplitter(this.content, this.delimiter);
+  Splitter(this.content, this.delimiter);
 
   List<String> split() {
     List<String> sqlList = List.empty(growable: true);
@@ -30,7 +30,7 @@ class SqlSplitter {
     if (rightContent.isEmpty) {
       return sqlList;
     }
-    List<String> nextSplit = SqlSplitter(rightContent, delimiter).split();
+    List<String> nextSplit = Splitter(rightContent, delimiter).split();
     if (nextSplit.isNotEmpty) sqlList.addAll(nextSplit);
     return sqlList;
   }
