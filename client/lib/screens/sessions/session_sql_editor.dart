@@ -7,6 +7,7 @@ import 'package:client/widgets/split_view.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:client/widgets/sql_result_table.dart';
 import 'package:client/widgets/tab_widget.dart';
+import 'package:sql_parser/sql_parser.dart';
 
 final multiSplitViewCtrl = MultiSplitViewController();
 
@@ -78,8 +79,29 @@ class _CodeEditorState extends State<CodeEditor> {
                 alignment: Alignment.topLeft,
                 onPressed: canQuery
                     ? () {
-                        final query = widget.codeController.text.toString();
-                        if (query.isNotEmpty) {
+                        var content = widget.codeController.text.toString();
+                        List<String> querys = Splitter(content, ";").split();
+                        TextSelection s = widget.codeController.selection;
+
+                        String query;
+                        // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
+                        if (!s.isCollapsed) {
+                          query = widget.codeController.text
+                              .toString()
+                              .substring(s.start, s.end);
+                        } else {
+                          // 当前界面未选中SQL, 则当前游标在哪个SQL片段内就执行哪个SQL. todo: 移动到通用的地方.
+                          int totalLength = 0;
+                          query = querys.firstWhere((query) {
+                            totalLength = totalLength + query.length;
+                            if (s.start <= totalLength) {
+                              return true;
+                            } else {
+                              return false;
+                            }
+                          }, orElse: () => "");
+                        }
+                        if (query.trim().isNotEmpty) {
                           sessionProvider.query(query);
                         }
                       }

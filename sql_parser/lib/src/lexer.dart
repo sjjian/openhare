@@ -1,57 +1,57 @@
 import "token.dart";
 import "scanner.dart";
+import "token_builder.dart";
 
 class LexerContext {
-  Pos lastPos;
+  Pos startPos;
   Scanner scanner;
+  bool eof = false; // 当 scanner 偏移到最后一位时，再次偏移就返回 eof.
 
   LexerContext(String content)
       : scanner = Scanner(content),
-        lastPos = Pos.init();
-
-  LexerContext.from(LexerContext parent)
-      : scanner = parent.scanner,
-        lastPos = parent.scanner.pos.copy();
-
-  Token genToken(TokenType tok) {
-    return Token(
-        tok, scanner.subString(lastPos, scanner.pos), lastPos, scanner.pos);
-  }
-
-  String subString() {
-    return scanner.subString(lastPos, scanner.pos);
-  }
+        startPos = Pos.init();
 }
 
-class Lexer {
+class Lexer extends LexerContext {
   static Set<String> keywords = {"select", "update"};
 
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
+    EOFTokenBuilder(),
     SpaceTokenBuilder(),
     KeyWordTokenBuilder(Lexer.keywords),
-    NumberTokenBuilder(),
     SingleQValueTokenBuilder(),
     DoubleQValueTokenBuilder(),
     BackQValueTokenBuilder(),
     NumberTokenBuilder(),
-    PunctuationTokenBuilder()
+    PunctuationTokenBuilder(),
   ]);
 
-  LexerContext ctx;
-
-  Lexer(String content) : ctx = LexerContext(content);
+  Lexer(String content) : super(content);
 
   Token scan() {
-    if (!ctx.scanner.next()) {
-      ctx = LexerContext.from(ctx);
-      return ctx.genToken(TokenType.eof);
+    if (eof) {
+      return Token(TokenType.eof, "", Pos.none(), Pos.none());
     }
-    ctx = LexerContext.from(ctx);
-    var (match, tok) = builder.matchToken(ctx);
-    if (!match || tok == null) {
-      return ctx.genToken(TokenType.invalid);
-    } else {
-      return ctx.genToken(tok);
+    var (match, tok) = builder.matchToken(this);
+
+    Token token =
+        (!match || tok == null) ? genToken(TokenType.invalid) : genToken(tok);
+
+    // 如果scanner next 失败, 则代表已经偏移结束了
+    scanner.next() ? startPos = scanner.pos : eof = true;
+    return token;
+  }
+
+  Token? scanWhere(bool Function(Token token) check) {
+    while (!eof) {
+      Token token = scan();
+      if (check(token)) return token;
     }
+    return null;
+  }
+
+  Token genToken(TokenType tok) {
+    return Token(tok, scanner.subString(startPos, scanner.pos), startPos.copy(),
+        scanner.pos.copy());
   }
 }
