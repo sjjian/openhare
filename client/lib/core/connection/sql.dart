@@ -7,8 +7,9 @@ class SQLConnection {
   InstanceModel instance;
   MySQLConnection? conn;
   SQLConnectState state = SQLConnectState.pending;
+  final void Function() onClose;
 
-  SQLConnection(this.instance);
+  SQLConnection(this.instance, this.onClose);
 
   Future<void> connect() async {
     try {
@@ -20,9 +21,12 @@ class SQLConnection {
           password: instance.password);
       await conn.connect();
       this.conn = conn;
+      conn.onClose(() {
+        state = SQLConnectState.pending;
+        onClose();
+      });
       state = SQLConnectState.connected;
     } catch (e) {
-      print(e);
       state = SQLConnectState.failed;
     }
   }
