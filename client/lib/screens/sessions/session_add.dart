@@ -1,5 +1,3 @@
-import 'package:client/core/connection/sql.dart';
-import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
@@ -45,9 +43,13 @@ class _AddSessionState extends State<AddSession> {
                       if (sessionProvider.session == null) {
                         SessionModel session = SessionModel();
                         sessionListProvider.addSession(session);
-                        sessionProvider.setConn(SQLConnection(inst));
+                        sessionProvider.setConn(inst);
+                        // 添加会话自动建立连接
+                        sessionListProvider.connect(session);
                       } else {
-                        sessionProvider.setConn(SQLConnection(inst));
+                        sessionProvider.setConn(inst);
+                        // todo: 添加会话自动建立连接
+                        // sessionListProvider.connect(session);
                       }
                       sessionListProvider.refresh();
                     },

@@ -1,4 +1,3 @@
-import 'package:client/models/sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_add.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';

@@ -5,6 +5,7 @@ import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:mysql_client/mysql_client.dart';
+import 'package:client/models/instances.dart';
 
 class InitializedProvider with ChangeNotifier {}
 
@@ -144,12 +145,17 @@ class SessionProvider with ChangeNotifier {
     return _session != null && _session!.conn != null;
   }
 
-  void setConn(SQLConnection conn) {
+  void setConn(InstanceModel instance) {
+    SQLConnection conn = SQLConnection(instance, onConnClose);
     if (_session == null) {
       _session = SessionModel(conn: conn);
     } else {
       _session!.conn = conn;
     }
+    notifyListeners();
+  }
+
+  void onConnClose() {
     notifyListeners();
   }
 
@@ -198,8 +204,6 @@ class SessionProvider with ChangeNotifier {
       result.setError(e);
       _session!.state = SQLExecuteState.error;
     } finally {
-      print(
-          "effect rows: ${result.effectRows}, execute time: ${result.executeTime}");
       notifyListeners();
     }
   }
