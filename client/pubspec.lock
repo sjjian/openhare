@@ -161,6 +161,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  common:
+    dependency: "direct main"
+    description:
+      path: "../common"
+      relative: true
+    source: path
+    version: "1.0.0"
   convert:
     dependency: transitive
     description:
@@ -693,13 +700,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
-  sql_parser:
-    dependency: "direct main"
-    description:
-      path: "../sql_parser"
-      relative: true
-    source: path
-    version: "1.0.0"
   stack_trace:
     dependency: transitive
     description:

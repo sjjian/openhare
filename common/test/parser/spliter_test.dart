@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:sql_parser/src/splitter.dart';
+import 'package:common/parser.dart';
 
 void main() {
   test('test split', () {

@@ -1,5 +1,5 @@
-import 'package:sql_parser/sql_parser.dart';
-import 'package:sql_parser/src/token.dart';
+import 'package:common/parser.dart';
+import 'package:common/src/parser/token.dart';
 import 'package:test/test.dart';
 
 void main() {
