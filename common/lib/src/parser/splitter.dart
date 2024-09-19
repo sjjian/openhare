@@ -1,5 +1,5 @@
-import 'package:sql_parser/src/lexer.dart';
-import 'package:sql_parser/src/token.dart';
+import 'lexer.dart';
+import 'token.dart';
 
 class Splitter {
   String content;

@@ -7,7 +7,7 @@ import 'package:client/widgets/split_view.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:client/widgets/sql_result_table.dart';
 import 'package:client/widgets/tab_widget.dart';
-import 'package:sql_parser/sql_parser.dart';
+import 'package:common/parser.dart';
 
 final multiSplitViewCtrl = MultiSplitViewController();
 
