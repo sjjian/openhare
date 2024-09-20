@@ -48,8 +48,8 @@ class _AddSessionState extends State<AddSession> {
                         sessionListProvider.connect(session);
                       } else {
                         sessionProvider.setConn(inst);
-                        // todo: 添加会话自动建立连接
-                        // sessionListProvider.connect(session);
+                        // 添加会话自动建立连接
+                        sessionProvider.connect();
                       }
                       sessionListProvider.refresh();
                     },
