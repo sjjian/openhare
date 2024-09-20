@@ -155,6 +155,13 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> connect() async {
+    if (_session != null) {
+      await _session!.conn!.connect();
+      notifyListeners();
+    }
+  }
+
   void onConnClose() {
     notifyListeners();
   }
