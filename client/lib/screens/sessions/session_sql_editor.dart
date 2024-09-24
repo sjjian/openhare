@@ -1,4 +1,5 @@
 import 'package:client/providers/sessions.dart';
+import 'package:client/widgets/hover_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
@@ -108,7 +109,8 @@ class _CodeEditorState extends State<CodeEditor> {
                     : null,
                 icon: Icon(Icons.play_arrow_rounded,
                     size: 36, color: canQuery ? Colors.green : Colors.grey));
-          })
+          }),
+          HoverIconButton(onTap: () => print(1), icon: Icons.play_arrow_rounded)
         ]),
       );
 
