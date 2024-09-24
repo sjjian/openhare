@@ -7,7 +7,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = const WindowOptions(
-    title: "Intro Data",
+    title: "Natuo",
     size: Size(1400, 1000),
     center: true,
     skipTaskbar: false,

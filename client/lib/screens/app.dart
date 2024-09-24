@@ -70,7 +70,7 @@ class _AppState extends State<App> {
         ChangeNotifierProvider.value(value: instancesProvider)
       ],
       child: MaterialApp.router(
-        title: 'Intro Data',
+        title: 'Natuo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
