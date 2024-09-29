@@ -168,7 +168,7 @@ class SessionProvider with ChangeNotifier {
 
   SessionModel? get session => _session;
 
-  Future<void> query(String query) async {
+  Future<void> query(String query, bool newResult) async {
     if (_session == null) {
       return;
     }
