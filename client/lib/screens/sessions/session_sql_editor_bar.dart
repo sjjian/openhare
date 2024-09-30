@@ -17,7 +17,7 @@ class CodeButtionBar extends StatefulWidget {
 }
 
 class _CodeButtionBarState extends State<CodeButtionBar> {
-  void query(SessionProvider sessionProvider) {
+  void query(SessionProvider sessionProvider, bool newResult) {
     var content = widget.codeController.text.toString();
     List<String> querys = Splitter(content, ";").split();
     TextSelection s = widget.codeController.selection;
@@ -39,7 +39,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
       }, orElse: () => "");
     }
     if (query.trim().isNotEmpty) {
-      sessionProvider.query(query, true);
+      sessionProvider.query(query, newResult);
     }
   }
 
@@ -59,17 +59,24 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 iconSize: widget.height,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(2),
-                onPressed: canQuery ? () => query : null,
+                onPressed: canQuery
+                    ? () {
+                        query(sessionProvider, false);
+                      }
+                    : null,
                 icon: Icon(Icons.play_arrow_rounded,
                     color: canQuery ? Colors.green : Colors.grey)),
             IconButton(
                 iconSize: widget.height,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(2),
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.play_arrow_rounded,
-                ))
+                onPressed: canQuery
+                    ? () {
+                        query(sessionProvider, true);
+                      }
+                    : null,
+                icon: Icon(Icons.play_arrow_rounded,
+                    color: canQuery ? Colors.green : Colors.grey)),
           ],
         );
       }),
