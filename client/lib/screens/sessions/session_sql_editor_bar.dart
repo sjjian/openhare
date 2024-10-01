@@ -75,8 +75,21 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                         query(sessionProvider, true);
                       }
                     : null,
-                icon: Icon(Icons.play_arrow_rounded,
-                    color: canQuery ? Colors.green : Colors.grey)),
+                icon: Stack(alignment: Alignment.center, children: [
+                  Icon(Icons.play_arrow_rounded,
+                      color: canQuery ? Colors.green : Colors.grey),
+                  Positioned(
+                    top: 5,
+                    left: 23,
+                    child: Icon(
+                      Icons.add,
+                      color: canQuery
+                          ? const Color.fromARGB(255, 179, 162, 17)
+                          : Colors.grey,
+                      size: 16,
+                    ),
+                  ),
+                ])),
           ],
         );
       }),
