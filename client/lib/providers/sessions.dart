@@ -168,16 +168,25 @@ class SessionProvider with ChangeNotifier {
 
   SessionModel? get session => _session;
 
-  Future<void> query(String query) async {
+  Future<void> query(String query, bool newResult) async {
     if (_session == null) {
       return;
     }
+
     if (_session!.conn?.state != SQLConnectState.connected) {
       return;
     }
+    SQLResultModel result;
 
-    final result = SQLResultModel(_session!.genSQLResultId(), query);
-    _session!.sqlResults.add(result);
+    SQLResultModel? cur = _session!.sqlResults.selected();
+    if (newResult || cur == null) {
+      result = SQLResultModel(_session!.genSQLResultId(), query);
+      _session!.sqlResults.add(result);
+    } else {
+      result = SQLResultModel(cur.id, query);
+      _session!.sqlResults.replace(cur, result);
+    }
+
     showRecord = false; // 如果执行query创建了新的tab则跳转过去
     _session!.state = SQLExecuteState.executing;
     notifyListeners();

@@ -35,13 +35,14 @@ class _SqlResultTableState extends State<SqlResultTable> {
       }
       if (result.state == SQLExecuteState.done) {
         return PlutoGrid(
-          key: ValueKey(result.id),
-          configuration:  PlutoGridConfiguration(
+          key: ObjectKey(result),
+          configuration: PlutoGridConfiguration(
             localeText: const PlutoGridLocaleText.china(),
             style: PlutoGridStyleConfig(
                 rowHeight: 30,
                 columnHeight: 36,
-                gridBorderColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+                gridBorderColor:
+                    Theme.of(context).colorScheme.surfaceContainerLowest,
                 enableGridBorderShadow: true),
           ),
           columns: result.columns!,

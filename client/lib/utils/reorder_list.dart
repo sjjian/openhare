@@ -55,4 +55,13 @@ class ReorderSelectedList<E> extends DelegatingList<E> {
   bool isSelected(E e) {
     return _selected == e;
   }
+
+  replace(E origin, E target) {
+    int index = _data.indexOf(origin);
+    // 如果不存在则 add, 如果存在, 则下标替换
+    index == -1 ? _data.add(target) : _data[index] = target;
+
+    // 如果替换的是selected 元素, 则selected 标记为 target 元素
+    _selected = _selected == origin ? target : _selected;
+  }
 }
