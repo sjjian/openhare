@@ -17,7 +17,7 @@ class CodeButtionBar extends StatefulWidget {
 }
 
 class _CodeButtionBarState extends State<CodeButtionBar> {
-  void query(SessionProvider sessionProvider, bool newResult) {
+  String getQuery(SessionProvider sessionProvider) {
     var content = widget.codeController.text.toString();
     List<String> querys = Splitter(content, ";").split();
     TextSelection s = widget.codeController.selection;
@@ -38,9 +38,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
         }
       }, orElse: () => "");
     }
-    if (query.trim().isNotEmpty) {
-      sessionProvider.query(query, newResult);
-    }
+    return query.trim();
   }
 
   @override
@@ -61,7 +59,10 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 padding: const EdgeInsets.all(2),
                 onPressed: canQuery
                     ? () {
-                        query(sessionProvider, false);
+                        String query = getQuery(sessionProvider);
+                        if (query.isNotEmpty) {
+                          sessionProvider.query(query, false);
+                        }
                       }
                     : null,
                 icon: Icon(Icons.play_arrow_rounded,
@@ -72,7 +73,10 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 padding: const EdgeInsets.all(2),
                 onPressed: canQuery
                     ? () {
-                        query(sessionProvider, true);
+                        String query = getQuery(sessionProvider);
+                        if (query.isNotEmpty) {
+                          sessionProvider.query(query, true);
+                        }
                       }
                     : null,
                 icon: Stack(alignment: Alignment.center, children: [
@@ -90,6 +94,40 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                     ),
                   ),
                 ])),
+            IconButton(
+                iconSize: widget.height,
+                padding: const EdgeInsets.all(2),
+                alignment: Alignment.topLeft,
+                onPressed: () {
+                  String query = getQuery(sessionProvider);
+                  if (query.isNotEmpty) {
+                    sessionProvider.query("explain $query", true);
+                  }
+                },
+                icon: Align(
+                  alignment: Alignment.center,
+                  child: Stack(
+                    children: [
+                      Icon(
+                        Icons.e_mobiledata,
+                        color: canQuery
+                            ? const Color.fromARGB(255, 241, 192, 84)
+                            : Colors.grey,
+                      ),
+                      Positioned(
+                        top: 13,
+                        left: 22,
+                        child: Icon(
+                          Icons.close,
+                          color: canQuery
+                              ? const Color.fromARGB(255, 179, 162, 17)
+                              : Colors.grey,
+                          size: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ))
           ],
         );
       }),
