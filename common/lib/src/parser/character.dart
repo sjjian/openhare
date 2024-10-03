@@ -15,6 +15,8 @@ class Char {
   static int comma = ",".codeUnitAt(0);
   static int semicolon = ";".codeUnitAt(0);
   static int period = ".".codeUnitAt(0);
+  static int slash = "/".codeUnitAt(0);
+  static int star = "*".codeUnitAt(0);
 
   static Set<int> punctuation = {
     "!",

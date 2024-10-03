@@ -1,5 +1,6 @@
 import 'package:client/models/instances.dart';
 import 'package:mysql_client/mysql_client.dart';
+import 'package:common/parser.dart';
 
 enum SQLConnectState { pending, connecting, connected, failed }
 
@@ -45,7 +46,19 @@ class SQLConnection {
   }
 
   Future<IResultSet> execute(String query) async {
-    IResultSet resultSet =  await conn!.execute(query);
+    // 判断是否是 SELECT 语句, 若是则嵌套一层 LIMIT 限制返回数据量. todo: 通用方法处理
+    Lexer lexer = Lexer(query);
+    final token = lexer.firstTrim();
+
+    if (token != null &&
+        token.id == TokenType.keyword &&
+        token.content == "select") {
+      query = "SELECT * FROM ($query) AS dt_1 Limit 100";
+    }
+
+    // 加入注释. todo: 通用方法处理
+    query = "/* call by natuo */ $query";
+    IResultSet resultSet = await conn!.execute(query);
     return resultSet;
   }
 }

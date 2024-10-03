@@ -94,17 +94,45 @@ void main() {
     expect(tok.id, TokenType.eof);
     expect(tok.content, "");
   });
-  test('test lexer scanwhere', () {
+  test('test lexer scanWhere', () {
     var l = Lexer(
         "aaa_123 \"abc\"   \"a\\\"bc\" 'abc' select a\$aa `\"abc` 123 123.1abc.1 ;");
 
-    Token? token = l.scanWhere((token) =>(token.id == TokenType.number && token.content=="123.1"));
+    Token? token = l.scanWhere(
+        (token) => (token.id == TokenType.number && token.content == "123.1"));
     expect(token!.id, TokenType.number);
 
-    token = l.scanWhere((token) =>(token.id == TokenType.punctuation && token.content==";"));
+    token = l.scanWhere(
+        (token) => (token.id == TokenType.punctuation && token.content == ";"));
     expect(token!.id, TokenType.punctuation);
 
-    token = l.scanWhere((token) =>(token.id == TokenType.ident && token.content=="no"));
+    token = l.scanWhere(
+        (token) => (token.id == TokenType.ident && token.content == "no"));
     expect(token, null);
+  });
+
+  test("test lexer first", () {
+    var l = Lexer("/* test */    select;");
+    Token? token = l.first((token) =>
+        (token.id == TokenType.whitespace || token.id == TokenType.comment));
+    expect(token!.id, TokenType.keyword);
+    expect(token.content, "select");
+
+    l = Lexer("-- abc\n select;");
+    token = l.first((token) =>
+        (token.id == TokenType.whitespace || token.id == TokenType.comment));
+    expect(token!.id, TokenType.keyword);
+    expect(token.content, "select");
+
+    l = Lexer("# abc\r\n select;");
+    token = l.first((token) =>
+        (token.id == TokenType.whitespace || token.id == TokenType.comment));
+    expect(token!.id, TokenType.keyword);
+    expect(token.content, "select");
+
+    l = Lexer("-- cba\r\n# cba\r select;");
+    token = l.firstTrim();
+    expect(token!.id, TokenType.keyword);
+    expect(token.content, "select");
   });
 }
