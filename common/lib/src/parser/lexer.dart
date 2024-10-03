@@ -23,6 +23,7 @@ class Lexer extends LexerContext {
     DoubleQValueTokenBuilder(),
     BackQValueTokenBuilder(),
     NumberTokenBuilder(),
+    CommentBuilder(),
     PunctuationTokenBuilder(),
   ]);
 
@@ -48,6 +49,25 @@ class Lexer extends LexerContext {
       if (check(token)) return token;
     }
     return null;
+  }
+
+  // 获取第一个token,
+  Token? first(bool Function(Token token) skip) {
+    while (!eof) {
+      Token token = scan();
+      if (skip(token)) {
+        continue;
+      } else {
+        return token;
+      }
+    }
+    return null;
+  }
+
+  // 获取第一个token, 去掉空格或注释.
+  Token? firstTrim() {
+    return first((token) =>
+        (token.id == TokenType.whitespace || token.id == TokenType.comment));
   }
 
   Token genToken(TokenType tok) {

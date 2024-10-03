@@ -78,7 +78,10 @@ class KeyWordTokenBuilder extends IdentTokenBuilder {
   (bool, TokenType?) matchToken(LexerContext ctx) {
     var (match, tok) = super.matchToken(ctx);
     // 设计的不合理
-    if (match && keywords.contains(ctx.scanner.subString(ctx.startPos, ctx.scanner.pos).toLowerCase())) {
+    if (match &&
+        keywords.contains(ctx.scanner
+            .subString(ctx.startPos, ctx.scanner.pos)
+            .toLowerCase())) {
       return (match, TokenType.keyword);
     }
     return (match, tok);
@@ -190,6 +193,56 @@ class EOFTokenBuilder implements TokenBuilder {
   (bool, TokenType?) matchToken(LexerContext ctx) {
     if (ctx.scanner.curChar() == 0) {
       return (true, TokenType.eof);
+    }
+    return (false, null);
+  }
+}
+
+class CommentBuilder implements TokenBuilder {
+  CommentBuilder();
+
+  (bool, TokenType?) matchNewLine(LexerContext ctx) {
+    while (ctx.scanner.hasNext() && ctx.scanner.next()) {
+      // \n
+      if (ctx.scanner.curChar() == Char.$n) {
+        return (true, TokenType.comment);
+      }
+      // \r 或者 \r\n
+      if (ctx.scanner.curChar() == Char.$r) {
+        // \r\n
+        if (ctx.scanner.hasNext() && ctx.scanner.nextChar() == Char.$n) {
+          ctx.scanner.next();
+        }
+        return (true, TokenType.comment);
+      }
+    }
+    return (false, null);
+  }
+
+  (bool, TokenType?) matchRightComment(LexerContext ctx) {
+    while (ctx.scanner.hasNext() && ctx.scanner.next()) {
+      // */
+      if (ctx.scanner.curChar() == Char.star &&
+          ctx.scanner.hasNext() &&
+          ctx.scanner.nextChar() == Char.slash) {
+        ctx.scanner.next();
+        return (true, TokenType.comment);
+      }
+    }
+    return (false, null);
+  }
+
+  @override
+  (bool, TokenType?) matchToken(LexerContext ctx) {
+    // find newline
+    if (ctx.scanner.startWith("-- ") || ctx.scanner.startWith("# ")) {
+      ctx.scanner.nextN(3);
+      return matchNewLine(ctx);
+    }
+    // find */
+    if (ctx.scanner.startWith("/*")) {
+      ctx.scanner.nextN(2);
+      return matchRightComment(ctx);
     }
     return (false, null);
   }
