@@ -46,16 +46,13 @@ class SQLConnection {
   }
 
   Future<IResultSet> execute(String query) async {
-    // 判断是否是 SELECT 语句, 若是则嵌套一层 LIMIT 限制返回数据量. todo: 通用方法处理
-    Lexer lexer = Lexer(query);
-    final token = lexer.firstTrim();
-
-    if (token != null &&
-        token.id == TokenType.keyword &&
-        token.content == "select") {
-      query = "SELECT * FROM ($query) AS dt_1 Limit 100";
+    // 判断是否是 SELECT 语句, 若是则嵌套一层 LIMIT 限制返回数据量, 暂时为100行. todo: 通用方法处理
+    final firstTok = Lexer(query).firstTrim();
+    if (firstTok != null && firstTok.content == "select") {
+      query = query.trimRight();
+      if (query.endsWith(";")) query = query.substring(0, query.length - 1);
+      query = "SELECT * FROM ($query) AS dt_1 Limit 100;";
     }
-
     // 加入注释. todo: 通用方法处理
     query = "/* call by natuo */ $query";
     IResultSet resultSet = await conn!.execute(query);
