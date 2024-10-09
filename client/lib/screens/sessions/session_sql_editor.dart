@@ -35,7 +35,7 @@ class _SqlEditorState extends State<SqlEditor> {
                   Consumer<SessionProvider>(
                     builder: (context, sessionProvider, _) {
                       return CodeEditor(
-                          key: UniqueKey(),
+                          key: ValueKey(sessionProvider.getSQLEditCode()),
                           codeController: sessionProvider.getSQLEditCode());
                     },
                   ),
