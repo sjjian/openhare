@@ -21,7 +21,9 @@ class _SessionStatusState extends State<SessionStatus> {
           sessionProvider.getCurrentSQLResult() != null) {
         SQLResultModel result = sessionProvider.getCurrentSQLResult()!;
         if (result.state == SQLExecuteState.done) {
-          return SizedBox(
+          return Container(
+            padding: const EdgeInsets.only(left: 42),
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
             height: 30,
             child: Row(
               children: [

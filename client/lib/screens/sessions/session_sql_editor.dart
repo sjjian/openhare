@@ -63,24 +63,30 @@ class _CodeEditorState extends State<CodeEditor> {
           child: CodeTheme(
         data: const CodeThemeData(styles: a11yLightTheme),
         child: CodeField(
+          lineNumberStyle: LineNumberStyle(
+              background: Theme.of(context).colorScheme.surfaceContainerLow),
           expands: true,
           controller: widget.codeController,
-          textStyle: const TextStyle(fontFamily: 'SourceCode'),
+          textStyle: const TextStyle(fontFamily: 'Roboto Mono'),
         ),
       ));
 
-      const double codeButtonHeight = 36;
-      Widget codeButtonBar = CodeButtionBar(
-          codeController: widget.codeController, height: codeButtonHeight);
+      // const double codeButtonHeight = 36;
+      // Widget codeButtonBar = CodeButtionBar(
+      // codeController: widget.codeController, height: codeButtonHeight);
 
-      if (c.maxHeight <= codeButtonHeight) {
-        codeButtonBar = Expanded(child: codeButtonBar);
-        return Column(children: [codeButtonBar]);
-      } else {
-        return Column(
-          children: [codeField, codeButtonBar],
-        );
-      }
+      return Column(
+        children: [codeField],
+      );
+
+      // if (c.maxHeight <= codeButtonHeight) {
+      //   codeButtonBar = Expanded(child: codeButtonBar);
+      //   return Column(children: [codeButtonBar]);
+      // } else {
+      //   return Column(
+      //     children: [codeField, codeButtonBar],
+      //   );
+      // }
     });
   }
 }
@@ -102,59 +108,78 @@ class _SqlResultTablesState extends State<SqlResultTables> {
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
     );
-    return Column(
+    return Row(
       children: [
         Container(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
-          alignment: Alignment.centerLeft,
-          constraints: const BoxConstraints(maxHeight: 40),
           child: Consumer<SessionProvider>(
             builder: (context, sessionProvider, _) {
-              final results = sessionProvider.getAllSQLResult();
-              final currentResult = sessionProvider.getCurrentSQLResult();
-              final showRecord = sessionProvider.showRecord;
-              if (results == null) {
-                return const Spacer();
-              }
-              return Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                CommonTab(
-                  label: "执行记录",
-                  selected: showRecord,
-                  width: 100,
-                  style: style,
-                  onTap: () {
-                    sessionProvider.selectToRecord();
-                  },
-                ),
-                Expanded(
-                    child: CommonTabBar(
-                        color:
-                            Theme.of(context).colorScheme.surfaceContainerLow,
-                        tabStyle: style,
-                        onReorder: (oldIndex, newIndex) {
-                          sessionProvider.reorderSQLResult(oldIndex, newIndex);
-                        },
-                        tabs: [
-                      for (var i = 0; i < results.length; i++)
-                        CommonTabWrap(
-                          label: "${results[i].id + 1}",
-                          selected: !showRecord && results[i] == currentResult,
-                          onTap: () {
-                            sessionProvider.selectSQLResultByIndex(i);
-                          },
-                          onDeleted: () {
-                            sessionProvider.deleteSQLResultByIndex(i);
-                          },
-                          avatar: const Icon(
-                            Icons.grid_on,
-                          ),
-                        )
-                    ]))
-              ]);
+              return CodeButtionBar(
+                  codeController: sessionProvider.getSQLEditCode());
             },
           ),
         ),
-        const Expanded(child: SqlResultTable())
+        Expanded(
+          child: Column(
+            children: [
+              Container(
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                alignment: Alignment.centerLeft,
+                constraints: const BoxConstraints(maxHeight: 40),
+                child: Consumer<SessionProvider>(
+                  builder: (context, sessionProvider, _) {
+                    final results = sessionProvider.getAllSQLResult();
+                    final currentResult = sessionProvider.getCurrentSQLResult();
+                    final showRecord = sessionProvider.showRecord;
+                    if (results == null) {
+                      return const Spacer();
+                    }
+                    return Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          CommonTab(
+                            label: "执行记录",
+                            selected: showRecord,
+                            width: 100,
+                            style: style,
+                            onTap: () {
+                              sessionProvider.selectToRecord();
+                            },
+                          ),
+                          Expanded(
+                              child: CommonTabBar(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerLow,
+                                  tabStyle: style,
+                                  onReorder: (oldIndex, newIndex) {
+                                    sessionProvider.reorderSQLResult(
+                                        oldIndex, newIndex);
+                                  },
+                                  tabs: [
+                                for (var i = 0; i < results.length; i++)
+                                  CommonTabWrap(
+                                    label: "${results[i].id + 1}",
+                                    selected: !showRecord &&
+                                        results[i] == currentResult,
+                                    onTap: () {
+                                      sessionProvider.selectSQLResultByIndex(i);
+                                    },
+                                    onDeleted: () {
+                                      sessionProvider.deleteSQLResultByIndex(i);
+                                    },
+                                    avatar: const Icon(
+                                      Icons.grid_on,
+                                    ),
+                                  )
+                              ]))
+                        ]);
+                  },
+                ),
+              ),
+              const Expanded(child: SqlResultTable())
+            ],
+          ),
+        ),
       ],
     );
   }

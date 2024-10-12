@@ -6,10 +6,10 @@ import 'package:common/parser.dart';
 
 class CodeButtionBar extends StatefulWidget {
   final CodeController codeController;
-  final double height;
+  final double width;
 
   const CodeButtionBar(
-      {Key? key, required this.codeController, this.height = 36})
+      {Key? key, required this.codeController, this.width = 36})
       : super(key: key);
 
   @override
@@ -44,17 +44,18 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 5),
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
-      constraints: BoxConstraints(maxHeight: widget.height),
+      // padding: const EdgeInsets.only(left: 5),
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      width: 42,
+      // constraints: const BoxConstraints(maxWidth: 44),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final canQuery = sessionProvider.canQuery();
-        return Row(
+        return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
-                iconSize: widget.height,
+                iconSize: 36,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(2),
                 onPressed: canQuery
@@ -68,7 +69,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 icon: Icon(Icons.play_arrow_rounded,
                     color: canQuery ? Colors.green : Colors.grey)),
             IconButton(
-                iconSize: widget.height,
+                iconSize: 36,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(2),
                 onPressed: canQuery
@@ -82,20 +83,14 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 icon: Stack(alignment: Alignment.center, children: [
                   Icon(Icons.play_arrow_rounded,
                       color: canQuery ? Colors.green : Colors.grey),
-                  Positioned(
-                    top: 5,
-                    left: 23,
-                    child: Icon(
-                      Icons.add,
-                      color: canQuery
-                          ? const Color.fromARGB(255, 179, 162, 17)
-                          : Colors.grey,
-                      size: 16,
-                    ),
+                  const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 12,
                   ),
                 ])),
             IconButton(
-                iconSize: widget.height,
+                iconSize: 36,
                 padding: const EdgeInsets.all(2),
                 alignment: Alignment.topLeft,
                 onPressed: () {
@@ -104,30 +99,13 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                     sessionProvider.query("explain $query", true);
                   }
                 },
-                icon: Align(
-                  alignment: Alignment.center,
-                  child: Stack(
-                    children: [
-                      Icon(
-                        Icons.e_mobiledata,
-                        color: canQuery
-                            ? const Color.fromARGB(255, 241, 192, 84)
-                            : Colors.grey,
-                      ),
-                      Positioned(
-                        top: 13,
-                        left: 22,
-                        child: Icon(
-                          Icons.close,
-                          color: canQuery
-                              ? const Color.fromARGB(255, 179, 162, 17)
-                              : Colors.grey,
-                          size: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ))
+                icon: Icon(
+                  Icons.e_mobiledata,
+                  color: canQuery
+                      ? const Color.fromARGB(255, 241, 192, 84)
+                      : Colors.grey,
+                )),
+            const Expanded(child: Spacer()),
           ],
         );
       }),
