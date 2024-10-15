@@ -97,7 +97,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         body: Row(
           children: <Widget>[
             NavigationRail(

@@ -71,12 +71,12 @@ class _CodeEditorState extends State<CodeEditor> {
         ),
       ));
 
-      // const double codeButtonHeight = 36;
-      // Widget codeButtonBar = CodeButtionBar(
-      // codeController: widget.codeController, height: codeButtonHeight);
+      const double codeButtonHeight = 36;
+      Widget codeButtonBar = CodeButtionBar(
+          codeController: widget.codeController, height: codeButtonHeight);
 
       return Column(
-        children: [codeField],
+        children: [codeButtonBar, codeField],
       );
 
       // if (c.maxHeight <= codeButtonHeight) {
@@ -105,24 +105,16 @@ class _SqlResultTablesState extends State<SqlResultTables> {
       maxWidth: 100,
       labelAlign: TextAlign.center,
       selectedColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      hoverColor: Theme.of(context).colorScheme.surfaceContainer,
     );
     return Row(
       children: [
-        Container(
-          child: Consumer<SessionProvider>(
-            builder: (context, sessionProvider, _) {
-              return CodeButtionBar(
-                  codeController: sessionProvider.getSQLEditCode());
-            },
-          ),
-        ),
         Expanded(
           child: Column(
             children: [
               Container(
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 alignment: Alignment.centerLeft,
                 constraints: const BoxConstraints(maxHeight: 40),
                 child: Consumer<SessionProvider>(
@@ -149,7 +141,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                               child: CommonTabBar(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .surfaceContainerLow,
+                                      .surfaceContainer,
                                   tabStyle: style,
                                   onReorder: (oldIndex, newIndex) {
                                     sessionProvider.reorderSQLResult(

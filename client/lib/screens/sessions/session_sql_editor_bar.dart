@@ -6,10 +6,10 @@ import 'package:common/parser.dart';
 
 class CodeButtionBar extends StatefulWidget {
   final CodeController codeController;
-  final double width;
+  final double height;
 
   const CodeButtionBar(
-      {Key? key, required this.codeController, this.width = 36})
+      {Key? key, required this.codeController, this.height = 36})
       : super(key: key);
 
   @override
@@ -45,17 +45,18 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
   Widget build(BuildContext context) {
     return Container(
       // padding: const EdgeInsets.only(left: 5),
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      width: 42,
-      // constraints: const BoxConstraints(maxWidth: 44),
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      constraints: BoxConstraints(maxHeight: widget.height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final canQuery = sessionProvider.canQuery();
-        return Column(
+        return Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // schema list
+            const SchemaBar(),
             IconButton(
-                iconSize: 36,
+                iconSize: widget.height,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(2),
                 onPressed: canQuery
@@ -69,7 +70,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 icon: Icon(Icons.play_arrow_rounded,
                     color: canQuery ? Colors.green : Colors.grey)),
             IconButton(
-                iconSize: 36,
+                iconSize: widget.height,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(2),
                 onPressed: canQuery
@@ -90,7 +91,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                   ),
                 ])),
             IconButton(
-                iconSize: 36,
+                iconSize: widget.height,
                 padding: const EdgeInsets.all(2),
                 alignment: Alignment.topLeft,
                 onPressed: () {
@@ -105,10 +106,44 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                       ? const Color.fromARGB(255, 241, 192, 84)
                       : Colors.grey,
                 )),
+
             const Expanded(child: Spacer()),
           ],
         );
       }),
     );
+  }
+}
+
+class SchemaBar extends StatefulWidget {
+  const SchemaBar({Key? key}) : super(key: key);
+
+  @override
+  State<SchemaBar> createState() => _SchemaBarState();
+}
+
+class _SchemaBarState extends State<SchemaBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+        // width: 100,
+        child: Row(
+          children: [
+            const Icon(Icons.chevron_right),
+            Container(
+                width: 100,
+                child: const Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "performance_schema",
+                      overflow: TextOverflow.ellipsis,
+                    ))),
+            const VerticalDivider(
+              indent: 5,
+              endIndent: 5,
+            ),
+          ],
+        ));
   }
 }

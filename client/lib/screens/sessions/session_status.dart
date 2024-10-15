@@ -22,8 +22,8 @@ class _SessionStatusState extends State<SessionStatus> {
         SQLResultModel result = sessionProvider.getCurrentSQLResult()!;
         if (result.state == SQLExecuteState.done) {
           return Container(
-            padding: const EdgeInsets.only(left: 42),
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            padding: const EdgeInsets.only(left: 5),
+            color: Theme.of(context).colorScheme.surfaceContainer,
             height: 30,
             child: Row(
               children: [
