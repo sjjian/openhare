@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:common/parser.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class CodeButtionBar extends StatefulWidget {
   final CodeController codeController;
@@ -54,7 +55,8 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // schema list
-            const SchemaBar(),
+            SchemaBar(
+                currentSchema: sessionProvider.session!.conn!.currentSchema),
             IconButton(
                 iconSize: widget.height,
                 alignment: Alignment.center,
@@ -116,34 +118,50 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
 }
 
 class SchemaBar extends StatefulWidget {
-  const SchemaBar({Key? key}) : super(key: key);
+  String? currentSchema;
+
+  SchemaBar({Key? key, this.currentSchema}) : super(key: key);
 
   @override
   State<SchemaBar> createState() => _SchemaBarState();
 }
 
 class _SchemaBarState extends State<SchemaBar> {
+  bool isEnter = false;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-        // width: 100,
-        child: Row(
-          children: [
-            const Icon(Icons.chevron_right),
-            Container(
-                width: 100,
-                child: const Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "performance_schema",
-                      overflow: TextOverflow.ellipsis,
-                    ))),
-            const VerticalDivider(
-              indent: 5,
-              endIndent: 5,
-            ),
-          ],
-        ));
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          isEnter = true;
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          isEnter = false;
+        });
+      },
+      child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          color: isEnter
+              ? Theme.of(context).colorScheme.surfaceContainerHighest
+              : null,
+          child: Row(
+            children: [
+              const HugeIcon(
+                  icon: HugeIcons.strokeRoundedDatabase, color: Colors.black, size: 20,),
+              Container(
+                padding: const EdgeInsets.only(left: 5),
+                  width: 100,
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.currentSchema ?? "",
+                        overflow: TextOverflow.ellipsis,
+                      ))),
+            ],
+          )),
+    );
   }
 }

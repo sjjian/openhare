@@ -13,7 +13,7 @@ class LexerContext {
 }
 
 class Lexer extends LexerContext {
-  static Set<String> keywords = {"select", "update"};
+  static Set<String> keywords = {"select", "update", "use"};
 
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
     EOFTokenBuilder(),
