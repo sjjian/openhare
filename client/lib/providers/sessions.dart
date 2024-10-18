@@ -224,5 +224,15 @@ class SessionProvider with ChangeNotifier {
     }
   }
 
+  Future<void> setCurrentSchema(String schema) async {
+    await session!.conn!.setCurrentSchema(schema);
+    notifyListeners();
+  }
+
+  Future<List<String>> getSchemas() async {
+    List<String> schemas = await session!.conn!.schemas();
+    return schemas;
+  }
+
   CodeController getSQLEditCode() => _session!.code;
 }

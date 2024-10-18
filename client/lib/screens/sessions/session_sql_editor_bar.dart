@@ -54,9 +54,6 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // schema list
-            SchemaBar(
-                currentSchema: sessionProvider.session!.conn!.currentSchema),
             IconButton(
                 iconSize: widget.height,
                 alignment: Alignment.center,
@@ -108,7 +105,13 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                       ? const Color.fromARGB(255, 241, 192, 84)
                       : Colors.grey,
                 )),
-
+            // schema list
+            const VerticalDivider(
+              indent: 5,
+              endIndent: 5,
+            ),
+            SchemaBar(
+                currentSchema: sessionProvider.session!.conn!.currentSchema),
             const Expanded(child: Spacer()),
           ],
         );
@@ -142,26 +145,61 @@ class _SchemaBarState extends State<SchemaBar> {
           isEnter = false;
         });
       },
-      child: Container(
-          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-          color: isEnter
-              ? Theme.of(context).colorScheme.surfaceContainerHighest
-              : null,
-          child: Row(
-            children: [
-              const HugeIcon(
-                  icon: HugeIcons.strokeRoundedDatabase, color: Colors.black, size: 20,),
-              Container(
-                padding: const EdgeInsets.only(left: 5),
-                  width: 100,
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        widget.currentSchema ?? "",
-                        overflow: TextOverflow.ellipsis,
-                      ))),
-            ],
-          )),
+      child: GestureDetector(
+        onTapUp: (detail) async {
+          final position = detail.globalPosition;
+          final RenderBox overlay =
+              Overlay.of(context).context.findRenderObject() as RenderBox;
+          final overlayPos = overlay.localToGlobal(Offset.zero);
+
+          SessionProvider sessionProvider =
+              Provider.of<SessionProvider>(context, listen: false);
+          List<String> schemas = await sessionProvider.getSchemas();
+
+          // todo
+          showMenu(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                position.dx - overlayPos.dx,
+                position.dy - overlayPos.dy,
+                position.dx - overlayPos.dx,
+                position.dy - overlayPos.dy,
+              ),
+              items: schemas.map((schema) {
+                return PopupMenuItem<String>(
+                    height: 30,
+                    onTap: () {
+                      SessionProvider sessionProvider =
+                          Provider.of<SessionProvider>(context, listen: false);
+                      sessionProvider.setCurrentSchema(schema);
+                    },
+                    child: Text(schema));
+              }).toList());
+        },
+        child: Container(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            color: isEnter
+                ? Theme.of(context).colorScheme.surfaceContainerHighest
+                : null,
+            child: Row(
+              children: [
+                const HugeIcon(
+                  icon: HugeIcons.strokeRoundedDatabase,
+                  color: Colors.black,
+                  size: 20,
+                ),
+                Container(
+                    padding: const EdgeInsets.only(left: 5),
+                    width: 100,
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.currentSchema ?? "",
+                          overflow: TextOverflow.ellipsis,
+                        ))),
+              ],
+            )),
+      ),
     );
   }
 }
