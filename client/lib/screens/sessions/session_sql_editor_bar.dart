@@ -93,12 +93,12 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 iconSize: widget.height,
                 padding: const EdgeInsets.all(2),
                 alignment: Alignment.topLeft,
-                onPressed: () {
+                onPressed: canQuery? () {
                   String query = getQuery(sessionProvider);
                   if (query.isNotEmpty) {
                     sessionProvider.query("explain $query", true);
                   }
-                },
+                }: null,
                 icon: Icon(
                   Icons.e_mobiledata,
                   color: canQuery
@@ -111,6 +111,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
               endIndent: 5,
             ),
             SchemaBar(
+                disable: canQuery ? false : true,
                 currentSchema: sessionProvider.session!.conn!.currentSchema),
             const Expanded(child: Spacer()),
           ],
@@ -121,9 +122,14 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
 }
 
 class SchemaBar extends StatefulWidget {
-  String? currentSchema;
+  final String? currentSchema;
+  final bool disable;
 
-  SchemaBar({Key? key, this.currentSchema}) : super(key: key);
+  const SchemaBar({
+    Key? key,
+    required this.disable,
+    this.currentSchema,
+  }) : super(key: key);
 
   @override
   State<SchemaBar> createState() => _SchemaBarState();
@@ -147,6 +153,9 @@ class _SchemaBarState extends State<SchemaBar> {
       },
       child: GestureDetector(
         onTapUp: (detail) async {
+          if (widget.disable) {
+            return;
+          }
           final position = detail.globalPosition;
           final RenderBox overlay =
               Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -178,7 +187,7 @@ class _SchemaBarState extends State<SchemaBar> {
         },
         child: Container(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-            color: isEnter
+            color: (isEnter && !widget.disable)
                 ? Theme.of(context).colorScheme.surfaceContainerHighest
                 : null,
             child: Row(

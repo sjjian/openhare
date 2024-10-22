@@ -20,7 +20,9 @@ class SQLConnection {
           host: instance.addr,
           port: instance.port,
           userName: instance.user,
-          password: instance.password);
+          password: instance.password,
+          databaseName: currentSchema, // todo: connect 后再切换db
+          );
       await conn.connect();
       this.conn = conn;
       conn.onClose(() {
@@ -45,7 +47,6 @@ class SQLConnection {
       // todo: handler error;
     }
   }
-
 
   Future<IResultSet> _execute(String query) async {
     // 加入注释. todo: 通用方法处理

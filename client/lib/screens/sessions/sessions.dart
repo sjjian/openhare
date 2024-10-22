@@ -22,7 +22,7 @@ class _SQLEditPageState extends State<SQLEditPage> {
         const SessionTabs(),
         Expanded(
             child: Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Column(
             children: [
               Consumer<SessionProvider>(builder: (context, sessionProvider, _) {

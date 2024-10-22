@@ -1,4 +1,4 @@
-import 'package:client/core/storages/instances.dart';
+import 'package:client/core/storages/storages.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
@@ -56,8 +56,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final storage = Storage();
-    final instancesProvider = InstancesProvider(storage);
+    final instancesProvider = InstancesProvider();
     instancesProvider.loadInstance();
     final sessions = SessionsModel();
     final sessionProvider = SessionProvider(sessions.data.selected());

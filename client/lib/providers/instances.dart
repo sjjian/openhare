@@ -1,14 +1,14 @@
-import 'package:client/core/storages/instances.dart';
+import 'package:client/core/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:flutter/material.dart';
 
 class InstancesProvider extends ChangeNotifier {
-  Storage st;
+  late Storage st = Storage.init();
 
-  InstancesProvider(this.st);
+  InstancesProvider();
 
   Future<void> loadInstance() async {
-    await st.load();
+    st = await Storage.load();
     notifyListeners();
   }
 
