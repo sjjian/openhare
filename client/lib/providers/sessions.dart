@@ -146,11 +146,12 @@ class SessionProvider with ChangeNotifier {
     return _session != null && _session!.conn != null;
   }
 
-  void setConn(InstanceModel instance) {
+  void setConn(InstanceModel instance, {String? schema}) {
     // 记录使用的数据源
     Storage().addActiveInstance(instance);
 
-    SQLConnection conn = SQLConnection(instance, onConnClose, (schema){
+    SQLConnection conn =
+        SQLConnection(instance, onConnClose, currentSchema: schema, (schema) {
       Storage().addInstanceActiveSchema(instance, schema);
     });
     if (_session == null) {

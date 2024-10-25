@@ -12,24 +12,30 @@ class SQLConnection {
   final void Function(String) onSchemaChanged;
   String? currentSchema;
 
-  SQLConnection(this.instance, this.onClose, this.onSchemaChanged, {this.currentSchema});
+  SQLConnection(this.instance, this.onClose, this.onSchemaChanged,
+      {this.currentSchema});
 
   Future<void> connect() async {
     try {
       state = SQLConnectState.connecting;
       final conn = await MySQLConnection.createConnection(
-          host: instance.addr,
-          port: instance.port,
-          userName: instance.user,
-          password: instance.password,
-          databaseName: currentSchema, // todo: connect 后再切换db
-          );
+        host: instance.addr,
+        port: instance.port,
+        userName: instance.user,
+        password: instance.password,
+        databaseName: currentSchema, // todo: connect 后再切换db
+      );
       await conn.connect();
       this.conn = conn;
       conn.onClose(() {
         state = SQLConnectState.pending;
         onClose();
       });
+
+      if (currentSchema != null) {
+        onSchemaChanged(currentSchema!);
+      }
+
       state = SQLConnectState.connected;
     } catch (e) {
       state = SQLConnectState.failed;
