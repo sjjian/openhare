@@ -1,4 +1,4 @@
-import 'package:client/core/storages/storages.dart';
+import 'package:client/storages/storages.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';

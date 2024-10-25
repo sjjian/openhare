@@ -9,9 +9,10 @@ class SQLConnection {
   MySQLConnection? conn;
   SQLConnectState state = SQLConnectState.pending;
   final void Function() onClose;
+  final void Function(String) onSchemaChanged;
   String? currentSchema;
 
-  SQLConnection(this.instance, this.onClose, {this.currentSchema});
+  SQLConnection(this.instance, this.onClose, this.onSchemaChanged, {this.currentSchema});
 
   Future<void> connect() async {
     try {
@@ -67,6 +68,7 @@ class SQLConnection {
     // 如果执行的语句包含`use schema`
     if (firstTok != null && firstTok.content.toLowerCase() == "use") {
       await getCurrentSchema();
+      onSchemaChanged(currentSchema!);
     }
     return resultSet;
   }
@@ -85,6 +87,7 @@ class SQLConnection {
   Future<void> setCurrentSchema(String schema) async {
     await _execute("USE $schema");
     await getCurrentSchema();
+    onSchemaChanged(currentSchema!);
   }
 
   Future<String?> getCurrentSchema() async {

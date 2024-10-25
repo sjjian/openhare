@@ -14,6 +14,11 @@ InstanceModel _$InstanceModelFromJson(Map<String, dynamic> json) =>
       port: (json['port'] as num).toInt(),
       user: json['user'] as String,
       password: json['password'] as String,
+      activeSchemas: json['active_schemas'] == null
+          ? null
+          : ActiveNameSet.fromJson((json['active_schemas'] as List<dynamic>)
+              .map((e) => e as String)
+              .toList()),
     );
 
 Map<String, dynamic> _$InstanceModelToJson(InstanceModel instance) =>
@@ -24,4 +29,5 @@ Map<String, dynamic> _$InstanceModelToJson(InstanceModel instance) =>
       'port': instance.port,
       'user': instance.user,
       'password': instance.password,
+      'active_schemas': instance.activeSchemas,
     };

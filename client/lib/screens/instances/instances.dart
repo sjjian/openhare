@@ -57,7 +57,7 @@ class _InstancesPageState extends State<InstancesPage> {
                           showBottomBorder: true,
                           columns: column,
                           rows:
-                              instancesProvider.st.instances!.map((instance) {
+                              instancesProvider.instances().map((instance) {
                             return DataRow(
                                 selected: selectedInstances.contains(instance),
                                 onSelectChanged: (state) {
@@ -85,7 +85,7 @@ class _InstancesPageState extends State<InstancesPage> {
                                         onPressed: () {
                                           context
                                               .read<InstancesProvider>()
-                                              .deleteInstance(instance.name);
+                                              .deleteInstance(instance);
                                         },
                                         icon: const Icon(Icons.delete),
                                       ),
@@ -106,7 +106,7 @@ class _InstancesPageState extends State<InstancesPage> {
                                 selectedInstances.clear();
                               } else {
                                 selectedInstances
-                                    .addAll(instancesProvider.st.instances!);
+                                    .addAll(instancesProvider.instances());
                               }
                             });
                           }

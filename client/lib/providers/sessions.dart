@@ -1,6 +1,7 @@
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
+import 'package:client/storages/storages.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
@@ -146,7 +147,12 @@ class SessionProvider with ChangeNotifier {
   }
 
   void setConn(InstanceModel instance) {
-    SQLConnection conn = SQLConnection(instance, onConnClose);
+    // 记录使用的数据源
+    Storage().addActiveInstance(instance);
+
+    SQLConnection conn = SQLConnection(instance, onConnClose, (schema){
+      Storage().addInstanceActiveSchema(instance, schema);
+    });
     if (_session == null) {
       _session = SessionModel(conn: conn);
     } else {

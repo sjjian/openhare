@@ -30,7 +30,7 @@ class _AddSessionState extends State<AddSession> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 5),
-              for (var inst in instancesProvider.st.instances!)
+              for (var inst in instancesProvider.instances())
                 TextButton(
                     onPressed: () {
                       SessionProvider sessionProvider =
