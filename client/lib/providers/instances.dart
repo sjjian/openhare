@@ -1,35 +1,34 @@
-import 'package:client/core/storages/instances.dart';
+import 'package:client/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:flutter/material.dart';
 
 class InstancesProvider extends ChangeNotifier {
-  Storage st;
-
-  InstancesProvider(this.st);
+  InstancesProvider();
 
   Future<void> loadInstance() async {
-    await st.load();
+    await Storage.load();
     notifyListeners();
   }
 
   void addInstance(InstanceModel instance) {
-    st.instances?.add(instance);
-    st.save();
+    Storage st = Storage();
+    st.addInstance(instance);
     notifyListeners();
   }
 
-  void deleteInstance(String name) {
-    st.instances?.removeWhere((element) => element.name == name);
-    st.save();
+  void deleteInstance(InstanceModel instance) {
+    Storage st = Storage();
+    st.deleteInstance(instance);
     notifyListeners(); // 默认能删除成功
   }
 
   bool isInstanceExist(String name) {
-    for (var instance in st.instances!) {
-      if (instance.name == name) {
-        return true;
-      }
-    }
-    return false;
+    Storage st = Storage();
+    return st.isInstanceExist(name);
+  }
+
+  List<InstanceModel> instances() {
+    Storage st = Storage();
+    return st.instances;
   }
 }

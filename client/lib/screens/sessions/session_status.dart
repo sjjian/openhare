@@ -21,7 +21,9 @@ class _SessionStatusState extends State<SessionStatus> {
           sessionProvider.getCurrentSQLResult() != null) {
         SQLResultModel result = sessionProvider.getCurrentSQLResult()!;
         if (result.state == SQLExecuteState.done) {
-          return SizedBox(
+          return Container(
+            padding: const EdgeInsets.only(left: 5),
+            color: Theme.of(context).colorScheme.surfaceContainer,
             height: 30,
             child: Row(
               children: [
@@ -44,10 +46,10 @@ class _SessionStatusState extends State<SessionStatus> {
             ),
           );
         } else {
-          return const SizedBox(height: 30);
+          return Container(height: 30, color:  Theme.of(context).colorScheme.surfaceContainer);
         }
       } else {
-        return const SizedBox(height: 30);
+        return Container(height: 30, color:  Theme.of(context).colorScheme.surfaceContainer);
       }
     });
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:common/parser.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class CodeButtionBar extends StatefulWidget {
   final CodeController codeController;
@@ -44,8 +45,8 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 5),
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      // padding: const EdgeInsets.only(left: 5),
+      color: Theme.of(context).colorScheme.surfaceContainer,
       constraints: BoxConstraints(maxHeight: widget.height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final canQuery = sessionProvider.canQuery();
@@ -82,55 +83,132 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 icon: Stack(alignment: Alignment.center, children: [
                   Icon(Icons.play_arrow_rounded,
                       color: canQuery ? Colors.green : Colors.grey),
-                  Positioned(
-                    top: 5,
-                    left: 23,
-                    child: Icon(
-                      Icons.add,
-                      color: canQuery
-                          ? const Color.fromARGB(255, 179, 162, 17)
-                          : Colors.grey,
-                      size: 16,
-                    ),
+                  const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 12,
                   ),
                 ])),
             IconButton(
                 iconSize: widget.height,
                 padding: const EdgeInsets.all(2),
                 alignment: Alignment.topLeft,
-                onPressed: () {
+                onPressed: canQuery? () {
                   String query = getQuery(sessionProvider);
                   if (query.isNotEmpty) {
                     sessionProvider.query("explain $query", true);
                   }
-                },
-                icon: Align(
-                  alignment: Alignment.center,
-                  child: Stack(
-                    children: [
-                      Icon(
-                        Icons.e_mobiledata,
-                        color: canQuery
-                            ? const Color.fromARGB(255, 241, 192, 84)
-                            : Colors.grey,
-                      ),
-                      Positioned(
-                        top: 13,
-                        left: 22,
-                        child: Icon(
-                          Icons.close,
-                          color: canQuery
-                              ? const Color.fromARGB(255, 179, 162, 17)
-                              : Colors.grey,
-                          size: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ))
+                }: null,
+                icon: Icon(
+                  Icons.e_mobiledata,
+                  color: canQuery
+                      ? const Color.fromARGB(255, 241, 192, 84)
+                      : Colors.grey,
+                )),
+            // schema list
+            const VerticalDivider(
+              indent: 5,
+              endIndent: 5,
+            ),
+            SchemaBar(
+                disable: canQuery ? false : true,
+                currentSchema: sessionProvider.session!.conn!.currentSchema),
+            const Expanded(child: Spacer()),
           ],
         );
       }),
+    );
+  }
+}
+
+class SchemaBar extends StatefulWidget {
+  final String? currentSchema;
+  final bool disable;
+
+  const SchemaBar({
+    Key? key,
+    required this.disable,
+    this.currentSchema,
+  }) : super(key: key);
+
+  @override
+  State<SchemaBar> createState() => _SchemaBarState();
+}
+
+class _SchemaBarState extends State<SchemaBar> {
+  bool isEnter = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          isEnter = true;
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          isEnter = false;
+        });
+      },
+      child: GestureDetector(
+        onTapUp: (detail) async {
+          if (widget.disable) {
+            return;
+          }
+          final position = detail.globalPosition;
+          final RenderBox overlay =
+              Overlay.of(context).context.findRenderObject() as RenderBox;
+          final overlayPos = overlay.localToGlobal(Offset.zero);
+
+          SessionProvider sessionProvider =
+              Provider.of<SessionProvider>(context, listen: false);
+          List<String> schemas = await sessionProvider.getSchemas();
+
+          // todo
+          showMenu(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                position.dx - overlayPos.dx,
+                position.dy - overlayPos.dy,
+                position.dx - overlayPos.dx,
+                position.dy - overlayPos.dy,
+              ),
+              items: schemas.map((schema) {
+                return PopupMenuItem<String>(
+                    height: 30,
+                    onTap: () {
+                      SessionProvider sessionProvider =
+                          Provider.of<SessionProvider>(context, listen: false);
+                      sessionProvider.setCurrentSchema(schema);
+                    },
+                    child: Text(schema));
+              }).toList());
+        },
+        child: Container(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            color: (isEnter && !widget.disable)
+                ? Theme.of(context).colorScheme.surfaceContainerHighest
+                : null,
+            child: Row(
+              children: [
+                const HugeIcon(
+                  icon: HugeIcons.strokeRoundedDatabase,
+                  color: Colors.black,
+                  size: 20,
+                ),
+                Container(
+                    padding: const EdgeInsets.only(left: 5),
+                    width: 100,
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.currentSchema ?? "",
+                          overflow: TextOverflow.ellipsis,
+                        ))),
+              ],
+            )),
+      ),
     );
   }
 }

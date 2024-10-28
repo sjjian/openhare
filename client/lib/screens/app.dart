@@ -1,4 +1,4 @@
-import 'package:client/core/storages/instances.dart';
+import 'package:client/storages/storages.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
@@ -56,8 +56,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final storage = Storage();
-    final instancesProvider = InstancesProvider(storage);
+    final instancesProvider = InstancesProvider();
     instancesProvider.loadInstance();
     final sessions = SessionsModel();
     final sessionProvider = SessionProvider(sessions.data.selected());
@@ -97,7 +96,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
         body: Row(
           children: <Widget>[
             NavigationRail(

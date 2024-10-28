@@ -1,6 +1,7 @@
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
+import 'package:client/storages/storages.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
@@ -145,8 +146,14 @@ class SessionProvider with ChangeNotifier {
     return _session != null && _session!.conn != null;
   }
 
-  void setConn(InstanceModel instance) {
-    SQLConnection conn = SQLConnection(instance, onConnClose);
+  void setConn(InstanceModel instance, {String? schema}) {
+    // 记录使用的数据源
+    Storage().addActiveInstance(instance);
+
+    SQLConnection conn =
+        SQLConnection(instance, onConnClose, currentSchema: schema, (schema) {
+      Storage().addInstanceActiveSchema(instance, schema);
+    });
     if (_session == null) {
       _session = SessionModel(conn: conn);
     } else {
@@ -222,6 +229,16 @@ class SessionProvider with ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  Future<void> setCurrentSchema(String schema) async {
+    await session!.conn!.setCurrentSchema(schema);
+    notifyListeners();
+  }
+
+  Future<List<String>> getSchemas() async {
+    List<String> schemas = await session!.conn!.schemas();
+    return schemas;
   }
 
   CodeController getSQLEditCode() => _session!.code;
