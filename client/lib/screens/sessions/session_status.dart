@@ -46,10 +46,10 @@ class _SessionStatusState extends State<SessionStatus> {
             ),
           );
         } else {
-          return const SizedBox(height: 30);
+          return Container(height: 30, color:  Theme.of(context).colorScheme.surfaceContainer);
         }
       } else {
-        return const SizedBox(height: 30);
+        return Container(height: 30, color:  Theme.of(context).colorScheme.surfaceContainer);
       }
     });
   }

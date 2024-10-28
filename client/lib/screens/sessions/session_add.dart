@@ -41,7 +41,7 @@ class _AddSessionState extends State<AddSession> {
     return Expanded(
         child: Container(
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
       child: Row(
         children: [
           Column(
@@ -49,7 +49,7 @@ class _AddSessionState extends State<AddSession> {
             children: [
               Text(
                 "数据源列表",
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 5),
               for (var inst in instancesProvider.instances())

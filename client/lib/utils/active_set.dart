@@ -2,10 +2,9 @@ import 'dart:collection';
 
 class ActiveSet<T> {
   Queue<T> data;
+  int maxLength;
 
-  ActiveSet(
-    List<T> list,
-  ) : data = Queue<T>() {
+  ActiveSet(List<T> list, {this.maxLength = 5}) : data = Queue<T>() {
     for (final element in list) {
       add(element);
     }
@@ -14,6 +13,7 @@ class ActiveSet<T> {
   // 添加的元素在队首
   void add(T element) {
     data.remove(element);
+    if (data.length >= 5) data.removeLast();
     data.addFirst(element);
   }
 

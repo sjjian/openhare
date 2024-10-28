@@ -33,7 +33,7 @@ class InstanceModel {
 class ActiveNameSet extends ActiveSet<String> {
   ActiveNameSet(List<String> data) : super(data);
 
-  ActiveNameSet.empty() : super(List<String>.empty(growable: true));
+  ActiveNameSet.empty() : super(List.empty());
 
   factory ActiveNameSet.fromJson(List<String> data) => ActiveNameSet(data);
 
