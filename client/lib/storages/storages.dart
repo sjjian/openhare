@@ -68,7 +68,6 @@ class Storage {
   }
 
   List<InstanceModel> get instances => _instances;
-  ActiveNameSet get activeInstances => _activeInstances;
 
   void addInstance(InstanceModel instance) {
     _instances.add(instance);
@@ -77,6 +76,7 @@ class Storage {
 
   void deleteInstance(InstanceModel instance) {
     _instances.removeWhere((element) => element.name == instance.name);
+    removeActiveInstance(instance);
     _save();
   }
 
@@ -89,13 +89,34 @@ class Storage {
     return false;
   }
 
+  InstanceModel? getInstance(String name) {
+    for (var instance in _instances) {
+      if (instance.name == name) {
+        return instance;
+      }
+    }
+    return null;
+  }
+
+  List<InstanceModel> get activeInstances {
+    return _activeInstances
+        .toList()
+        .where((name) => isInstanceExist(name)) //todo: 降低判断instance存在的复杂度
+        .map<InstanceModel>((name) {
+      return getInstance(name)!;
+    }).toList();
+  }
+
   void addActiveInstance(InstanceModel instance) {
     _activeInstances.add(instance.name);
     _save();
   }
 
+  void removeActiveInstance(InstanceModel instance) {
+    _activeInstances.remove(instance.name);
+  }
+
   void addInstanceActiveSchema(InstanceModel instance, String schema) {
-    print("instance: ${instance.name}; schema: $schema");
     _save();
     if (_instances.contains(instance)) instance.activeSchemas.add(schema);
   }

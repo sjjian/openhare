@@ -47,19 +47,43 @@ class _AddSessionState extends State<AddSession> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "数据源列表",
-                style: Theme.of(context).textTheme.titleLarge,
+              Container(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  "最近使用",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
-              const SizedBox(height: 5),
-              for (var inst in instancesProvider.instances())
+              Container(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 200, child: Text("数据源")),
+                    Container(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: const Text("最近打开的数据库"))
+                  ],
+                ),
+              ),
+              for (var inst in instancesProvider.activeInstances())
                 Row(
                   children: [
-                    TextButton(
-                        onPressed: () {
-                          addSession(context, inst);
-                        },
-                        child: Text(inst.name)),
+                    SizedBox(
+                      width: 200,
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            "assets/icons/mysql_icon.png",
+                            height: 24,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                addSession(context, inst);
+                              },
+                              child: Text(inst.name)),
+                        ],
+                      ),
+                    ),
                     const VerticalDivider(
                       width: 5,
                     ),
@@ -71,7 +95,55 @@ class _AddSessionState extends State<AddSession> {
                         child: Text(schema),
                       )
                   ],
-                )
+                ),
+              Container(
+                padding: const EdgeInsets.only(bottom: 15, top: 25),
+                child: Text(
+                  "完整列表",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 200, child: Text("数据源")),
+                    Container(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: const Text("地址"))
+                  ],
+                ),
+              ),
+              for (var inst in instancesProvider.instances())
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 200,
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            "assets/icons/mysql_icon.png",
+                            height: 24,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                addSession(context, inst);
+                              },
+                              child: Text(inst.name)),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(left: 15),
+                      width: 200,
+                      child: Row(
+                        children: [
+                          Text("${inst.addr}:${inst.port}"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ],

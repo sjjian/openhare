@@ -17,6 +17,10 @@ class ActiveSet<T> {
     data.addFirst(element);
   }
 
+  bool remove(T element) {
+    return data.remove(element);
+  }
+
   // 获取集合中所有的元素
   List<T> toList() => data.toList();
 

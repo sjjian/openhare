@@ -31,4 +31,9 @@ class InstancesProvider extends ChangeNotifier {
     Storage st = Storage();
     return st.instances;
   }
+
+  List<InstanceModel> activeInstances() {
+    Storage st = Storage();
+    return st.activeInstances;
+  }
 }
