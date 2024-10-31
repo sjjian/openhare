@@ -98,6 +98,18 @@ class Storage {
     return null;
   }
 
+  List<InstanceModel> searchInstance(String key) {
+    if (key.isEmpty) {
+      return _instances;
+    }
+    return _instances.where((instance) {
+      return instance.name.contains(key) ||
+          instance.addr.contains(key) ||
+          (instance.desc ?? "").contains(key) ||
+          instance.port.toString().contains(key);
+    }).toList();
+  }
+
   List<InstanceModel> get activeInstances {
     return _activeInstances
         .toList()

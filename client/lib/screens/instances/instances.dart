@@ -57,7 +57,7 @@ class _InstancesPageState extends State<InstancesPage> {
                           showBottomBorder: true,
                           columns: column,
                           rows:
-                              instancesProvider.instances().map((instance) {
+                              instancesProvider.instances("").map((instance) {
                             return DataRow(
                                 selected: selectedInstances.contains(instance),
                                 onSelectChanged: (state) {
@@ -106,7 +106,7 @@ class _InstancesPageState extends State<InstancesPage> {
                                 selectedInstances.clear();
                               } else {
                                 selectedInstances
-                                    .addAll(instancesProvider.instances());
+                                    .addAll(instancesProvider.instances(""));
                               }
                             });
                           }
