@@ -30,6 +30,7 @@ class InstanceModel {
   Map<String, dynamic> toJson() => _$InstanceModelToJson(this);
 }
 
+@JsonSerializable()
 class ActiveNameSet extends ActiveSet<String> {
   ActiveNameSet(List<String> data) : super(data);
 

@@ -1,13 +1,12 @@
-import 'package:client/storages/storages.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/instances/add_instance.dart';
 import 'package:client/screens/instances/instances.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
@@ -121,22 +120,10 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                         ? const Icon(Icons.menu_open)
                         : const Icon(Icons.menu),
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  FloatingActionButton.small(
-                    elevation: 2,
-                    onPressed: () =>
-                        {AddInstancePage.showAddInstanceDialog(context)},
-                    child: const Icon(Icons.add),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
                 ],
               ),
-              destinations: const [
-                NavigationRailDestination(
+              destinations:  [
+                const NavigationRailDestination(
                   icon: Icon(Icons.personal_video),
                   label: Text(
                     "工作台",
@@ -144,15 +131,18 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                   ),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.auto_awesome_mosaic_outlined),
-                  label: Center(
+                  icon:  HugeIcon(
+                  icon: HugeIcons.strokeRoundedDatabase,
+                  color: Theme.of(context).iconTheme.color?? Colors.black87,
+                ),
+                  label: const Center(
                     child: Text(
                       "数据源",
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
-                NavigationRailDestination(
+                const NavigationRailDestination(
                   icon: Icon(Icons.settings),
                   label: Center(
                     child: Text(

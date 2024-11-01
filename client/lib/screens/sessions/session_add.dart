@@ -13,6 +13,8 @@ class AddSession extends StatefulWidget {
 }
 
 class _AddSessionState extends State<AddSession> {
+  String searchKey = "";
+
   void addSession(BuildContext context, InstanceModel inst, {String? schema}) {
     SessionProvider sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
@@ -34,6 +36,12 @@ class _AddSessionState extends State<AddSession> {
     sessionListProvider.refresh();
   }
 
+  void setSearchKey(String key) {
+    setState(() {
+      searchKey = key;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     InstancesProvider instancesProvider =
@@ -44,35 +52,151 @@ class _AddSessionState extends State<AddSession> {
       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "数据源列表",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 5),
-              for (var inst in instancesProvider.instances())
-                Row(
-                  children: [
-                    TextButton(
-                        onPressed: () {
-                          addSession(context, inst);
-                        },
-                        child: Text(inst.name)),
-                    const VerticalDivider(
-                      width: 5,
-                    ),
-                    for (final schema in inst.activeSchemas.toList())
-                      TextButton(
-                        onPressed: () {
-                          addSession(context, inst, schema: schema);
-                        },
-                        child: Text(schema),
-                      )
-                  ],
-                )
-            ],
+          Container(
+            width: 800,
+            constraints: const BoxConstraints(minWidth: 800),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    "最近使用",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                const Divider(),
+                Container(
+                  padding: const EdgeInsets.only(top: 5, bottom: 5),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 200, child: Text("数据源")),
+                      Container(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const Text("最近打开的数据库"))
+                    ],
+                  ),
+                ),
+                for (var inst in instancesProvider.activeInstances())
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 200,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              "assets/icons/mysql_icon.png",
+                              height: 24,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  addSession(context, inst);
+                                },
+                                child: Text(inst.name)),
+                          ],
+                        ),
+                      ),
+                      const VerticalDivider(
+                        width: 5,
+                      ),
+                      for (final schema in inst.activeSchemas.toList())
+                        TextButton(
+                          onPressed: () {
+                            addSession(context, inst, schema: schema);
+                          },
+                          child: Text(schema),
+                        )
+                    ],
+                  ),
+                Container(
+                  padding: const EdgeInsets.only(bottom: 5, top: 35),
+                  child: Row(
+                    children: [
+                      Text(
+                        "完整列表",
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SearchBarTheme(
+                                  data: const SearchBarThemeData(
+                                      elevation: WidgetStatePropertyAll(0),
+                                      constraints: BoxConstraints(
+                                          minHeight: 35, maxWidth: 200)),
+                                  child: SearchBar(
+                                    onChanged: (value) {
+                                      setSearchKey(value);
+                                    },
+                                    trailing: const [Icon(Icons.search)],
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Container(
+                  padding: const EdgeInsets.only(top: 5, bottom: 5),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 200, child: Text("数据源")),
+                      Container(
+                          width: 200,
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const Text("地址")),
+                      Container(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const Text("描述")),
+                    ],
+                  ),
+                ),
+                for (var inst in instancesProvider.instances(searchKey))
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 200,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              "assets/icons/mysql_icon.png",
+                              height: 24,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  addSession(context, inst);
+                                },
+                                child: Text(inst.name)),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 15),
+                        width: 200,
+                        child: Row(
+                          children: [
+                            Text("${inst.addr}:${inst.port}"),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 15),
+                        width: 200,
+                        child: Row(
+                          children: [
+                            Text(inst.desc ?? ""),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
         ],
       ),

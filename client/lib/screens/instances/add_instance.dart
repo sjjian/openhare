@@ -196,11 +196,13 @@ class AddInstancePage {
                                         context
                                             .read<InstancesProvider>()
                                             .addInstance(InstanceModel(
-                                                name: nameCtrl.text,
-                                                addr: addrCtrl.text,
-                                                port: 3306,
-                                                user: userCtrl.text,
-                                                password: passwordCtrl.text));
+                                              name: nameCtrl.text,
+                                              addr: addrCtrl.text,
+                                              port: 3306,
+                                              user: userCtrl.text,
+                                              password: passwordCtrl.text,
+                                              desc: descCtrl.text,
+                                            ));
 
                                         context.pop();
                                       }

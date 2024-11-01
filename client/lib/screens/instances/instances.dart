@@ -1,5 +1,6 @@
 import 'package:client/models/instances.dart';
 import 'package:client/providers/instances.dart';
+import 'package:client/screens/instances/add_instance.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,13 @@ class InstancesPage extends StatefulWidget {
 
 class _InstancesPageState extends State<InstancesPage> {
   Set<InstanceModel> selectedInstances = {};
+  String searchKey = "";
+
+  void setSearchKey(String key) {
+    setState(() {
+      searchKey = key;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +36,50 @@ class _InstancesPageState extends State<InstancesPage> {
       children: [
         Expanded(
             child: Container(
-          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+          padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                padding: const EdgeInsets.fromLTRB(5, 20, 20, 10),
                 decoration: BoxDecoration(
                     border: Border(bottom: Divider.createBorderSide(context))),
                 child: Row(
                   children: [
                     Text(
                       "数据源列表",
-                      style:  Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context).textTheme.titleLarge,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    Expanded(
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: 35,
+                          height: 35,
+                          child: FloatingActionButton.small(
+                            elevation: 2,
+                            onPressed: () => {
+                              AddInstancePage.showAddInstanceDialog(context)
+                            },
+                            child: const Icon(Icons.add),
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        SearchBarTheme(
+                            data: const SearchBarThemeData(
+                                elevation: WidgetStatePropertyAll(0),
+                                constraints: BoxConstraints(
+                                    minHeight: 35, maxWidth: 200)),
+                            child: SearchBar(
+                              onChanged: (value) {
+                                setSearchKey(value);
+                              },
+                              trailing: const [Icon(Icons.search)],
+                            )),
+                      ],
+                    ))
                   ],
                 ),
               ),
@@ -56,8 +93,9 @@ class _InstancesPageState extends State<InstancesPage> {
                           checkboxHorizontalMargin: 0,
                           showBottomBorder: true,
                           columns: column,
-                          rows:
-                              instancesProvider.instances().map((instance) {
+                          rows: instancesProvider
+                              .instances(searchKey)
+                              .map((instance) {
                             return DataRow(
                                 selected: selectedInstances.contains(instance),
                                 onSelectChanged: (state) {
@@ -105,20 +143,18 @@ class _InstancesPageState extends State<InstancesPage> {
                               if (state == null || !state) {
                                 selectedInstances.clear();
                               } else {
-                                selectedInstances
-                                    .addAll(instancesProvider.instances());
+                                selectedInstances.addAll(
+                                    instancesProvider.instances(searchKey));
                               }
                             });
-                          }
-                          // setState(() => _instances.selectAll(state!)),
-                          );
+                          });
                     },
                   ),
                 ),
               )),
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: Row(
+                child: const Row(
                   children: [],
                 ),
               )

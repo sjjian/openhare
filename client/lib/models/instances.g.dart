@@ -31,3 +31,14 @@ Map<String, dynamic> _$InstanceModelToJson(InstanceModel instance) =>
       'password': instance.password,
       'active_schemas': instance.activeSchemas,
     };
+
+ActiveNameSet _$ActiveNameSetFromJson(Map<String, dynamic> json) =>
+    ActiveNameSet(
+      (json['data'] as List<dynamic>).map((e) => e as String).toList(),
+    )..maxLength = (json['maxLength'] as num).toInt();
+
+Map<String, dynamic> _$ActiveNameSetToJson(ActiveNameSet instance) =>
+    <String, dynamic>{
+      'data': instance.data.toList(),
+      'maxLength': instance.maxLength,
+    };
