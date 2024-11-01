@@ -1,8 +1,6 @@
-import 'package:client/storages/storages.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/instances/add_instance.dart';
 import 'package:client/screens/instances/instances.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/sessions/sessions.dart';
@@ -120,18 +118,6 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                     child: extended
                         ? const Icon(Icons.menu_open)
                         : const Icon(Icons.menu),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  FloatingActionButton.small(
-                    elevation: 2,
-                    onPressed: () =>
-                        {AddInstancePage.showAddInstanceDialog(context)},
-                    child: const Icon(Icons.add),
-                  ),
-                  const SizedBox(
-                    height: 5,
                   ),
                 ],
               ),
