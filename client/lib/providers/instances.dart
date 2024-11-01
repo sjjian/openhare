@@ -27,13 +27,13 @@ class InstancesProvider extends ChangeNotifier {
     return st.isInstanceExist(name);
   }
 
-  List<InstanceModel> instances(String filter) {
+  List<InstanceModel> instances(String key) {
     Storage st = Storage();
-    return st.searchInstance(filter);
+    return st.searchInstances(key);
   }
 
   List<InstanceModel> activeInstances() {
     Storage st = Storage();
-    return st.activeInstances;
+    return st.getActiveInstances();
   }
 }

@@ -11,10 +11,10 @@ part 'storages.g.dart';
 @JsonSerializable(constructor: "_internal")
 class Storage {
   @JsonKey(name: "instances")
-  List<InstanceModel> _instances;
+  List<InstanceModel> instances;
 
   @JsonKey(name: "active_instances")
-  ActiveNameSet _activeInstances;
+  ActiveNameSet activeInstances;
 
   static Storage? _storage;
 
@@ -28,8 +28,8 @@ class Storage {
 
   Storage._internal(
       {List<InstanceModel>? instances, ActiveNameSet? activeInstances})
-      : _instances = instances ?? List.empty(growable: true),
-        _activeInstances = activeInstances ?? ActiveNameSet.empty();
+      : instances = instances ?? List.empty(growable: true),
+        activeInstances = activeInstances ?? ActiveNameSet.empty();
 
   // json interface impl
   factory Storage.fromJson(Map<String, dynamic> json) {
@@ -67,21 +67,19 @@ class Storage {
     }
   }
 
-  List<InstanceModel> get instances => _instances;
-
   void addInstance(InstanceModel instance) {
-    _instances.add(instance);
+    instances.add(instance);
     _save();
   }
 
   void deleteInstance(InstanceModel instance) {
-    _instances.removeWhere((element) => element.name == instance.name);
+    instances.removeWhere((element) => element.name == instance.name);
     removeActiveInstance(instance);
     _save();
   }
 
   bool isInstanceExist(String name) {
-    for (var instance in _instances) {
+    for (var instance in instances) {
       if (instance.name == name) {
         return true;
       }
@@ -90,7 +88,7 @@ class Storage {
   }
 
   InstanceModel? getInstance(String name) {
-    for (var instance in _instances) {
+    for (var instance in instances) {
       if (instance.name == name) {
         return instance;
       }
@@ -98,11 +96,11 @@ class Storage {
     return null;
   }
 
-  List<InstanceModel> searchInstance(String key) {
+  List<InstanceModel> searchInstances(String key) {
     if (key.isEmpty) {
-      return _instances;
+      return instances;
     }
-    return _instances.where((instance) {
+    return instances.where((instance) {
       return instance.name.contains(key) ||
           instance.addr.contains(key) ||
           (instance.desc ?? "").contains(key) ||
@@ -110,8 +108,8 @@ class Storage {
     }).toList();
   }
 
-  List<InstanceModel> get activeInstances {
-    return _activeInstances
+  List<InstanceModel> getActiveInstances() {
+    return activeInstances
         .toList()
         .where((name) => isInstanceExist(name)) //todo: 降低判断instance存在的复杂度
         .map<InstanceModel>((name) {
@@ -120,16 +118,16 @@ class Storage {
   }
 
   void addActiveInstance(InstanceModel instance) {
-    _activeInstances.add(instance.name);
+    activeInstances.add(instance.name);
     _save();
   }
 
   void removeActiveInstance(InstanceModel instance) {
-    _activeInstances.remove(instance.name);
+    activeInstances.remove(instance.name);
   }
 
   void addInstanceActiveSchema(InstanceModel instance, String schema) {
     _save();
-    if (_instances.contains(instance)) instance.activeSchemas.add(schema);
+    if (instances.contains(instance)) instance.activeSchemas.add(schema);
   }
 }
