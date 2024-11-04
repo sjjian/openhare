@@ -96,16 +96,41 @@ class Storage {
     return null;
   }
 
-  List<InstanceModel> searchInstances(String key) {
+  //todo: 简化
+  List<InstanceModel> searchInstances(
+      String key, int pageNumer, int pageCount) {
     if (key.isEmpty) {
       return instances;
     }
-    return instances.where((instance) {
-      return instance.name.contains(key) ||
-          instance.addr.contains(key) ||
-          (instance.desc ?? "").contains(key) ||
-          instance.port.toString().contains(key);
-    }).toList();
+    if (instances.length <= pageNumer * (pageCount - 1)) {
+      return List.empty();
+    }
+    return instances
+        .sublist(pageNumer * (pageCount - 1))
+        .where((instance) {
+          return instance.name.contains(key) ||
+              instance.addr.contains(key) ||
+              (instance.desc ?? "").contains(key) ||
+              instance.port.toString().contains(key);
+        })
+        .toList()
+        .sublist(0, pageCount);
+  }
+
+  //todo: 简化
+  int instanceCount(String key) {
+    if (key.isEmpty) {
+      return instances.length;
+    }
+    return instances
+        .where((instance) {
+          return instance.name.contains(key) ||
+              instance.addr.contains(key) ||
+              (instance.desc ?? "").contains(key) ||
+              instance.port.toString().contains(key);
+        })
+        .toList()
+        .length;
   }
 
   List<InstanceModel> getActiveInstances() {

@@ -156,7 +156,7 @@ class _AddSessionState extends State<AddSession> {
                     ],
                   ),
                 ),
-                for (var inst in instancesProvider.instances(searchKey))
+                for (var inst in instancesProvider.instances(searchKey, 10, 1))
                   Row(
                     children: [
                       SizedBox(
