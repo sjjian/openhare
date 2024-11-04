@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TablePaginatedBar extends StatefulWidget {
-  // int count;
-  // int pageSize;
-  // int pageNumber;
-  // late int totalPageNumber;
   TablePageController controller;
 
-  // Function(int limit, int offset) onChange;
-
   TablePaginatedBar({Key? key, required this.controller}) : super(key: key);
-  //     {
-  //   // totalPageNumber = (count / pageSize).ceil(); // 向上取整, 总得出页数.
-  // }
 
   @override
   State<TablePaginatedBar> createState() => _PaginatedBarState();
@@ -51,7 +42,6 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
                         widget.controller
                             .onChange(widget.controller.pageNumber - 1);
                       });
-                      // widget.onChange(widget.pageSize, widget.pageNumber);
                     },
               icon: const Icon(Icons.keyboard_arrow_left)),
           IconButton(
@@ -62,7 +52,6 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
                         widget.controller
                             .onChange(widget.controller.pageNumber + 1);
                       });
-                      // widget.onChange(widget.pageSize, widget.pageNumber);
                     },
               icon: const Icon(Icons.keyboard_arrow_right_outlined)),
           IconButton(
@@ -71,9 +60,7 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
                   : () {
                       setState(() {
                         widget.controller.onChange(totalPageNumber);
-                        // widget.pageNumber = widget.totalPageNumber;
                       });
-                      // widget.onChange(widget.pageSize, widget.pageNumber);
                     },
               icon: const Icon(Icons.last_page)),
         ],

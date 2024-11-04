@@ -1,4 +1,5 @@
 import 'package:client/models/instances.dart';
+import 'package:client/utils/list_extend.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -97,40 +98,26 @@ class Storage {
   }
 
   //todo: 简化
-  List<InstanceModel> searchInstances(
-      String key, int pageNumer, int pageCount) {
-    if (key.isEmpty) {
-      return instances;
+  List<InstanceModel> searchInstances(String key,
+      {int? pageNumber, int? pageSize}) {
+    List<InstanceModel> filterList = key.isEmpty
+        ? instances
+        : instances.where((instance) {
+            return instance.name.contains(key) ||
+                instance.addr.contains(key) ||
+                (instance.desc ?? "").contains(key) ||
+                instance.port.toString().contains(key);
+          }).toList();
+
+    if (pageNumber == null || pageSize == null) {
+      return filterList;
     }
-    if (instances.length <= pageNumer * (pageCount - 1)) {
-      return List.empty();
-    }
-    return instances
-        .sublist(pageNumer * (pageCount - 1))
-        .where((instance) {
-          return instance.name.contains(key) ||
-              instance.addr.contains(key) ||
-              (instance.desc ?? "").contains(key) ||
-              instance.port.toString().contains(key);
-        })
-        .toList()
-        .sublist(0, pageCount);
+    return filterList.limit(pageSize * (pageNumber - 1), pageSize);
   }
 
   //todo: 简化
   int instanceCount(String key) {
-    if (key.isEmpty) {
-      return instances.length;
-    }
-    return instances
-        .where((instance) {
-          return instance.name.contains(key) ||
-              instance.addr.contains(key) ||
-              (instance.desc ?? "").contains(key) ||
-              instance.port.toString().contains(key);
-        })
-        .toList()
-        .length;
+    return searchInstances(key).length;
   }
 
   List<InstanceModel> getActiveInstances() {

@@ -43,7 +43,7 @@ class _AppState extends State<App> {
               GoRoute(
                 path: '/instances',
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage<void>(child: InstancesPage()),
+                     const NoTransitionPage<void>(child: InstancesPage()),
               ),
               GoRoute(
                 path: '/settings',

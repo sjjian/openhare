@@ -27,10 +27,11 @@ class InstancesProvider extends ChangeNotifier {
     return st.isInstanceExist(name);
   }
 
-  List<InstanceModel> instances(String key, int pageNumer, int pageCount) {
+  List<InstanceModel> instances(String key, int pageSize, int pageNumber) {
     Storage st = Storage();
-    return st.searchInstances(key, pageNumer, pageCount);
+    return st.searchInstances(key, pageNumber: pageNumber, pageSize: pageSize);
   }
+
   int instanceCount(String key) {
     Storage st = Storage();
     return st.instanceCount(key);

@@ -5,7 +5,7 @@ import 'package:client/widgets/paginated_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class InstancesPage extends StatefulWidget{
+class InstancesPage extends StatefulWidget {
   const InstancesPage({super.key});
 
   @override
@@ -13,34 +13,27 @@ class InstancesPage extends StatefulWidget{
 }
 
 class _InstancesPageState extends State<InstancesPage> {
-  Set<InstanceModel> selectedInstances = {};
-  String searchKey = "";
-  int currentPage = 1;
-  int pageSize = 10;
-
-  void setSearchKey(String key) {
-    PageController
-    setState(() {
-      searchKey = key;
-    });
+  @override
+  void initState() {
+    super.initState();
+    pageController.addListener(() => mounted ? setState(() {}) : null);
   }
 
-  void setPage(int pageSize, int pageNumber) {
-    setState(() {
-      pageSize = pageSize;
-      pageNumber = pageNumber;
-    });
+  @override
+  void dispose() {
+    pageController.removeListener(() {});
+    super.dispose();
   }
 
   DataRow buildDataRow(InstanceModel instance) {
     return DataRow(
-        selected: selectedInstances.contains(instance),
+        selected: pageController.selectedInstances.contains(instance),
         onSelectChanged: (state) {
           setState(() {
             if (state == null || !state) {
-              selectedInstances.remove(instance);
+              pageController.selectedInstances.remove(instance);
             } else {
-              selectedInstances.add(instance);
+              pageController.selectedInstances.add(instance);
             }
           });
         },
@@ -89,6 +82,8 @@ class _InstancesPageState extends State<InstancesPage> {
           padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
           child: Consumer<InstancesProvider>(
             builder: (context, instancesProvider, _) {
+              pageController.setCount(
+                  instancesProvider.instanceCount(pageController.searchKey));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -127,7 +122,7 @@ class _InstancesPageState extends State<InstancesPage> {
                                         minHeight: 35, maxWidth: 200)),
                                 child: SearchBar(
                                   onChanged: (value) {
-                                    setSearchKey(value);
+                                    pageController.setSearchKey(value);
                                   },
                                   trailing: const [Icon(Icons.search)],
                                 )),
@@ -144,7 +139,10 @@ class _InstancesPageState extends State<InstancesPage> {
                           showBottomBorder: true,
                           columns: column,
                           rows: instancesProvider
-                              .instances(searchKey, pageSize, currentPage)
+                              .instances(
+                                  pageController.searchKey,
+                                  pageController.pageSize,
+                                  pageController.pageNumber)
                               .map((instance) {
                             return buildDataRow(instance);
                           }).toList(),
@@ -153,20 +151,19 @@ class _InstancesPageState extends State<InstancesPage> {
                           onSelectAll: (state) {
                             setState(() {
                               if (state == null || !state) {
-                                selectedInstances.clear();
+                                pageController.selectedInstances.clear();
                               } else {
-                                selectedInstances.addAll(
-                                    instancesProvider.instances(searchKey, pageSize, currentPage));
+                                pageController.selectedInstances.addAll(
+                                    instancesProvider.instances(
+                                        pageController.searchKey,
+                                        pageController.pageSize,
+                                        pageController.currentPage));
                               }
                             });
                           }),
                     ),
                   ),
-                  PaginatedBar(
-                      onChange: setPage,
-                      count: instancesProvider.instanceCount(searchKey),
-                      pageSize: pageSize,
-                      pageNumber: currentPage),
+                  TablePaginatedBar(controller: pageController),
                   const Expanded(child: Spacer()),
                   Container(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -183,3 +180,36 @@ class _InstancesPageState extends State<InstancesPage> {
     );
   }
 }
+
+class PageController extends ChangeNotifier implements TablePageController {
+  Set<InstanceModel> selectedInstances = {};
+  String searchKey = "";
+  int currentPage = 1;
+  int _count = 0;
+
+  PageController();
+
+  @override
+  void onChange(int pageNumber) {
+    currentPage = pageNumber;
+    notifyListeners();
+  }
+
+  void setSearchKey(String key) {
+    searchKey = key;
+    notifyListeners();
+  }
+
+  void setCount(int count) => _count = count;
+
+  @override
+  int get count => _count;
+
+  @override
+  int get pageSize => 10;
+
+  @override
+  int get pageNumber => currentPage;
+}
+
+PageController pageController = PageController();
