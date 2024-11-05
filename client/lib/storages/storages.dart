@@ -1,4 +1,5 @@
 import 'package:client/models/instances.dart';
+import 'package:client/utils/list_extend.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -96,16 +97,27 @@ class Storage {
     return null;
   }
 
-  List<InstanceModel> searchInstances(String key) {
-    if (key.isEmpty) {
-      return instances;
+  //todo: 简化
+  List<InstanceModel> searchInstances(String key,
+      {int? pageNumber, int? pageSize}) {
+    List<InstanceModel> filterList = key.isEmpty
+        ? instances
+        : instances.where((instance) {
+            return instance.name.contains(key) ||
+                instance.addr.contains(key) ||
+                (instance.desc ?? "").contains(key) ||
+                instance.port.toString().contains(key);
+          }).toList();
+
+    if (pageNumber == null || pageSize == null) {
+      return filterList;
     }
-    return instances.where((instance) {
-      return instance.name.contains(key) ||
-          instance.addr.contains(key) ||
-          (instance.desc ?? "").contains(key) ||
-          instance.port.toString().contains(key);
-    }).toList();
+    return filterList.limit(pageSize * (pageNumber - 1), pageSize);
+  }
+
+  //todo: 简化
+  int instanceCount(String key) {
+    return searchInstances(key).length;
   }
 
   List<InstanceModel> getActiveInstances() {
