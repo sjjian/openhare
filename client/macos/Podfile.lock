@@ -1,4 +1,6 @@
 PODS:
+  - bitsdojo_window_macos (0.0.1):
+    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - path_provider_foundation (0.0.1):
     - Flutter
@@ -9,12 +11,15 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - bitsdojo_window_macos (from `Flutter/ephemeral/.symlinks/plugins/bitsdojo_window_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - screen_retriever (from `Flutter/ephemeral/.symlinks/plugins/screen_retriever/macos`)
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
 
 EXTERNAL SOURCES:
+  bitsdojo_window_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/bitsdojo_window_macos/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   path_provider_foundation:
@@ -25,6 +30,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
+  bitsdojo_window_macos: 44e3b8fe3dd463820e0321f6256c5b1c16bb6a00
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38

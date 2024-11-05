@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
+import 'package:client/screens/win_bar.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -43,7 +44,7 @@ class _AppState extends State<App> {
               GoRoute(
                 path: '/instances',
                 pageBuilder: (context, state) =>
-                     const NoTransitionPage<void>(child: InstancesPage()),
+                    const NoTransitionPage<void>(child: InstancesPage()),
               ),
               GoRoute(
                 path: '/settings',
@@ -96,73 +97,87 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-        body: Row(
-          children: <Widget>[
-            NavigationRail(
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-              useIndicator: true,
-              selectedIndex: _calculateSelectedIndex(context),
-              onDestinationSelected: (value) {
-                _onItemTapped(value, context);
-              },
-              extended: extended,
-              leading: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        extended = !extended;
-                      });
+        body: Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  NavigationRail(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    useIndicator: true,
+                    selectedIndex: _calculateSelectedIndex(context),
+                    onDestinationSelected: (value) {
+                      _onItemTapped(value, context);
                     },
-                    child: extended
-                        ? const Icon(Icons.menu_open)
-                        : const Icon(Icons.menu),
+                    extended: extended,
+                    leading: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 35),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              extended = !extended;
+                            });
+                          },
+                          child: extended
+                              ? const Icon(Icons.menu_open)
+                              : const Icon(Icons.menu),
+                        ),
+                      ],
+                    ),
+                    destinations: [
+                      const NavigationRailDestination(
+                        icon: Icon(Icons.personal_video),
+                        label: Text(
+                          "工作台",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      NavigationRailDestination(
+                        icon: HugeIcon(
+                          icon: HugeIcons.strokeRoundedDatabase,
+                          color: Theme.of(context).iconTheme.color ??
+                              Colors.black87,
+                        ),
+                        label: const Center(
+                          child: Text(
+                            "数据源",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                      const NavigationRailDestination(
+                        icon: Icon(Icons.settings),
+                        label: Center(
+                          child: Text(
+                            "设置",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      )
+                    ],
+                    trailing: const Expanded(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 20),
+                          child: FlutterLogo(),
+                        ),
+                      ),
+                    ),
                   ),
+                  Expanded(
+                      child: Column(
+                    children: [
+                      const SizedBox(height: 40, child: WindowsBar()),
+                      Expanded(child: widget.child)
+                    ],
+                  ))
                 ],
               ),
-              destinations:  [
-                const NavigationRailDestination(
-                  icon: Icon(Icons.personal_video),
-                  label: Text(
-                    "工作台",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                NavigationRailDestination(
-                  icon:  HugeIcon(
-                  icon: HugeIcons.strokeRoundedDatabase,
-                  color: Theme.of(context).iconTheme.color?? Colors.black87,
-                ),
-                  label: const Center(
-                    child: Text(
-                      "数据源",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const NavigationRailDestination(
-                  icon: Icon(Icons.settings),
-                  label: Center(
-                    child: Text(
-                      "设置",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                )
-              ],
-              trailing: const Expanded(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 20),
-                    child: FlutterLogo(),
-                  ),
-                ),
-              ),
             ),
-            Expanded(child: widget.child)
           ],
         ));
   }
