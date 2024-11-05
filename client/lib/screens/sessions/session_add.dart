@@ -2,6 +2,8 @@ import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:client/screens/instances/instances.dart';
+import 'package:client/widgets/paginated_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +15,17 @@ class AddSession extends StatefulWidget {
 }
 
 class _AddSessionState extends State<AddSession> {
-  String searchKey = "";
+  @override
+  void initState() {
+    super.initState();
+    instanceTableController.addListener(() => mounted ? setState(() {}) : null);
+  }
+
+  @override
+  void dispose() {
+    instanceTableController.removeListener(() {});
+    super.dispose();
+  }
 
   void addSession(BuildContext context, InstanceModel inst, {String? schema}) {
     SessionProvider sessionProvider =
@@ -36,16 +48,14 @@ class _AddSessionState extends State<AddSession> {
     sessionListProvider.refresh();
   }
 
-  void setSearchKey(String key) {
-    setState(() {
-      searchKey = key;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     InstancesProvider instancesProvider =
         Provider.of<InstancesProvider>(context);
+
+    instanceTableController.setCount(instancesProvider
+        .instanceCount(instanceTableController.searchTextController.text));
+
     return Expanded(
         child: Container(
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
@@ -128,8 +138,10 @@ class _AddSessionState extends State<AddSession> {
                                       constraints: BoxConstraints(
                                           minHeight: 35, maxWidth: 200)),
                                   child: SearchBar(
+                                    controller: instanceTableController
+                                        .searchTextController,
                                     onChanged: (value) {
-                                      setSearchKey(value);
+                                      instanceTableController.onSearchChange();
                                     },
                                     trailing: const [Icon(Icons.search)],
                                   )),
@@ -156,7 +168,10 @@ class _AddSessionState extends State<AddSession> {
                     ],
                   ),
                 ),
-                for (var inst in instancesProvider.instances(searchKey, 10, 1))
+                for (var inst in instancesProvider.instances(
+                    instanceTableController.searchTextController.text,
+                    instanceTableController.pageSize,
+                    instanceTableController.pageNumber))
                   Row(
                     children: [
                       SizedBox(
@@ -195,6 +210,7 @@ class _AddSessionState extends State<AddSession> {
                       ),
                     ],
                   ),
+                TablePaginatedBar(controller: instanceTableController)
               ],
             ),
           ),
@@ -203,3 +219,5 @@ class _AddSessionState extends State<AddSession> {
     ));
   }
 }
+
+InstanceTableController instanceTableController = InstanceTableController();

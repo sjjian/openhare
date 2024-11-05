@@ -16,24 +16,24 @@ class _InstancesPageState extends State<InstancesPage> {
   @override
   void initState() {
     super.initState();
-    pageController.addListener(() => mounted ? setState(() {}) : null);
+    instanceTableController.addListener(() => mounted ? setState(() {}) : null);
   }
 
   @override
   void dispose() {
-    pageController.removeListener(() {});
+    instanceTableController.removeListener(() {});
     super.dispose();
   }
 
   DataRow buildDataRow(InstanceModel instance) {
     return DataRow(
-        selected: pageController.selectedInstances.contains(instance),
+        selected: instanceTableController.selectedInstances.contains(instance),
         onSelectChanged: (state) {
           setState(() {
             if (state == null || !state) {
-              pageController.selectedInstances.remove(instance);
+              instanceTableController.selectedInstances.remove(instance);
             } else {
-              pageController.selectedInstances.add(instance);
+              instanceTableController.selectedInstances.add(instance);
             }
           });
         },
@@ -82,8 +82,8 @@ class _InstancesPageState extends State<InstancesPage> {
           padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
           child: Consumer<InstancesProvider>(
             builder: (context, instancesProvider, _) {
-              pageController.setCount(
-                  instancesProvider.instanceCount(pageController.searchKey));
+              instanceTableController.setCount(instancesProvider
+                  .instanceCount(instanceTableController.searchTextController.text));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -121,8 +121,10 @@ class _InstancesPageState extends State<InstancesPage> {
                                     constraints: BoxConstraints(
                                         minHeight: 35, maxWidth: 200)),
                                 child: SearchBar(
+                                  controller:
+                                      instanceTableController.searchTextController,
                                   onChanged: (value) {
-                                    pageController.setSearchKey(value);
+                                    instanceTableController.onSearchChange();
                                   },
                                   trailing: const [Icon(Icons.search)],
                                 )),
@@ -140,9 +142,9 @@ class _InstancesPageState extends State<InstancesPage> {
                           columns: column,
                           rows: instancesProvider
                               .instances(
-                                  pageController.searchKey,
-                                  pageController.pageSize,
-                                  pageController.pageNumber)
+                                  instanceTableController.searchTextController.text,
+                                  instanceTableController.pageSize,
+                                  instanceTableController.pageNumber)
                               .map((instance) {
                             return buildDataRow(instance);
                           }).toList(),
@@ -151,19 +153,20 @@ class _InstancesPageState extends State<InstancesPage> {
                           onSelectAll: (state) {
                             setState(() {
                               if (state == null || !state) {
-                                pageController.selectedInstances.clear();
+                                instanceTableController.selectedInstances.clear();
                               } else {
-                                pageController.selectedInstances.addAll(
+                                instanceTableController.selectedInstances.addAll(
                                     instancesProvider.instances(
-                                        pageController.searchKey,
-                                        pageController.pageSize,
-                                        pageController.currentPage));
+                                        instanceTableController
+                                            .searchTextController.text,
+                                        instanceTableController.pageSize,
+                                        instanceTableController.currentPage));
                               }
                             });
                           }),
                     ),
                   ),
-                  TablePaginatedBar(controller: pageController),
+                  TablePaginatedBar(controller: instanceTableController),
                   const Expanded(child: Spacer()),
                   Container(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -181,13 +184,13 @@ class _InstancesPageState extends State<InstancesPage> {
   }
 }
 
-class PageController extends ChangeNotifier implements TablePageController {
+class InstanceTableController extends ChangeNotifier implements TablePageController {
   Set<InstanceModel> selectedInstances = {};
-  String searchKey = "";
+  TextEditingController searchTextController = TextEditingController(text: "");
   int currentPage = 1;
   int _count = 0;
 
-  PageController();
+  InstanceTableController();
 
   @override
   void onChange(int pageNumber) {
@@ -195,8 +198,7 @@ class PageController extends ChangeNotifier implements TablePageController {
     notifyListeners();
   }
 
-  void setSearchKey(String key) {
-    searchKey = key;
+  void onSearchChange() {
     notifyListeners();
   }
 
@@ -212,4 +214,4 @@ class PageController extends ChangeNotifier implements TablePageController {
   int get pageNumber => currentPage;
 }
 
-PageController pageController = PageController();
+InstanceTableController instanceTableController = InstanceTableController();
