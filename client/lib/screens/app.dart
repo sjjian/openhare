@@ -1,14 +1,16 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances/instances.dart';
+import 'package:client/screens/sessions/session_tabs.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
-import 'package:client/screens/win_bar.dart';
+import 'package:client/screens/page_skeleton.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -38,18 +40,23 @@ class _AppState extends State<App> {
             routes: [
               GoRoute(
                 path: '/sessions',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage<void>(child: SQLEditPage()),
+                pageBuilder: (context, state) => const NoTransitionPage<void>(
+                    child: PageSkeleton(
+                        key: Key("sessions"),
+                        topBar: SessionTabs(),
+                        child: SQLEditPage())),
               ),
               GoRoute(
                 path: '/instances',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage<void>(child: InstancesPage()),
+                pageBuilder: (context, state) => const NoTransitionPage<void>(
+                    child: PageSkeleton(
+                        key: Key("instances"), child: InstancesPage())),
               ),
               GoRoute(
                 path: '/settings',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage<void>(child: SettingsPage()),
+                pageBuilder: (context, state) => const NoTransitionPage<void>(
+                    child: PageSkeleton(
+                        key: Key("settings"), child: SettingsPage())),
               ),
             ]),
       ]);
@@ -168,13 +175,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                       ),
                     ),
                   ),
-                  Expanded(
-                      child: Column(
-                    children: [
-                      const SizedBox(height: 40, child: WindowsBar()),
-                      Expanded(child: widget.child)
-                    ],
-                  ))
+                  Expanded(child: widget.child)
                 ],
               ),
             ),

@@ -82,13 +82,13 @@ class _InstancesPageState extends State<InstancesPage> {
           padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
           child: Consumer<InstancesProvider>(
             builder: (context, instancesProvider, _) {
-              instanceTableController.setCount(instancesProvider
-                  .instanceCount(instanceTableController.searchTextController.text));
+              instanceTableController.setCount(instancesProvider.instanceCount(
+                  instanceTableController.searchTextController.text));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Container(
-                    padding: const EdgeInsets.fromLTRB(5, 20, 20, 10),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                     decoration: BoxDecoration(
                         border:
                             Border(bottom: Divider.createBorderSide(context))),
@@ -121,8 +121,8 @@ class _InstancesPageState extends State<InstancesPage> {
                                     constraints: BoxConstraints(
                                         minHeight: 35, maxWidth: 200)),
                                 child: SearchBar(
-                                  controller:
-                                      instanceTableController.searchTextController,
+                                  controller: instanceTableController
+                                      .searchTextController,
                                   onChanged: (value) {
                                     instanceTableController.onSearchChange();
                                   },
@@ -142,7 +142,8 @@ class _InstancesPageState extends State<InstancesPage> {
                           columns: column,
                           rows: instancesProvider
                               .instances(
-                                  instanceTableController.searchTextController.text,
+                                  instanceTableController
+                                      .searchTextController.text,
                                   instanceTableController.pageSize,
                                   instanceTableController.pageNumber)
                               .map((instance) {
@@ -153,10 +154,11 @@ class _InstancesPageState extends State<InstancesPage> {
                           onSelectAll: (state) {
                             setState(() {
                               if (state == null || !state) {
-                                instanceTableController.selectedInstances.clear();
+                                instanceTableController.selectedInstances
+                                    .clear();
                               } else {
-                                instanceTableController.selectedInstances.addAll(
-                                    instancesProvider.instances(
+                                instanceTableController.selectedInstances
+                                    .addAll(instancesProvider.instances(
                                         instanceTableController
                                             .searchTextController.text,
                                         instanceTableController.pageSize,
@@ -184,7 +186,8 @@ class _InstancesPageState extends State<InstancesPage> {
   }
 }
 
-class InstanceTableController extends ChangeNotifier implements TablePageController {
+class InstanceTableController extends ChangeNotifier
+    implements TablePageController {
   Set<InstanceModel> selectedInstances = {};
   TextEditingController searchTextController = TextEditingController(text: "");
   int currentPage = 1;

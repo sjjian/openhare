@@ -1,24 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-
-class WindowsBar extends StatelessWidget {
-  const WindowsBar({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest,
-        child: Column(children: [
-          WindowTitleBarBox(
-            child: Row(
-              children: [Expanded(child: MoveWindow()), const WindowButtons()],
-            ),
-          )
-        ]),
-      ),
-    );
-  }
-}
 
 final buttonColors = WindowButtonColors(
     iconNormal: const Color(0xFF805306),
@@ -44,5 +26,34 @@ class WindowButtons extends StatelessWidget {
         CloseWindowButton(colors: closeButtonColors),
       ],
     );
+  }
+}
+
+class PageSkeleton extends StatelessWidget {
+  final Widget? topBar;
+  final Widget? bottomBar;
+  final Widget child;
+
+  const PageSkeleton(
+      {Key? key, this.topBar, this.bottomBar, required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      SizedBox(
+          height: 40,
+          child: MoveWindow(
+            key: GlobalKey(debugLabel: "move window"),
+            child: Row(
+              children: [
+                if (topBar != null) Expanded(child: topBar!),
+                if (!kIsWeb) const WindowButtons(),
+              ],
+            ),
+          )),
+      Expanded(child: child),
+      if (bottomBar != null) SizedBox(height: 40, child: bottomBar!)
+    ]);
   }
 }
