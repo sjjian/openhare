@@ -19,7 +19,7 @@ class _SQLEditPageState extends State<SQLEditPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SessionTabs(),
+        // const SessionTabs(),
         Expanded(
             child: Container(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
