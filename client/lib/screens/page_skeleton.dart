@@ -43,14 +43,15 @@ class PageSkeleton extends StatelessWidget {
     return Column(children: [
       SizedBox(
           height: 40,
-          child: MoveWindow(
-            key: GlobalKey(debugLabel: "move window"),
-            child: Row(
-              children: [
-                if (topBar != null) Expanded(child: topBar!),
-                if (!kIsWeb) const WindowButtons(),
-              ],
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: MoveWindow( // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
+                  child: topBar,
+                ),
+              ),
+              if (!kIsWeb) const WindowButtons(),
+            ],
           )),
       Expanded(child: child),
       if (bottomBar != null) SizedBox(height: 40, child: bottomBar!)
