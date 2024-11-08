@@ -16,62 +16,66 @@ class _SessionTabsState extends State<SessionTabs> {
   Widget build(BuildContext context) {
     return Consumer<SessionListProvider>(
         builder: (context, sessionListProvider, _) {
-      return CommonTabBar(
-          tabStyle: CommonTabStyle(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            selectedColor: Theme.of(context).colorScheme.surfaceContainerLow,
-            hoverColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-          ),
-          addTab: () {
-            sessionListProvider.addSession(SessionModel());
-          },
-          onReorder: (oldIndex, newIndex) {
-            sessionListProvider.reorderSession(oldIndex, newIndex);
-          },
-          tabs: [
-            for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
-              CommonTabWrap(
-                avatar: Image.asset("assets/icons/mysql_icon.png"),
-                label: sessionListProvider.sessions.data[i].conn != null
-                    ? sessionListProvider.sessions.data[i].conn!.instance.name
-                    : "new",
-                items: <PopupMenuEntry>[
-                  PopupMenuItem<String>(
-                    height: 30,
-                    onTap: () {
-                      sessionListProvider
-                          .connect(sessionListProvider.sessions.data[i]);
-                    },
-                    child: const Text("连接"),
-                  ),
-                  const PopupMenuDivider(height: 0.1),
-                  PopupMenuItem<String>(
-                    height: 30,
-                    onTap: () {
-                      sessionListProvider
-                          .close(sessionListProvider.sessions.data[i]);
-                    },
-                    child: const Text("断开"),
-                  ),
-                  const PopupMenuDivider(height: 0.1),
-                  PopupMenuItem<String>(
-                    height: 30,
-                    onTap: () {
-                      sessionListProvider.deleteSessionByIndex(i);
-                    },
-                    child: const Text("关闭"),
-                  ),
-                ],
-                onTap: () {
-                  sessionListProvider.selectSessionByIndex(i);
-                },
-                onDeleted: () {
-                  sessionListProvider.deleteSessionByIndex(i);
-                },
-                selected: sessionListProvider.sessions.data
-                    .isSelected(sessionListProvider.sessions.data[i]),
-              )
-          ]);
+      return Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: CommonTabBar(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            tabStyle: CommonTabStyle(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              selectedColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+              hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
+            ),
+            addTab: () {
+              sessionListProvider.addSession(SessionModel());
+            },
+            onReorder: (oldIndex, newIndex) {
+              sessionListProvider.reorderSession(oldIndex, newIndex);
+            },
+            tabs: [
+              for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
+                CommonTabWrap(
+                  avatar: Image.asset("assets/icons/mysql_icon.png"),
+                  label: sessionListProvider.sessions.data[i].conn != null
+                      ? sessionListProvider.sessions.data[i].conn!.instance.name
+                      : "new",
+                  items: <PopupMenuEntry>[
+                    PopupMenuItem<String>(
+                      height: 30,
+                      onTap: () {
+                        sessionListProvider
+                            .connect(sessionListProvider.sessions.data[i]);
+                      },
+                      child: const Text("连接"),
+                    ),
+                    const PopupMenuDivider(height: 0.1),
+                    PopupMenuItem<String>(
+                      height: 30,
+                      onTap: () {
+                        sessionListProvider
+                            .close(sessionListProvider.sessions.data[i]);
+                      },
+                      child: const Text("断开"),
+                    ),
+                    const PopupMenuDivider(height: 0.1),
+                    PopupMenuItem<String>(
+                      height: 30,
+                      onTap: () {
+                        sessionListProvider.deleteSessionByIndex(i);
+                      },
+                      child: const Text("关闭"),
+                    ),
+                  ],
+                  onTap: () {
+                    sessionListProvider.selectSessionByIndex(i);
+                  },
+                  onDeleted: () {
+                    sessionListProvider.deleteSessionByIndex(i);
+                  },
+                  selected: sessionListProvider.sessions.data
+                      .isSelected(sessionListProvider.sessions.data[i]),
+                )
+            ]),
+      );
     });
   }
 }

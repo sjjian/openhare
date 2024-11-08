@@ -41,12 +41,14 @@ class PageSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      SizedBox(
+      Container(
+        color: Theme.of(context).colorScheme.surfaceContainer,
           height: 40,
           child: Row(
             children: [
               Expanded(
-                child: MoveWindow( // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
+                child: MoveWindow(
+                  // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
                   child: topBar,
                 ),
               ),
@@ -54,7 +56,11 @@ class PageSkeleton extends StatelessWidget {
             ],
           )),
       Expanded(child: child),
-      if (bottomBar != null) SizedBox(height: 40, child: bottomBar!)
+      Container(
+        height: 40,
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        child: bottomBar,
+      )
     ]);
   }
 }

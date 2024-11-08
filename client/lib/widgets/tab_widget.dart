@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 const double defaultTabMaxWidth = 200;
 
 class CommonTabBar extends StatefulWidget {
+  final double? height;
   final List<CommonTabWrap>? tabs;
   final ReorderCallback? onReorder;
   final VoidCallback? addTab;
@@ -12,6 +13,7 @@ class CommonTabBar extends StatefulWidget {
 
   const CommonTabBar(
       {Key? key,
+      this.height,
       this.tabs,
       this.onReorder,
       this.addTab,
@@ -31,9 +33,9 @@ class _CommonTabBarState extends State<CommonTabBar> {
       double width = min(c.maxWidth / widget.tabs!.length,
           style.maxWidth ?? defaultTabMaxWidth);
 
-      Widget addTabWidget = Container(
-          height: 35,
-          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+      Widget addTabWidget = SizedBox(
+          height: widget.height ?? 35,
+          // padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
           child: IconButton(
             alignment: Alignment.center,
             constraints: const BoxConstraints(),
@@ -45,8 +47,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
           ));
 
       return Container(
-        constraints: const BoxConstraints(maxHeight: 40),
-        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+        constraints: BoxConstraints(maxHeight: widget.height ?? 40),
         decoration: BoxDecoration(
           color: widget.color ??
               Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -67,6 +68,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
                           child: CommonTab.fromWarp(
                               warp: widget.tabs![i],
                               width: width,
+                              height: widget.height,
                               style: style),
                         ),
                   ],
@@ -77,7 +79,10 @@ class _CommonTabBarState extends State<CommonTabBar> {
                     if (widget.tabs != null)
                       for (var i = 0; i < widget.tabs!.length; i++)
                         CommonTab.fromWarp(
-                            warp: widget.tabs![i], width: width, style: style),
+                            warp: widget.tabs![i],
+                            width: width,
+                            height: widget.height,
+                            style: style),
                     if (widget.addTab != null) addTabWidget,
                     const Expanded(
                       child: Spacer(),
@@ -109,13 +114,15 @@ class CommonTabWrap {
 }
 
 class CommonTabStyle {
+  final double? height;
   final double? maxWidth;
   final Color? color;
   final Color? selectedColor;
   final Color? hoverColor;
   final TextAlign? labelAlign;
   CommonTabStyle(
-      {this.maxWidth,
+      {this.height,
+      this.maxWidth,
       this.color,
       this.selectedColor,
       this.hoverColor,
@@ -128,25 +135,31 @@ class CommonTab extends StatefulWidget {
   final List<PopupMenuEntry>? items;
   final bool selected;
   final double? width;
+  final double? height;
   final CommonTabStyle? style;
 
   final GestureTapCallback? onTap;
   final VoidCallback? onDeleted;
 
-  const CommonTab({
-    Key? key,
-    this.avatar,
-    required this.label,
-    required this.selected,
-    this.items,
-    this.onTap,
-    this.onDeleted,
-    this.style,
-    this.width,
-  }) : super(key: key);
+  const CommonTab(
+      {Key? key,
+      this.avatar,
+      required this.label,
+      required this.selected,
+      this.items,
+      this.onTap,
+      this.onDeleted,
+      this.style,
+      this.width,
+      this.height})
+      : super(key: key);
 
   CommonTab.fromWarp(
-      {super.key, required CommonTabWrap warp, this.style, this.width})
+      {super.key,
+      required CommonTabWrap warp,
+      this.style,
+      this.width,
+      this.height})
       : avatar = warp.avatar,
         label = warp.label,
         items = warp.items,
@@ -218,7 +231,7 @@ class _CommonTabState extends State<CommonTab> {
           child: Container(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
             width: widget.width ?? defaultTabMaxWidth,
-            height: 35,
+            height: widget.height ?? 40,
             decoration: BoxDecoration(
                 color: color(),
                 borderRadius: const BorderRadius.only(
