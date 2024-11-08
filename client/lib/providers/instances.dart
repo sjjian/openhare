@@ -16,6 +16,12 @@ class InstancesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateInstance(InstanceModel instance){
+    Storage st = Storage();
+    st.updateInstance(instance);
+    notifyListeners();
+  }
+
   void deleteInstance(InstanceModel instance) {
     Storage st = Storage();
     st.deleteInstance(instance);

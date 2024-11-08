@@ -4,30 +4,91 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class AddInstancePage {
-  static Future<void> showAddInstanceDialog(BuildContext context) {
-    // todo: 释放资源
+Future<void> showAddInstanceDialog(BuildContext context) {
+  // todo: 释放资源
+  return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          alignment: Alignment.center,
+          child: AddInstancePage(),
+        );
+      });
+}
 
-    return showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return const Dialog(
-            alignment: Alignment.center,
-            child: InstanceForm(),
-          );
-        });
+Future<void> showUpdateInstanceDialog(
+    BuildContext context, InstanceModel instance) {
+  // todo: 释放资源
+  return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          alignment: Alignment.center,
+          child: UpdateInstancePage(instance: instance),
+        );
+      });
+}
+
+class AddInstancePage extends StatelessWidget {
+  final TextEditingController nameCtrl = TextEditingController();
+  final TextEditingController descCtrl = TextEditingController();
+  final TextEditingController addrCtrl = TextEditingController();
+  final TextEditingController portCtrl = TextEditingController(text: "3306");
+  final TextEditingController userCtrl = TextEditingController();
+  final TextEditingController passwordCtrl = TextEditingController();
+  final String title = "添加数据源";
+
+  AddInstancePage({Key? key}) : super(key: key);
+
+  void onSubmit(BuildContext context, InstanceModel instance) {
+    context.read<InstancesProvider>().addInstance(instance);
   }
-}
 
-class InstanceForm extends StatefulWidget {
-  const InstanceForm({Key? key}) : super(key: key);
+  FormFieldValidator validatorName(BuildContext context) {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return "名称不能为空";
+      }
+      if (context.read<InstancesProvider>().isInstanceExist(value)) {
+        return "名称已存在";
+      }
+      return null;
+    };
+  }
 
-  @override
-  State<InstanceForm> createState() => _InstanceForm();
-}
+  FormFieldValidator validatorPassword() {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return "密码不能为空";
+      }
+      return null;
+    };
+  }
 
-class _InstanceForm extends State<InstanceForm> {
+  Widget nameFormField(TextEditingController ctrl,
+      {FormFieldValidator? validator}) {
+    return commonFormField("名称", ctrl, validator: validator);
+  }
+
+  Widget passwordFormField(TextEditingController ctrl,
+      {FormFieldValidator? validator}) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 80),
+      child: TextFormField(
+        obscureText: true,
+        controller: ctrl,
+        validator: validator,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+          labelText: "密码",
+          contentPadding: const EdgeInsets.all(10),
+        ),
+      ),
+    );
+  }
+
   Widget commonFormField(String label, TextEditingController ctrl,
       {FormFieldValidator? validator}) {
     return Container(
@@ -96,12 +157,6 @@ class _InstanceForm extends State<InstanceForm> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController nameCtrl = TextEditingController();
-    TextEditingController descCtrl = TextEditingController();
-    TextEditingController addrCtrl = TextEditingController();
-    TextEditingController portCtrl = TextEditingController(text: "3306");
-    TextEditingController userCtrl = TextEditingController();
-    TextEditingController passwordCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
@@ -112,7 +167,7 @@ class _InstanceForm extends State<InstanceForm> {
           child: Row(
             children: [
               Text(
-                "添加数据源",
+                title,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Expanded(
@@ -135,26 +190,12 @@ class _InstanceForm extends State<InstanceForm> {
               key: formKey,
               child: Column(
                 children: [
-                  commonFormField("名称", nameCtrl, validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "名称不能为空";
-                    }
-                    if (context
-                        .read<InstancesProvider>()
-                        .isInstanceExist(value)) {
-                      return "名称已存在";
-                    }
-                    return null;
-                  }),
+                  nameFormField(nameCtrl, validator: validatorName(context)),
                   descFormField(descCtrl),
                   addressFormField(addrCtrl, portCtrl),
                   commonFormField("账号", userCtrl),
-                  commonFormField("密码", passwordCtrl, validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "密码不能为空";
-                    }
-                    return null;
-                  }),
+                  passwordFormField(passwordCtrl,
+                      validator: validatorPassword()),
                 ],
               )),
         ),
@@ -171,9 +212,9 @@ class _InstanceForm extends State<InstanceForm> {
                   TextButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          context
-                              .read<InstancesProvider>()
-                              .addInstance(InstanceModel(
+                          onSubmit(
+                              context,
+                              InstanceModel(
                                 name: nameCtrl.text,
                                 addr: addrCtrl.text,
                                 port: 3306,
@@ -181,7 +222,6 @@ class _InstanceForm extends State<InstanceForm> {
                                 password: passwordCtrl.text,
                                 desc: descCtrl.text,
                               ));
-
                           context.pop();
                         }
                       },
@@ -192,6 +232,53 @@ class _InstanceForm extends State<InstanceForm> {
           ],
         ))
       ]),
+    );
+  }
+}
+
+class UpdateInstancePage extends AddInstancePage {
+  @override
+  String get title => "更新数据源";
+
+  UpdateInstancePage({Key? key, required InstanceModel instance})
+      : super(key: key) {
+    nameCtrl.text = instance.name;
+    descCtrl.text = instance.desc ?? "";
+    addrCtrl.text = instance.addr;
+    portCtrl.text = instance.port.toString();
+    userCtrl.text = instance.user;
+    passwordCtrl.text = instance.password;
+  }
+
+  @override
+  void onSubmit(BuildContext context, InstanceModel instance) {
+    context.read<InstancesProvider>().updateInstance(instance);
+  }
+
+  @override
+  FormFieldValidator validatorName(BuildContext context) {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return "名称不能为空";
+      }
+      return null;
+    };
+  }
+
+  @override
+  Widget nameFormField(TextEditingController ctrl,
+      {FormFieldValidator? validator}) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 80),
+      child: TextFormField(
+        readOnly: true,
+        controller: ctrl,
+        validator: validator,
+        decoration: InputDecoration(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+            labelText: "名称",
+            contentPadding: const EdgeInsets.all(10)),
+      ),
     );
   }
 }
