@@ -46,7 +46,9 @@ class _InstancesPageState extends State<InstancesPage> {
           DataCell(Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  showUpdateInstanceDialog(context, instance);
+                },
                 icon: const Icon(Icons.edit),
               ),
               IconButton(
@@ -109,7 +111,7 @@ class _InstancesPageState extends State<InstancesPage> {
                               child: FloatingActionButton.small(
                                 elevation: 2,
                                 onPressed: () => {
-                                  AddInstancePage.showAddInstanceDialog(context)
+                                  showAddInstanceDialog(context)
                                 },
                                 child: const Icon(Icons.add),
                               ),

@@ -73,6 +73,16 @@ class Storage {
     _save();
   }
 
+  void updateInstance(InstanceModel target) {
+    for (int i = 0; i < instances.length; i++) {
+      if (instances[i].name == target.name) {
+        instances[i] = target;
+        break;
+      }
+    }
+    _save();
+  }
+
   void deleteInstance(InstanceModel instance) {
     instances.removeWhere((element) => element.name == instance.name);
     removeActiveInstance(instance);
