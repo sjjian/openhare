@@ -1,4 +1,5 @@
 import 'package:client/providers/sessions.dart';
+import 'package:client/screens/sessions/session_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +45,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
 
   @override
   Widget build(BuildContext context) {
+    // CustomDrawer c = CustomDrawer(context: context, child: const Text("test"));
     return Container(
       // padding: const EdgeInsets.only(left: 5),
       color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -115,6 +117,9 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 disable: canQuery ? false : true,
                 currentSchema: sessionProvider.session!.conn!.currentSchema),
             const Expanded(child: Spacer()),
+             IconButton(onPressed: () {
+              Scaffold.of(context).openEndDrawer();
+            }, icon: const Icon(Icons.menu)),
           ],
         );
       }),

@@ -1,6 +1,7 @@
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:client/screens/sessions/session_add.dart';
+import 'package:client/screens/sessions/session_drawer.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_status.dart';
 import 'package:client/screens/sessions/session_tabs.dart';
@@ -50,6 +51,7 @@ class SessionsPage extends StatelessWidget {
         key: Key("sessions"),
         topBar: SessionTabs(),
         bottomBar: SessionStatus(),
+        drawer: SessionDrawer(),
         child: SQLEditPage());
   }
 }
