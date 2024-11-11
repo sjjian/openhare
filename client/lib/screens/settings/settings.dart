@@ -1,3 +1,4 @@
+import 'package:client/screens/page_skeleton.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -10,14 +11,17 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          'setting',
-        ),
-      ],
-    ));
+    return const PageSkeleton(
+      key: Key("settings"),
+      child: Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'setting',
+          ),
+        ],
+      )),
+    );
   }
 }

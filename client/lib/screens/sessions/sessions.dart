@@ -1,4 +1,5 @@
 import 'package:client/providers/sessions.dart';
+import 'package:client/screens/page_skeleton.dart';
 import 'package:client/screens/sessions/session_add.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_status.dart';
@@ -19,7 +20,6 @@ class _SQLEditPageState extends State<SQLEditPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // const SessionTabs(),
         Expanded(
             child: Container(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -32,11 +32,24 @@ class _SQLEditPageState extends State<SQLEditPage> {
                   return const AddSession();
                 }
               }),
-              const SessionStatus(),
+              // const SessionStatus(),
             ],
           ),
         )),
       ],
     );
+  }
+}
+
+class SessionsPage extends StatelessWidget {
+  const SessionsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const PageSkeleton(
+        key: Key("sessions"),
+        topBar: SessionTabs(),
+        bottomBar: SessionStatus(),
+        child: SQLEditPage());
   }
 }

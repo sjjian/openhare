@@ -46,7 +46,8 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
   Widget build(BuildContext context) {
     return Container(
       // padding: const EdgeInsets.only(left: 5),
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      
       constraints: BoxConstraints(maxHeight: widget.height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final canQuery = sessionProvider.canQuery();

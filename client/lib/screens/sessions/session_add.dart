@@ -2,7 +2,7 @@ import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/instances/instances.dart';
+import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -64,7 +64,7 @@ class _CodeEditorState extends State<CodeEditor> {
         data: const CodeThemeData(styles: a11yLightTheme),
         child: CodeField(
           lineNumberStyle: LineNumberStyle(
-              background: Theme.of(context).colorScheme.surfaceContainerLow),
+              background: Theme.of(context).colorScheme.surfaceContainerLowest),
           expands: true,
           controller: widget.codeController,
           textStyle: const TextStyle(fontFamily: 'Roboto Mono'),
@@ -78,15 +78,6 @@ class _CodeEditorState extends State<CodeEditor> {
       return Column(
         children: [codeButtonBar, codeField],
       );
-
-      // if (c.maxHeight <= codeButtonHeight) {
-      //   codeButtonBar = Expanded(child: codeButtonBar);
-      //   return Column(children: [codeButtonBar]);
-      // } else {
-      //   return Column(
-      //     children: [codeField, codeButtonBar],
-      //   );
-      // }
     });
   }
 }
@@ -106,7 +97,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
       labelAlign: TextAlign.center,
       selectedColor: Theme.of(context).colorScheme.surfaceContainerLowest,
       color: Theme.of(context).colorScheme.surfaceContainer,
-      hoverColor: Theme.of(context).colorScheme.surfaceContainer,
+      hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
     );
     return Row(
       children: [
@@ -116,7 +107,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
               Container(
                 color: Theme.of(context).colorScheme.surfaceContainer,
                 alignment: Alignment.centerLeft,
-                constraints: const BoxConstraints(maxHeight: 40),
+                constraints: const BoxConstraints(maxHeight: 35),
                 child: Consumer<SessionProvider>(
                   builder: (context, sessionProvider, _) {
                     final results = sessionProvider.getAllSQLResult();
@@ -139,6 +130,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                           ),
                           Expanded(
                               child: CommonTabBar(
+                                height: 35,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .surfaceContainer,

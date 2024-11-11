@@ -2,14 +2,12 @@ import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances/instances.dart';
-import 'package:client/screens/sessions/session_tabs.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
-import 'package:client/screens/page_skeleton.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -39,23 +37,18 @@ class _AppState extends State<App> {
             routes: [
               GoRoute(
                 path: '/sessions',
-                pageBuilder: (context, state) => const NoTransitionPage<void>(
-                    child: PageSkeleton(
-                        key: Key("sessions"),
-                        topBar: SessionTabs(),
-                        child: SQLEditPage())),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage<void>(child: SessionsPage()),
               ),
               GoRoute(
                 path: '/instances',
                 pageBuilder: (context, state) => const NoTransitionPage<void>(
-                    child: PageSkeleton(
-                        key: Key("instances"), child: InstancesPage())),
+                    child: InstancesPage()),
               ),
               GoRoute(
                 path: '/settings',
                 pageBuilder: (context, state) => const NoTransitionPage<void>(
-                    child: PageSkeleton(
-                        key: Key("settings"), child: SettingsPage())),
+                    child: SettingsPage()),
               ),
             ]),
       ]);
