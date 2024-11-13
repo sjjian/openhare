@@ -49,7 +49,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
     return Container(
       // padding: const EdgeInsets.only(left: 5),
       color: Theme.of(context).colorScheme.surfaceContainerLow,
-      
+
       constraints: BoxConstraints(maxHeight: widget.height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final canQuery = sessionProvider.canQuery();
@@ -96,12 +96,14 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 iconSize: widget.height,
                 padding: const EdgeInsets.all(2),
                 alignment: Alignment.topLeft,
-                onPressed: canQuery? () {
-                  String query = getQuery(sessionProvider);
-                  if (query.isNotEmpty) {
-                    sessionProvider.query("explain $query", true);
-                  }
-                }: null,
+                onPressed: canQuery
+                    ? () {
+                        String query = getQuery(sessionProvider);
+                        if (query.isNotEmpty) {
+                          sessionProvider.query("explain $query", true);
+                        }
+                      }
+                    : null,
                 icon: Icon(
                   Icons.e_mobiledata,
                   color: canQuery
@@ -117,9 +119,13 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 disable: canQuery ? false : true,
                 currentSchema: sessionProvider.session!.conn!.currentSchema),
             const Expanded(child: Spacer()),
-             IconButton(onPressed: () {
-              Scaffold.of(context).openEndDrawer();
-            }, icon: const Icon(Icons.menu)),
+            IconButton(
+                onPressed: () {
+                  Provider.of<SessionProvider>(context, listen: false);
+                  sessionProvider.loadMetadata();
+                  Scaffold.of(context).openEndDrawer();
+                },
+                icon: const Icon(Icons.menu)),
           ],
         );
       }),

@@ -2,6 +2,7 @@ import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/storages/storages.dart';
+import 'package:client/widgets/data_tree.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
@@ -239,6 +240,25 @@ class SessionProvider with ChangeNotifier {
   Future<List<String>> getSchemas() async {
     List<String> schemas = await session!.conn!.schemas();
     return schemas;
+  }
+
+  Future<void> loadMetadata() async {
+    List<DataNode> root = List<DataNode>.empty(growable: true);
+    List<String> schemas = await session!.conn!.schemas();
+    for (var schema in schemas) {
+      DataNode schemaNode = DataNode(value: schema, type: "schema");
+      root.add(schemaNode);
+      List<String> tables = await session!.conn!.getTables(schema);
+      for (var table in tables) {
+        schemaNode.addChildren(DataNode(value: table, type: "table"));
+      }
+    }
+    session!.metadata = root;
+    notifyListeners();
+  }
+
+  List<DataNode>? getMetadata() {
+    return session!.metadata;
   }
 
   CodeController getSQLEditCode() => _session!.code;

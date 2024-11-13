@@ -1,6 +1,7 @@
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/utils/reorder_list.dart';
+import 'package:client/widgets/data_tree.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:highlight/languages/sql.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
@@ -17,6 +18,8 @@ class SessionModel {
   SQLConnection? conn;
 
   SQLExecuteState? state;
+
+  List<DataNode>? metadata;
 
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 

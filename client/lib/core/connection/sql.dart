@@ -101,4 +101,16 @@ class SQLConnection {
     currentSchema = resultSet.first.rows.first.colByName("DATABASE()");
     return currentSchema;
   }
+
+  Future<List<String>> getTables(String schema) async {
+    List<String> tables = List.empty(growable: true);
+    IResultSet resultSet = await _execute(
+        "select TABLE_NAME from information_schema.tables where table_schema='$schema' and TABLE_TYPE in ('BASE TABLE','SYSTEM VIEW')");
+    for (final result in resultSet) {
+      for (final row in result.rows) {
+        tables.add(row.colByName("TABLE_NAME")!);
+      }
+    }
+    return tables;
+  }
 }
