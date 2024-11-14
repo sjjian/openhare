@@ -44,6 +44,7 @@ dependencies:
   json_annotation: ^4.9.0
   hugeicons: ^0.0.7
   flutter_fancy_tree_view: ^1.6.0
+  flutter_breadcrumb: ^1.0.1
   common:
     path: ../common/
 

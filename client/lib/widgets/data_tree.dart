@@ -1,6 +1,8 @@
+import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:provider/provider.dart';
 
 class DataNode {
   final String value;
@@ -126,7 +128,9 @@ class _MyTreeTileState extends State<MyTreeTile> {
                     constraints: const BoxConstraints(maxWidth: 300),
                     child: InkWell(
                       onTap: () {
-                        print("text press");
+                        SessionProvider sessionProvider = Provider.of<SessionProvider>(context, listen: false);
+                        sessionProvider.loadTableMeta("sqle", "rules");
+                        sessionProvider.toDrawerPage("table");
                       },
                       child: Text(
                         selectionColor: Theme.of(context).colorScheme.primary,

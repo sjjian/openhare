@@ -1,3 +1,4 @@
+import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
@@ -82,6 +83,8 @@ class SessionListProvider with ChangeNotifier {
 class SessionProvider with ChangeNotifier {
   SessionModel? _session;
   bool showRecord = true;
+
+  String drawerPage = "tree";
 
   SessionProvider(this._session);
 
@@ -243,22 +246,49 @@ class SessionProvider with ChangeNotifier {
   }
 
   Future<void> loadMetadata() async {
-    List<DataNode> root = List<DataNode>.empty(growable: true);
+    List<SchemaMeta> metadata = List<SchemaMeta>.empty(growable: true);
     List<String> schemas = await session!.conn!.schemas();
     for (var schema in schemas) {
-      DataNode schemaNode = DataNode(value: schema, type: "schema");
-      root.add(schemaNode);
+      SchemaMeta schemaMeta = SchemaMeta(schema);
+      metadata.add(schemaMeta);
       List<String> tables = await session!.conn!.getTables(schema);
       for (var table in tables) {
-        schemaNode.addChildren(DataNode(value: table, type: "table"));
+        schemaMeta.tables.add(TableMeta(table));
       }
     }
-    session!.metadata = root;
+    session!.metadata = metadata;
     notifyListeners();
   }
 
-  List<DataNode>? getMetadata() {
-    return session!.metadata;
+  List<DataNode>? getMetadataTree() {
+    if (session!.metadata == null) {
+      return null;
+    }
+    List<DataNode> root = List<DataNode>.empty(growable: true);
+    for (var schema in session!.metadata!) {
+      DataNode schemaNode = DataNode(value: schema.name, type: "schema");
+      root.add(schemaNode);
+      for (var table in schema.tables) {
+        schemaNode.addChildren(DataNode(value: table.name, type: "table"));
+      }
+    }
+    return root;
+  }
+
+  Future<void> loadTableMeta(String schema, String table) async {
+    List<TableColumnMeta> columns =
+        await session!.conn!.getTableColumn(schema, table);
+    session!.columns = columns;
+    notifyListeners();
+  }
+
+  List<TableColumnMeta>? getTableColumn() {
+    return session!.columns;
+  }
+
+  void toDrawerPage(String page) {
+    drawerPage = page;
+    notifyListeners();
   }
 
   CodeController getSQLEditCode() => _session!.code;

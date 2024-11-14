@@ -1,3 +1,4 @@
+import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/utils/reorder_list.dart';
@@ -19,7 +20,9 @@ class SessionModel {
 
   SQLExecuteState? state;
 
-  List<DataNode>? metadata;
+  List<SchemaMeta>? metadata;
+
+  List<TableColumnMeta>? columns;
 
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 

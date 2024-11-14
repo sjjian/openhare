@@ -121,7 +121,6 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
             const Expanded(child: Spacer()),
             IconButton(
                 onPressed: () {
-                  Provider.of<SessionProvider>(context, listen: false);
                   sessionProvider.loadMetadata();
                   Scaffold.of(context).openEndDrawer();
                 },

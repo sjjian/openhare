@@ -1,3 +1,4 @@
+import 'package:client/core/connection/metadata.dart';
 import 'package:client/models/instances.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:common/parser.dart';
@@ -112,5 +113,17 @@ class SQLConnection {
       }
     }
     return tables;
+  }
+
+  Future<List<TableColumnMeta>> getTableColumn(
+      String schema, String table) async {
+    List<TableColumnMeta> columns = List.empty(growable: true);
+    IResultSet resultSet = await _execute("desc $schema.$table");
+    for (final result in resultSet) {
+      for (final row in result.rows) {
+        columns.add(TableColumnMeta.loadFromRow(row));
+      }
+    }
+    return columns;
   }
 }

@@ -285,6 +285,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_breadcrumb:
+    dependency: "direct main"
+    description:
+      name: flutter_breadcrumb
+      sha256: "1531680034def621878562ad763079933dabe9f9f5d5add5a094190edc33259b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   flutter_fancy_tree_view:
     dependency: "direct main"
     description:
@@ -599,6 +607,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  pedantic:
+    dependency: transitive
+    description:
+      name: pedantic
+      sha256: "67fc27ed9639506c856c840ccce7594d0bdcd91bc8d53d6e52359449a1d50602"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.11.1"
   platform:
     dependency: transitive
     description:
