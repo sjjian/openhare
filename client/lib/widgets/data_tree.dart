@@ -1,17 +1,17 @@
-import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:provider/provider.dart';
 
 class DataNode {
   final String value;
   final String type;
   late List<DataNode> children;
+  Widget Function(BuildContext context, DataNode node) builder;
 
   DataNode({
     required this.value,
     required this.type,
+    required this.builder,
   }) {
     children = List.empty(growable: true);
   }
@@ -99,7 +99,9 @@ class _MyTreeTileState extends State<MyTreeTile> {
       child: InkWell(
         onTap: widget.onTap,
         child: Container(
-          color: isEnter? Theme.of(context).colorScheme.surfaceContainerLow : null,
+          color: isEnter
+              ? Theme.of(context).colorScheme.surfaceContainerLow
+              : null,
           child: TreeIndentation(
             entry: widget.entry,
             guide: const IndentGuide.connectingLines(indent: 32),
@@ -110,34 +112,28 @@ class _MyTreeTileState extends State<MyTreeTile> {
                   FolderButton(
                     openedIcon: HugeIcon(
                       icon: widget.entry.node.openIcons(),
-                      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+                      color:
+                          Theme.of(context).iconTheme.color ?? Colors.black87,
                     ),
                     closedIcon: HugeIcon(
                       icon: widget.entry.node.closeIcons(),
-                      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+                      color:
+                          Theme.of(context).iconTheme.color ?? Colors.black87,
                     ),
                     icon: HugeIcon(
                       icon: widget.entry.node.openIcons(),
-                      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+                      color:
+                          Theme.of(context).iconTheme.color ?? Colors.black87,
                     ),
-                    isOpen:
-                        widget.entry.hasChildren ? widget.entry.isExpanded : null,
+                    isOpen: widget.entry.hasChildren
+                        ? widget.entry.isExpanded
+                        : null,
                     onPressed: widget.entry.hasChildren ? widget.onTap : null,
                   ),
                   Container(
                     constraints: const BoxConstraints(maxWidth: 300),
-                    child: InkWell(
-                      onTap: () {
-                        SessionProvider sessionProvider = Provider.of<SessionProvider>(context, listen: false);
-                        sessionProvider.loadTableMeta("sqle", "rules");
-                        sessionProvider.toDrawerPage("table");
-                      },
-                      child: Text(
-                        selectionColor: Theme.of(context).colorScheme.primary,
-                        widget.entry.hasChildren? "${widget.entry.node.value}  [${widget.entry.node.children.length}]": widget.entry.node.value,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                    child:
+                        widget.entry.node.builder(context, widget.entry.node),
                   ),
                 ],
               ),

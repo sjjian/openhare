@@ -260,19 +260,11 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<DataNode>? getMetadataTree() {
+  List<SchemaMeta>? getMetadata() {
     if (session!.metadata == null) {
       return null;
     }
-    List<DataNode> root = List<DataNode>.empty(growable: true);
-    for (var schema in session!.metadata!) {
-      DataNode schemaNode = DataNode(value: schema.name, type: "schema");
-      root.add(schemaNode);
-      for (var table in schema.tables) {
-        schemaNode.addChildren(DataNode(value: table.name, type: "table"));
-      }
-    }
-    return root;
+    return session!.metadata;
   }
 
   Future<void> loadTableMeta(String schema, String table) async {
@@ -282,13 +274,8 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<TableColumnMeta>? getTableColumn() {
+  List<TableColumnMeta>? getTableMeta(String schema, String table) {
     return session!.columns;
-  }
-
-  void toDrawerPage(String page) {
-    drawerPage = page;
-    notifyListeners();
   }
 
   CodeController getSQLEditCode() => _session!.code;
