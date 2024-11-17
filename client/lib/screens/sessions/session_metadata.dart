@@ -94,30 +94,92 @@ class _SessionMetadataState extends State<SessionMetadata> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 600,
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+        Widget body = const SizedBox(
+          height: 40,
+          width: 40,
+          child: CircularProgressIndicator(),
+        );
         if (widget.controller.page == "tree") {
           List<SchemaMeta>? meta = sessionProvider.getMetadata();
-          if (meta == null) {
-            return const CircularProgressIndicator();
-          } else {
-            return DataTree(roots: buildMetadataTree(meta));
+          if (meta != null) {
+            body = DataTree(roots: buildMetadataTree(meta));
           }
         } else {
           List<TableColumnMeta>? columns = sessionProvider.getTableMeta(
               widget.controller.currentSchema!,
               widget.controller.currentTable!);
-          if (columns == null) {
-            return const CircularProgressIndicator();
-          } else {
-            return SessionMetadataDetail(
+          if (columns != null) {
+            body = SessionMetadataDetail(
               columns: columns,
               schema: widget.controller.currentSchema!,
               table: widget.controller.currentTable!,
+              controller: widget.controller,
             );
           }
         }
+        return Expanded(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SessionMetadataTitle(controller: widget.controller),
+                  const Divider(
+                    endIndent: 10,
+                  ),
+                  Expanded(child: body),
+                ]),
+          ),
+        );
       }),
+    );
+  }
+}
+
+class SessionMetadataTitle extends StatelessWidget {
+  final MetadataController controller;
+  const SessionMetadataTitle({Key? key, required this.controller})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 33,
+      child: Row(
+        children: [
+          BreadCrumb(
+            items: <BreadCrumbItem>[
+              BreadCrumbItem(
+                  content: IconButton(
+                      onPressed: () {
+                        controller.goToTree();
+                      },
+                      icon: const Icon(Icons.home))),
+              if (controller.page != "tree")
+                BreadCrumbItem(
+                    content: Text(
+                  controller.currentSchema!,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                )),
+              if (controller.page != "tree")
+                BreadCrumbItem(
+                    content: Text(
+                  controller.currentTable!,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                )),
+            ],
+            divider: const Icon(Icons.chevron_right),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -126,12 +188,14 @@ class SessionMetadataDetail extends StatefulWidget {
   final String schema;
   final String table;
   final List<TableColumnMeta> columns;
+  final MetadataController controller;
 
   const SessionMetadataDetail(
       {Key? key,
       required this.schema,
       required this.table,
-      required this.columns})
+      required this.columns,
+      required this.controller})
       : super(key: key);
 
   @override
@@ -141,49 +205,24 @@ class SessionMetadataDetail extends StatefulWidget {
 class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BreadCrumb(
-            items: <BreadCrumbItem>[
-              BreadCrumbItem(
-                  content: Text(
-                widget.schema,
-                style: Theme.of(context).textTheme.titleMedium,
-              )),
-              BreadCrumbItem(
-                  content: Text(
-                widget.table,
-                style: Theme.of(context).textTheme.titleMedium,
-              )),
-              BreadCrumbItem(
-                  content: Text(
-                '列信息',
-                style: Theme.of(context).textTheme.titleMedium,
-              )),
-            ],
-            divider: const Icon(Icons.chevron_right),
-          ),
-          const Divider(
-            endIndent: 10,
-          ),
-          DataTable(columns: [
-            for (final column in TableColumnMeta.getDataTableColumn())
-              DataColumn(label: Text(column)),
-          ], rows: [
-            for (final column in widget.columns)
-              DataRow(cells: [
-                DataCell(Text(column.name)),
-                DataCell(Text(column.type)),
-                DataCell(Text(column.isNull)),
-                DataCell(Text(column.key ?? "")),
-                DataCell(Text(column.defaultValue ?? "")),
-                DataCell(Text(column.extra ?? "")),
-              ]),
-          ]),
-        ],
+    return Scrollbar(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: DataTable(columns: [
+          for (final column
+              in TableColumnMeta.getDataTableColumn().sublist(0, 2))
+            DataColumn(label: Text(column)),
+        ], rows: [
+          for (final column in widget.columns)
+            DataRow(cells: [
+              DataCell(Text(column.name)),
+              DataCell(Text(column.type)),
+              // DataCell(Text(column.isNull)),
+              // DataCell(Text(column.key ?? "")),
+              // DataCell(Text(column.defaultValue ?? "")),
+              // DataCell(Text(column.extra ?? "")),
+            ]),
+        ]),
       ),
     );
   }
