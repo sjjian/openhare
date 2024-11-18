@@ -268,14 +268,36 @@ class SessionProvider with ChangeNotifier {
   }
 
   Future<void> loadTableMeta(String schema, String table) async {
-    List<TableColumnMeta> columns =
-        await session!.conn!.getTableColumn(schema, table);
-    session!.columns = columns;
-    notifyListeners();
+    // todo: 使用map
+    for (var schemaMeta in session!.metadata!) {
+      if (schemaMeta.name == schema) {
+        for (var tableMeta in schemaMeta.tables) {
+          if (tableMeta.name == table) {
+            if (tableMeta.columns != null) {
+              return;
+            }
+            List<TableColumnMeta> columns =
+                await session!.conn!.getTableColumn(schema, table);
+            tableMeta.columns = columns;
+            notifyListeners();
+          }
+        }
+      }
+    }
   }
 
   List<TableColumnMeta>? getTableMeta(String schema, String table) {
-    return session!.columns;
+    // todo: 使用map
+    for (var schemaMeta in session!.metadata!) {
+      if (schemaMeta.name == schema) {
+        for (var tableMeta in schemaMeta.tables) {
+          if (tableMeta.name == table) {
+            return tableMeta.columns;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   CodeController getSQLEditCode() => _session!.code;

@@ -122,7 +122,7 @@ class _SessionMetadataState extends State<SessionMetadata> {
         }
         return Expanded(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,25 +205,15 @@ class SessionMetadataDetail extends StatefulWidget {
 class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: DataTable(columns: [
-          for (final column
-              in TableColumnMeta.getDataTableColumn().sublist(0, 2))
-            DataColumn(label: Text(column)),
-        ], rows: [
-          for (final column in widget.columns)
-            DataRow(cells: [
-              DataCell(Text(column.name)),
-              DataCell(Text(column.type)),
-              // DataCell(Text(column.isNull)),
-              // DataCell(Text(column.key ?? "")),
-              // DataCell(Text(column.defaultValue ?? "")),
-              // DataCell(Text(column.extra ?? "")),
-            ]),
-        ]),
-      ),
-    );
+    return ListView(children: [
+      for (final column in widget.columns)
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.abc),
+            title: Row(children: [Text(column.name), const Expanded(child: Spacer())],),
+            trailing: const Icon(Icons.unfold_more),
+          ),
+        ),
+    ]);
   }
 }
