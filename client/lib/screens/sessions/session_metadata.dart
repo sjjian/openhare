@@ -209,21 +209,32 @@ class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
       for (final column in widget.columns)
         Card(
           child: ListTile(
-            leading: switch (column.getDataType()) {
-              DataType.number => const Icon(
-                  Icons.onetwothree,
-                  color: Colors.teal,
-                ),
-              DataType.char => const Icon(
-                  Icons.abc,
-                  color: Colors.blueAccent,
-                ),
-              DataType.time => const Icon(
-                  Icons.access_time,
-                  color: Colors.deepPurple,
-                ),
-              _ => const Icon(Icons.abc)
-            },
+            leading: Tooltip(
+              message: column.columnType,
+              child: switch (column.getDataType()) {
+                DataType.number => const Icon(
+                    Icons.onetwothree,
+                    color: Colors.teal,
+                  ),
+                DataType.char => const Icon(
+                    Icons.abc,
+                    color: Colors.blueAccent,
+                  ),
+                DataType.time => const Icon(
+                    Icons.access_time,
+                    color: Colors.deepPurple,
+                  ),
+                DataType.blob => const Icon(
+                    Icons.insert_drive_file_outlined,
+                    color: Colors.black87,
+                  ),
+                DataType.json => const Icon(
+                    Icons.data_object,
+                    color: Colors.orangeAccent,
+                  ),
+                _ => const Icon(Icons.abc)
+              },
+            ),
             title: Row(
               children: [Text(column.name), const Expanded(child: Spacer())],
             ),
