@@ -2,6 +2,15 @@ import 'package:mysql_client/mysql_client.dart';
 
 enum MetaType { schema, table }
 
+enum DataType {
+  number,
+  char,
+  time,
+  blob,
+  json,
+  dataSet,
+}
+
 class SchemaMeta {
   String name;
   List<TableMeta> tables = List.empty(growable: true);
@@ -22,30 +31,70 @@ class TableMeta {
 
 class TableColumnMeta {
   String name;
-  String type;
+  String dataType; // varchar
+  String columnType; // varchar(255)
   String isNull;
   String? key;
   String? defaultValue;
+  String? characterSetName;
+  String? collationName;
+  String? comment;
   String? extra;
 
   TableColumnMeta({
     required this.name,
-    required this.type,
+    required this.dataType,
+    required this.columnType,
+    this.defaultValue,
     required this.isNull,
     this.key,
-    this.defaultValue,
+    this.characterSetName,
+    this.collationName,
+    this.comment,
     this.extra,
   });
+  /*
+  COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT, EXTRA
+  */
 
   TableColumnMeta.loadFromRow(ResultSetRow row)
-      : name = row.colByName("Field")!,
-        type = row.colByName("Type")!,
-        isNull = row.colByName("Null")!,
-        key = row.colByName("Key"),
-        defaultValue = row.colByName("Default"),
+      : name = row.colByName("COLUMN_NAME")!,
+        dataType = row.colByName("DATA_TYPE")!,
+        columnType = row.colByName("COLUMN_TYPE")!,
+        isNull = row.colByName("IS_NULLABLE")!,
+        defaultValue = row.colByName("COLUMN_DEFAULT"),
+        key = row.colByName("COLUMN_KEY"),
+        comment = row.colByName("COLUMN_COMMENT"),
+        characterSetName = row.colByName("CHARACTER_SET_NAME"),
+        collationName = row.colByName("COLLATION_NAME"),
         extra = row.colByName("Extra");
 
   static List<String> getDataTableColumn() {
-    return ["Field", "Type", "Null", "Key", "Default", "Extra"];
+    return ["COLUMN_NAME", "DATA_TYPE", "Null", "Key", "Default", "Extra"];
+  }
+
+  DataType getDataType() {
+    return switch (dataType) {
+      "int" ||
+      "bigint" ||
+      "smallint" ||
+      "tinyint" ||
+      "decimal" ||
+      "double" ||
+      "float" =>
+        DataType.number,
+      "char" || "varchar" => DataType.char,
+      "datetime" || "time" || "timestamp" => DataType.time,
+      "text" ||
+      "blob" ||
+      "longblob" ||
+      "longtext" ||
+      "mediumblob" ||
+      "mediumtext" =>
+        DataType.blob,
+      "json" => DataType.json,
+      "set" => DataType.dataSet,
+      _ => DataType.blob,
+    };
   }
 }

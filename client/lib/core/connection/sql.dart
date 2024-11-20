@@ -118,7 +118,8 @@ class SQLConnection {
   Future<List<TableColumnMeta>> getTableColumn(
       String schema, String table) async {
     List<TableColumnMeta> columns = List.empty(growable: true);
-    IResultSet resultSet = await _execute("desc $schema.$table");
+    // ref: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html
+    IResultSet resultSet = await _execute("select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT, EXTRA from information_schema.columns where TABLE_SCHEMA = '$schema' and TABLE_NAME = '$table'");
     for (final result in resultSet) {
       for (final row in result.rows) {
         columns.add(TableColumnMeta.loadFromRow(row));

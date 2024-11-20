@@ -209,8 +209,24 @@ class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
       for (final column in widget.columns)
         Card(
           child: ListTile(
-            leading: const Icon(Icons.abc),
-            title: Row(children: [Text(column.name), const Expanded(child: Spacer())],),
+            leading: switch (column.getDataType()) {
+              DataType.number => const Icon(
+                  Icons.onetwothree,
+                  color: Colors.teal,
+                ),
+              DataType.char => const Icon(
+                  Icons.abc,
+                  color: Colors.blueAccent,
+                ),
+              DataType.time => const Icon(
+                  Icons.access_time,
+                  color: Colors.deepPurple,
+                ),
+              _ => const Icon(Icons.abc)
+            },
+            title: Row(
+              children: [Text(column.name), const Expanded(child: Spacer())],
+            ),
             trailing: const Icon(Icons.unfold_more),
           ),
         ),
