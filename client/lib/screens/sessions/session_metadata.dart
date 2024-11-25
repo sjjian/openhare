@@ -207,40 +207,134 @@ class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
   Widget build(BuildContext context) {
     return ListView(children: [
       for (final column in widget.columns)
-        Card(
-          child: ListTile(
-            leading: Tooltip(
-              message: column.columnType,
-              child: switch (column.getDataType()) {
-                DataType.number => const Icon(
-                    Icons.onetwothree,
-                    color: Colors.teal,
-                  ),
-                DataType.char => const Icon(
-                    Icons.abc,
-                    color: Colors.blueAccent,
-                  ),
-                DataType.time => const Icon(
-                    Icons.access_time,
-                    color: Colors.deepPurple,
-                  ),
-                DataType.blob => const Icon(
-                    Icons.insert_drive_file_outlined,
-                    color: Colors.black87,
-                  ),
-                DataType.json => const Icon(
-                    Icons.data_object,
-                    color: Colors.orangeAccent,
-                  ),
-                _ => const Icon(Icons.abc)
-              },
-            ),
-            title: Row(
-              children: [Text(column.name), const Expanded(child: Spacer())],
-            ),
-            trailing: const Icon(Icons.unfold_more),
-          ),
+        SessionMetadataColumn(
+          column: column,
         ),
     ]);
+  }
+}
+
+class SessionMetadataColumn extends StatefulWidget {
+  final TableColumnMeta column;
+
+  const SessionMetadataColumn({Key? key, required this.column})
+      : super(key: key);
+
+  @override
+  State<SessionMetadataColumn> createState() => _SessionMetadataColumnState();
+}
+
+class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
+  bool isEnter = false;
+  bool unfold = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          isEnter = true;
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          isEnter = false;
+        });
+      },
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            unfold = !unfold;
+          });
+        },
+        child: Card(
+          color:
+              isEnter ? Theme.of(context).colorScheme.surfaceContainer : null,
+          child: Column(
+            children: [
+              ListTile(
+                leading: Tooltip(
+                  message: widget.column.columnType,
+                  child: switch (widget.column.getDataType()) {
+                    DataType.number => const Icon(
+                        Icons.onetwothree,
+                        color: Colors.teal,
+                      ),
+                    DataType.char => const Icon(
+                        Icons.abc,
+                        color: Colors.blueAccent,
+                      ),
+                    DataType.time => const Icon(
+                        Icons.access_time,
+                        color: Colors.deepPurple,
+                      ),
+                    DataType.blob => const Icon(
+                        Icons.insert_drive_file_outlined,
+                        color: Colors.black87,
+                      ),
+                    DataType.json => const Icon(
+                        Icons.data_object,
+                        color: Colors.orangeAccent,
+                      ),
+                    _ => const Icon(Icons.question_mark)
+                  },
+                ),
+                title: Row(
+                  children: [
+                    Text(widget.column.name),
+                    const Expanded(child: Spacer())
+                  ],
+                ),
+                trailing: unfold
+                    ? const Icon(Icons.unfold_less)
+                    : const Icon(Icons.unfold_more),
+              ),
+              if (unfold)
+                Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      Container(
+                        padding: const EdgeInsets.only(left: 40),
+                        child: Row(
+                          children: [
+                            Chip(label: Text(widget.column.columnType)),
+                            if (widget.column.isNull == "YES")
+                              const Chip(label: Text("非空"))
+                            else
+                              const Chip(label: Text("空")),
+                            if (widget.column.key != null)
+                              Chip(label: Text(widget.column.key!)),
+                          ],
+                        ),
+                      ),
+
+                      const Divider(),
+                      ListTile(
+                        title: Text("default: ${widget.column.defaultValue}"),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        title: Text(
+                            "character set & collation: ${widget.column.characterSetName} : ${widget.column.collationName}"),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        title: Text("extra: ${widget.column.extra}"),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        title: Text("comment: ${widget.column.comment}"),
+                      )
+                    ],
+                  ),
+                )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
