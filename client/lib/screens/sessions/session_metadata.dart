@@ -108,12 +108,14 @@ class _SessionMetadataState extends State<SessionMetadata> {
             body = DataTree(roots: buildMetadataTree(meta));
           }
         } else {
-          List<TableColumnMeta>? columns = sessionProvider.getTableMeta(
+          TableMeta? tableMeta = sessionProvider.getTableMeta(
               widget.controller.currentSchema!,
               widget.controller.currentTable!);
-          if (columns != null) {
+          if (tableMeta != null &&
+              tableMeta.columns != null &&
+              tableMeta.keys != null) {
             body = SessionMetadataDetail(
-              columns: columns,
+              tableMeta: tableMeta,
               schema: widget.controller.currentSchema!,
               table: widget.controller.currentTable!,
               controller: widget.controller,
@@ -187,14 +189,17 @@ class SessionMetadataTitle extends StatelessWidget {
 class SessionMetadataDetail extends StatefulWidget {
   final String schema;
   final String table;
-  final List<TableColumnMeta> columns;
+  final TableMeta tableMeta;
+  // final List<TableColumnMeta> columns;
+  // final List<TableKeyMeta> keys;
   final MetadataController controller;
 
   const SessionMetadataDetail(
       {Key? key,
       required this.schema,
       required this.table,
-      required this.columns,
+      required this.tableMeta,
+      // required this.keys,
       required this.controller})
       : super(key: key);
 
@@ -206,9 +211,10 @@ class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
   @override
   Widget build(BuildContext context) {
     return ListView(children: [
-      for (final column in widget.columns)
+      for (final column in widget.tableMeta.columns!)
         SessionMetadataColumn(
           column: column,
+          keys: widget.tableMeta.getKeysByColumn(column.name),
         ),
     ]);
   }
@@ -216,8 +222,10 @@ class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
 
 class SessionMetadataColumn extends StatefulWidget {
   final TableColumnMeta column;
+  final List<TableKeyMeta>? keys;
 
-  const SessionMetadataColumn({Key? key, required this.column})
+  const SessionMetadataColumn(
+      {Key? key, required this.column, required this.keys})
       : super(key: key);
 
   @override
@@ -227,6 +235,10 @@ class SessionMetadataColumn extends StatefulWidget {
 class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
   bool isEnter = false;
   bool unfold = false;
+
+  // List<Widget> getDetail() {
+  //   return
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -291,43 +303,56 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
               ),
               if (unfold)
                 Container(
+                  padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Divider(),
-                      Container(
-                        padding: const EdgeInsets.only(left: 40),
+                      SessionMetadataInfo(
+                        name: "type",
                         child: Row(
                           children: [
-                            Chip(label: Text(widget.column.columnType)),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child:
+                                  Chip(label: Text(widget.column.columnType)),
+                            ),
                             if (widget.column.isNull == "YES")
-                              const Chip(label: Text("非空"))
+                              const Chip(label: Text("NOT NULL"))
                             else
-                              const Chip(label: Text("空")),
-                            if (widget.column.key != null)
-                              Chip(label: Text(widget.column.key!)),
+                              const Chip(label: Text("NULL")),
+                            if (widget.column.key == "PRI")
+                              const Chip(label: Text("PK"))
+                            else if (widget.column.key != "")
+                              Chip(label: Text(widget.column.key!))
                           ],
                         ),
                       ),
-
-                      const Divider(),
-                      ListTile(
-                        title: Text("default: ${widget.column.defaultValue}"),
+                      SessionMetadataInfo(
+                          name: "default",
+                          child: Text(widget.column.defaultValue ?? "null")),
+                      SessionMetadataInfo(
+                          name: "character set",
+                          child: Text(
+                              "${widget.column.characterSetName} | ${widget.column.collationName}")),
+                      SessionMetadataInfo(
+                          name: "extra",
+                          child: Text(widget.column.extra ?? "")),
+                      SessionMetadataInfo(
+                          name: "comment",
+                          child: Text(widget.column.comment ?? "")),
+                      SessionMetadataInfo(
+                        name: "keys",
+                        child: Column(
+                          children: [
+                            for (final key in widget.keys!)
+                              Tooltip(
+                                message: "${key.columns.join(",")}",
+                                child: Text("${key.name}"),
+                              )
+                          ],
+                        ),
                       ),
-                      const Divider(),
-                      ListTile(
-                        title: Text(
-                            "character set & collation: ${widget.column.characterSetName} : ${widget.column.collationName}"),
-                      ),
-                      const Divider(),
-                      ListTile(
-                        title: Text("extra: ${widget.column.extra}"),
-                      ),
-                      const Divider(),
-                      ListTile(
-                        title: Text("comment: ${widget.column.comment}"),
-                      )
                     ],
                   ),
                 )
@@ -335,6 +360,35 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class SessionMetadataInfo extends StatelessWidget {
+  final String name;
+  final Widget child;
+  const SessionMetadataInfo({Key? key, required this.name, required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(),
+        Container(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: Text(
+              name,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+            )),
+        Container(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          child: child,
+        )
+      ],
     );
   }
 }

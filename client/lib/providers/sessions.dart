@@ -277,8 +277,11 @@ class SessionProvider with ChangeNotifier {
               return;
             }
             List<TableColumnMeta> columns =
-                await session!.conn!.getTableColumn(schema, table);
+                await session!.conn!.getTableColumns(schema, table);
             tableMeta.columns = columns;
+
+            List<TableKeyMeta> keys = await session!.conn!.getTableKeys(schema, table);
+            tableMeta.keys = keys;
             notifyListeners();
           }
         }
@@ -286,13 +289,13 @@ class SessionProvider with ChangeNotifier {
     }
   }
 
-  List<TableColumnMeta>? getTableMeta(String schema, String table) {
+  TableMeta? getTableMeta(String schema, String table) {
     // todo: 使用map
     for (var schemaMeta in session!.metadata!) {
       if (schemaMeta.name == schema) {
         for (var tableMeta in schemaMeta.tables) {
           if (tableMeta.name == table) {
-            return tableMeta.columns;
+            return tableMeta;
           }
         }
       }

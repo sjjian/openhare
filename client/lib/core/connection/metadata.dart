@@ -25,8 +25,24 @@ class SchemaMeta {
 class TableMeta {
   String name;
   List<TableColumnMeta>? columns;
+  List<TableKeyMeta>? keys;
 
   TableMeta(this.name);
+
+  List<TableKeyMeta>? getKeysByColumn(String tartgetColumn) {
+    if (keys == null) {
+      return null;
+    }
+    List<TableKeyMeta> includeKeys = List.empty(growable: true);
+    for (final key in keys!) {
+      for (final column in key.columns) {
+        if (tartgetColumn == column) {
+          includeKeys.add(key);
+        }
+      }
+    }
+    return includeKeys;
+  }
 }
 
 class TableColumnMeta {
@@ -97,4 +113,15 @@ class TableColumnMeta {
       _ => DataType.blob,
     };
   }
+}
+
+class TableKeyMeta {
+  String name;
+  List<String> columns;
+
+  TableKeyMeta(this.name, this.columns);
+
+  TableKeyMeta.loadFromRow(ResultSetRow row)
+      : name = row.colByName("INDEX_NAME")!,
+        columns = row.colByName("COLUMNS")!.split(";");
 }
