@@ -236,9 +236,21 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
   bool isEnter = false;
   bool unfold = false;
 
-  // List<Widget> getDetail() {
-  //   return
-  // }
+  List<Widget> getTypeTags(TableColumnMeta column) {
+    List<Widget> tags = List.empty(growable: true);
+    tags.add(Chip(label: Text(widget.column.columnType)));
+    if (widget.column.isNull == "YES") {
+      tags.add(const Chip(label: Text("NOT NULL")));
+    } else {
+      tags.add(const Chip(label: Text("NULL")));
+    }
+    if (widget.column.key == "PRI") {
+      tags.add(const Chip(label: Text("PK")));
+    } else if (widget.column.key != "") {
+      tags.add(Chip(label: Text(widget.column.key!)));
+    }
+    return tags;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,46 +272,46 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           });
         },
         child: Card(
-          color:
-              isEnter ? Theme.of(context).colorScheme.surfaceContainer : null,
+          // color:
+          //     isEnter ? Theme.of(context).colorScheme.surfaceContainerLowest : null,
           child: Column(
             children: [
               ListTile(
-                leading: Tooltip(
-                  message: widget.column.columnType,
-                  child: switch (widget.column.getDataType()) {
-                    DataType.number => const Icon(
-                        Icons.onetwothree,
-                        color: Colors.teal,
-                      ),
-                    DataType.char => const Icon(
-                        Icons.abc,
-                        color: Colors.blueAccent,
-                      ),
-                    DataType.time => const Icon(
-                        Icons.access_time,
-                        color: Colors.deepPurple,
-                      ),
-                    DataType.blob => const Icon(
-                        Icons.insert_drive_file_outlined,
-                        color: Colors.black87,
-                      ),
-                    DataType.json => const Icon(
-                        Icons.data_object,
-                        color: Colors.orangeAccent,
-                      ),
-                    _ => const Icon(Icons.question_mark)
-                  },
-                ),
+                leading: switch (widget.column.getDataType()) {
+                  DataType.number => const Icon(
+                      Icons.onetwothree,
+                      color: Colors.teal,
+                    ),
+                  DataType.char => const Icon(
+                      Icons.abc,
+                      color: Colors.blueAccent,
+                    ),
+                  DataType.time => const Icon(
+                      Icons.access_time,
+                      color: Colors.deepPurple,
+                    ),
+                  DataType.blob => const Icon(
+                      Icons.insert_drive_file_outlined,
+                      color: Colors.black87,
+                    ),
+                  DataType.json => const Icon(
+                      Icons.data_object,
+                      color: Colors.orangeAccent,
+                    ),
+                  _ => const Icon(Icons.question_mark)
+                },
                 title: Row(
                   children: [
                     Text(widget.column.name),
-                    const Expanded(child: Spacer())
+                    const Expanded(child: Spacer()),
+                    if (widget.column.key != "") const Icon(Icons.key)
                   ],
                 ),
                 trailing: unfold
-                    ? const Icon(Icons.unfold_less)
-                    : const Icon(Icons.unfold_more),
+                    ? Icon(Icons.unfold_less,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant)
+                    : Icon(Icons.unfold_more,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               if (unfold)
                 Container(
@@ -312,47 +324,44 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
                         name: "type",
                         child: Row(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 5),
-                              child:
-                                  Chip(label: Text(widget.column.columnType)),
-                            ),
-                            if (widget.column.isNull == "YES")
-                              const Chip(label: Text("NOT NULL"))
-                            else
-                              const Chip(label: Text("NULL")),
-                            if (widget.column.key == "PRI")
-                              const Chip(label: Text("PK"))
-                            else if (widget.column.key != "")
-                              Chip(label: Text(widget.column.key!))
+                            for (final tag in getTypeTags(widget.column))
+                              Padding(
+                                padding: const EdgeInsets.only(right: 5),
+                                child: tag,
+                              ),
                           ],
                         ),
                       ),
                       SessionMetadataInfo(
                           name: "default",
                           child: Text(widget.column.defaultValue ?? "null")),
-                      SessionMetadataInfo(
-                          name: "character set",
-                          child: Text(
-                              "${widget.column.characterSetName} | ${widget.column.collationName}")),
-                      SessionMetadataInfo(
-                          name: "extra",
-                          child: Text(widget.column.extra ?? "")),
-                      SessionMetadataInfo(
-                          name: "comment",
-                          child: Text(widget.column.comment ?? "")),
-                      SessionMetadataInfo(
-                        name: "keys",
-                        child: Column(
-                          children: [
-                            for (final key in widget.keys!)
-                              Tooltip(
-                                message: "${key.columns.join(",")}",
-                                child: Text("${key.name}"),
-                              )
-                          ],
+                      if (widget.column.characterSetName != null)
+                        SessionMetadataInfo(
+                            name: "character set",
+                            child: Text(
+                                "${widget.column.characterSetName} | ${widget.column.collationName}")),
+                      if (widget.column.extra != null ||
+                          widget.column.extra!.isNotEmpty)
+                        SessionMetadataInfo(
+                            name: "extra", child: Text(widget.column.extra!)),
+                      if (widget.column.comment != null ||
+                          widget.column.comment!.isNotEmpty)
+                        SessionMetadataInfo(
+                            name: "comment",
+                            child: Text(widget.column.comment!)),
+                      if (widget.keys!.isNotEmpty)
+                        SessionMetadataInfo(
+                          name: "keys",
+                          child: Column(
+                            children: [
+                              for (final key in widget.keys!)
+                                Tooltip(
+                                  message: "${key.columns.join(",")}",
+                                  child: Text("${key.name}"),
+                                )
+                            ],
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 )
@@ -366,8 +375,8 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
 
 class SessionMetadataInfo extends StatelessWidget {
   final String name;
-  final Widget child;
-  const SessionMetadataInfo({Key? key, required this.name, required this.child})
+  final Widget? child;
+  const SessionMetadataInfo({Key? key, required this.name, this.child})
       : super(key: key);
 
   @override
@@ -378,15 +387,15 @@ class SessionMetadataInfo extends StatelessWidget {
       children: [
         const Divider(),
         Container(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
             child: Text(
               name,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
             )),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-          child: child,
+          padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+          child: child ?? const Text("null"),
         )
       ],
     );
