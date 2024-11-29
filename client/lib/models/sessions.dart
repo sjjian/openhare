@@ -4,6 +4,7 @@ import 'package:client/models/sql_result.dart';
 import 'package:client/screens/sessions/session_metadata.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:code_text_field/code_text_field.dart';
+import 'package:flutter/material.dart';
 import 'package:highlight/languages/sql.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
 
@@ -25,6 +26,8 @@ class SessionModel {
   MetadataController metadataController = MetadataController();
 
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
+
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   CodeController code = CodeController(
     text: "",

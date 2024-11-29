@@ -97,10 +97,13 @@ class _SessionMetadataState extends State<SessionMetadata> {
       width: 600,
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        Widget body = const SizedBox(
-          height: 40,
-          width: 40,
-          child: CircularProgressIndicator(),
+        Widget body = const Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            height: 40,
+            width: 40,
+            child: CircularProgressIndicator(),
+          ),
         );
         if (widget.controller.page == "tree") {
           List<SchemaMeta>? meta = sessionProvider.getMetadata();
@@ -111,11 +114,9 @@ class _SessionMetadataState extends State<SessionMetadata> {
           TableMeta? tableMeta = sessionProvider.getTableMeta(
               widget.controller.currentSchema!,
               widget.controller.currentTable!);
-          if (tableMeta != null &&
-              tableMeta.columns != null &&
-              tableMeta.keys != null) {
+          if (TableMeta.initialized(tableMeta)) {
             body = SessionMetadataDetail(
-              tableMeta: tableMeta,
+              tableMeta: tableMeta!,
               schema: widget.controller.currentSchema!,
               table: widget.controller.currentTable!,
               controller: widget.controller,
@@ -190,8 +191,6 @@ class SessionMetadataDetail extends StatefulWidget {
   final String schema;
   final String table;
   final TableMeta tableMeta;
-  // final List<TableColumnMeta> columns;
-  // final List<TableKeyMeta> keys;
   final MetadataController controller;
 
   const SessionMetadataDetail(
@@ -199,7 +198,6 @@ class SessionMetadataDetail extends StatefulWidget {
       required this.schema,
       required this.table,
       required this.tableMeta,
-      // required this.keys,
       required this.controller})
       : super(key: key);
 
@@ -272,8 +270,6 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           });
         },
         child: Card(
-          // color:
-          //     isEnter ? Theme.of(context).colorScheme.surfaceContainerLowest : null,
           child: Column(
             children: [
               ListTile(
@@ -340,11 +336,11 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
                             name: "character set",
                             child: Text(
                                 "${widget.column.characterSetName} | ${widget.column.collationName}")),
-                      if (widget.column.extra != null ||
+                      if (widget.column.extra != null &&
                           widget.column.extra!.isNotEmpty)
                         SessionMetadataInfo(
                             name: "extra", child: Text(widget.column.extra!)),
-                      if (widget.column.comment != null ||
+                      if (widget.column.comment != null &&
                           widget.column.comment!.isNotEmpty)
                         SessionMetadataInfo(
                             name: "comment",
@@ -356,8 +352,8 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
                             children: [
                               for (final key in widget.keys!)
                                 Tooltip(
-                                  message: "${key.columns.join(",")}",
-                                  child: Text("${key.name}"),
+                                  message: key.columns.join(","),
+                                  child: Text(key.name),
                                 )
                             ],
                           ),

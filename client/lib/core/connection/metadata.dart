@@ -43,6 +43,12 @@ class TableMeta {
     }
     return includeKeys;
   }
+
+  static bool initialized(TableMeta? tableMeta) {
+    return tableMeta != null &&
+        tableMeta.columns != null &&
+        tableMeta.keys != null;
+  }
 }
 
 class TableColumnMeta {

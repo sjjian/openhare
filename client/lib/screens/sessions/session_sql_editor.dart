@@ -1,4 +1,5 @@
 import 'package:client/providers/sessions.dart';
+import 'package:client/screens/sessions/session_drawer.dart';
 import 'package:client/screens/sessions/session_sql_editor_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
@@ -130,7 +131,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                           ),
                           Expanded(
                               child: CommonTabBar(
-                                height: 35,
+                                  height: 35,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .surfaceContainer,

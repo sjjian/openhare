@@ -3,7 +3,6 @@ import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/storages/storages.dart';
-import 'package:client/widgets/data_tree.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
@@ -246,6 +245,9 @@ class SessionProvider with ChangeNotifier {
   }
 
   Future<void> loadMetadata() async {
+    if (session!.metadata != null) {
+      return;
+    }
     List<SchemaMeta> metadata = List<SchemaMeta>.empty(growable: true);
     List<String> schemas = await session!.conn!.schemas();
     for (var schema in schemas) {
@@ -280,7 +282,8 @@ class SessionProvider with ChangeNotifier {
                 await session!.conn!.getTableColumns(schema, table);
             tableMeta.columns = columns;
 
-            List<TableKeyMeta> keys = await session!.conn!.getTableKeys(schema, table);
+            List<TableKeyMeta> keys =
+                await session!.conn!.getTableKeys(schema, table);
             tableMeta.keys = keys;
             notifyListeners();
           }

@@ -28,12 +28,11 @@ class _SQLEditPageState extends State<SQLEditPage> {
             children: [
               Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
                 if (sessionProvider.initialized()) {
-                  return const Expanded(child: SqlEditor());
+                  return const SessionBodyPage(isOpened: true);
                 } else {
                   return const AddSession();
                 }
               }),
-              // const SessionStatus(),
             ],
           ),
         )),
@@ -53,5 +52,40 @@ class SessionsPage extends StatelessWidget {
         bottomBar: SessionStatus(),
         drawer: SessionDrawer(),
         child: SQLEditPage());
+  }
+}
+
+class SessionBodyPage extends StatefulWidget {
+  final bool isOpened;
+
+  const SessionBodyPage({Key? key, required this.isOpened}) : super(key: key);
+
+  @override
+  State<SessionBodyPage> createState() => _SessionBodyPageState();
+}
+
+class _SessionBodyPageState extends State<SessionBodyPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isOpened){
+    // _scaffoldKey.currentState!.openEndDrawer();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Scaffold(
+          key: _scaffoldKey,
+          onEndDrawerChanged: (isOpened) {
+            print(isOpened);
+          },
+          // key: sessionProvider.session!.scaffoldKey,
+          endDrawer: const SessionDrawer(),
+          body: const SqlEditor()),
+    );
   }
 }

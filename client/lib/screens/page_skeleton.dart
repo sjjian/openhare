@@ -59,10 +59,8 @@ class PageSkeleton extends StatelessWidget {
             )),
       ),
       Expanded(
-        // child: Material(child: child,),
-        child: Scaffold(
-          body: child,
-          endDrawer: drawer,
+        child: Material(
+          child: child,
         ),
       ),
       Material(
