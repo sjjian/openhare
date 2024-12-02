@@ -45,9 +45,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
 
   @override
   Widget build(BuildContext context) {
-    // CustomDrawer c = CustomDrawer(context: context, child: const Text("test"));
     return Container(
-      // padding: const EdgeInsets.only(left: 5),
       color: Theme.of(context).colorScheme.surfaceContainerLow,
 
       constraints: BoxConstraints(maxHeight: widget.height),
@@ -121,7 +119,6 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
             const Expanded(child: Spacer()),
             IconButton(
                 onPressed: () {
-                  sessionProvider.loadMetadata();
                   Scaffold.of(context).openEndDrawer();
                 },
                 icon: const Icon(Icons.menu)),

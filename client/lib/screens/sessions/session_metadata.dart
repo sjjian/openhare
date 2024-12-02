@@ -93,6 +93,10 @@ class _SessionMetadataState extends State<SessionMetadata> {
 
   @override
   Widget build(BuildContext context) {
+    SessionProvider sessionProvider =
+        Provider.of<SessionProvider>(context, listen: false);
+    sessionProvider.loadMetadata();
+
     return Container(
       width: 600,
       color: Theme.of(context).colorScheme.surfaceContainerLowest,

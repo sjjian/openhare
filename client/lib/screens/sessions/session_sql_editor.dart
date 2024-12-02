@@ -29,19 +29,41 @@ class _SqlEditorState extends State<SqlEditor> {
             borderRadius: BorderRadius.circular(10)),
         child: Column(
           children: [
-            SplitView(
-                controller: multiSplitViewCtrl,
-                axis: Axis.vertical,
+            Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+              const double codeButtonHeight = 36;
+              return CodeButtionBar(
+                  codeController: sessionProvider.getSQLEditCode(),
+                  height: codeButtonHeight);
+            }),
+            Expanded(
+              child: SplitView(
+                axis: Axis.horizontal,
                 children: [
-                  Consumer<SessionProvider>(
-                    builder: (context, sessionProvider, _) {
-                      return CodeEditor(
-                          key: ValueKey(sessionProvider.getSQLEditCode()),
-                          codeController: sessionProvider.getSQLEditCode());
-                    },
+                  Expanded(
+                    child: Column(
+                      children: [
+                        SplitView(
+                            controller: multiSplitViewCtrl,
+                            axis: Axis.vertical,
+                            children: [
+                              Consumer<SessionProvider>(
+                                builder: (context, sessionProvider, _) {
+                                  return CodeEditor(
+                                      key: ValueKey(
+                                          sessionProvider.getSQLEditCode()),
+                                      codeController:
+                                          sessionProvider.getSQLEditCode());
+                                },
+                              ),
+                              const Expanded(child: SqlResultTables()),
+                            ]),
+                      ],
+                    ),
                   ),
-                  const Expanded(child: SqlResultTables()),
-                ]),
+                  const SessionDrawer(),
+                ],
+              ),
+            ),
           ],
         ));
   }
@@ -71,14 +93,7 @@ class _CodeEditorState extends State<CodeEditor> {
           textStyle: const TextStyle(fontFamily: 'Roboto Mono'),
         ),
       ));
-
-      const double codeButtonHeight = 36;
-      Widget codeButtonBar = CodeButtionBar(
-          codeController: widget.codeController, height: codeButtonHeight);
-
-      return Column(
-        children: [codeButtonBar, codeField],
-      );
+      return codeField;
     });
   }
 }

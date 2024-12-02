@@ -16,7 +16,7 @@ class _SessionDrawerState extends State<SessionDrawer> {
     SessionProvider sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
     return Drawer(
-      width: 600,
+      // width: 400,
       shape: const Border(),
       elevation: 0,
       child: Row(
@@ -24,16 +24,6 @@ class _SessionDrawerState extends State<SessionDrawer> {
           Expanded(
             child: Column(
               children: [
-                Container(
-                    height: 36,
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                            onPressed: () {}, icon: const Icon(Icons.menu))
-                      ],
-                    )),
                 Expanded(
                   child: sessionProvider.initialized()
                       ? SessionMetadata(
