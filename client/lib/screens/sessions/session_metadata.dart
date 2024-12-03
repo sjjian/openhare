@@ -1,6 +1,7 @@
 import 'package:client/core/connection/metadata.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
+import 'package:client/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
@@ -55,7 +56,6 @@ class _SessionMetadataState extends State<SessionMetadata> {
         type: "schema",
         builder: (context, node) {
           return Text(
-            selectionColor: Theme.of(context).colorScheme.primary,
             node.children.isNotEmpty
                 ? "${node.value}  [${node.children.length}]"
                 : node.value,
@@ -79,7 +79,6 @@ class _SessionMetadataState extends State<SessionMetadata> {
                 },
                 child: Text(
                   node.value,
-                  selectionColor: Theme.of(context).colorScheme.primary,
                   overflow: TextOverflow.ellipsis,
                 ),
               );
@@ -155,9 +154,10 @@ class SessionMetadataTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 33,
-      child: Row(
-        children: [
-          BreadCrumb(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double width = constraints.maxWidth - 40 - 24 - 24;
+          return BreadCrumb(
             items: <BreadCrumbItem>[
               BreadCrumbItem(
                   content: IconButton(
@@ -167,24 +167,32 @@ class SessionMetadataTitle extends StatelessWidget {
                       icon: const Icon(Icons.home))),
               if (controller.page != "tree")
                 BreadCrumbItem(
-                    content: Text(
-                  controller.currentSchema!,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                    content: Container(
+                  constraints: BoxConstraints(maxWidth: width / 2),
+                  child: Text(
+                    controller.currentSchema!,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 )),
               if (controller.page != "tree")
                 BreadCrumbItem(
-                    content: Text(
-                  controller.currentTable!,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                    content: Expanded(
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: width / 2),
+                    child: Text(
+                      controller.currentTable!,
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 )),
             ],
             divider: const Icon(Icons.chevron_right),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
