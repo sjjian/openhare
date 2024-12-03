@@ -515,10 +515,10 @@ packages:
     dependency: "direct main"
     description:
       name: multi_split_view
-      sha256: d68e129bff71fc9e6b66de59e1b79deaf4b91f30940130bfbd2d704c1c713499
+      sha256: "99c02f128e7423818d13b8f2e01e3027e953b35508019dcee214791bd0525db5"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "3.6.0"
   mysql_client:
     dependency: "direct main"
     description:

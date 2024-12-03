@@ -1,5 +1,5 @@
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/sessions/session_drawer.dart';
+import 'package:client/screens/sessions/session_metadata.dart';
 import 'package:client/screens/sessions/session_sql_editor_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
@@ -9,8 +9,6 @@ import 'package:client/widgets/split_view.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:client/widgets/sql_result_table.dart';
 import 'package:client/widgets/tab_widget.dart';
-
-final multiSplitViewCtrl = MultiSplitViewController();
 
 class SqlEditor extends StatefulWidget {
   const SqlEditor({Key? key}) : super(key: key);
@@ -23,49 +21,51 @@ class _SqlEditorState extends State<SqlEditor> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        alignment: Alignment.topLeft,
-        decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          children: [
-            Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-              const double codeButtonHeight = 36;
-              return CodeButtionBar(
-                  codeController: sessionProvider.getSQLEditCode(),
-                  height: codeButtonHeight);
-            }),
-            Expanded(
-              child: SplitView(
-                axis: Axis.horizontal,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        SplitView(
-                            controller: multiSplitViewCtrl,
-                            axis: Axis.vertical,
-                            children: [
-                              Consumer<SessionProvider>(
-                                builder: (context, sessionProvider, _) {
-                                  return CodeEditor(
-                                      key: ValueKey(
-                                          sessionProvider.getSQLEditCode()),
-                                      codeController:
-                                          sessionProvider.getSQLEditCode());
-                                },
-                              ),
-                              const Expanded(child: SqlResultTables()),
-                            ]),
-                      ],
-                    ),
-                  ),
-                  const SessionDrawer(),
-                ],
+      alignment: Alignment.topLeft,
+      decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(10)),
+      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+        const double codeButtonHeight = 36;
+
+        final Widget left = Expanded(
+          child: Column(
+            children: [
+              SplitView(
+                controller: sessionProvider.session!.multiSplitViewCtrl,
+                axis: Axis.vertical,
+                first: CodeEditor(
+                    key: ValueKey(sessionProvider.getSQLEditCode()),
+                    codeController: sessionProvider.getSQLEditCode()),
+                second: const Expanded(child: SqlResultTables()),
               ),
-            ),
+            ],
+          ),
+        );
+
+        return Column(
+          children: [
+            CodeButtionBar(
+                codeController: sessionProvider.getSQLEditCode(),
+                height: codeButtonHeight),
+            sessionProvider.isRightPageOpen
+                ? Expanded(
+                    child: SplitView(
+                      axis: Axis.horizontal,
+                      controller:
+                          sessionProvider.session!.metaDataSplitViewCtrl,
+                      first: left,
+                      second: SessionMetadata(
+                        controller:
+                            sessionProvider.session!.metadataController, //todo
+                      ),
+                    ),
+                  )
+                : left,
           ],
-        ));
+        );
+      }),
+    );
   }
 }
 

@@ -82,6 +82,7 @@ class SessionListProvider with ChangeNotifier {
 class SessionProvider with ChangeNotifier {
   SessionModel? _session;
   bool showRecord = true;
+  bool isRightPageOpen = true;
 
   String drawerPage = "tree";
 
@@ -307,4 +308,14 @@ class SessionProvider with ChangeNotifier {
   }
 
   CodeController getSQLEditCode() => _session!.code;
+
+  void showRightPage() {
+    isRightPageOpen = true;
+    notifyListeners();
+  }
+
+  void hideRightPage() {
+    isRightPageOpen = false;
+    notifyListeners();
+  }
 }

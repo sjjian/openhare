@@ -98,7 +98,6 @@ class _SessionMetadataState extends State<SessionMetadata> {
     sessionProvider.loadMetadata();
 
     return Container(
-      width: 600,
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         Widget body = const Align(

@@ -1,7 +1,6 @@
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:client/screens/sessions/session_add.dart';
-import 'package:client/screens/sessions/session_drawer.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_status.dart';
 import 'package:client/screens/sessions/session_tabs.dart';
@@ -22,7 +21,7 @@ class _SQLEditPageState extends State<SQLEditPage> {
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         if (sessionProvider.initialized()) {
-          return const Expanded(child:  SqlEditor());
+          return const Expanded(child: SqlEditor());
         } else {
           return const AddSession();
         }
@@ -40,7 +39,6 @@ class SessionsPage extends StatelessWidget {
         key: Key("sessions"),
         topBar: SessionTabs(),
         bottomBar: SessionStatus(),
-        drawer: SessionDrawer(),
         child: SQLEditPage());
   }
 }
