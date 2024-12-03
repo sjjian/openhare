@@ -33,33 +33,42 @@ class PageSkeleton extends StatelessWidget {
   final Widget? topBar;
   final Widget? bottomBar;
   final Widget child;
+  final Widget? drawer;
 
   const PageSkeleton(
-      {Key? key, this.topBar, this.bottomBar, required this.child})
+      {Key? key, this.topBar, this.bottomBar, this.drawer, required this.child})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Container(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-          height: 40,
-          child: Row(
-            children: [
-              Expanded(
-                child: MoveWindow(
-                  // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
-                  child: topBar,
+      Material(
+        child: Container(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            height: 40,
+            child: Row(
+              children: [
+                Expanded(
+                  child: MoveWindow(
+                    // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
+                    child: topBar,
+                  ),
                 ),
-              ),
-              if (!kIsWeb) const WindowButtons(),
-            ],
-          )),
-      Expanded(child: child),
-      Container(
-        height: 40,
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        child: bottomBar,
+                if (!kIsWeb) const WindowButtons(),
+              ],
+            )),
+      ),
+      Expanded(
+        child: Material(
+          child: child,
+        ),
+      ),
+      Material(
+        child: Container(
+          height: 40,
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          child: bottomBar,
+        ),
       )
     ]);
   }

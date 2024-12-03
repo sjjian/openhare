@@ -45,9 +45,7 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // padding: const EdgeInsets.only(left: 5),
       color: Theme.of(context).colorScheme.surfaceContainerLow,
-      
       constraints: BoxConstraints(maxHeight: widget.height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final canQuery = sessionProvider.canQuery();
@@ -94,12 +92,14 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 iconSize: widget.height,
                 padding: const EdgeInsets.all(2),
                 alignment: Alignment.topLeft,
-                onPressed: canQuery? () {
-                  String query = getQuery(sessionProvider);
-                  if (query.isNotEmpty) {
-                    sessionProvider.query("explain $query", true);
-                  }
-                }: null,
+                onPressed: canQuery
+                    ? () {
+                        String query = getQuery(sessionProvider);
+                        if (query.isNotEmpty) {
+                          sessionProvider.query("explain $query", true);
+                        }
+                      }
+                    : null,
                 icon: Icon(
                   Icons.e_mobiledata,
                   color: canQuery
@@ -115,6 +115,16 @@ class _CodeButtionBarState extends State<CodeButtionBar> {
                 disable: canQuery ? false : true,
                 currentSchema: sessionProvider.session!.conn!.currentSchema),
             const Expanded(child: Spacer()),
+            IconButton(
+              onPressed: () {
+                sessionProvider.isRightPageOpen
+                    ? sessionProvider.hideRightPage()
+                    : sessionProvider.showRightPage();
+              },
+              icon: sessionProvider.isRightPageOpen
+                  ? const Icon(Icons.format_indent_increase)
+                  : const Icon(Icons.format_indent_decrease),
+            )
           ],
         );
       }),

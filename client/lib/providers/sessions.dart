@@ -1,3 +1,4 @@
+import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
@@ -81,6 +82,9 @@ class SessionListProvider with ChangeNotifier {
 class SessionProvider with ChangeNotifier {
   SessionModel? _session;
   bool showRecord = true;
+  bool isRightPageOpen = true;
+
+  String drawerPage = "tree";
 
   SessionProvider(this._session);
 
@@ -241,5 +245,77 @@ class SessionProvider with ChangeNotifier {
     return schemas;
   }
 
+  Future<void> loadMetadata() async {
+    if (session!.metadata != null) {
+      return;
+    }
+    List<SchemaMeta> metadata = List<SchemaMeta>.empty(growable: true);
+    List<String> schemas = await session!.conn!.schemas();
+    for (var schema in schemas) {
+      SchemaMeta schemaMeta = SchemaMeta(schema);
+      metadata.add(schemaMeta);
+      List<String> tables = await session!.conn!.getTables(schema);
+      for (var table in tables) {
+        schemaMeta.tables.add(TableMeta(table));
+      }
+    }
+    session!.metadata = metadata;
+    notifyListeners();
+  }
+
+  List<SchemaMeta>? getMetadata() {
+    if (session!.metadata == null) {
+      return null;
+    }
+    return session!.metadata;
+  }
+
+  Future<void> loadTableMeta(String schema, String table) async {
+    // todo: 使用map
+    for (var schemaMeta in session!.metadata!) {
+      if (schemaMeta.name == schema) {
+        for (var tableMeta in schemaMeta.tables) {
+          if (tableMeta.name == table) {
+            if (tableMeta.columns != null) {
+              return;
+            }
+            List<TableColumnMeta> columns =
+                await session!.conn!.getTableColumns(schema, table);
+            tableMeta.columns = columns;
+
+            List<TableKeyMeta> keys =
+                await session!.conn!.getTableKeys(schema, table);
+            tableMeta.keys = keys;
+            notifyListeners();
+          }
+        }
+      }
+    }
+  }
+
+  TableMeta? getTableMeta(String schema, String table) {
+    // todo: 使用map
+    for (var schemaMeta in session!.metadata!) {
+      if (schemaMeta.name == schema) {
+        for (var tableMeta in schemaMeta.tables) {
+          if (tableMeta.name == table) {
+            return tableMeta;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   CodeController getSQLEditCode() => _session!.code;
+
+  void showRightPage() {
+    isRightPageOpen = true;
+    notifyListeners();
+  }
+
+  void hideRightPage() {
+    isRightPageOpen = false;
+    notifyListeners();
+  }
 }

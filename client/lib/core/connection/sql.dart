@@ -1,3 +1,4 @@
+import 'package:client/core/connection/metadata.dart';
 import 'package:client/models/instances.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:common/parser.dart';
@@ -100,5 +101,42 @@ class SQLConnection {
     IResultSet resultSet = await _execute("SELECT DATABASE()");
     currentSchema = resultSet.first.rows.first.colByName("DATABASE()");
     return currentSchema;
+  }
+
+  Future<List<String>> getTables(String schema) async {
+    List<String> tables = List.empty(growable: true);
+    IResultSet resultSet = await _execute(
+        "select TABLE_NAME from information_schema.tables where table_schema='$schema' and TABLE_TYPE in ('BASE TABLE','SYSTEM VIEW')");
+    for (final result in resultSet) {
+      for (final row in result.rows) {
+        tables.add(row.colByName("TABLE_NAME")!);
+      }
+    }
+    return tables;
+  }
+
+  Future<List<TableColumnMeta>> getTableColumns(
+      String schema, String table) async {
+    List<TableColumnMeta> columns = List.empty(growable: true);
+    // ref: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html
+    IResultSet resultSet = await _execute(
+        "select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT, EXTRA from information_schema.columns where TABLE_SCHEMA = '$schema' and TABLE_NAME = '$table'");
+    for (final result in resultSet) {
+      for (final row in result.rows) {
+        columns.add(TableColumnMeta.loadFromRow(row));
+      }
+    }
+    return columns;
+  }
+
+  Future<List<TableKeyMeta>> getTableKeys(String schema, String table) async {
+    List<TableKeyMeta> keys = List.empty(growable: true);
+    IResultSet resultSet = await _execute("SELECT INDEX_NAME, GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX SEPARATOR \",\") AS COLUMNS FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = '$schema' AND TABLE_NAME = '$table' GROUP BY INDEX_NAME");
+    for (final result in resultSet) {
+      for (final row in result.rows) {
+        keys.add(TableKeyMeta.loadFromRow(row));
+      }
+    }
+    return keys;
   }
 }

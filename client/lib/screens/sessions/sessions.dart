@@ -17,26 +17,15 @@ class SQLEditPage extends StatefulWidget {
 class _SQLEditPageState extends State<SQLEditPage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Column(
-            children: [
-              Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-                if (sessionProvider.initialized()) {
-                  return const Expanded(child: SqlEditor());
-                } else {
-                  return const AddSession();
-                }
-              }),
-              // const SessionStatus(),
-            ],
-          ),
-        )),
-      ],
+    return Container(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+        if (sessionProvider.initialized()) {
+          return const Expanded(child: SqlEditor());
+        } else {
+          return const AddSession();
+        }
+      }),
     );
   }
 }
