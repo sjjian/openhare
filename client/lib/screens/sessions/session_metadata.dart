@@ -1,7 +1,6 @@
 import 'package:client/core/connection/metadata.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
-import 'package:client/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
@@ -247,16 +246,14 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
 
   List<Widget> getTypeTags(TableColumnMeta column) {
     List<Widget> tags = List.empty(growable: true);
-    tags.add(Chip(label: Text(widget.column.columnType)));
+    tags.add(Chip(
+        label: Tooltip(
+            message: widget.column.columnType,
+            child: Text(widget.column.getColumnType()))));
     if (widget.column.isNull == "YES") {
       tags.add(const Chip(label: Text("NOT NULL")));
     } else {
       tags.add(const Chip(label: Text("NULL")));
-    }
-    if (widget.column.key == "PRI") {
-      tags.add(const Chip(label: Text("PK")));
-    } else if (widget.column.key != "") {
-      tags.add(Chip(label: Text(widget.column.key!)));
     }
     return tags;
   }
@@ -284,7 +281,7 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           child: Column(
             children: [
               ListTile(
-                leading: switch (widget.column.getDataType()) {
+                leading: switch (widget.column.dataType) {
                   DataType.number => const Icon(
                       Icons.onetwothree,
                       color: Colors.teal,
