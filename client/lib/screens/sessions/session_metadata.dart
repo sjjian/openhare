@@ -306,8 +306,7 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
                 },
                 title: Row(
                   children: [
-                    Text(widget.column.name),
-                    const Expanded(child: Spacer()),
+                     Expanded(child: Text(widget.column.name, overflow: TextOverflow.ellipsis,)),
                     if (widget.column.key != "") const Icon(Icons.key)
                   ],
                 ),
