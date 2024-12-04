@@ -130,10 +130,8 @@ class _MyTreeTileState extends State<MyTreeTile> {
                         : null,
                     onPressed: widget.entry.hasChildren ? widget.onTap : null,
                   ),
-                  Container(
-                    // constraints: const BoxConstraints(maxWidth: 300),
-                    child:
-                        widget.entry.node.builder(context, widget.entry.node),
+                  Expanded(
+                    child: widget.entry.node.builder(context, widget.entry.node),
                   ),
                 ],
               ),
