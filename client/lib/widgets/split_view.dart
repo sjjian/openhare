@@ -13,11 +13,11 @@ class SplitViewController extends MultiSplitViewController {
         ]);
 }
 
-class SplitView extends StatefulWidget {
+class SplitView extends StatelessWidget {
+  final SplitViewController controller;
   final Widget first;
   final Widget second;
   final Axis axis;
-  final SplitViewController controller;
 
   const SplitView(
       {Key? key,
@@ -28,21 +28,16 @@ class SplitView extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<SplitView> createState() => _SplitViewState();
-}
-
-class _SplitViewState extends State<SplitView> {
-  @override
   Widget build(BuildContext context) {
     MultiSplitView mv = MultiSplitView(
-      axis: widget.axis,
-      controller: widget.controller,
+      axis: axis,
+      controller: controller,
       builder: (context, area) {
         switch (area.data) {
           case 1:
-            return widget.first;
+            return first;
           case 2:
-            return widget.second;
+            return second;
           default:
             return const Spacer();
         }
@@ -52,7 +47,7 @@ class _SplitViewState extends State<SplitView> {
     MultiSplitViewTheme theme = MultiSplitViewTheme(
       data: MultiSplitViewThemeData(
         dividerPainter: DividerPainters.background(
-          color: Theme.of(context).colorScheme.surfaceContainer,
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
         ),
       ),
       child: mv,

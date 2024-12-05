@@ -55,7 +55,6 @@ class _SessionMetadataState extends State<SessionMetadata> {
         type: "schema",
         builder: (context, node) {
           return Text(
-            selectionColor: Theme.of(context).colorScheme.primary,
             node.children.isNotEmpty
                 ? "${node.value}  [${node.children.length}]"
                 : node.value,
@@ -79,7 +78,6 @@ class _SessionMetadataState extends State<SessionMetadata> {
                 },
                 child: Text(
                   node.value,
-                  selectionColor: Theme.of(context).colorScheme.primary,
                   overflow: TextOverflow.ellipsis,
                 ),
               );
@@ -155,9 +153,10 @@ class SessionMetadataTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 33,
-      child: Row(
-        children: [
-          BreadCrumb(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double width = constraints.maxWidth - 40 - 24 - 24;
+          return BreadCrumb(
             items: <BreadCrumbItem>[
               BreadCrumbItem(
                   content: IconButton(
@@ -167,24 +166,32 @@ class SessionMetadataTitle extends StatelessWidget {
                       icon: const Icon(Icons.home))),
               if (controller.page != "tree")
                 BreadCrumbItem(
-                    content: Text(
-                  controller.currentSchema!,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                    content: Container(
+                  constraints: BoxConstraints(maxWidth: width / 2),
+                  child: Text(
+                    controller.currentSchema!,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 )),
               if (controller.page != "tree")
                 BreadCrumbItem(
-                    content: Text(
-                  controller.currentTable!,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                    content: Expanded(
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: width / 2),
+                    child: Text(
+                      controller.currentTable!,
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 )),
             ],
             divider: const Icon(Icons.chevron_right),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -239,16 +246,14 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
 
   List<Widget> getTypeTags(TableColumnMeta column) {
     List<Widget> tags = List.empty(growable: true);
-    tags.add(Chip(label: Text(widget.column.columnType)));
+    tags.add(Chip(
+        label: Tooltip(
+            message: widget.column.columnType,
+            child: Text(widget.column.getColumnType()))));
     if (widget.column.isNull == "YES") {
       tags.add(const Chip(label: Text("NOT NULL")));
     } else {
       tags.add(const Chip(label: Text("NULL")));
-    }
-    if (widget.column.key == "PRI") {
-      tags.add(const Chip(label: Text("PK")));
-    } else if (widget.column.key != "") {
-      tags.add(Chip(label: Text(widget.column.key!)));
     }
     return tags;
   }
@@ -276,7 +281,7 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           child: Column(
             children: [
               ListTile(
-                leading: switch (widget.column.getDataType()) {
+                leading: switch (widget.column.dataType) {
                   DataType.number => const Icon(
                       Icons.onetwothree,
                       color: Colors.teal,
@@ -301,8 +306,7 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
                 },
                 title: Row(
                   children: [
-                    Text(widget.column.name),
-                    const Expanded(child: Spacer()),
+                     Expanded(child: Text(widget.column.name, overflow: TextOverflow.ellipsis,)),
                     if (widget.column.key != "") const Icon(Icons.key)
                   ],
                 ),

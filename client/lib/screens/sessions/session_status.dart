@@ -4,14 +4,9 @@ import 'package:client/providers/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/utils/duration_extend.dart';
 
-class SessionStatus extends StatefulWidget {
+class SessionStatus extends StatelessWidget {
   const SessionStatus({Key? key}) : super(key: key);
 
-  @override
-  State<SessionStatus> createState() => _SessionStatusState();
-}
-
-class _SessionStatusState extends State<SessionStatus> {
   @override
   Widget build(BuildContext context) {
     // todo: 采用更通用的形式
@@ -39,17 +34,21 @@ class _SessionStatusState extends State<SessionStatus> {
                   message: result.query,
                   child: SizedBox(
                       width: 200,
-                      child: Text("query: ${result.query.trimLeft().split("\n")[0]}",
+                      child: Text(
+                          "query: ${result.query.trimLeft().split("\n")[0]}",
                           overflow: TextOverflow.ellipsis)),
                 )
               ],
             ),
           );
         } else {
-          return Container(height: 30, color:  Theme.of(context).colorScheme.surfaceContainer);
+          return Container(
+              height: 30,
+              color: Theme.of(context).colorScheme.surfaceContainer);
         }
       } else {
-        return Container(height: 30, color:  Theme.of(context).colorScheme.surfaceContainer);
+        return Container(
+            height: 30, color: Theme.of(context).colorScheme.surfaceContainer);
       }
     });
   }

@@ -43,6 +43,7 @@ class _SqlResultTableState extends State<SqlResultTable> {
                 columnHeight: 36,
                 gridBorderColor:
                     Theme.of(context).colorScheme.surfaceContainerLowest,
+                  gridBackgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                 enableGridBorderShadow: true),
           ),
           columns: result.columns!,

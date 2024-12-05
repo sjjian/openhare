@@ -30,7 +30,7 @@ class SessionModel {
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 
   final SplitViewController multiSplitViewCtrl =
-      SplitViewController(Area(), Area());
+      SplitViewController(Area(), Area( min: 35, size: 500));
 
   final SplitViewController metaDataSplitViewCtrl =
       SplitViewController(Area(min: 400), Area(size: 400, min: 400));

@@ -53,7 +53,7 @@ class TableMeta {
 
 class TableColumnMeta {
   String name;
-  String dataType; // varchar
+  DataType dataType; // varchar
   String columnType; // varchar(255)
   String isNull;
   String? key;
@@ -81,7 +81,7 @@ class TableColumnMeta {
 
   TableColumnMeta.loadFromRow(ResultSetRow row)
       : name = row.colByName("COLUMN_NAME")!,
-        dataType = row.colByName("DATA_TYPE")!,
+        dataType = TableColumnMeta.getDataType(row.colByName("DATA_TYPE")!),
         columnType = row.colByName("COLUMN_TYPE")!,
         isNull = row.colByName("IS_NULLABLE")!,
         defaultValue = row.colByName("COLUMN_DEFAULT"),
@@ -95,7 +95,7 @@ class TableColumnMeta {
     return ["COLUMN_NAME", "DATA_TYPE", "Null", "Key", "Default", "Extra"];
   }
 
-  DataType getDataType() {
+  static DataType getDataType(String dataType) {
     return switch (dataType) {
       "int" ||
       "bigint" ||
@@ -115,8 +115,15 @@ class TableColumnMeta {
       "mediumtext" =>
         DataType.blob,
       "json" => DataType.json,
-      "set" => DataType.dataSet,
+      "set" || "enum" => DataType.dataSet,
       _ => DataType.blob,
+    };
+  }
+
+  String getColumnType() {
+    return switch (dataType) {
+      DataType.dataSet => columnType.split("(").first,
+      _ => columnType
     };
   }
 }
