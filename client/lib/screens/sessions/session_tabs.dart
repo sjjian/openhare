@@ -4,14 +4,9 @@ import 'package:client/widgets/tab_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SessionTabs extends StatefulWidget {
+class SessionTabs extends StatelessWidget {
   const SessionTabs({Key? key}) : super(key: key);
 
-  @override
-  State<SessionTabs> createState() => _SessionTabsState();
-}
-
-class _SessionTabsState extends State<SessionTabs> {
   @override
   Widget build(BuildContext context) {
     return Consumer<SessionListProvider>(
@@ -22,7 +17,8 @@ class _SessionTabsState extends State<SessionTabs> {
             color: Theme.of(context).colorScheme.surfaceContainer,
             tabStyle: CommonTabStyle(
               color: Theme.of(context).colorScheme.surfaceContainer,
-              selectedColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+              selectedColor:
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
               hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
             ),
             addTab: () {

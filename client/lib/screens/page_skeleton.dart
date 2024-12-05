@@ -41,9 +41,9 @@ class PageSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Material(
-        child: Container(
+    return Material(
+      child: Column(children: [
+        Container(
             color: Theme.of(context).colorScheme.surfaceContainer,
             height: 40,
             child: Row(
@@ -57,19 +57,15 @@ class PageSkeleton extends StatelessWidget {
                 if (!kIsWeb) const WindowButtons(),
               ],
             )),
-      ),
-      Expanded(
-        child: Material(
+        Expanded(
           child: child,
         ),
-      ),
-      Material(
-        child: Container(
+        Container(
           height: 40,
           color: Theme.of(context).colorScheme.surfaceContainer,
           child: bottomBar,
-        ),
-      )
-    ]);
+        )
+      ]),
+    );
   }
 }

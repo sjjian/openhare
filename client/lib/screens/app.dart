@@ -72,6 +72,7 @@ class _AppState extends State<App> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
+          // brightness: Brightness.dark
         ),
         routerConfig: _router,
         debugShowCheckedModeBanner: false,
