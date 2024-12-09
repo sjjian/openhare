@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:highlight/languages/sql.dart';
 
 class CodeEditor extends StatefulWidget {
-  final CodeController codeController;
+  final SqlEditingController codeController;
 
   const CodeEditor({super.key, required this.codeController});
 
@@ -24,13 +24,14 @@ class _CodeEditorState extends State<CodeEditor> {
             styles: Theme.of(context).brightness == Brightness.dark
                 ? a11yDarkTheme
                 : a11yLightTheme),
-        child: CodeField(
-          lineNumberStyle: LineNumberStyle(
-              background: Theme.of(context).colorScheme.surfaceContainerLowest),
-          expands: true,
-          controller: widget.codeController,
-          textStyle: GoogleFonts.robotoMono(),
-        ),
+        // child: CodeField(
+        //   lineNumberStyle: LineNumberStyle(
+        //       background: Theme.of(context).colorScheme.surfaceContainerLowest),
+        //   expands: true,
+        //   controller: widget.codeController,
+        //   textStyle: GoogleFonts.robotoMono(),
+        // ),
+        child: SqlField(codeController: widget.codeController),
       ));
       return codeField;
     });
@@ -56,7 +57,6 @@ class SQlTabModifier extends CodeModifier {
     TextSelection sel,
     EditorParams params,
   ) {
-
     // todo
     // showMenu(
     //     // context: BuildContext(),
@@ -76,5 +76,50 @@ class SQlTabModifier extends CodeModifier {
     //     ]);
     final tmp = replace(text, sel.start, sel.end, "");
     return tmp;
+  }
+}
+
+class SqlField extends StatefulWidget {
+  final SqlEditingController codeController;
+  const SqlField({Key? key, required this.codeController}) : super(key: key);
+
+  @override
+  State<SqlField> createState() => _SqlFieldState();
+}
+
+class _SqlFieldState extends State<SqlField> {
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: widget.codeController,
+      expands: true,
+      maxLines: null,
+      minLines: null,
+      decoration: const InputDecoration(
+        disabledBorder: InputBorder.none,
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+      )
+    );
+  }
+}
+
+class SqlEditingController extends TextEditingController {
+  SqlEditingController(String? text):super(text: text);
+
+  @override
+  set value(TextEditingValue newValue) {
+    print("====================================");
+    print(newValue.selection);
+    print(newValue.composing);
+    int l = newValue.selection.start - value.selection.start;
+    if (l == 0) {
+      print("没有输入字符");
+    }else if (l > 0) {
+      print("插入了${l}个字符");
+    }else {
+      print("删除了${l}个字符");
+    }
+    super.value = newValue;
   }
 }

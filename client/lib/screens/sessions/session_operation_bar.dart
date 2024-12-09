@@ -1,12 +1,12 @@
 import 'package:client/providers/sessions.dart';
+import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:flutter/material.dart';
-import 'package:code_text_field/code_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:common/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class SessionOpBar extends StatelessWidget {
-  final CodeController codeController;
+  final SqlEditingController codeController;
   final double height;
 
   const SessionOpBar({Key? key, required this.codeController, this.height = 36})

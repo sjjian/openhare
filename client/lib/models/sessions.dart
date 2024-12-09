@@ -32,7 +32,7 @@ class SessionModel {
   final SplitViewController metaDataSplitViewCtrl =
       SplitViewController(Area(min: 400), Area(size: 400, min: 400));
 
-  SQLCodeController code = SQLCodeController();
+  SqlEditingController code = SqlEditingController("");
 
   SessionModel({this.conn});
 

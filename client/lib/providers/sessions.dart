@@ -2,6 +2,7 @@ import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
+import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/storages/storages.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
@@ -307,7 +308,7 @@ class SessionProvider with ChangeNotifier {
     return null;
   }
 
-  CodeController getSQLEditCode() => _session!.code;
+  SqlEditingController getSQLEditCode() => _session!.code; 
 
   void showRightPage() {
     isRightPageOpen = true;
