@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:client/models/instances.dart';
+import 'package:re_editor/re_editor.dart';
 
 class InitializedProvider with ChangeNotifier {}
 
@@ -308,7 +309,7 @@ class SessionProvider with ChangeNotifier {
     return null;
   }
 
-  SqlEditingController getSQLEditCode() => _session!.code; 
+  CodeLineEditingController getSQLEditCode() => _session!.code;
 
   void showRightPage() {
     isRightPageOpen = true;

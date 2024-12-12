@@ -26,7 +26,7 @@ class SessionBodyPage extends StatelessWidget {
               SplitView(
                 controller: sessionProvider.session!.multiSplitViewCtrl,
                 axis: Axis.vertical,
-                first: CodeEditor(
+                first: SQLEditor(
                     key: ValueKey(sessionProvider.getSQLEditCode()),
                     codeController: sessionProvider.getSQLEditCode()),
                 second: const Expanded(child: SqlResultTables()),
@@ -60,4 +60,3 @@ class SessionBodyPage extends StatelessWidget {
     );
   }
 }
-

@@ -32,7 +32,6 @@ dependencies:
     sdk: flutter
   provider: ^6.1.1
   pluto_grid: ^8.0.0
-  code_text_field: ^1.1.0
   window_manager: ^0.3.7
   bitsdojo_window: ^0.1.6
   cupertino_icons: ^1.0.2
@@ -46,6 +45,7 @@ dependencies:
   flutter_fancy_tree_view: ^1.6.0
   flutter_breadcrumb: ^1.0.1
   google_fonts: ^6.2.1
+  re_editor: ^0.6.0
   common:
     path: ../common/
 

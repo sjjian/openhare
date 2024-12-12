@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:common/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:re_editor/re_editor.dart';
 
 class SessionOpBar extends StatelessWidget {
-  final SqlEditingController codeController;
+  final CodeLineEditingController codeController;
   final double height;
 
   const SessionOpBar({Key? key, required this.codeController, this.height = 36})
@@ -15,18 +16,19 @@ class SessionOpBar extends StatelessWidget {
   String getQuery(SessionProvider sessionProvider) {
     var content = codeController.text.toString();
     List<String> querys = Splitter(content, ";").split();
-    TextSelection s = codeController.selection;
+    CodeLineSelection s = codeController.selection;
 
     String query;
     // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
     if (!s.isCollapsed) {
-      query = codeController.text.toString().substring(s.start, s.end);
+      query =
+          codeController.text.toString().substring(s.start.index, s.end.index);
     } else {
       // 当前界面未选中SQL, 则当前游标在哪个SQL片段内就执行哪个SQL. todo: 移动到通用的地方.
       int totalLength = 0;
       query = querys.firstWhere((query) {
         totalLength = totalLength + query.length;
-        if (s.start <= totalLength) {
+        if (s.start.index <= totalLength) {
           return true;
         } else {
           return false;
