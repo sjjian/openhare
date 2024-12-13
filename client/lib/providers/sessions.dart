@@ -4,7 +4,6 @@ import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/storages/storages.dart';
-import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:mysql_client/mysql_client.dart';
