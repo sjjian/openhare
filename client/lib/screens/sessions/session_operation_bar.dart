@@ -1,8 +1,8 @@
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:common/parser.dart';
+// import 'package:common/src/parser/scanner.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:re_editor/re_editor.dart';
 
@@ -15,25 +15,24 @@ class SessionOpBar extends StatelessWidget {
 
   String getQuery(SessionProvider sessionProvider) {
     var content = codeController.text.toString();
-    List<String> querys = Splitter(content, ";").split();
+    List<SQLChunk> querys = Splitter(content, ";").split();
     CodeLineSelection s = codeController.selection;
-
     String query;
     // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
     if (!s.isCollapsed) {
-      query =
-          codeController.text.toString().substring(s.start.index, s.end.index);
+      query = codeController.selectedText;
     } else {
-      // 当前界面未选中SQL, 则当前游标在哪个SQL片段内就执行哪个SQL. todo: 移动到通用的地方.
-      int totalLength = 0;
-      query = querys.firstWhere((query) {
-        totalLength = totalLength + query.length;
-        if (s.start.index <= totalLength) {
+      int line = s.baseIndex + 1;
+      int row = s.baseOffset;
+      SQLChunk chunk = querys.firstWhere((chunk) {
+        if (line < chunk.end.line) {
           return true;
-        } else {
-          return false;
+        } else if (line == chunk.end.line && row <= chunk.end.row) {
+          return true;
         }
-      }, orElse: () => "");
+        return false;
+      }, orElse: () => SQLChunk.empty());
+      query = chunk.content;
     }
     return query.trim();
   }

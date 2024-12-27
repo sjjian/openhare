@@ -81,4 +81,74 @@ void main() {
     expect(s.subString(Pos(15, 0, 0), Pos(14, 0, 0)), "");
     expect(s.subString(Pos(4, 0, 0), Pos(3, 0, 0)), "");
   });
+
+  test('test line and row', () {
+    Scanner s =
+        Scanner("test line 1\ntest line 2\rtest line 3\r\ntest line 4\r");
+
+    expect(s.curChar(), "t".codeUnitAt(0));
+    expect(s.pos.line, 1);
+    expect(s.pos.row, 1);
+    expect(s.pos.cursor, 0);
+
+    s.next();
+    expect(s.curChar(), "e".codeUnitAt(0));
+    expect(s.pos.line, 1);
+    expect(s.pos.row, 2);
+    expect(s.pos.cursor, 1);
+
+    s.nextN(9);
+    expect(s.curChar(), "1".codeUnitAt(0));
+    expect(s.pos.line, 1);
+    expect(s.pos.row, 11);
+    expect(s.pos.cursor, 10);
+
+    s.next();
+    expect(s.curChar(), "\n".codeUnitAt(0));
+    expect(s.pos.line, 1);
+    expect(s.pos.row, 12);
+    expect(s.pos.cursor, 11);
+
+    s.next();
+    expect(s.curChar(), "t".codeUnitAt(0));
+    expect(s.pos.line, 2);
+    expect(s.pos.row, 1);
+    expect(s.pos.cursor, 12);
+
+    s.nextN(10);
+    expect(s.curChar(), "2".codeUnitAt(0));
+    expect(s.pos.line, 2);
+    expect(s.pos.row, 11);
+    expect(s.pos.cursor, 22);
+
+    s.next();
+    expect(s.curChar(), "\r".codeUnitAt(0));
+    expect(s.pos.line, 2);
+    expect(s.pos.row, 12);
+    expect(s.pos.cursor, 23);
+
+    s.next();
+    expect(s.curChar(), "t".codeUnitAt(0));
+    expect(s.pos.line, 3);
+    expect(s.pos.row, 1);
+    expect(s.pos.cursor, 24);
+
+    s.nextN(11);
+    expect(s.curChar(), "\r".codeUnitAt(0));
+    expect(s.pos.line, 3);
+    expect(s.pos.row, 12);
+    expect(s.pos.cursor, 35);
+
+    s.next();
+    expect(s.curChar(), "\n".codeUnitAt(0));
+    expect(s.pos.line, 3);
+    expect(s.pos.row, 13);
+    expect(s.pos.cursor, 36);
+
+    s.next();
+    expect(s.curChar(), "t".codeUnitAt(0));
+    expect(s.pos.line, 4);
+    expect(s.pos.row, 1);
+    expect(s.pos.cursor, 37);
+  });
 }
