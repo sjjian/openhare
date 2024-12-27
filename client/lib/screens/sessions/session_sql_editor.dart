@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:common/parser.dart';
 import 'package:re_editor/re_editor.dart';
-import 'package:re_highlight/languages/dart.dart';
+import 'package:re_highlight/languages/sql.dart';
 import 'dart:math';
 
 class SQLEditor extends StatefulWidget {
@@ -42,18 +41,7 @@ class _SqlFieldState extends State<SqlField> {
         );
       },
       promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
-        language: langDart,
-        directPrompts: const [
-          CodeFieldPrompt(word: 'foo', type: 'String'),
-          CodeFieldPrompt(word: 'bar', type: 'String'),
-          CodeFunctionPrompt(word: 'hello', type: 'void', parameters: {
-            'value': 'String',
-          })
-        ],
-        relatedPrompts: {
-          'foo': _kStringPrompts,
-          'bar': _kStringPrompts,
-        },
+        language: langSql,
       ),
       child: CodeEditor(
         style: CodeEditorStyle(
@@ -76,47 +64,8 @@ class _SqlFieldState extends State<SqlField> {
         controller: widget.codeController,
       ),
     );
-    // return TextField(
-    //   controller: widget.codeController,
-    //   expands: true,
-    //   maxLines: null,
-    //   minLines: null,
-    //   decoration: const InputDecoration(
-    //     disabledBorder: InputBorder.none,
-    //     border: InputBorder.none,
-    //     focusedBorder: InputBorder.none,
-    //   )
-    // );
   }
 }
-
-const List<CodePrompt> _kStringPrompts = [
-  CodeFieldPrompt(word: 'length', type: 'int'),
-  CodeFieldPrompt(word: 'isEmpty', type: 'bool'),
-  CodeFieldPrompt(word: 'isNotEmpty', type: 'bool'),
-  CodeFieldPrompt(word: 'characters', type: 'Characters'),
-  CodeFieldPrompt(word: 'hashCode', type: 'int'),
-  CodeFieldPrompt(word: 'codeUnits', type: 'List<int>'),
-  CodeFieldPrompt(word: 'runes', type: 'Runes'),
-  CodeFunctionPrompt(
-      word: 'codeUnitAt', type: 'int', parameters: {'index': 'int'}),
-  CodeFunctionPrompt(word: 'replaceAll', type: 'String', parameters: {
-    'from': 'Pattern',
-    'replace': 'String',
-  }),
-  CodeFunctionPrompt(word: 'contains', type: 'bool', parameters: {
-    'other': 'String',
-  }),
-  CodeFunctionPrompt(word: 'split', type: 'List<String>', parameters: {
-    'pattern': 'Pattern',
-  }),
-  CodeFunctionPrompt(word: 'endsWith', type: 'bool', parameters: {
-    'other': 'String',
-  }),
-  CodeFunctionPrompt(word: 'startsWith', type: 'bool', parameters: {
-    'other': 'String',
-  })
-];
 
 class _DefaultCodeAutocompleteListView extends StatefulWidget
     implements PreferredSizeWidget {
