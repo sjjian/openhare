@@ -45,7 +45,8 @@ dependencies:
   flutter_fancy_tree_view: ^1.6.0
   flutter_breadcrumb: ^1.0.1
   google_fonts: ^6.2.1
-  re_editor: ^0.6.0
+  re_editor:
+    path:  ../sql-editor/
   common:
     path: ../common/
 

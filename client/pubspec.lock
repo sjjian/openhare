@@ -682,10 +682,9 @@ packages:
   re_editor:
     dependency: "direct main"
     description:
-      name: re_editor
-      sha256: "2169c114c7877bcaae72d6e8b69cdaa2a9cded69a51e3cf26209dad4a3ed2b9c"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../sql-editor"
+      relative: true
+    source: path
     version: "0.6.0"
   re_highlight:
     dependency: transitive
