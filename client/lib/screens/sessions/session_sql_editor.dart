@@ -16,23 +16,6 @@ class SQLEditor extends StatefulWidget {
 class _SQLEditorState extends State<SQLEditor> {
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (ctx, c) {
-      return SqlField(codeController: widget.codeController);
-    });
-  }
-}
-
-class SqlField extends StatefulWidget {
-  final CodeLineEditingController codeController;
-  const SqlField({Key? key, required this.codeController}) : super(key: key);
-
-  @override
-  State<SqlField> createState() => _SqlFieldState();
-}
-
-class _SqlFieldState extends State<SqlField> {
-  @override
-  Widget build(BuildContext context) {
     return CodeAutocomplete(
       viewBuilder: (context, notifier, onSelected) {
         return _DefaultCodeAutocompleteListView(
@@ -41,12 +24,16 @@ class _SqlFieldState extends State<SqlField> {
         );
       },
       promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
-        language: langSql,
-      ),
+          language: langSql,
+          keywordPrompts: <CodeKeywordPrompt>[
+            const CodeKeywordPrompt(word: "optimize_task"),
+            const CodeKeywordPrompt(word: "optimize_steps"),
+          ]),
       child: CodeEditor(
         style: CodeEditorStyle(
-          fontFamily: GoogleFonts.robotoMono().fontFamily,
-          fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
+          textStyle: GoogleFonts.robotoMono(
+              textStyle: Theme.of(context).textTheme.bodyMedium,
+              color: Theme.of(context).colorScheme.onSurface),
         ),
         indicatorBuilder:
             (context, editingController, chunkController, notifier) {
