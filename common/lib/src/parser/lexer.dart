@@ -1,6 +1,7 @@
 import "token.dart";
 import "scanner.dart";
 import "token_builder.dart";
+import 'keyword.dart';
 
 class LexerContext {
   Pos startPos;
@@ -13,12 +14,11 @@ class LexerContext {
 }
 
 class Lexer extends LexerContext {
-  static Set<String> keywords = {"select", "update", "use"};
 
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
     EOFTokenBuilder(),
     SpaceTokenBuilder(),
-    KeyWordTokenBuilder(Lexer.keywords),
+    KeyWordTokenBuilder(keywords),
     SingleQValueTokenBuilder(),
     DoubleQValueTokenBuilder(),
     BackQValueTokenBuilder(),

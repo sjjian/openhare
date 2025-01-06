@@ -1,8 +1,10 @@
+import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
-import 'package:re_highlight/languages/sql.dart';
 import 'dart:math';
+import 'package:common/parser.dart';
 
 class SQLEditor extends StatefulWidget {
   final CodeLineEditingController codeController;
@@ -16,6 +18,8 @@ class SQLEditor extends StatefulWidget {
 class _SQLEditorState extends State<SQLEditor> {
   @override
   Widget build(BuildContext context) {
+    SessionProvider sessionProvider =
+        Provider.of<SessionProvider>(context, listen: false);
     return CodeAutocomplete(
       viewBuilder: (context, notifier, onSelected) {
         return _DefaultCodeAutocompleteListView(
@@ -24,11 +28,12 @@ class _SQLEditorState extends State<SQLEditor> {
         );
       },
       promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
-          language: langSql,
-          keywordPrompts: <CodeKeywordPrompt>[
-            const CodeKeywordPrompt(word: "optimize_task"),
-            const CodeKeywordPrompt(word: "optimize_steps"),
-          ]),
+        keywordPrompts: <CodeKeywordPrompt>[
+          for (final keyword in keywords) CodeKeywordPrompt(word: keyword),
+          for (final keyword in sessionProvider.getMetadataKey())
+            CodeKeywordPrompt(word: keyword),
+        ],
+      ),
       child: CodeEditor(
         style: CodeEditorStyle(
           textStyle: GoogleFonts.robotoMono(

@@ -307,6 +307,30 @@ class SessionProvider with ChangeNotifier {
     return null;
   }
 
+  List<String> getMetadataKey() {
+    List<String> keys = List.empty(growable: true);
+    if (session!.metadata == null) {
+      return keys;
+    }
+    for (var schemaMeta in session!.metadata!) {
+      keys.add(schemaMeta.name);
+      for (var tableMeta in schemaMeta.tables) {
+        keys.add(tableMeta.name);
+        if (tableMeta.columns != null) {
+          for (var column in tableMeta.columns!) {
+            keys.add(column.name);
+          }
+        }
+        if (tableMeta.keys != null) {
+          for (var index in tableMeta.keys!) {
+            keys.add(index.name);
+          }
+        }
+      }
+    }
+    return keys;
+  }
+
   CodeLineEditingController getSQLEditCode() => _session!.code;
 
   void showRightPage() {
