@@ -25,6 +25,7 @@ class SessionListProvider with ChangeNotifier {
         notifyListeners();
         if (session == sessionProvider._session) {
           sessionProvider.update(session);
+          sessionProvider.loadMetadata();
         }
         return;
       }
@@ -240,6 +241,10 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  String? getCurrentSchema(){
+    return session!.conn!.currentSchema;
+  }
+
   Future<List<String>> getSchemas() async {
     List<String> schemas = await session!.conn!.schemas();
     return schemas;
@@ -256,7 +261,16 @@ class SessionProvider with ChangeNotifier {
       metadata.add(schemaMeta);
       List<String> tables = await session!.conn!.getTables(schema);
       for (var table in tables) {
-        schemaMeta.tables.add(TableMeta(table));
+        TableMeta tableMeta = TableMeta(table);
+        schemaMeta.tables.add(tableMeta);
+        // todo: 一次性获取所有表信息
+        List<TableColumnMeta> columns =
+            await session!.conn!.getTableColumns(schema, table);
+        tableMeta.columns = columns;
+
+        List<TableKeyMeta> keys =
+            await session!.conn!.getTableKeys(schema, table);
+        tableMeta.keys = keys;
       }
     }
     session!.metadata = metadata;
@@ -268,29 +282,6 @@ class SessionProvider with ChangeNotifier {
       return null;
     }
     return session!.metadata;
-  }
-
-  Future<void> loadTableMeta(String schema, String table) async {
-    // todo: 使用map
-    for (var schemaMeta in session!.metadata!) {
-      if (schemaMeta.name == schema) {
-        for (var tableMeta in schemaMeta.tables) {
-          if (tableMeta.name == table) {
-            if (tableMeta.columns != null) {
-              return;
-            }
-            List<TableColumnMeta> columns =
-                await session!.conn!.getTableColumns(schema, table);
-            tableMeta.columns = columns;
-
-            List<TableKeyMeta> keys =
-                await session!.conn!.getTableKeys(schema, table);
-            tableMeta.keys = keys;
-            notifyListeners();
-          }
-        }
-      }
-    }
   }
 
   TableMeta? getTableMeta(String schema, String table) {
