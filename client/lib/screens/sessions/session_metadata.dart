@@ -71,9 +71,9 @@ class _SessionMetadataState extends State<SessionMetadata> {
             builder: (context, node) {
               return InkWell(
                 onTap: () {
-                  SessionProvider sessionProvider =
-                      Provider.of<SessionProvider>(context, listen: false);
-                  sessionProvider.loadTableMeta(schema.name, table.name);
+                  // SessionProvider sessionProvider =
+                  //     Provider.of<SessionProvider>(context, listen: false);
+                  // sessionProvider.loadTableMeta(schema.name, table.name);
                   widget.controller.openTable(schema.name, table.name);
                 },
                 child: Text(
@@ -91,10 +91,6 @@ class _SessionMetadataState extends State<SessionMetadata> {
 
   @override
   Widget build(BuildContext context) {
-    SessionProvider sessionProvider =
-        Provider.of<SessionProvider>(context, listen: false);
-    sessionProvider.loadMetadata();
-
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {

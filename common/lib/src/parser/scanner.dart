@@ -1,7 +1,9 @@
+import "character.dart";
+
 class Pos {
-  int cursor = 0; // 记录偏移值，对应字符串文本的数组下标
+  int cursor = 0; // 记录偏移值，对应字符串文本的数组下标, 从0开始
   int line = 1; // 记录偏移的行数
-  int row = 0; // 记录当前行的偏移值
+  int row = 1; // 记录当前行的真实位置, 非下标.
 
   Pos.init();
 
@@ -11,16 +13,6 @@ class Pos {
 
   Pos copy() {
     return Pos(cursor, line, row);
-  }
-
-  offset(int length) {
-    cursor += length;
-    row += length;
-  }
-
-  newline() {
-    line++;
-    row = 0;
   }
 }
 
@@ -38,18 +30,37 @@ class Scanner {
     return pos.cursor + count <= length - 1;
   }
 
-  bool nextN(int count) {
-    var yes = hasNextN(count);
-    if (yes) pos.offset(count);
-    return yes;
-  }
-
   bool hasNext() {
     return hasNextN(1);
   }
 
+  void _next() {
+    // 当前字符为 \n 换行, 当前字符为 \r 换行, 如果后面两个字符为 \r\n 时则下一个字符\r不换行, 等到下下个字符\n时换行.
+    if (curChar() == Char.$n ||
+        (curChar() == Char.$r && nextChar() != Char.$n)) {
+      pos.line++;
+      pos.row = 1;
+    } else {
+      pos.row++;
+    }
+    pos.cursor++;
+  }
+
+  bool nextN(int count) {
+    if (!hasNextN(count)) return false;
+    for (int i = 0; i < count; i++) {
+      _next();
+    }
+    return true;
+  }
+
   bool next() {
-    return nextN(1);
+    if (hasNextN(1)) {
+      _next();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   int curChar() {
