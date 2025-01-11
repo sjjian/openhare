@@ -14,7 +14,6 @@ class LexerContext {
 }
 
 class Lexer extends LexerContext {
-
   static TokenBuilder builder = TokenRooter(<TokenBuilder>[
     EOFTokenBuilder(),
     SpaceTokenBuilder(),
@@ -41,6 +40,13 @@ class Lexer extends LexerContext {
     // 如果scanner next 失败, 则代表已经偏移结束了
     scanner.next() ? startPos = scanner.pos : eof = true;
     return token;
+  }
+
+  Iterable<Token> tokens({bool trim = true}) sync* {
+    while (!eof) {
+      Token token = scan();
+      yield token;
+    }
   }
 
   Token? scanWhere(bool Function(Token token) check) {
