@@ -81,7 +81,7 @@ class KeyWordTokenBuilder extends IdentTokenBuilder {
     if (match &&
         keywords.contains(ctx.scanner
             .subString(ctx.startPos, ctx.scanner.pos)
-            .toLowerCase())) {
+            .toUpperCase())) {
       return (match, TokenType.keyword);
     }
     return (match, tok);
