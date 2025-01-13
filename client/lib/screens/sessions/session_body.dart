@@ -1,5 +1,6 @@
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/sessions/session_metadata.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
+import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_sql_results.dart';
@@ -47,7 +48,7 @@ class SessionBodyPage extends StatelessWidget {
                       controller:
                           sessionProvider.session!.metaDataSplitViewCtrl,
                       first: left,
-                      second: SessionMetadata(
+                      second: SessionDrawerBody(
                         controller:
                             sessionProvider.session!.metadataController, //todo
                       ),

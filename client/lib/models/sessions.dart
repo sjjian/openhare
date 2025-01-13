@@ -1,7 +1,7 @@
 import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/sql.dart';
 import 'package:client/models/sql_result.dart';
-import 'package:client/screens/sessions/session_metadata.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/split_view.dart';
@@ -25,7 +25,7 @@ class SessionModel {
 
   List<SchemaMeta>? metadata;
 
-  MetadataController metadataController = MetadataController();
+  SessionDrawerController metadataController = SessionDrawerController();
 
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 

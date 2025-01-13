@@ -36,7 +36,10 @@ class _SqlResultTableState extends State<SqlResultTable> {
       if (result.state == SQLExecuteState.done) {
         return PlutoGrid(
           key: ObjectKey(result),
-          mode: PlutoGridMode.readOnly,
+          mode: PlutoGridMode.selectWithOneTap,
+          onSelected: (event) {
+            print(event.cell!.value!);
+          },
           configuration: PlutoGridConfiguration(
             localeText: const PlutoGridLocaleText.china(),
             style: PlutoGridStyleConfig(

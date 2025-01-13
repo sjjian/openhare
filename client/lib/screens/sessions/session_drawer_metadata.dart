@@ -1,52 +1,18 @@
 import 'package:client/core/connection/metadata.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
-class MetadataController extends ChangeNotifier {
-  String page = "tree";
-  String? currentSchema;
-  String? currentTable;
+class SessionDrawerMetadata extends StatelessWidget {
+  final SessionDrawerController controller;
 
-  MetadataController();
+  const SessionDrawerMetadata({Key? key, required this.controller})
+      : super(key: key);
 
-  void goToTree() {
-    page = "tree";
-    notifyListeners();
-  }
-
-  void openTable(String schema, String table) {
-    page = "table";
-    currentSchema = schema;
-    currentTable = table;
-    notifyListeners();
-  }
-}
-
-class SessionMetadata extends StatefulWidget {
-  final MetadataController controller;
-
-  const SessionMetadata({Key? key, required this.controller}) : super(key: key);
-
-  @override
-  State<SessionMetadata> createState() => _SessionMetadataState();
-}
-
-class _SessionMetadataState extends State<SessionMetadata> {
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(() => mounted ? setState(() {}) : null);
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(() {});
-    super.dispose();
-  }
-
+  // @override
   List<DataNode> buildMetadataTree(List<SchemaMeta> metadata) {
     List<DataNode> root = List<DataNode>.empty(growable: true);
     for (var schema in metadata) {
@@ -71,10 +37,8 @@ class _SessionMetadataState extends State<SessionMetadata> {
             builder: (context, node) {
               return InkWell(
                 onTap: () {
-                  // SessionProvider sessionProvider =
-                  //     Provider.of<SessionProvider>(context, listen: false);
-                  // sessionProvider.loadTableMeta(schema.name, table.name);
-                  widget.controller.openTable(schema.name, table.name);
+                  print(11111111);
+                  controller.openTable(schema.name, table.name);
                 },
                 child: Text(
                   node.value,
@@ -102,49 +66,82 @@ class _SessionMetadataState extends State<SessionMetadata> {
             child: CircularProgressIndicator(),
           ),
         );
-        if (widget.controller.page == "tree") {
-          List<SchemaMeta>? meta = sessionProvider.getMetadata();
-          if (meta != null) {
-            body = DataTree(roots: buildMetadataTree(meta));
-          }
-        } else {
-          TableMeta? tableMeta = sessionProvider.getTableMeta(
-              widget.controller.currentSchema!,
-              widget.controller.currentTable!);
-          if (TableMeta.initialized(tableMeta)) {
-            body = SessionMetadataDetail(
-              tableMeta: tableMeta!,
-              schema: widget.controller.currentSchema!,
-              table: widget.controller.currentTable!,
-              controller: widget.controller,
-            );
-          }
+
+        List<SchemaMeta>? meta = sessionProvider.getMetadata();
+        if (meta != null) {
+          body = DataTree(roots: buildMetadataTree(meta));
         }
-        return Expanded(
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SessionMetadataTitle(controller: widget.controller),
-                  const Divider(
-                    endIndent: 10,
-                  ),
-                  Expanded(child: body),
-                ]),
-          ),
-        );
+
+        return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SessionMetadataTitle(controller: controller),
+              const Divider(
+                endIndent: 10,
+              ),
+              Expanded(child: body),
+            ]);
       }),
     );
   }
 }
 
-class SessionMetadataTitle extends StatelessWidget {
-  final MetadataController controller;
+class SessionDrawerMetadataDetail extends StatelessWidget {
+  final SessionDrawerController controller;
+
+  const SessionDrawerMetadataDetail({Key? key, required this.controller})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+        Widget body = const Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            height: 40,
+            width: 40,
+            child: CircularProgressIndicator(),
+          ),
+        );
+        TableMeta? tableMeta = sessionProvider.getTableMeta(
+            controller.currentSchema!, controller.currentTable!);
+        if (TableMeta.initialized(tableMeta)) {
+          body = ListView(children: [
+            for (final column in tableMeta!.columns!)
+              SessionMetadataColumn(
+                column: column,
+                keys: tableMeta.getKeysByColumn(column.name),
+              ),
+          ]);
+        }
+        return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SessionMetadataTitle(controller: controller),
+              const Divider(
+                endIndent: 10,
+              ),
+              Expanded(child: body),
+            ]);
+      }),
+    );
+  }
+}
+
+class SessionMetadataTitle extends StatefulWidget {
+  final SessionDrawerController controller;
   const SessionMetadataTitle({Key? key, required this.controller})
       : super(key: key);
 
+  @override
+  State<SessionMetadataTitle> createState() => _SessionMetadataTitleState();
+}
+
+class _SessionMetadataTitleState extends State<SessionMetadataTitle> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -157,27 +154,27 @@ class SessionMetadataTitle extends StatelessWidget {
               BreadCrumbItem(
                   content: IconButton(
                       onPressed: () {
-                        controller.goToTree();
+                        widget.controller.goToTree();
                       },
                       icon: const Icon(Icons.home))),
-              if (controller.page != "tree")
+              if (widget.controller.page != DrawerPage.metadataTree)
                 BreadCrumbItem(
                     content: Container(
                   constraints: BoxConstraints(maxWidth: width / 2),
                   child: Text(
-                    controller.currentSchema!,
+                    widget.controller.currentSchema!,
                     style: Theme.of(context).textTheme.titleMedium,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                   ),
                 )),
-              if (controller.page != "tree")
+              if (widget.controller.page != DrawerPage.metadataTree)
                 BreadCrumbItem(
                     content: Expanded(
                   child: Container(
                     constraints: BoxConstraints(maxWidth: width / 2),
                     child: Text(
-                      controller.currentTable!,
+                      widget.controller.currentTable!,
                       style: Theme.of(context).textTheme.titleMedium,
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
@@ -190,37 +187,6 @@ class SessionMetadataTitle extends StatelessWidget {
         },
       ),
     );
-  }
-}
-
-class SessionMetadataDetail extends StatefulWidget {
-  final String schema;
-  final String table;
-  final TableMeta tableMeta;
-  final MetadataController controller;
-
-  const SessionMetadataDetail(
-      {Key? key,
-      required this.schema,
-      required this.table,
-      required this.tableMeta,
-      required this.controller})
-      : super(key: key);
-
-  @override
-  State<SessionMetadataDetail> createState() => _SessionDrawerStateDetail();
-}
-
-class _SessionDrawerStateDetail extends State<SessionMetadataDetail> {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(children: [
-      for (final column in widget.tableMeta.columns!)
-        SessionMetadataColumn(
-          column: column,
-          keys: widget.tableMeta.getKeysByColumn(column.name),
-        ),
-    ]);
   }
 }
 
@@ -302,7 +268,11 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
                 },
                 title: Row(
                   children: [
-                     Expanded(child: Text(widget.column.name, overflow: TextOverflow.ellipsis,)),
+                    Expanded(
+                        child: Text(
+                      widget.column.name,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                     if (widget.column.key != "") const Icon(Icons.key)
                   ],
                 ),
