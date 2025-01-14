@@ -110,16 +110,13 @@ class SessionOpBar extends StatelessWidget {
                 disable: canQuery ? false : true,
                 currentSchema: sessionProvider.session!.conn!.currentSchema),
             const Expanded(child: Spacer()),
-            IconButton(
-              onPressed: () {
-                sessionProvider.isRightPageOpen
-                    ? sessionProvider.hideRightPage()
-                    : sessionProvider.showRightPage();
-              },
-              icon: sessionProvider.isRightPageOpen
-                  ? const Icon(Icons.format_indent_increase)
-                  : const Icon(Icons.format_indent_decrease),
-            )
+            if (sessionProvider.isRightPageOpen == false)
+              IconButton(
+                onPressed: () {
+                  sessionProvider.showRightPage();
+                },
+                icon: const Icon(Icons.format_indent_decrease),
+              )
           ],
         );
       }),

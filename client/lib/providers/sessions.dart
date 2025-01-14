@@ -85,8 +85,6 @@ class SessionProvider with ChangeNotifier {
   bool showRecord = true;
   bool isRightPageOpen = true;
 
-  String drawerPage = "tree";
-
   SessionProvider(this._session);
 
   void update(SessionModel? session) {

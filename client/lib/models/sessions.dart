@@ -33,7 +33,7 @@ class SessionModel {
       SplitViewController(Area(), Area(min: 35, size: 500));
 
   final SplitViewController metaDataSplitViewCtrl =
-      SplitViewController(Area(min: 400), Area(size: 400, min: 400));
+      SplitViewController(Area(flex: 7, min:3), Area(flex: 3, min: 3));
 
   CodeLineEditingController code = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {

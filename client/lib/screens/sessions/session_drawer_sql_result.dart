@@ -8,8 +8,6 @@ const SessionDrawerSqlResult({ Key? key, required this.controller }) : super(key
 
   @override
   Widget build(BuildContext context){
-    return Container(
-      child: Text(controller.sqlResult!),
-    );
+    return Text(controller.sqlResult??"");
   }
 }

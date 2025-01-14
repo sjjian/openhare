@@ -19,11 +19,12 @@ class SessionBodyPage extends StatelessWidget {
           color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(10)),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        const double codeButtonHeight = 36;
 
         final Widget left = Expanded(
           child: Column(
             children: [
+              SessionOpBar(
+                  codeController: sessionProvider.getSQLEditCode()),
               SplitView(
                 controller: sessionProvider.session!.multiSplitViewCtrl,
                 axis: Axis.vertical,
@@ -35,28 +36,19 @@ class SessionBodyPage extends StatelessWidget {
             ],
           ),
         );
-
-        return Column(
-          children: [
-            SessionOpBar(
-                codeController: sessionProvider.getSQLEditCode(),
-                height: codeButtonHeight),
-            sessionProvider.isRightPageOpen
-                ? Expanded(
-                    child: SplitView(
-                      axis: Axis.horizontal,
-                      controller:
-                          sessionProvider.session!.metaDataSplitViewCtrl,
-                      first: left,
-                      second: SessionDrawerBody(
-                        controller:
-                            sessionProvider.session!.metadataController, //todo
-                      ),
-                    ),
-                  )
-                : left,
-          ],
-        );
+        return sessionProvider.isRightPageOpen
+            ? Expanded(
+                child: SplitView(
+                  axis: Axis.horizontal,
+                  controller: sessionProvider.session!.metaDataSplitViewCtrl,
+                  first: left,
+                  second: SessionDrawerBody(
+                    controller:
+                        sessionProvider.session!.metadataController, //todo
+                  ),
+                ),
+              )
+            : left;
       }),
     );
   }

@@ -128,7 +128,7 @@ class _SqlResultTableState extends State<SqlResultTable> {
           mode: PlutoGridMode.selectWithOneTap,
           onSelected: (event) {
             print(event.cell!.value!);
-            sessionProvider.session!.metadataController.showSQLResult(event.cell!.value!);
+            sessionProvider.session!.metadataController.showSQLResult(result:  event.cell!.value);
           },
           configuration: PlutoGridConfiguration(
             localeText: const PlutoGridLocaleText.china(),
