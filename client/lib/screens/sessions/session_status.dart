@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:client/providers/sessions.dart';
@@ -37,7 +39,25 @@ class SessionStatus extends StatelessWidget {
                       child: Text(
                           "query: ${result.query.trimLeft().split("\n")[0]}",
                           overflow: TextOverflow.ellipsis)),
-                )
+                ),
+                const Text("  |  "),
+                IconButton(
+                    onPressed: () async {
+                      String? outputFile = await FilePicker.platform.saveFile(
+                        dialogTitle: 'Please select an output file:',
+                        fileName: 'output-file.txt',
+                      );
+                      if (outputFile == null) {
+                        return;
+                        // User canceled the picker
+                      }
+                      File file = File(outputFile);
+                      await file.writeAsString("test for download");
+                    },
+                    icon: const Icon(
+                      Icons.download_rounded,
+                      color: Colors.green,
+                    ))
               ],
             ),
           );
