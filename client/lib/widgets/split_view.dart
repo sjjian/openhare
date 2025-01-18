@@ -52,6 +52,6 @@ class SplitView extends StatelessWidget {
       ),
       child: mv,
     );
-    return Expanded(child: theme);
+    return theme;
   }
 }
