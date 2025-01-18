@@ -1,4 +1,4 @@
-import 'package:mysql_client/mysql_client.dart';
+import 'package:client/core/connection/result_set.dart';
 
 enum MetaType { schema, table }
 
@@ -80,16 +80,16 @@ class TableColumnMeta {
   */
 
   TableColumnMeta.loadFromRow(ResultSetRow row)
-      : name = row.colByName("COLUMN_NAME")!,
-        dataType = TableColumnMeta.getDataType(row.colByName("DATA_TYPE")!),
-        columnType = row.colByName("COLUMN_TYPE")!,
-        isNull = row.colByName("IS_NULLABLE")!,
-        defaultValue = row.colByName("COLUMN_DEFAULT"),
-        key = row.colByName("COLUMN_KEY"),
-        comment = row.colByName("COLUMN_COMMENT"),
-        characterSetName = row.colByName("CHARACTER_SET_NAME"),
-        collationName = row.colByName("COLLATION_NAME"),
-        extra = row.colByName("Extra");
+      : name = row.getString("COLUMN_NAME")!,
+        dataType = TableColumnMeta.getDataType(row.getString("DATA_TYPE")!),
+        columnType = row.getString("COLUMN_TYPE")!,
+        isNull = row.getString("IS_NULLABLE")!,
+        defaultValue = row.getString("COLUMN_DEFAULT"),
+        key = row.getString("COLUMN_KEY"),
+        comment = row.getString("COLUMN_COMMENT"),
+        characterSetName = row.getString("CHARACTER_SET_NAME"),
+        collationName = row.getString("COLLATION_NAME"),
+        extra = row.getString("Extra");
 
   static List<String> getDataTableColumn() {
     return ["COLUMN_NAME", "DATA_TYPE", "Null", "Key", "Default", "Extra"];
@@ -135,6 +135,6 @@ class TableKeyMeta {
   TableKeyMeta(this.name, this.columns);
 
   TableKeyMeta.loadFromRow(ResultSetRow row)
-      : name = row.colByName("INDEX_NAME")!,
-        columns = row.colByName("COLUMNS")!.split(";");
+      : name = row.getString("INDEX_NAME")!,
+        columns = row.getString("COLUMNS")!.split(";");
 }

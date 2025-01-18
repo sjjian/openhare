@@ -2,6 +2,7 @@ import 'package:client/core/connection/metadata.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/widgets/data_tree.dart';
+import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
@@ -37,7 +38,6 @@ class SessionDrawerMetadata extends StatelessWidget {
             builder: (context, node) {
               return InkWell(
                 onTap: () {
-                  print(11111111);
                   controller.openTable(schema.name, table.name);
                 },
                 child: Text(
@@ -243,29 +243,7 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           child: Column(
             children: [
               ListTile(
-                leading: switch (widget.column.dataType) {
-                  DataType.number => const Icon(
-                      Icons.onetwothree,
-                      color: Colors.teal,
-                    ),
-                  DataType.char => const Icon(
-                      Icons.abc,
-                      color: Colors.blueAccent,
-                    ),
-                  DataType.time => const Icon(
-                      Icons.access_time,
-                      color: Colors.deepPurple,
-                    ),
-                  DataType.blob => const Icon(
-                      Icons.insert_drive_file_outlined,
-                      color: Colors.black87,
-                    ),
-                  DataType.json => const Icon(
-                      Icons.data_object,
-                      color: Colors.orangeAccent,
-                    ),
-                  _ => const Icon(Icons.question_mark)
-                },
+                leading: DataTypeIcon(type: widget.column.dataType),
                 title: Row(
                   children: [
                     Expanded(

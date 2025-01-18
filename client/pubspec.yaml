@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   multi_split_view: ^3.6.0
   mysql_client: ^0.0.27
+  mysql1: ^0.20.0
   quiver: ^3.2.1
   go_router: ^13.2.4
   path_provider: ^2.1.3
@@ -46,6 +47,7 @@ dependencies:
   flutter_breadcrumb: ^1.0.1
   google_fonts: ^6.2.1
   file_picker: ^8.1.7
+  excel: ^4.0.6
   re_editor:
     path:  ../sql-editor/
   common:

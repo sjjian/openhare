@@ -25,8 +25,8 @@ class SessionStatus extends StatelessWidget {
             child: Row(
               children: [
                 Tooltip(
-                    message: 'effect rows: ${result.effectRows}',
-                    child: Text('effect rows: ${result.effectRows}')),
+                    message: 'effect rows: ${result.resultSet!.affectedRows}',
+                    child: Text('effect rows: ${result.resultSet!.affectedRows}')),
                 const Text("  |  "),
                 Tooltip(
                     message: 'duration: ${result.executeTime!.format()}',
@@ -45,14 +45,13 @@ class SessionStatus extends StatelessWidget {
                     onPressed: () async {
                       String? outputFile = await FilePicker.platform.saveFile(
                         dialogTitle: 'Please select an output file:',
-                        fileName: 'output-file.txt',
+                        fileName: '${sessionProvider.session!.conn!.instance.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
                       );
                       if (outputFile == null) {
                         return;
-                        // User canceled the picker
                       }
                       File file = File(outputFile);
-                      await file.writeAsString("test for download");
+                      await file.writeAsBytes(result.toExcel().save()!);
                     },
                     icon: const Icon(
                       Icons.download_rounded,

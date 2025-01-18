@@ -1,4 +1,5 @@
-import 'package:pluto_grid/pluto_grid.dart';
+import 'package:client/core/connection/result_set.dart';
+import 'package:excel/excel.dart';
 
 enum SQLExecuteState { executing, done, error }
 
@@ -7,23 +8,33 @@ class SQLResultModel {
   SQLExecuteState state = SQLExecuteState.executing;
   String query;
   Exception? error;
-  List<PlutoColumn>? columns;
-  List<PlutoRow>? rows;
-  BigInt? effectRows;
+  ResultSet? resultSet;
   Duration? executeTime;
 
   SQLResultModel(this.id, this.query);
 
-  void setDone(columns, rows, effectRows, executeTime) {
+  void setDone(ResultSet resultSet, executeTime) {
     state = SQLExecuteState.done;
-    this.columns = columns;
-    this.rows = rows;
-    this.effectRows = effectRows;
+    this.resultSet = resultSet;
     this.executeTime = executeTime;
   }
 
   void setError(error) {
     state = SQLExecuteState.error;
     this.error = error;
+  }
+
+  Excel toExcel() {
+    Excel excel = Excel.createExcel();
+    Sheet sheet = excel["Sheet1"];
+    sheet.appendRow(resultSet!.columns
+        .map<TextCellValue>((e) => TextCellValue(e.name))
+        .toList());
+    for (final row in resultSet!.rows) {
+      sheet.appendRow(row.cells
+          .map<TextCellValue>((e) => TextCellValue(e.toString()))
+          .toList());
+    }
+    return excel;
   }
 }
