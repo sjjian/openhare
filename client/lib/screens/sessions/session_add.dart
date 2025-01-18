@@ -63,7 +63,7 @@ class _AddSessionState extends State<AddSession> {
       child: Row(
         children: [
           Container(
-            width: 800,
+            width: 900,
             constraints: const BoxConstraints(minWidth: 800),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +102,10 @@ class _AddSessionState extends State<AddSession> {
                                 onPressed: () {
                                   addSession(context, inst);
                                 },
-                                child: Text(inst.name)),
+                                child: Text(
+                                  inst.name,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                           ],
                         ),
                       ),
@@ -114,7 +117,7 @@ class _AddSessionState extends State<AddSession> {
                           onPressed: () {
                             addSession(context, inst, schema: schema);
                           },
-                          child: Text(schema),
+                          child: Text(schema, overflow: TextOverflow.ellipsis),
                         )
                     ],
                   ),
@@ -186,7 +189,8 @@ class _AddSessionState extends State<AddSession> {
                                 onPressed: () {
                                   addSession(context, inst);
                                 },
-                                child: Text(inst.name)),
+                                child: Text(inst.name,
+                                    overflow: TextOverflow.ellipsis)),
                           ],
                         ),
                       ),
@@ -195,7 +199,8 @@ class _AddSessionState extends State<AddSession> {
                         width: 200,
                         child: Row(
                           children: [
-                            Text("${inst.addr}:${inst.port}"),
+                            Text("${inst.addr}:${inst.port}",
+                                overflow: TextOverflow.ellipsis),
                           ],
                         ),
                       ),
