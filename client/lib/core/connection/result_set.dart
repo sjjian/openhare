@@ -26,8 +26,12 @@ class ResultSetRow {
   ResultSetRow(this.cells);
 
   String? getString(String column) {
+    return getValue(column)?.asString();
+  }
+
+  ResultSetValue? getValue(String column) {
     for (final c in cells) {
-      if (c.column.name == column) return c.value.asString();
+      if (c.column.name == column) return c.value;
     }
     return null;
   }
@@ -46,7 +50,7 @@ class ResultSet {
 
   ResultSet(this.columns, this.rows, this.affectedRows);
 
-  String? getValue(String colunm, int line) {
-    return rows[line].getString(colunm);
+  ResultSetValue? getValue(String colunm, int line) {
+    return rows[line].getValue(colunm);
   }
 }

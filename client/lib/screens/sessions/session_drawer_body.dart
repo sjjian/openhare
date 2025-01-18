@@ -1,3 +1,4 @@
+import 'package:client/core/connection/result_set.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ class SessionDrawerController extends ChangeNotifier {
   DrawerPage page = DrawerPage.metadataTree;
   String? currentSchema;
   String? currentTable;
-  String? sqlResult;
+  ResultSetValue? sqlResult;
 
   SessionDrawerController();
 
@@ -30,7 +31,7 @@ class SessionDrawerController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void showSQLResult({String? result}) {
+  void showSQLResult({ResultSetValue? result}) {
     page = DrawerPage.sqlResult;
     sqlResult = result ?? sqlResult;
     notifyListeners();

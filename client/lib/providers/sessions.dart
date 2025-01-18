@@ -6,7 +6,7 @@ import 'package:client/models/sql_result.dart';
 import 'package:client/storages/storages.dart';
 import 'package:flutter/material.dart';
 import 'package:client/models/instances.dart';
-import 'package:re_editor/re_editor.dart';
+import 'package:sql_editor/re_editor.dart';
 
 class InitializedProvider with ChangeNotifier {}
 

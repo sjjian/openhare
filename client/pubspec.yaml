@@ -48,7 +48,9 @@ dependencies:
   google_fonts: ^6.2.1
   file_picker: ^8.1.7
   excel: ^4.0.6
-  re_editor:
+  re_editor: ^0.6.0
+  collection: ^1.19.1
+  sql_editor:
     path:  ../sql-editor/
   common:
     path: ../common/

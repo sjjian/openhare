@@ -552,7 +552,7 @@ packages:
     source: hosted
     version: "1.15.0"
   mime:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mime
       sha256: "2e123074287cc9fd6c09de8336dae606d1ddb88d9ac47358826db698c176a1f2"
@@ -746,9 +746,10 @@ packages:
   re_editor:
     dependency: "direct main"
     description:
-      path: "../sql-editor"
-      relative: true
-    source: path
+      name: re_editor
+      sha256: "2169c114c7877bcaae72d6e8b69cdaa2a9cded69a51e3cf26209dad4a3ed2b9c"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.6.0"
   re_highlight:
     dependency: transitive
@@ -851,6 +852,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  sql_editor:
+    dependency: "direct main"
+    description:
+      path: "../sql-editor"
+      relative: true
+    source: path
+    version: "0.6.0"
   stack_trace:
     dependency: transitive
     description:

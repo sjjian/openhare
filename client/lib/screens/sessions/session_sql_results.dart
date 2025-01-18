@@ -1,4 +1,3 @@
-import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/result_set.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/data_type_icon.dart';

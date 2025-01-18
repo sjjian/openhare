@@ -2,9 +2,8 @@ import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:common/parser.dart';
-// import 'package:common/src/parser/scanner.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:re_editor/re_editor.dart';
+import 'package:sql_editor/re_editor.dart';
 
 class SessionOpBar extends StatelessWidget {
   final CodeLineEditingController codeController;

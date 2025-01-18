@@ -32,7 +32,7 @@ class SQLResultModel {
         .toList());
     for (final row in resultSet!.rows) {
       sheet.appendRow(row.cells
-          .map<TextCellValue>((e) => TextCellValue(e.toString()))
+          .map<TextCellValue>((e) => TextCellValue(e.value.asString() ?? ""))
           .toList());
     }
     return excel;
