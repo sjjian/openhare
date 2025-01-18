@@ -171,7 +171,7 @@ class _InstanceTableState extends State<InstanceTable> {
                     ),
                   ),
                   TablePaginatedBar(controller: instanceTableController),
-                  const Expanded(child: Spacer()),
+                  const Spacer(),
                   Container(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
                     child: const Row(

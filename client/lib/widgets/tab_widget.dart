@@ -84,9 +84,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
                             height: widget.height,
                             style: style),
                     if (widget.addTab != null) addTabWidget,
-                    const Expanded(
-                      child: Spacer(),
-                    )
+                    const Spacer()
                   ],
                 ),
         ),
