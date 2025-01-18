@@ -21,7 +21,7 @@ class SessionsPage extends StatelessWidget {
           child:
               Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
             if (sessionProvider.initialized()) {
-              return const Expanded(child: SessionBodyPage());
+              return const SessionBodyPage();
             } else {
               return const AddSession();
             }

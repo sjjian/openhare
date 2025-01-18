@@ -18,33 +18,29 @@ class SessionBodyPage extends StatelessWidget {
           color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(10)),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-
-        final Widget left = Expanded(
-          child: Column(
-            children: [
-              SessionOpBar(
-                  codeController: sessionProvider.getSQLEditCode()),
-              SplitView(
+        final Widget left = Column(
+          children: [
+            SessionOpBar(codeController: sessionProvider.getSQLEditCode()),
+            Expanded(
+              child: SplitView(
                 controller: sessionProvider.session!.multiSplitViewCtrl,
                 axis: Axis.vertical,
                 first: SQLEditor(
                     key: ValueKey(sessionProvider.getSQLEditCode()),
                     codeController: sessionProvider.getSQLEditCode()),
-                second: const Expanded(child: SqlResultTables()),
+                second: const SqlResultTables(),
               ),
-            ],
-          ),
+            ),
+          ],
         );
         return sessionProvider.isRightPageOpen
-            ? Expanded(
-                child: SplitView(
-                  axis: Axis.horizontal,
-                  controller: sessionProvider.session!.metaDataSplitViewCtrl,
-                  first: left,
-                  second: SessionDrawerBody(
-                    controller:
-                        sessionProvider.session!.metadataController, //todo
-                  ),
+            ? SplitView(
+                axis: Axis.horizontal,
+                controller: sessionProvider.session!.metaDataSplitViewCtrl,
+                first: left,
+                second: SessionDrawerBody(
+                  controller:
+                      sessionProvider.session!.metadataController, //todo
                 ),
               )
             : left;

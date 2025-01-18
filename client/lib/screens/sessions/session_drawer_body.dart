@@ -125,7 +125,7 @@ class SessionDrawerBar extends StatelessWidget {
                         color: Theme.of(context).colorScheme.primary,
                       )
                     : const Icon(Icons.article_outlined)),
-            const Expanded(child: Spacer()),
+            const Spacer(),
             IconButton(
               onPressed: () {
                 sessionProvider.isRightPageOpen
