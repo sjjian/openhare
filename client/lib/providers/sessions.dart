@@ -1,13 +1,12 @@
 import 'package:client/core/connection/metadata.dart';
-import 'package:client/core/connection/sql.dart';
+import 'package:client/core/connection/mysql.dart';
+import 'package:client/core/connection/result_set.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/storages/storages.dart';
 import 'package:flutter/material.dart';
-import 'package:pluto_grid/pluto_grid.dart';
-import 'package:mysql_client/mysql_client.dart';
 import 'package:client/models/instances.dart';
-import 'package:re_editor/re_editor.dart';
+import 'package:sql_editor/re_editor.dart';
 
 class InitializedProvider with ChangeNotifier {}
 
@@ -84,8 +83,6 @@ class SessionProvider with ChangeNotifier {
   SessionModel? _session;
   bool showRecord = true;
   bool isRightPageOpen = true;
-
-  String drawerPage = "tree";
 
   SessionProvider(this._session);
 
@@ -205,28 +202,9 @@ class SessionProvider with ChangeNotifier {
 
     try {
       DateTime start = DateTime.now();
-      IResultSet resultSet = await _session!.conn!.execute(query);
+      ResultSet resultSet = await _session!.conn!.execute(query);
       DateTime end = DateTime.now();
-
-      List<PlutoColumn> columns = List.empty(growable: true);
-      for (final column in resultSet.cols) {
-        columns.add(PlutoColumn(
-            title: column.name,
-            field: column.name,
-            type: PlutoColumnType.text()));
-      }
-
-      List<PlutoRow> rows = List.empty(growable: true);
-      for (final result in resultSet) {
-        for (final row in result.rows) {
-          Map<String, PlutoCell> cells = row
-              .assoc()
-              .map((key, value) => MapEntry(key, PlutoCell(value: value)));
-          rows.add(PlutoRow(cells: cells));
-        }
-      }
-      result.setDone(
-          columns, rows, resultSet.affectedRows, end.difference(start));
+      result.setDone(resultSet, end.difference(start));
       _session!.state = SQLExecuteState.done;
     } catch (e) {
       result.setError(e);
@@ -241,7 +219,7 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  String? getCurrentSchema(){
+  String? getCurrentSchema() {
     return session!.conn!.currentSchema;
   }
 

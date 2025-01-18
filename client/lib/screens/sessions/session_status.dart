@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:client/providers/sessions.dart';
@@ -23,8 +25,8 @@ class SessionStatus extends StatelessWidget {
             child: Row(
               children: [
                 Tooltip(
-                    message: 'effect rows: ${result.effectRows}',
-                    child: Text('effect rows: ${result.effectRows}')),
+                    message: 'effect rows: ${result.resultSet!.affectedRows}',
+                    child: Text('effect rows: ${result.resultSet!.affectedRows}')),
                 const Text("  |  "),
                 Tooltip(
                     message: 'duration: ${result.executeTime!.format()}',
@@ -37,7 +39,24 @@ class SessionStatus extends StatelessWidget {
                       child: Text(
                           "query: ${result.query.trimLeft().split("\n")[0]}",
                           overflow: TextOverflow.ellipsis)),
-                )
+                ),
+                const Text("  |  "),
+                IconButton(
+                    onPressed: () async {
+                      String? outputFile = await FilePicker.platform.saveFile(
+                        dialogTitle: 'Please select an output file:',
+                        fileName: '${sessionProvider.session!.conn!.instance.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+                      );
+                      if (outputFile == null) {
+                        return;
+                      }
+                      File file = File(outputFile);
+                      await file.writeAsBytes(result.toExcel().save()!);
+                    },
+                    icon: const Icon(
+                      Icons.download_rounded,
+                      color: Colors.green,
+                    ))
               ],
             ),
           );

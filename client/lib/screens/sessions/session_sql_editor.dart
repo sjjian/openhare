@@ -3,7 +3,7 @@ import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:re_editor/re_editor.dart';
+import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:common/parser.dart';
 

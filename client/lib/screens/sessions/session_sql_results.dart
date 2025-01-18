@@ -1,8 +1,11 @@
+import 'package:client/core/connection/result_set.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:client/widgets/sql_result_table.dart';
 import 'package:client/widgets/tab_widget.dart';
+import 'package:client/models/sql_result.dart';
+import 'package:pluto_grid/pluto_grid.dart';
 
 class SqlResultTables extends StatefulWidget {
   const SqlResultTables({Key? key}) : super(key: key);
@@ -88,5 +91,111 @@ class _SqlResultTablesState extends State<SqlResultTables> {
         ),
       ],
     );
+  }
+}
+
+class SqlResultTable extends StatefulWidget {
+  const SqlResultTable({super.key});
+
+  @override
+  State<SqlResultTable> createState() => _SqlResultTableState();
+}
+
+class _SqlResultTableState extends State<SqlResultTable> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  List<PlutoColumn> buildColumns(List<ResultSetColumn> columns) {
+    return columns
+        .map<PlutoColumn>((e) => PlutoColumn(
+            title: e.name,
+            field: e.name,
+            type: switch (e.type) {
+              ValueType.str => PlutoColumnType.text(),
+              ValueType.number => PlutoColumnType.number(),
+              _ => PlutoColumnType.text(),
+            },
+            titleSpan: WidgetSpan(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 2),
+                    child: ValueTypeIcon(type: e.type, size: 20),
+                  ),
+                  Expanded(
+                      child: Text(e.name, overflow: TextOverflow.ellipsis)),
+                ],
+              ),
+            )))
+        .toList();
+  }
+
+  List<PlutoRow> buildRows(List<ResultSetRow> rows) {
+    return rows.map<PlutoRow>((e) {
+      return PlutoRow(cells: <String, PlutoCell>{
+        for (final v in e.cells) v.column.name: PlutoCell(value: v.value.summary())
+      });
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+      final result = sessionProvider.getCurrentSQLResult();
+      if (sessionProvider.showRecord) {
+        return Container(
+            alignment: Alignment.center,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            child: const Text('执行记录'));
+      }
+      if (result == null) {
+        return Container(
+            alignment: Alignment.center,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            child: const Text('no data'));
+      }
+      if (result.state == SQLExecuteState.done) {
+        return PlutoGrid(
+          key: ObjectKey(result),
+          mode: PlutoGridMode.selectWithOneTap,
+          onSelected: (event) {
+            sessionProvider.session!.metadataController.showSQLResult(
+                result: result.resultSet!
+                    .getValue(event.cell!.column.title, event.rowIdx!));
+          },
+          configuration: PlutoGridConfiguration(
+            localeText: const PlutoGridLocaleText.china(),
+            style: PlutoGridStyleConfig(
+              rowHeight: 30,
+              columnHeight: 36,
+              gridBorderColor:
+                  Theme.of(context).colorScheme.surfaceContainerLow,
+              rowColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+              activatedColor: Theme.of(context).colorScheme.surfaceContainerLow,
+            ),
+          ),
+          columns: buildColumns(result.resultSet!.columns),
+          rows: buildRows(result.resultSet!.rows),
+        );
+      } else if (result.state == SQLExecuteState.error) {
+        return Container(
+            alignment: Alignment.topLeft,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            child: Text('${result.error}'));
+      } else {
+        return Container(
+            alignment: Alignment.topLeft,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            child: const Center(
+              child: SizedBox(
+                height: 40,
+                width: 40,
+                child: CircularProgressIndicator(),
+              ),
+            ));
+      }
+    });
   }
 }

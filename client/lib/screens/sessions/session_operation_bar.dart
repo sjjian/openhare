@@ -2,9 +2,8 @@ import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:common/parser.dart';
-// import 'package:common/src/parser/scanner.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:re_editor/re_editor.dart';
+import 'package:sql_editor/re_editor.dart';
 
 class SessionOpBar extends StatelessWidget {
   final CodeLineEditingController codeController;
@@ -110,16 +109,13 @@ class SessionOpBar extends StatelessWidget {
                 disable: canQuery ? false : true,
                 currentSchema: sessionProvider.session!.conn!.currentSchema),
             const Expanded(child: Spacer()),
-            IconButton(
-              onPressed: () {
-                sessionProvider.isRightPageOpen
-                    ? sessionProvider.hideRightPage()
-                    : sessionProvider.showRightPage();
-              },
-              icon: sessionProvider.isRightPageOpen
-                  ? const Icon(Icons.format_indent_increase)
-                  : const Icon(Icons.format_indent_decrease),
-            )
+            if (sessionProvider.isRightPageOpen == false)
+              IconButton(
+                onPressed: () {
+                  sessionProvider.showRightPage();
+                },
+                icon: const Icon(Icons.format_indent_decrease),
+              )
           ],
         );
       }),

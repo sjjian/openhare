@@ -1,13 +1,13 @@
 import 'package:client/core/connection/metadata.dart';
-import 'package:client/core/connection/sql.dart';
+import 'package:client/core/connection/mysql.dart';
 import 'package:client/models/sql_result.dart';
-import 'package:client/screens/sessions/session_metadata.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_split_view/multi_split_view.dart';
-import 'package:re_editor/re_editor.dart';
+import 'package:sql_editor/re_editor.dart';
 import 'package:common/parser.dart';
 
 class SessionsModel {
@@ -25,7 +25,7 @@ class SessionModel {
 
   List<SchemaMeta>? metadata;
 
-  MetadataController metadataController = MetadataController();
+  SessionDrawerController metadataController = SessionDrawerController();
 
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 
@@ -33,7 +33,7 @@ class SessionModel {
       SplitViewController(Area(), Area(min: 35, size: 500));
 
   final SplitViewController metaDataSplitViewCtrl =
-      SplitViewController(Area(min: 400), Area(size: 400, min: 400));
+      SplitViewController(Area(flex: 7, min:3), Area(flex: 3, min: 3));
 
   CodeLineEditingController code = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {

@@ -217,7 +217,7 @@ class AddInstancePage extends StatelessWidget {
                               InstanceModel(
                                 name: nameCtrl.text,
                                 addr: addrCtrl.text,
-                                port: 3306,
+                                port: int.parse(portCtrl.text),
                                 user: userCtrl.text,
                                 password: passwordCtrl.text,
                                 desc: descCtrl.text,
