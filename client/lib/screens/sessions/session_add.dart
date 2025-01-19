@@ -57,7 +57,6 @@ class _AddSessionState extends State<AddSession> {
         .instanceCount(instanceTableController.searchTextController.text));
 
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
       child: Row(
         children: [

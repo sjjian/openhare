@@ -14,12 +14,12 @@ class SessionTabs extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(top: 6),
         child: CommonTabBar(
-            color: Theme.of(context).colorScheme.surfaceContainer,
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
             tabStyle: CommonTabStyle(
-              color: Theme.of(context).colorScheme.surfaceContainer,
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
               selectedColor:
-                  Theme.of(context).colorScheme.surfaceContainerLowest,
-              hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                  Theme.of(context).colorScheme.surfaceContainer,
+              hoverColor: Theme.of(context).colorScheme.surfaceContainer,
             ),
             addTab: () {
               sessionListProvider.addSession(SessionModel());

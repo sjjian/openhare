@@ -15,7 +15,6 @@ class SessionBodyPage extends StatelessWidget {
     return Container(
       alignment: Alignment.topLeft,
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(10)),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final Widget left = Column(

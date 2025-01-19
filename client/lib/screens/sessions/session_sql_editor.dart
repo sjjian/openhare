@@ -7,16 +7,11 @@ import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:common/parser.dart';
 
-class SQLEditor extends StatefulWidget {
+class SQLEditor extends StatelessWidget {
   final CodeLineEditingController codeController;
 
   const SQLEditor({super.key, required this.codeController});
 
-  @override
-  State<SQLEditor> createState() => _SQLEditorState();
-}
-
-class _SQLEditorState extends State<SQLEditor> {
   List<CodeKeywordPrompt> buildMetadataKeyword(List<SchemaMeta> metadata) {
     List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
     for (var schemaMeta in metadata) {
@@ -94,9 +89,10 @@ class _SQLEditorState extends State<SQLEditor> {
       ),
       child: CodeEditor(
         style: CodeEditorStyle(
+          backgroundColor: Theme.of(context).colorScheme.surfaceBright, // SQL 编辑器背景色
           textStyle: GoogleFonts.robotoMono(
               textStyle: Theme.of(context).textTheme.bodyMedium,
-              color: Theme.of(context).colorScheme.onSurface),
+              color: Theme.of(context).colorScheme.onSurface), // SQL 编辑器文字颜色
         ),
         indicatorBuilder:
             (context, editingController, chunkController, notifier) {
@@ -111,7 +107,7 @@ class _SQLEditorState extends State<SQLEditor> {
             ],
           );
         },
-        controller: widget.codeController,
+        controller: codeController,
       ),
     );
   }

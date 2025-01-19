@@ -39,7 +39,6 @@ class SessionOpBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
       constraints: BoxConstraints(maxHeight: height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final canQuery = sessionProvider.canQuery();
@@ -190,7 +189,7 @@ class _SchemaBarState extends State<SchemaBar> {
         child: Container(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
             color: (isEnter && !widget.disable)
-                ? Theme.of(context).colorScheme.surfaceContainerHighest
+                ? Theme.of(context).colorScheme.surfaceContainerHigh // schema 鼠标移入的颜色
                 : null,
             child: Row(
               children: [

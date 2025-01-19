@@ -20,9 +20,9 @@ class _SqlResultTablesState extends State<SqlResultTables> {
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
       labelAlign: TextAlign.center,
-      selectedColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      selectedColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      hoverColor: Theme.of(context).colorScheme.surfaceContainer,
     );
     return Row(
       children: [
@@ -30,7 +30,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
           child: Column(
             children: [
               Container(
-                color: Theme.of(context).colorScheme.surfaceContainer,
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
                 alignment: Alignment.centerLeft,
                 constraints: const BoxConstraints(maxHeight: 35),
                 child: Consumer<SessionProvider>(
@@ -147,13 +147,13 @@ class _SqlResultTableState extends State<SqlResultTable> {
       if (sessionProvider.showRecord) {
         return Container(
             alignment: Alignment.center,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
             child: const Text('执行记录'));
       }
       if (result == null) {
         return Container(
             alignment: Alignment.center,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
             child: const Text('no data'));
       }
       if (result.state == SQLExecuteState.done) {
@@ -172,8 +172,9 @@ class _SqlResultTableState extends State<SqlResultTable> {
               columnHeight: 36,
               gridBorderColor:
                   Theme.of(context).colorScheme.surfaceContainerLow,
-              rowColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-              activatedColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              rowColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              activatedColor: Theme.of(context).colorScheme.surfaceContainer,
+              gridBackgroundColor : Theme.of(context).colorScheme.surfaceContainer,
             ),
           ),
           columns: buildColumns(result.resultSet!.columns),
@@ -182,12 +183,12 @@ class _SqlResultTableState extends State<SqlResultTable> {
       } else if (result.state == SQLExecuteState.error) {
         return Container(
             alignment: Alignment.topLeft,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
             child: Text('${result.error}'));
       } else {
         return Container(
             alignment: Alignment.topLeft,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
             child: const Center(
               child: SizedBox(
                 height: 40,

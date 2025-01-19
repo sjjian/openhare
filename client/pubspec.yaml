@@ -49,7 +49,7 @@ dependencies:
   file_picker: ^8.1.7
   excel: ^4.0.6
   re_editor: ^0.6.0
-  collection: ^1.19.1
+  collection: ^1.18.0
   sql_editor:
     path:  ../sql-editor/
   common:

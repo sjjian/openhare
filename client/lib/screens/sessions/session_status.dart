@@ -20,7 +20,7 @@ class SessionStatus extends StatelessWidget {
         if (result.state == SQLExecuteState.done) {
           return Container(
             padding: const EdgeInsets.only(left: 5),
-            color: Theme.of(context).colorScheme.surfaceContainer,
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
             height: 30,
             child: Row(
               children: [
@@ -63,11 +63,11 @@ class SessionStatus extends StatelessWidget {
         } else {
           return Container(
               height: 30,
-              color: Theme.of(context).colorScheme.surfaceContainer);
+              color: Theme.of(context).colorScheme.surfaceContainerHigh);
         }
       } else {
         return Container(
-            height: 30, color: Theme.of(context).colorScheme.surfaceContainer);
+            height: 30, color: Theme.of(context).colorScheme.surfaceContainerHigh);
       }
     });
   }

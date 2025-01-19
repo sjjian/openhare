@@ -100,7 +100,7 @@ class _MyTreeTileState extends State<MyTreeTile> {
         onTap: widget.onTap,
         child: Container(
           color: isEnter
-              ? Theme.of(context).colorScheme.surfaceContainerLow
+              ? Theme.of(context).colorScheme.surfaceContainer
               : null,
           child: TreeIndentation(
             entry: widget.entry,

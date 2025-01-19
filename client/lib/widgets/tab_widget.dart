@@ -174,7 +174,7 @@ class _CommonTabState extends State<CommonTab> {
 
   Color color() {
     if (widget.selected) {
-      Color defaultColor = Theme.of(context).colorScheme.surfaceContainer;
+      Color defaultColor = Theme.of(context).colorScheme.surfaceContainerHigh;
       return widget.style != null
           ? (widget.style!.selectedColor ?? defaultColor)
           : defaultColor;
