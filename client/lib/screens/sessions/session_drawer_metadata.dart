@@ -234,6 +234,13 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           });
         },
         child: Card(
+          color: isEnter
+              ? Theme.of(context)
+                  .colorScheme
+                  .surfaceContainer // metadata detail 卡片的背景色
+              : Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHigh, // metadata detail 卡片鼠标移入的颜色
           child: Column(
             children: [
               ListTile(
