@@ -45,7 +45,9 @@ class PageSkeleton extends StatelessWidget {
       color: Theme.of(context).colorScheme.surfaceContainer, // 全局背景色
       child: Column(children: [
         Container(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest, // header 背景色
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest, // header 背景色
             height: 40,
             child: Row(
               children: [
@@ -63,7 +65,9 @@ class PageSkeleton extends StatelessWidget {
         ),
         Container(
           height: 40,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest, // bottom 背景色
+          color: Theme.of(context)
+              .colorScheme
+              .surfaceContainerHighest, // bottom 背景色
           child: bottomBar,
         )
       ]),

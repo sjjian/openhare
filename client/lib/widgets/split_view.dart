@@ -47,7 +47,8 @@ class SplitView extends StatelessWidget {
     MultiSplitViewTheme theme = MultiSplitViewTheme(
       data: MultiSplitViewThemeData(
         dividerPainter: DividerPainters.background(
-          color: Theme.of(context).colorScheme.surfaceContainer,
+          color:
+              Theme.of(context).colorScheme.surfaceContainer, // split view 的背景色
         ),
       ),
       child: mv,

@@ -189,7 +189,9 @@ class _SchemaBarState extends State<SchemaBar> {
         child: Container(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
             color: (isEnter && !widget.disable)
-                ? Theme.of(context).colorScheme.surfaceContainerHigh // schema 鼠标移入的颜色
+                ? Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHigh // schema 鼠标移入的颜色
                 : null,
             child: Row(
               children: [

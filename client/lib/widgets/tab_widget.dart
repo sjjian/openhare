@@ -43,14 +43,14 @@ class _CommonTabBarState extends State<CommonTabBar> {
             icon: Icon(
                 size: 20,
                 Icons.add,
-                color: Theme.of(context).colorScheme.onSurface),
+                color:
+                    Theme.of(context).colorScheme.onSurface), // tab add 的字体颜色
           ));
 
       return Container(
         constraints: BoxConstraints(maxHeight: widget.height ?? 40),
         decoration: BoxDecoration(
-          color: widget.color ??
-              Theme.of(context).colorScheme.surfaceContainerHighest,
+          color: widget.color,
         ),
         child: SizedBox(
           child: widget.onReorder != null
