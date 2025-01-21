@@ -7,16 +7,11 @@ import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:common/parser.dart';
 
-class SQLEditor extends StatefulWidget {
+class SQLEditor extends StatelessWidget {
   final CodeLineEditingController codeController;
 
   const SQLEditor({super.key, required this.codeController});
 
-  @override
-  State<SQLEditor> createState() => _SQLEditorState();
-}
-
-class _SQLEditorState extends State<SQLEditor> {
   List<CodeKeywordPrompt> buildMetadataKeyword(List<SchemaMeta> metadata) {
     List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
     for (var schemaMeta in metadata) {
@@ -94,9 +89,11 @@ class _SQLEditorState extends State<SQLEditor> {
       ),
       child: CodeEditor(
         style: CodeEditorStyle(
+          backgroundColor:
+              Theme.of(context).colorScheme.surfaceBright, // SQL 编辑器背景色
           textStyle: GoogleFonts.robotoMono(
               textStyle: Theme.of(context).textTheme.bodyMedium,
-              color: Theme.of(context).colorScheme.onSurface),
+              color: Theme.of(context).colorScheme.onSurface), // SQL 编辑器文字颜色
         ),
         indicatorBuilder:
             (context, editingController, chunkController, notifier) {
@@ -111,7 +108,7 @@ class _SQLEditorState extends State<SQLEditor> {
             ],
           );
         },
-        controller: widget.codeController,
+        controller: codeController,
       ),
     );
   }
@@ -159,7 +156,9 @@ class _DefaultCodeAutocompleteListViewState
     return Container(
         constraints: BoxConstraints.loose(widget.preferredSize),
         decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.inverseSurface,
+            color: Theme.of(context)
+                .colorScheme
+                .inverseSurface, // SQL editor 提示框背景色
             borderRadius: BorderRadius.circular(6)),
         child: AutoScrollListView(
           controller: ScrollController(),
@@ -192,7 +191,9 @@ class _DefaultCodeAutocompleteListViewState
                   alignment: Alignment.centerLeft,
                   decoration: BoxDecoration(
                       color: index == widget.notifier.value.index
-                          ? Theme.of(context).colorScheme.secondary
+                          ? Theme.of(context)
+                              .colorScheme
+                              .secondary // SQL editor 提示框选中时背景色
                           : null,
                       borderRadius: radius),
                   child: RichText(
@@ -217,7 +218,9 @@ extension _CodePromptExtension on CodePrompt {
     final InlineSpan span = style.createSpan(
       value: word,
       anchor: input,
-      color: Theme.of(context).colorScheme.inversePrimary,
+      color: Theme.of(context)
+          .colorScheme
+          .inversePrimary, // SQL editor 提示框高亮字体色，例如： [SE]LECT 中的 SE
       fontWeight: FontWeight.bold,
     );
     final CodePrompt prompt = this;

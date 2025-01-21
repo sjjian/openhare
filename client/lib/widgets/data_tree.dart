@@ -100,7 +100,9 @@ class _MyTreeTileState extends State<MyTreeTile> {
         onTap: widget.onTap,
         child: Container(
           color: isEnter
-              ? Theme.of(context).colorScheme.surfaceContainerLow
+              ? Theme.of(context)
+                  .colorScheme
+                  .surfaceContainer // meta data detail 鼠标移入的颜色
               : null,
           child: TreeIndentation(
             entry: widget.entry,
@@ -131,7 +133,8 @@ class _MyTreeTileState extends State<MyTreeTile> {
                     onPressed: widget.entry.hasChildren ? widget.onTap : null,
                   ),
                   Expanded(
-                    child: widget.entry.node.builder(context, widget.entry.node),
+                    child:
+                        widget.entry.node.builder(context, widget.entry.node),
                   ),
                 ],
               ),

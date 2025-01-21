@@ -159,7 +159,6 @@ class AddInstancePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       constraints: const BoxConstraints(maxWidth: 500, maxHeight: 532),
       child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
         Container(

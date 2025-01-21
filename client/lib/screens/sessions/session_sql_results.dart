@@ -20,9 +20,14 @@ class _SqlResultTablesState extends State<SqlResultTables> {
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
       labelAlign: TextAlign.center,
-      selectedColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      selectedColor: Theme.of(context)
+          .colorScheme
+          .surfaceContainerLow, // sql result tab 的选中颜色
+      color:
+          Theme.of(context).colorScheme.surfaceContainer, // sql result tab 的背景色
+      hoverColor: Theme.of(context)
+          .colorScheme
+          .surfaceContainer, // sql result tab 的鼠标移入色
     );
     return Row(
       children: [
@@ -30,7 +35,6 @@ class _SqlResultTablesState extends State<SqlResultTables> {
           child: Column(
             children: [
               Container(
-                color: Theme.of(context).colorScheme.surfaceContainer,
                 alignment: Alignment.centerLeft,
                 constraints: const BoxConstraints(maxHeight: 35),
                 child: Consumer<SessionProvider>(
@@ -58,7 +62,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                                   height: 35,
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .surfaceContainerLow,
+                                      .surfaceContainer,
                                   tabStyle: style,
                                   onReorder: (oldIndex, newIndex) {
                                     sessionProvider.reorderSQLResult(
@@ -135,7 +139,8 @@ class _SqlResultTableState extends State<SqlResultTable> {
   List<PlutoRow> buildRows(List<ResultSetRow> rows) {
     return rows.map<PlutoRow>((e) {
       return PlutoRow(cells: <String, PlutoCell>{
-        for (final v in e.cells) v.column.name: PlutoCell(value: v.value.summary())
+        for (final v in e.cells)
+          v.column.name: PlutoCell(value: v.value.summary())
       });
     }).toList();
   }
@@ -143,17 +148,20 @@ class _SqlResultTableState extends State<SqlResultTable> {
   @override
   Widget build(BuildContext context) {
     return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+      final color = Theme.of(context)
+          .colorScheme
+          .surfaceContainerLow; // sql result body 的背景色
       final result = sessionProvider.getCurrentSQLResult();
       if (sessionProvider.showRecord) {
         return Container(
             alignment: Alignment.center,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: color,
             child: const Text('执行记录'));
       }
       if (result == null) {
         return Container(
             alignment: Alignment.center,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: color,
             child: const Text('no data'));
       }
       if (result.state == SQLExecuteState.done) {
@@ -170,10 +178,12 @@ class _SqlResultTableState extends State<SqlResultTable> {
             style: PlutoGridStyleConfig(
               rowHeight: 30,
               columnHeight: 36,
-              gridBorderColor:
-                  Theme.of(context).colorScheme.surfaceContainerLow,
-              rowColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-              activatedColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              gridBorderColor: color,
+              rowColor: color,
+              activatedColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainer, // sql result table 行选中的颜色
+              gridBackgroundColor: color,
             ),
           ),
           columns: buildColumns(result.resultSet!.columns),
@@ -182,12 +192,12 @@ class _SqlResultTableState extends State<SqlResultTable> {
       } else if (result.state == SQLExecuteState.error) {
         return Container(
             alignment: Alignment.topLeft,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: color,
             child: Text('${result.error}'));
       } else {
         return Container(
             alignment: Alignment.topLeft,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: color,
             child: const Center(
               child: SizedBox(
                 height: 40,

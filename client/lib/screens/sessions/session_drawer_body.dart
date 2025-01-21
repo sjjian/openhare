@@ -64,7 +64,9 @@ class _SessionDrawerBodyState extends State<SessionDrawerBody> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerLow, // session drawer 背景色
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         return Column(
           children: [
@@ -97,7 +99,9 @@ class SessionDrawerBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainer, // session drawer bar 背景色
       constraints: BoxConstraints(maxHeight: height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         return Row(
@@ -112,7 +116,9 @@ class SessionDrawerBar extends StatelessWidget {
                         controller.page == DrawerPage.metadataTable)
                     ? Icon(
                         Icons.account_tree_rounded,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary, // metadata 按钮色
                       )
                     : const Icon(Icons.account_tree_outlined)),
             IconButton(
@@ -122,7 +128,9 @@ class SessionDrawerBar extends StatelessWidget {
                 icon: (controller.page == DrawerPage.sqlResult)
                     ? Icon(
                         Icons.article_rounded,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary, // sql result 按钮色
                       )
                     : const Icon(Icons.article_outlined)),
             const Spacer(),

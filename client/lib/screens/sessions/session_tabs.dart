@@ -14,12 +14,16 @@ class SessionTabs extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(top: 6),
         child: CommonTabBar(
-            color: Theme.of(context).colorScheme.surfaceContainer,
             tabStyle: CommonTabStyle(
-              color: Theme.of(context).colorScheme.surfaceContainer,
-              selectedColor:
-                  Theme.of(context).colorScheme.surfaceContainerLowest,
-              hoverColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest, // session tab 背景色
+              selectedColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainer, // session tab 选择的颜色
+              hoverColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceDim, // session tab 鼠标移入的颜色
             ),
             addTab: () {
               sessionListProvider.addSession(SessionModel());

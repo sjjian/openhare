@@ -55,35 +55,32 @@ class SessionDrawerMetadata extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
-      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        Widget body = const Align(
-          alignment: Alignment.center,
-          child: SizedBox(
-            height: 40,
-            width: 40,
-            child: CircularProgressIndicator(),
-          ),
-        );
+    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+      Widget body = const Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          height: 40,
+          width: 40,
+          child: CircularProgressIndicator(),
+        ),
+      );
 
-        List<SchemaMeta>? meta = sessionProvider.getMetadata();
-        if (meta != null) {
-          body = DataTree(roots: buildMetadataTree(meta));
-        }
+      List<SchemaMeta>? meta = sessionProvider.getMetadata();
+      if (meta != null) {
+        body = DataTree(roots: buildMetadataTree(meta));
+      }
 
-        return Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SessionMetadataTitle(controller: controller),
-              const Divider(
-                endIndent: 10,
-              ),
-              Expanded(child: body),
-            ]);
-      }),
-    );
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SessionMetadataTitle(controller: controller),
+            // const Divider(
+            //   endIndent: 10,
+            // ),
+            Expanded(child: body),
+          ]);
+    });
   }
 }
 
@@ -95,40 +92,37 @@ class SessionDrawerMetadataDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
-      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        Widget body = const Align(
-          alignment: Alignment.center,
-          child: SizedBox(
-            height: 40,
-            width: 40,
-            child: CircularProgressIndicator(),
-          ),
-        );
-        TableMeta? tableMeta = sessionProvider.getTableMeta(
-            controller.currentSchema!, controller.currentTable!);
-        if (TableMeta.initialized(tableMeta)) {
-          body = ListView(children: [
-            for (final column in tableMeta!.columns!)
-              SessionMetadataColumn(
-                column: column,
-                keys: tableMeta.getKeysByColumn(column.name),
-              ),
+    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+      Widget body = const Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          height: 40,
+          width: 40,
+          child: CircularProgressIndicator(),
+        ),
+      );
+      TableMeta? tableMeta = sessionProvider.getTableMeta(
+          controller.currentSchema!, controller.currentTable!);
+      if (TableMeta.initialized(tableMeta)) {
+        body = ListView(children: [
+          for (final column in tableMeta!.columns!)
+            SessionMetadataColumn(
+              column: column,
+              keys: tableMeta.getKeysByColumn(column.name),
+            ),
+        ]);
+      }
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SessionMetadataTitle(controller: controller),
+            // const Divider(
+            //   endIndent: 10,
+            // ),
+            Expanded(child: body),
           ]);
-        }
-        return Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SessionMetadataTitle(controller: controller),
-              const Divider(
-                endIndent: 10,
-              ),
-              Expanded(child: body),
-            ]);
-      }),
-    );
+    });
   }
 }
 
@@ -170,15 +164,13 @@ class _SessionMetadataTitleState extends State<SessionMetadataTitle> {
                 )),
               if (widget.controller.page != DrawerPage.metadataTree)
                 BreadCrumbItem(
-                    content: Expanded(
-                  child: Container(
-                    constraints: BoxConstraints(maxWidth: width / 2),
-                    child: Text(
-                      widget.controller.currentTable!,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    content: Container(
+                  constraints: BoxConstraints(maxWidth: width / 2),
+                  child: Text(
+                    widget.controller.currentTable!,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 )),
             ],
@@ -240,6 +232,13 @@ class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
           });
         },
         child: Card(
+          color: isEnter
+              ? Theme.of(context)
+                  .colorScheme
+                  .surfaceContainer // metadata detail 卡片的背景色
+              : Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHigh, // metadata detail 卡片鼠标移入的颜色
           child: Column(
             children: [
               ListTile(

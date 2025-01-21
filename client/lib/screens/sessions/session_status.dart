@@ -20,13 +20,13 @@ class SessionStatus extends StatelessWidget {
         if (result.state == SQLExecuteState.done) {
           return Container(
             padding: const EdgeInsets.only(left: 5),
-            color: Theme.of(context).colorScheme.surfaceContainer,
             height: 30,
             child: Row(
               children: [
                 Tooltip(
                     message: 'effect rows: ${result.resultSet!.affectedRows}',
-                    child: Text('effect rows: ${result.resultSet!.affectedRows}')),
+                    child:
+                        Text('effect rows: ${result.resultSet!.affectedRows}')),
                 const Text("  |  "),
                 Tooltip(
                     message: 'duration: ${result.executeTime!.format()}',
@@ -45,7 +45,8 @@ class SessionStatus extends StatelessWidget {
                     onPressed: () async {
                       String? outputFile = await FilePicker.platform.saveFile(
                         dialogTitle: 'Please select an output file:',
-                        fileName: '${sessionProvider.session!.conn!.instance.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+                        fileName:
+                            '${sessionProvider.session!.conn!.instance.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
                       );
                       if (outputFile == null) {
                         return;
@@ -62,12 +63,13 @@ class SessionStatus extends StatelessWidget {
           );
         } else {
           return Container(
-              height: 30,
-              color: Theme.of(context).colorScheme.surfaceContainer);
+            height: 30,
+          );
         }
       } else {
         return Container(
-            height: 30, color: Theme.of(context).colorScheme.surfaceContainer);
+          height: 30,
+        );
       }
     });
   }
