@@ -75,9 +75,9 @@ class SessionDrawerMetadata extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SessionMetadataTitle(controller: controller),
-            const Divider(
-              endIndent: 10,
-            ),
+            // const Divider(
+            //   endIndent: 10,
+            // ),
             Expanded(child: body),
           ]);
     });
@@ -117,9 +117,9 @@ class SessionDrawerMetadataDetail extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SessionMetadataTitle(controller: controller),
-            const Divider(
-              endIndent: 10,
-            ),
+            // const Divider(
+            //   endIndent: 10,
+            // ),
             Expanded(child: body),
           ]);
     });
@@ -164,15 +164,13 @@ class _SessionMetadataTitleState extends State<SessionMetadataTitle> {
                 )),
               if (widget.controller.page != DrawerPage.metadataTree)
                 BreadCrumbItem(
-                    content: Expanded(
-                  child: Container(
-                    constraints: BoxConstraints(maxWidth: width / 2),
-                    child: Text(
-                      widget.controller.currentTable!,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    content: Container(
+                  constraints: BoxConstraints(maxWidth: width / 2),
+                  child: Text(
+                    widget.controller.currentTable!,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 )),
             ],
