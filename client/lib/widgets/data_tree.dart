@@ -2,37 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-class DataNode {
-  final String value;
-  final String type;
-  late List<DataNode> children;
-  Widget Function(BuildContext context, DataNode node) builder;
-
-  DataNode({
-    required this.value,
-    required this.type,
-    required this.builder,
-  }) {
-    children = List.empty(growable: true);
-  }
-
-  IconData openIcons() {
-    if (type == "schema") {
-      return HugeIcons.strokeRoundedDatabase;
-    } else if (type == "table") {
-      return HugeIcons.strokeRoundedTable;
-    } else {
-      return HugeIcons.strokeRoundedDatabase;
-    }
-  }
-
-  IconData closeIcons() {
-    return HugeIcons.strokeRoundedDatabase;
-  }
-
-  void addChildren(DataNode node) {
-    children.add(node);
-  }
+abstract class DataNode {
+  List<DataNode> get children;
+  Widget builder(BuildContext context);
+  IconData closeIcons();
+  IconData openIcons();
 }
 
 class DataTree extends StatefulWidget {
@@ -133,8 +107,7 @@ class _MyTreeTileState extends State<MyTreeTile> {
                     onPressed: widget.entry.hasChildren ? widget.onTap : null,
                   ),
                   Expanded(
-                    child:
-                        widget.entry.node.builder(context, widget.entry.node),
+                    child: widget.entry.node.builder(context),
                   ),
                 ],
               ),

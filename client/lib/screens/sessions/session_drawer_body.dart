@@ -1,8 +1,9 @@
-import 'package:client/core/connection/result_set.dart';
+// import 'package:mysql1/mysql1.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
 import 'package:flutter/material.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:provider/provider.dart';
 
 enum DrawerPage {
@@ -15,7 +16,8 @@ class SessionDrawerController extends ChangeNotifier {
   DrawerPage page = DrawerPage.metadataTree;
   String? currentSchema;
   String? currentTable;
-  ResultSetValue? sqlResult;
+  BaseQueryValue? sqlResult;
+  BaseQueryColumn? sqlColumn;
 
   SessionDrawerController();
 
@@ -31,8 +33,9 @@ class SessionDrawerController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void showSQLResult({ResultSetValue? result}) {
+  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
     page = DrawerPage.sqlResult;
+    sqlColumn = column ?? sqlColumn;
     sqlResult = result ?? sqlResult;
     notifyListeners();
   }
@@ -75,8 +78,8 @@ class _SessionDrawerBodyState extends State<SessionDrawerBody> {
               child: Container(
                   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                   child: switch (widget.controller.page) {
-                    DrawerPage.metadataTable => SessionDrawerMetadataDetail(
-                        controller: widget.controller),
+                    // DrawerPage.metadataTable => SessionDrawerMetadataDetail(
+                    //     controller: widget.controller),
                     DrawerPage.sqlResult =>
                       SessionDrawerSqlResult(controller: widget.controller),
                     _ => SessionDrawerMetadata(controller: widget.controller),

@@ -1,6 +1,6 @@
-import 'package:client/core/connection/metadata.dart';
+// import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/mysql.dart';
-import 'package:client/core/connection/result_set.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/storages/storages.dart';
@@ -24,7 +24,7 @@ class SessionListProvider with ChangeNotifier {
         notifyListeners();
         if (session == sessionProvider._session) {
           sessionProvider.update(session);
-          sessionProvider.loadMetadata();
+          // sessionProvider.loadMetadata();
         }
         return;
       }
@@ -152,10 +152,13 @@ class SessionProvider with ChangeNotifier {
     // 记录使用的数据源
     Storage().addActiveInstance(instance);
 
-    SQLConnection conn =
-        SQLConnection(instance, onConnClose, currentSchema: schema, (schema) {
+    SQLConnectionMgr conn = SQLConnectionMgr(instance, onConnClose,
+        currentSchema: schema, (schema) {
+      session!.conn!.currentSchema = schema;
       Storage().addInstanceActiveSchema(instance, schema);
+      notifyListeners();
     });
+
     if (_session == null) {
       _session = SessionModel(conn: conn);
     } else {
@@ -202,9 +205,11 @@ class SessionProvider with ChangeNotifier {
 
     try {
       DateTime start = DateTime.now();
-      ResultSet resultSet = await _session!.conn!.execute(query);
+      BaseQueryResult queryResult = await _session!.conn!.conn2!.query(query);
+      List<QueryResultRow> rows = queryResult.rows;
       DateTime end = DateTime.now();
-      result.setDone(resultSet, end.difference(start));
+      result.setDone(queryResult.columns, rows, end.difference(start),
+          queryResult.affectedRows.toInt());
       _session!.state = SQLExecuteState.done;
     } catch (e) {
       result.setError(e);
@@ -215,7 +220,7 @@ class SessionProvider with ChangeNotifier {
   }
 
   Future<void> setCurrentSchema(String schema) async {
-    await session!.conn!.setCurrentSchema(schema);
+    await session!.conn!.conn2!.setCurrentSchema(schema);
     notifyListeners();
   }
 
@@ -224,7 +229,7 @@ class SessionProvider with ChangeNotifier {
   }
 
   Future<List<String>> getSchemas() async {
-    List<String> schemas = await session!.conn!.schemas();
+    List<String> schemas = await session!.conn!.conn2!.schemas();
     return schemas;
   }
 
@@ -232,72 +237,15 @@ class SessionProvider with ChangeNotifier {
     if (session!.metadata != null) {
       return;
     }
-    List<SchemaMeta> metadata = List<SchemaMeta>.empty(growable: true);
-    List<String> schemas = await session!.conn!.schemas();
-    for (var schema in schemas) {
-      SchemaMeta schemaMeta = SchemaMeta(schema);
-      metadata.add(schemaMeta);
-      List<String> tables = await session!.conn!.getTables(schema);
-      for (var table in tables) {
-        TableMeta tableMeta = TableMeta(table);
-        schemaMeta.tables.add(tableMeta);
-        // todo: 一次性获取所有表信息
-        List<TableColumnMeta> columns =
-            await session!.conn!.getTableColumns(schema, table);
-        tableMeta.columns = columns;
-
-        List<TableKeyMeta> keys =
-            await session!.conn!.getTableKeys(schema, table);
-        tableMeta.keys = keys;
-      }
-    }
-    session!.metadata = metadata;
+    session!.metadata = await session!.conn!.conn2!.metadata();
     notifyListeners();
   }
 
-  List<SchemaMeta>? getMetadata() {
+  MetaDataNode? getMetadata() {
     if (session!.metadata == null) {
       return null;
     }
     return session!.metadata;
-  }
-
-  TableMeta? getTableMeta(String schema, String table) {
-    // todo: 使用map
-    for (var schemaMeta in session!.metadata!) {
-      if (schemaMeta.name == schema) {
-        for (var tableMeta in schemaMeta.tables) {
-          if (tableMeta.name == table) {
-            return tableMeta;
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  List<String> getMetadataKey() {
-    List<String> keys = List.empty(growable: true);
-    if (session!.metadata == null) {
-      return keys;
-    }
-    for (var schemaMeta in session!.metadata!) {
-      keys.add(schemaMeta.name);
-      for (var tableMeta in schemaMeta.tables) {
-        keys.add(tableMeta.name);
-        if (tableMeta.columns != null) {
-          for (var column in tableMeta.columns!) {
-            keys.add(column.name);
-          }
-        }
-        if (tableMeta.keys != null) {
-          for (var index in tableMeta.keys!) {
-            keys.add(index.name);
-          }
-        }
-      }
-    }
-    return keys;
   }
 
   CodeLineEditingController getSQLEditCode() => _session!.code;

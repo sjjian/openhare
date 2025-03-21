@@ -1,11 +1,85 @@
-import 'package:client/core/connection/metadata.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
+
+class RootNode implements DataNode {
+  final String name;
+
+  final List<DataNode> _children = List.empty(growable: true);
+
+  RootNode({this.name = ""});
+
+  @override
+  List<DataNode> get children {
+    return _children;
+  }
+
+  @override
+  IconData openIcons() {
+    return HugeIcons.strokeRoundedDatabase;
+  }
+
+  @override
+  IconData closeIcons() {
+    return HugeIcons.strokeRoundedDatabase;
+  }
+
+  @override
+  Widget builder(context) {
+    return Text(
+      children.isNotEmpty ? "$name  [${_children.length}]" : name,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class SchemaNode extends RootNode {
+  SchemaNode(String name) : super(name: name);
+
+  @override
+  IconData openIcons() {
+    return HugeIcons.strokeRoundedDatabase;
+  }
+
+  @override
+  IconData closeIcons() {
+    return HugeIcons.strokeRoundedDatabase;
+  }
+}
+
+class TableNode extends RootNode {
+  TableNode(String name) : super(name: name);
+
+  @override
+  IconData openIcons() {
+    return HugeIcons.strokeRoundedTable;
+  }
+
+  @override
+  IconData closeIcons() {
+    return HugeIcons.strokeRoundedTable;
+  }
+}
+
+class ColumnNode extends RootNode {
+  ColumnNode(String name) : super(name: name);
+
+  @override
+  IconData openIcons() {
+    return Icons.abc;
+  }
+
+  @override
+  IconData closeIcons() {
+    return Icons.abc;
+  }
+}
 
 class SessionDrawerMetadata extends StatelessWidget {
   final SessionDrawerController controller;
@@ -13,44 +87,27 @@ class SessionDrawerMetadata extends StatelessWidget {
   const SessionDrawerMetadata({Key? key, required this.controller})
       : super(key: key);
 
-  // @override
-  List<DataNode> buildMetadataTree(List<SchemaMeta> metadata) {
-    List<DataNode> root = List<DataNode>.empty(growable: true);
-    for (var schema in metadata) {
-      DataNode schemaNode = DataNode(
-        value: schema.name,
-        type: "schema",
-        builder: (context, node) {
-          return Text(
-            node.children.isNotEmpty
-                ? "${node.value}  [${node.children.length}]"
-                : node.value,
-            overflow: TextOverflow.ellipsis,
-          );
-        },
-      );
-      root.add(schemaNode);
-      for (var table in schema.tables) {
-        schemaNode.addChildren(
-          DataNode(
-            value: table.name,
-            type: "table",
-            builder: (context, node) {
-              return InkWell(
-                onTap: () {
-                  controller.openTable(schema.name, table.name);
-                },
-                child: Text(
-                  node.value,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            },
-          ),
-        );
+  DataNode buildDataNode(MetaDataNode node) {
+    return switch (node.type) {
+      MetaType.database => SchemaNode(node.value),
+      MetaType.table => TableNode(node.value),
+      MetaType.column => ColumnNode(node.value),
+      _ => SchemaNode(node.value)
+    };
+  }
+
+  DataNode buildMetadataTree(DataNode parent, List<MetaDataNode>? nodes) {
+    if (nodes == null) {
+      return parent;
+    }
+    for (var node in nodes) {
+      final dataNode = buildDataNode(node);
+      parent.children.add(dataNode);
+      if (node.items != null && node.items!.isNotEmpty) {
+        buildMetadataTree(dataNode, node.items!);
       }
     }
-    return root;
+    return parent;
   }
 
   @override
@@ -65,9 +122,10 @@ class SessionDrawerMetadata extends StatelessWidget {
         ),
       );
 
-      List<SchemaMeta>? meta = sessionProvider.getMetadata();
+      MetaDataNode? meta = sessionProvider.getMetadata();
       if (meta != null) {
-        body = DataTree(roots: buildMetadataTree(meta));
+        final root = RootNode();
+        body = DataTree(roots: buildMetadataTree(root, [meta]).children);
       }
 
       return Column(
@@ -84,47 +142,47 @@ class SessionDrawerMetadata extends StatelessWidget {
   }
 }
 
-class SessionDrawerMetadataDetail extends StatelessWidget {
-  final SessionDrawerController controller;
+// class SessionDrawerMetadataDetail extends StatelessWidget {
+//   final SessionDrawerController controller;
 
-  const SessionDrawerMetadataDetail({Key? key, required this.controller})
-      : super(key: key);
+//   const SessionDrawerMetadataDetail({Key? key, required this.controller})
+//       : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-      Widget body = const Align(
-        alignment: Alignment.center,
-        child: SizedBox(
-          height: 40,
-          width: 40,
-          child: CircularProgressIndicator(),
-        ),
-      );
-      TableMeta? tableMeta = sessionProvider.getTableMeta(
-          controller.currentSchema!, controller.currentTable!);
-      if (TableMeta.initialized(tableMeta)) {
-        body = ListView(children: [
-          for (final column in tableMeta!.columns!)
-            SessionMetadataColumn(
-              column: column,
-              keys: tableMeta.getKeysByColumn(column.name),
-            ),
-        ]);
-      }
-      return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SessionMetadataTitle(controller: controller),
-            // const Divider(
-            //   endIndent: 10,
-            // ),
-            Expanded(child: body),
-          ]);
-    });
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
+//       Widget body = const Align(
+//         alignment: Alignment.center,
+//         child: SizedBox(
+//           height: 40,
+//           width: 40,
+//           child: CircularProgressIndicator(),
+//         ),
+//       );
+//       TableMeta? tableMeta = sessionProvider.getTableMeta(
+//           controller.currentSchema!, controller.currentTable!);
+//       if (TableMeta.initialized(tableMeta)) {
+//         body = ListView(children: [
+//           for (final column in tableMeta!.columns!)
+//             SessionMetadataColumn(
+//               column: column,
+//               keys: tableMeta.getKeysByColumn(column.name),
+//             ),
+//         ]);
+//       }
+//       return Column(
+//           mainAxisAlignment: MainAxisAlignment.end,
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             SessionMetadataTitle(controller: controller),
+//             // const Divider(
+//             //   endIndent: 10,
+//             // ),
+//             Expanded(child: body),
+//           ]);
+//     });
+//   }
+// }
 
 class SessionMetadataTitle extends StatefulWidget {
   final SessionDrawerController controller;
@@ -182,142 +240,142 @@ class _SessionMetadataTitleState extends State<SessionMetadataTitle> {
   }
 }
 
-class SessionMetadataColumn extends StatefulWidget {
-  final TableColumnMeta column;
-  final List<TableKeyMeta>? keys;
+// class SessionMetadataColumn extends StatefulWidget {
+//   final TableColumnMeta column;
+//   final List<TableKeyMeta>? keys;
 
-  const SessionMetadataColumn(
-      {Key? key, required this.column, required this.keys})
-      : super(key: key);
+//   const SessionMetadataColumn(
+//       {Key? key, required this.column, required this.keys})
+//       : super(key: key);
 
-  @override
-  State<SessionMetadataColumn> createState() => _SessionMetadataColumnState();
-}
+//   @override
+//   State<SessionMetadataColumn> createState() => _SessionMetadataColumnState();
+// }
 
-class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
-  bool isEnter = false;
-  bool unfold = false;
+// class _SessionMetadataColumnState extends State<SessionMetadataColumn> {
+//   bool isEnter = false;
+//   bool unfold = false;
 
-  List<Widget> getTypeTags(TableColumnMeta column) {
-    List<Widget> tags = List.empty(growable: true);
-    tags.add(Chip(
-        label: Tooltip(
-            message: widget.column.columnType,
-            child: Text(widget.column.getColumnType()))));
-    if (widget.column.isNull == "YES") {
-      tags.add(const Chip(label: Text("NOT NULL")));
-    } else {
-      tags.add(const Chip(label: Text("NULL")));
-    }
-    return tags;
-  }
+//   List<Widget> getTypeTags(TableColumnMeta column) {
+//     List<Widget> tags = List.empty(growable: true);
+//     tags.add(Chip(
+//         label: Tooltip(
+//             message: widget.column.columnType,
+//             child: Text(widget.column.getColumnType()))));
+//     if (widget.column.isNull == "YES") {
+//       tags.add(const Chip(label: Text("NOT NULL")));
+//     } else {
+//       tags.add(const Chip(label: Text("NULL")));
+//     }
+//     return tags;
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          isEnter = true;
-        });
-      },
-      onExit: (_) {
-        setState(() {
-          isEnter = false;
-        });
-      },
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            unfold = !unfold;
-          });
-        },
-        child: Card(
-          color: isEnter
-              ? Theme.of(context)
-                  .colorScheme
-                  .surfaceContainer // metadata detail 卡片的背景色
-              : Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHigh, // metadata detail 卡片鼠标移入的颜色
-          child: Column(
-            children: [
-              ListTile(
-                leading: DataTypeIcon(type: widget.column.dataType),
-                title: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      widget.column.name,
-                      overflow: TextOverflow.ellipsis,
-                    )),
-                    if (widget.column.key != "") const Icon(Icons.key)
-                  ],
-                ),
-                trailing: unfold
-                    ? Icon(Icons.unfold_less,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant)
-                    : Icon(Icons.unfold_more,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
-              ),
-              if (unfold)
-                Container(
-                  padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SessionMetadataInfo(
-                        name: "type",
-                        child: Row(
-                          children: [
-                            for (final tag in getTypeTags(widget.column))
-                              Padding(
-                                padding: const EdgeInsets.only(right: 5),
-                                child: tag,
-                              ),
-                          ],
-                        ),
-                      ),
-                      SessionMetadataInfo(
-                          name: "default",
-                          child: Text(widget.column.defaultValue ?? "null")),
-                      if (widget.column.characterSetName != null)
-                        SessionMetadataInfo(
-                            name: "character set",
-                            child: Text(
-                                "${widget.column.characterSetName} | ${widget.column.collationName}")),
-                      if (widget.column.extra != null &&
-                          widget.column.extra!.isNotEmpty)
-                        SessionMetadataInfo(
-                            name: "extra", child: Text(widget.column.extra!)),
-                      if (widget.column.comment != null &&
-                          widget.column.comment!.isNotEmpty)
-                        SessionMetadataInfo(
-                            name: "comment",
-                            child: Text(widget.column.comment!)),
-                      if (widget.keys!.isNotEmpty)
-                        SessionMetadataInfo(
-                          name: "keys",
-                          child: Column(
-                            children: [
-                              for (final key in widget.keys!)
-                                Tooltip(
-                                  message: key.columns.join(","),
-                                  child: Text(key.name),
-                                )
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return MouseRegion(
+//       onEnter: (_) {
+//         setState(() {
+//           isEnter = true;
+//         });
+//       },
+//       onExit: (_) {
+//         setState(() {
+//           isEnter = false;
+//         });
+//       },
+//       child: InkWell(
+//         onTap: () {
+//           setState(() {
+//             unfold = !unfold;
+//           });
+//         },
+//         child: Card(
+//           color: isEnter
+//               ? Theme.of(context)
+//                   .colorScheme
+//                   .surfaceContainer // metadata detail 卡片的背景色
+//               : Theme.of(context)
+//                   .colorScheme
+//                   .surfaceContainerHigh, // metadata detail 卡片鼠标移入的颜色
+//           child: Column(
+//             children: [
+//               ListTile(
+//                 leading: DataTypeIcon(type: widget.column.dataType),
+//                 title: Row(
+//                   children: [
+//                     Expanded(
+//                         child: Text(
+//                       widget.column.name,
+//                       overflow: TextOverflow.ellipsis,
+//                     )),
+//                     if (widget.column.key != "") const Icon(Icons.key)
+//                   ],
+//                 ),
+//                 trailing: unfold
+//                     ? Icon(Icons.unfold_less,
+//                         color: Theme.of(context).colorScheme.onSurfaceVariant)
+//                     : Icon(Icons.unfold_more,
+//                         color: Theme.of(context).colorScheme.onSurfaceVariant),
+//               ),
+//               if (unfold)
+//                 Container(
+//                   padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+//                   child: Column(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       SessionMetadataInfo(
+//                         name: "type",
+//                         child: Row(
+//                           children: [
+//                             for (final tag in getTypeTags(widget.column))
+//                               Padding(
+//                                 padding: const EdgeInsets.only(right: 5),
+//                                 child: tag,
+//                               ),
+//                           ],
+//                         ),
+//                       ),
+//                       SessionMetadataInfo(
+//                           name: "default",
+//                           child: Text(widget.column.defaultValue ?? "null")),
+//                       if (widget.column.characterSetName != null)
+//                         SessionMetadataInfo(
+//                             name: "character set",
+//                             child: Text(
+//                                 "${widget.column.characterSetName} | ${widget.column.collationName}")),
+//                       if (widget.column.extra != null &&
+//                           widget.column.extra!.isNotEmpty)
+//                         SessionMetadataInfo(
+//                             name: "extra", child: Text(widget.column.extra!)),
+//                       if (widget.column.comment != null &&
+//                           widget.column.comment!.isNotEmpty)
+//                         SessionMetadataInfo(
+//                             name: "comment",
+//                             child: Text(widget.column.comment!)),
+//                       if (widget.keys!.isNotEmpty)
+//                         SessionMetadataInfo(
+//                           name: "keys",
+//                           child: Column(
+//                             children: [
+//                               for (final key in widget.keys!)
+//                                 Tooltip(
+//                                   message: key.columns.join(","),
+//                                   child: Text(key.name),
+//                                 )
+//                             ],
+//                           ),
+//                         ),
+//                     ],
+//                   ),
+//                 )
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class SessionMetadataInfo extends StatelessWidget {
   final String name;

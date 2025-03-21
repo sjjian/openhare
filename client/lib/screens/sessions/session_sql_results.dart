@@ -1,4 +1,4 @@
-import 'package:client/core/connection/result_set.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
@@ -111,14 +111,13 @@ class _SqlResultTableState extends State<SqlResultTable> {
     super.initState();
   }
 
-  List<PlutoColumn> buildColumns(List<ResultSetColumn> columns) {
+  List<PlutoColumn> buildColumns(List<BaseQueryColumn> columns) {
     return columns
         .map<PlutoColumn>((e) => PlutoColumn(
             title: e.name,
             field: e.name,
-            type: switch (e.type) {
-              ValueType.str => PlutoColumnType.text(),
-              ValueType.number => PlutoColumnType.number(),
+            type: switch (e.dataType()) {
+              DataType.number => PlutoColumnType.number(),
               _ => PlutoColumnType.text(),
             },
             titleSpan: WidgetSpan(
@@ -126,7 +125,7 @@ class _SqlResultTableState extends State<SqlResultTable> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 2),
-                    child: ValueTypeIcon(type: e.type, size: 20),
+                    child: DataTypeIcon(type: e.dataType(), size: 20),
                   ),
                   Expanded(
                       child: Text(e.name, overflow: TextOverflow.ellipsis)),
@@ -136,11 +135,11 @@ class _SqlResultTableState extends State<SqlResultTable> {
         .toList();
   }
 
-  List<PlutoRow> buildRows(List<ResultSetRow> rows) {
+  List<PlutoRow> buildRows(List<QueryResultRow> rows) {
     return rows.map<PlutoRow>((e) {
       return PlutoRow(cells: <String, PlutoCell>{
-        for (final v in e.cells)
-          v.column.name: PlutoCell(value: v.value.summary())
+        for (int i = 0; i < e.columns.length; i++)
+          e.columns[i].name: PlutoCell(value: e.values[i].getSummary())
       });
     }).toList();
   }
@@ -170,8 +169,11 @@ class _SqlResultTableState extends State<SqlResultTable> {
           mode: PlutoGridMode.selectWithOneTap,
           onSelected: (event) {
             sessionProvider.session!.metadataController.showSQLResult(
-                result: result.resultSet!
-                    .getValue(event.cell!.column.title, event.rowIdx!));
+              result: result.rows![event.rowIdx!]
+                  .getValue(event.cell!.column.title),
+              column: result.rows![event.rowIdx!]
+                  .getColumn(event.cell!.column.title), 
+            );
           },
           configuration: PlutoGridConfiguration(
             localeText: const PlutoGridLocaleText.china(),
@@ -186,8 +188,8 @@ class _SqlResultTableState extends State<SqlResultTable> {
               gridBackgroundColor: color,
             ),
           ),
-          columns: buildColumns(result.resultSet!.columns),
-          rows: buildRows(result.resultSet!.rows),
+          columns: buildColumns(result.columns!),
+          rows: buildRows(result.rows!),
         );
       } else if (result.state == SQLExecuteState.error) {
         return Container(

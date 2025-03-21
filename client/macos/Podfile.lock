@@ -2,6 +2,8 @@ PODS:
   - bitsdojo_window_macos (0.0.1):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
+  - mysql (0.0.1):
+    - FlutterMacOS
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -13,6 +15,7 @@ PODS:
 DEPENDENCIES:
   - bitsdojo_window_macos (from `Flutter/ephemeral/.symlinks/plugins/bitsdojo_window_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - mysql (from `Flutter/ephemeral/.symlinks/plugins/mysql/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - screen_retriever (from `Flutter/ephemeral/.symlinks/plugins/screen_retriever/macos`)
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
@@ -22,6 +25,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/bitsdojo_window_macos/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  mysql:
+    :path: Flutter/ephemeral/.symlinks/plugins/mysql/macos
   path_provider_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
   screen_retriever:
@@ -32,6 +37,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   bitsdojo_window_macos: 44e3b8fe3dd463820e0321f6256c5b1c16bb6a00
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  mysql: f78f3d3aaec63aeb0c979cd2c734aac52736879a
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8

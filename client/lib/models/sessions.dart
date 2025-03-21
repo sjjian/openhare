@@ -1,4 +1,4 @@
-import 'package:client/core/connection/metadata.dart';
+// import 'package:client/core/connection/metadata.dart';
 import 'package:client/core/connection/mysql.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:common/parser.dart';
+import 'package:db_driver/db_driver.dart';
 
 class SessionsModel {
   ReorderSelectedList<SessionModel> data = ReorderSelectedList();
@@ -19,11 +20,11 @@ class SessionsModel {
 class SessionModel {
   // String id;
 
-  SQLConnection? conn;
+  SQLConnectionMgr? conn;
 
   SQLExecuteState? state;
 
-  List<SchemaMeta>? metadata;
+  MetaDataNode? metadata;
 
   SessionDrawerController metadataController = SessionDrawerController();
 

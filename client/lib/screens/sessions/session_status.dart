@@ -24,9 +24,9 @@ class SessionStatus extends StatelessWidget {
             child: Row(
               children: [
                 Tooltip(
-                    message: 'effect rows: ${result.resultSet!.affectedRows}',
+                    message: 'effect rows: ${result.affectedRows}',
                     child:
-                        Text('effect rows: ${result.resultSet!.affectedRows}')),
+                        Text('effect rows: ${result.affectedRows}')),
                 const Text("  |  "),
                 Tooltip(
                     message: 'duration: ${result.executeTime!.format()}',

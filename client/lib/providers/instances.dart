@@ -1,12 +1,14 @@
 import 'package:client/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:flutter/material.dart';
+import 'package:db_driver/db_driver.dart';
 
 class InstancesProvider extends ChangeNotifier {
   InstancesProvider();
-
+  
   Future<void> loadInstance() async {
     await Storage.load();
+    await ConnectionFactory.init();
     notifyListeners();
   }
 
@@ -18,6 +20,10 @@ class InstancesProvider extends ChangeNotifier {
 
   void updateInstance(InstanceModel instance){
     Storage st = Storage();
+    if (instance.port == 5432) {
+      instance.type = "pg";
+      instance.databases = "postgres";
+    }
     st.updateInstance(instance);
     notifyListeners();
   }

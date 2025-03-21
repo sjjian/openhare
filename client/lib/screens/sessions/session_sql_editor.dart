@@ -1,5 +1,6 @@
-import 'package:client/core/connection/metadata.dart';
+// import 'package:client/core/connection/metadata.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -12,49 +13,50 @@ class SQLEditor extends StatelessWidget {
 
   const SQLEditor({super.key, required this.codeController});
 
-  List<CodeKeywordPrompt> buildMetadataKeyword(List<SchemaMeta> metadata) {
-    List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
-    for (var schemaMeta in metadata) {
-      keywordPrompt.add(CodeKeywordPrompt(word: schemaMeta.name));
-      for (var tableMeta in schemaMeta.tables) {
-        keywordPrompt.add(CodeKeywordPrompt(word: tableMeta.name));
-        if (tableMeta.columns != null) {
-          for (var column in tableMeta.columns!) {
-            keywordPrompt.add(CodeKeywordPrompt(word: column.name));
-          }
-        }
-        if (tableMeta.keys != null) {
-          for (var index in tableMeta.keys!) {
-            keywordPrompt.add(CodeKeywordPrompt(word: index.name));
-          }
-        }
-      }
-    }
-    return keywordPrompt;
+  List<CodeKeywordPrompt> buildMetadataKeyword(MetaDataNode metadata) {
+    return List.empty();
+    // List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
+    // for (var schemaMeta in metadata.items) {
+    //   keywordPrompt.add(CodeKeywordPrompt(word: schemaMeta.name));
+    //   for (var tableMeta in schemaMeta.tables) {
+    //     keywordPrompt.add(CodeKeywordPrompt(word: tableMeta.name));
+    //     if (tableMeta.columns != null) {
+    //       for (var column in tableMeta.columns!) {
+    //         keywordPrompt.add(CodeKeywordPrompt(word: column.name));
+    //       }
+    //     }
+    //     if (tableMeta.keys != null) {
+    //       for (var index in tableMeta.keys!) {
+    //         keywordPrompt.add(CodeKeywordPrompt(word: index.name));
+    //       }
+    //     }
+    //   }
+    // }
+    // return keywordPrompt;
   }
 
   Map<String, List<CodePrompt>> buildRelatePrompts(
-      List<SchemaMeta> metadata, String? currentSchema) {
+      MetaDataNode metadata, String? currentSchema) {
     Map<String, List<CodePrompt>> relatedPrompts = {};
-    for (var schemaMeta in metadata) {
-      relatedPrompts[schemaMeta.name] = [
-        for (final table in schemaMeta.tables)
-          CodeKeywordPrompt(word: table.name),
-      ];
-    }
-    if (currentSchema != null) {
-      SchemaMeta currentSchemaMeta = metadata.firstWhere(
-          (meta) => meta.name == currentSchema,
-          orElse: () => SchemaMeta(currentSchema));
-      for (final table in currentSchemaMeta.tables) {
-        if (table.columns != null) {
-          relatedPrompts[table.name] = [
-            for (final table in table.columns!)
-              CodeKeywordPrompt(word: table.name),
-          ];
-        }
-      }
-    }
+    // for (var schemaMeta in metadata) {
+    //   relatedPrompts[schemaMeta.name] = [
+    //     for (final table in schemaMeta.tables)
+    //       CodeKeywordPrompt(word: table.name),
+    //   ];
+    // }
+    // if (currentSchema != null) {
+    //   SchemaMeta currentSchemaMeta = metadata.firstWhere(
+    //       (meta) => meta.name == currentSchema,
+    //       orElse: () => SchemaMeta(currentSchema));
+    //   for (final table in currentSchemaMeta.tables) {
+    //     if (table.columns != null) {
+    //       relatedPrompts[table.name] = [
+    //         for (final table in table.columns!)
+    //           CodeKeywordPrompt(word: table.name),
+    //       ];
+    //     }
+    //   }
+    // }
     return relatedPrompts;
   }
 
@@ -63,7 +65,7 @@ class SQLEditor extends StatelessWidget {
     SessionProvider sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
 
-    List<SchemaMeta>? metadata = sessionProvider.getMetadata();
+    MetaDataNode? metadata = sessionProvider.getMetadata();
     String? currentSchema = sessionProvider.getCurrentSchema();
 
     List<CodeKeywordPrompt> keywordPrompt = [

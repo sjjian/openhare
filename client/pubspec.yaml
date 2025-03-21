@@ -54,6 +54,8 @@ dependencies:
     path:  ../sql-editor/
   common:
     path: ../common/
+  db_driver:
+    path: ../pkg/db_driver/
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,15 @@
+[package]
+name = "mysql"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+flutter_rust_bridge = "=2.9.0"
+mysql_async = { version = "0.35.1", default-features = false, features =  ["minimal-rust", "rustls-tls", "ring"] }
+chrono = "0.4"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
