@@ -32,7 +32,7 @@ class SessionBodyPage extends StatelessWidget {
             ),
           ],
         );
-        return sessionProvider.isRightPageOpen
+        return sessionProvider.isRightPageOpen()
             ? SplitView(
                 axis: Axis.horizontal,
                 controller: sessionProvider.session!.metaDataSplitViewCtrl,

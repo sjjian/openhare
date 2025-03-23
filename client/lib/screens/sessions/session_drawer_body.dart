@@ -139,11 +139,11 @@ class SessionDrawerBar extends StatelessWidget {
             const Spacer(),
             IconButton(
               onPressed: () {
-                sessionProvider.isRightPageOpen
+                sessionProvider.isRightPageOpen()
                     ? sessionProvider.hideRightPage()
                     : sessionProvider.showRightPage();
               },
-              icon: sessionProvider.isRightPageOpen
+              icon: sessionProvider.isRightPageOpen()
                   ? const Icon(Icons.format_indent_increase)
                   : const Icon(Icons.format_indent_decrease),
             )

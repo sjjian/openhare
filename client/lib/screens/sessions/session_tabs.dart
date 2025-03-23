@@ -35,8 +35,8 @@ class SessionTabs extends StatelessWidget {
               for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
                 CommonTabWrap(
                   avatar: Image.asset("assets/icons/mysql_icon.png"),
-                  label: sessionListProvider.sessions.data[i].conn != null
-                      ? sessionListProvider.sessions.data[i].conn!.instance.name
+                  label: sessionListProvider.sessions.data[i].conn2 != null
+                      ? sessionListProvider.sessions.data[i].instance!.name
                       : "new",
                   items: <PopupMenuEntry>[
                     PopupMenuItem<String>(

@@ -1,5 +1,3 @@
-// import 'package:client/core/connection/metadata.dart';
-import 'package:client/core/connection/mysql.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/utils/reorder_list.dart';
@@ -10,19 +8,22 @@ import 'package:multi_split_view/multi_split_view.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:common/parser.dart';
 import 'package:db_driver/db_driver.dart';
+import 'package:client/models/instances.dart';
 
 class SessionsModel {
   ReorderSelectedList<SessionModel> data = ReorderSelectedList();
-
-  // SessionsModel() {}
 }
 
+enum SQLConnectState { pending, connecting, connected, failed }
 class SessionModel {
-  // String id;
+  InstanceModel? instance;
+  BaseConnection? conn2;
+  SQLConnectState connState = SQLConnectState.pending;
+  void Function()? _onClose;
+  void Function(String)? _onSchemaChanged;
+  String? currentSchema;
 
-  SQLConnectionMgr? conn;
-
-  SQLExecuteState? state;
+  SQLExecuteState? queryState;
 
   MetaDataNode? metadata;
 
@@ -34,7 +35,7 @@ class SessionModel {
       SplitViewController(Area(), Area(min: 35, size: 500));
 
   final SplitViewController metaDataSplitViewCtrl =
-      SplitViewController(Area(flex: 7, min:3), Area(flex: 3, min: 3));
+      SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3));
 
   CodeLineEditingController code = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
@@ -47,7 +48,17 @@ class SessionModel {
             .toList());
   });
 
-  SessionModel({this.conn});
+  // session drawer
+  DrawerPage page = DrawerPage.metadataTree;
+
+  BaseQueryValue? sqlResult;
+  BaseQueryColumn? sqlColumn;
+
+  //
+  bool showRecord = true;
+  bool isRightPageOpen = true;
+
+  SessionModel();
 
   int genSQLResultId() {
     return sqlResults.isEmpty
@@ -57,5 +68,58 @@ class SessionModel {
                 (previousId, element) =>
                     previousId < element.id ? element.id : previousId) +
             1;
+  }
+
+  Future<void> connect() async {
+    try {
+      conn2 = await ConnectionFactory.open(
+          type: DatabaseType.mysql,
+          meta: ConnectMeta(
+              addr: instance!.addr,
+              port: instance!.port,
+              user: instance!.user,
+              password: instance!.password,
+              database: currentSchema),
+          onCloseCallback: onConnClose,
+          onSchemaChangedCallback: onSchemaChanged);
+      connState = SQLConnectState.connected;
+    } catch (e) {
+      print("conn error: ${e}");
+      connState = SQLConnectState.failed;
+    }
+  }
+
+  Future<void> close() async {
+    if (conn2 == null || connState != SQLConnectState.connected) {
+      return;
+    }
+    try {
+      conn2!.close();
+      connState = SQLConnectState.pending;
+      // conn = null;
+    } catch (e) {
+      // todo: handler error;
+    }
+  }
+
+  void onConnClose() {
+    connState = SQLConnectState.pending;
+    _onClose?.call();
+  }
+
+  void onSchemaChanged(String schema) {
+    currentSchema = schema;
+    _onSchemaChanged?.call(schema);
+  }
+
+  void listenCallBack(
+      void Function() onClose, void Function(String) onSchemaChanged) {
+    _onClose = onClose;
+    _onSchemaChanged = onSchemaChanged;
+  }
+
+  void unListenCallBack() {
+    _onClose = null;
+    _onSchemaChanged = null;
   }
 }

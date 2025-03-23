@@ -41,7 +41,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                   builder: (context, sessionProvider, _) {
                     final results = sessionProvider.getAllSQLResult();
                     final currentResult = sessionProvider.getCurrentSQLResult();
-                    final showRecord = sessionProvider.showRecord;
+                    final showRecord = sessionProvider.session!.showRecord;
                     if (results == null) {
                       return const Spacer();
                     }
@@ -151,7 +151,7 @@ class _SqlResultTableState extends State<SqlResultTable> {
           .colorScheme
           .surfaceContainerLow; // sql result body 的背景色
       final result = sessionProvider.getCurrentSQLResult();
-      if (sessionProvider.showRecord) {
+      if (sessionProvider.session!.showRecord) {
         return Container(
             alignment: Alignment.center,
             color: color,
