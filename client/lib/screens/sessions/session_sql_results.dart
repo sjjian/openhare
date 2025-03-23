@@ -168,7 +168,7 @@ class _SqlResultTableState extends State<SqlResultTable> {
           key: ObjectKey(result),
           mode: PlutoGridMode.selectWithOneTap,
           onSelected: (event) {
-            sessionProvider.session!.metadataController.showSQLResult(
+            sessionProvider.showSQLResult(
               result: result.rows![event.rowIdx!]
                   .getValue(event.cell!.column.title),
               column: result.rows![event.rowIdx!]

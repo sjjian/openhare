@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TablePaginatedBar extends StatefulWidget {
-  TablePageController controller;
+  final TablePageController controller;
 
-  TablePaginatedBar({Key? key, required this.controller}) : super(key: key);
+  const TablePaginatedBar({Key? key, required this.controller}) : super(key: key);
 
   @override
   State<TablePaginatedBar> createState() => _PaginatedBarState();

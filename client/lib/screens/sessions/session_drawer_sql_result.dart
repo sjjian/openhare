@@ -1,27 +1,27 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:client/providers/sessions.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/utils/file_type.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/atom-one-light.dart';
 
 class SessionDrawerSqlResult extends StatelessWidget {
-  final SessionDrawerController controller;
-
-  const SessionDrawerSqlResult({Key? key, required this.controller})
-      : super(key: key);
+  const SessionDrawerSqlResult({Key? key}) : super(key: key);
 
   Widget buildDisplayField(BuildContext context) {
-    BaseQueryValue? result = controller.sqlResult;
+    SessionProvider sessionProvider =
+        Provider.of<SessionProvider>(context, listen: false);
+    BaseQueryValue? result = sessionProvider.session!.sqlResult;
     if (result == null) {
       return const ValueDisplayField(data: "");
     }
-    BaseQueryColumn? column = controller.sqlColumn;
+    BaseQueryColumn? column = sessionProvider.session!.sqlColumn;
     if (column == null) {
-      return ValueDisplayField(data: result.getString()??"");
+      return ValueDisplayField(data: result.getString() ?? "");
     }
     final dataType = column.dataType();
     if (dataType == DataType.blob) {
@@ -56,7 +56,13 @@ class SessionDrawerSqlResult extends StatelessWidget {
           // const Divider(
           //   endIndent: 10,
           // ),
-          Expanded(child: buildDisplayField(context)),
+          Expanded(
+            child: Consumer<SessionProvider>(
+                builder: (context, sessionProvider, _) {
+              return buildDisplayField(context);
+            }),
+            // child: buildDisplayField(context),
+          ),
         ]);
   }
 }

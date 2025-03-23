@@ -265,4 +265,22 @@ class SessionProvider with ChangeNotifier {
     }
     return _session!.isRightPageOpen;
   }
+
+  void goToTree() {
+    if (_session == null) {
+      return;
+    }
+    _session!.drawerPage = DrawerPage.metadataTree;
+    notifyListeners();
+  }
+
+  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
+    if (_session == null) {
+      return;
+    }
+    _session!.drawerPage = DrawerPage.sqlResult;
+    _session!.sqlColumn = column ?? _session!.sqlColumn;
+    _session!.sqlResult = result ?? _session!.sqlResult;
+    notifyListeners();
+  }
 }

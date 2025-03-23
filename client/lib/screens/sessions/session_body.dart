@@ -14,8 +14,7 @@ class SessionBodyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.topLeft,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final Widget left = Column(
           children: [
@@ -37,10 +36,7 @@ class SessionBodyPage extends StatelessWidget {
                 axis: Axis.horizontal,
                 controller: sessionProvider.session!.metaDataSplitViewCtrl,
                 first: left,
-                second: SessionDrawerBody(
-                  controller:
-                      sessionProvider.session!.metadataController, //todo
-                ),
+                second: const SessionDrawerBody(),
               )
             : left;
       }),

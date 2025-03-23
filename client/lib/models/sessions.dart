@@ -15,6 +15,12 @@ class SessionsModel {
 }
 
 enum SQLConnectState { pending, connecting, connected, failed }
+
+enum DrawerPage {
+  metadataTree,
+  sqlResult,
+}
+
 class SessionModel {
   InstanceModel? instance;
   BaseConnection? conn2;
@@ -26,8 +32,6 @@ class SessionModel {
   SQLExecuteState? queryState;
 
   MetaDataNode? metadata;
-
-  SessionDrawerController metadataController = SessionDrawerController();
 
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 
@@ -49,7 +53,7 @@ class SessionModel {
   });
 
   // session drawer
-  DrawerPage page = DrawerPage.metadataTree;
+  DrawerPage drawerPage = DrawerPage.metadataTree;
 
   BaseQueryValue? sqlResult;
   BaseQueryColumn? sqlColumn;

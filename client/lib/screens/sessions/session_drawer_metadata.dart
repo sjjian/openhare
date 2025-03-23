@@ -1,12 +1,10 @@
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
 class RootNode implements DataNode {
   final String name;
@@ -82,10 +80,7 @@ class ColumnNode extends RootNode {
 }
 
 class SessionDrawerMetadata extends StatelessWidget {
-  final SessionDrawerController controller;
-
-  const SessionDrawerMetadata({Key? key, required this.controller})
-      : super(key: key);
+  const SessionDrawerMetadata({Key? key}) : super(key: key);
 
   DataNode buildDataNode(MetaDataNode node) {
     return switch (node.type) {
@@ -132,7 +127,7 @@ class SessionDrawerMetadata extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SessionMetadataTitle(controller: controller),
+            // SessionMetadataTitle(),
             // const Divider(
             //   endIndent: 10,
             // ),
@@ -184,61 +179,60 @@ class SessionDrawerMetadata extends StatelessWidget {
 //   }
 // }
 
-class SessionMetadataTitle extends StatefulWidget {
-  final SessionDrawerController controller;
-  const SessionMetadataTitle({Key? key, required this.controller})
-      : super(key: key);
+// class SessionMetadataTitle extends StatefulWidget {
+//   const SessionMetadataTitle({Key? key})
+//       : super(key: key);
 
-  @override
-  State<SessionMetadataTitle> createState() => _SessionMetadataTitleState();
-}
+//   @override
+//   State<SessionMetadataTitle> createState() => _SessionMetadataTitleState();
+// }
 
-class _SessionMetadataTitleState extends State<SessionMetadataTitle> {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 33,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          double width = constraints.maxWidth - 40 - 24 - 24;
-          return BreadCrumb(
-            items: <BreadCrumbItem>[
-              BreadCrumbItem(
-                  content: IconButton(
-                      onPressed: () {
-                        widget.controller.goToTree();
-                      },
-                      icon: const Icon(Icons.home))),
-              if (widget.controller.page != DrawerPage.metadataTree)
-                BreadCrumbItem(
-                    content: Container(
-                  constraints: BoxConstraints(maxWidth: width / 2),
-                  child: Text(
-                    widget.controller.currentSchema!,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )),
-              if (widget.controller.page != DrawerPage.metadataTree)
-                BreadCrumbItem(
-                    content: Container(
-                  constraints: BoxConstraints(maxWidth: width / 2),
-                  child: Text(
-                    widget.controller.currentTable!,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )),
-            ],
-            divider: const Icon(Icons.chevron_right),
-          );
-        },
-      ),
-    );
-  }
-}
+// class _SessionMetadataTitleState extends State<SessionMetadataTitle> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       height: 33,
+//       child: LayoutBuilder(
+//         builder: (context, constraints) {
+//           double width = constraints.maxWidth - 40 - 24 - 24;
+//           return BreadCrumb(
+//             items: <BreadCrumbItem>[
+//               BreadCrumbItem(
+//                   content: IconButton(
+//                       onPressed: () {
+//                         widget.controller.goToTree();
+//                       },
+//                       icon: const Icon(Icons.home))),
+//               if (widget.controller.page != DrawerPage.metadataTree)
+//                 BreadCrumbItem(
+//                     content: Container(
+//                   constraints: BoxConstraints(maxWidth: width / 2),
+//                   child: Text(
+//                     widget.controller.currentSchema!,
+//                     style: Theme.of(context).textTheme.titleMedium,
+//                     textAlign: TextAlign.center,
+//                     overflow: TextOverflow.ellipsis,
+//                   ),
+//                 )),
+//               if (widget.controller.page != DrawerPage.metadataTree)
+//                 BreadCrumbItem(
+//                     content: Container(
+//                   constraints: BoxConstraints(maxWidth: width / 2),
+//                   child: Text(
+//                     widget.controller.currentTable!,
+//                     style: Theme.of(context).textTheme.titleMedium,
+//                     textAlign: TextAlign.center,
+//                     overflow: TextOverflow.ellipsis,
+//                   ),
+//                 )),
+//             ],
+//             divider: const Icon(Icons.chevron_right),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
 
 // class SessionMetadataColumn extends StatefulWidget {
 //   final TableColumnMeta column;
