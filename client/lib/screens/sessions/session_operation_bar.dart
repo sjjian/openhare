@@ -108,7 +108,7 @@ class SessionOpBar extends StatelessWidget {
                 disable: canQuery ? false : true,
                 currentSchema: sessionProvider.session!.currentSchema),
             const Spacer(),
-            if (sessionProvider.isRightPageOpen == false)
+            if (sessionProvider.isRightPageOpen() == false)
               IconButton(
                 onPressed: () {
                   sessionProvider.showRightPage();

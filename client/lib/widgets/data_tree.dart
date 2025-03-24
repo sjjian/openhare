@@ -10,9 +10,9 @@ abstract class DataNode {
 }
 
 class DataTree extends StatefulWidget {
-  final List<DataNode> roots;
+  final TreeController<DataNode> controller;
 
-  const DataTree({Key? key, required this.roots}) : super(key: key);
+  const DataTree({Key? key, required this.controller}) : super(key: key);
 
   @override
   State<DataTree> createState() => _DataTreeState();
@@ -21,18 +21,13 @@ class DataTree extends StatefulWidget {
 class _DataTreeState extends State<DataTree> {
   @override
   Widget build(BuildContext context) {
-    late final TreeController<DataNode> treeController;
-    treeController = TreeController<DataNode>(
-      roots: widget.roots,
-      childrenProvider: (DataNode node) => node.children,
-    );
     return TreeView<DataNode>(
-      treeController: treeController,
+      treeController: widget.controller,
       nodeBuilder: (BuildContext context, TreeEntry<DataNode> entry) {
         return MyTreeTile(
           key: ValueKey(entry.node),
           entry: entry,
-          onTap: () => treeController.toggleExpansion(entry.node),
+          onTap: () => widget.controller.toggleExpansion(entry.node),
         );
       },
     );

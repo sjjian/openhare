@@ -52,7 +52,7 @@ class SessionDrawerSqlResult extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 32),
+          // const SizedBox(height: 32),
           // const Divider(
           //   endIndent: 10,
           // ),

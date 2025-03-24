@@ -1,9 +1,10 @@
 import 'package:client/models/sql_result.dart';
-import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:flutter/material.dart';
+import 'package:client/widgets/data_tree.dart';
+import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:common/parser.dart';
@@ -32,6 +33,8 @@ class SessionModel {
   SQLExecuteState? queryState;
 
   MetaDataNode? metadata;
+
+  TreeController<DataNode>? metadataController;
 
   ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
 

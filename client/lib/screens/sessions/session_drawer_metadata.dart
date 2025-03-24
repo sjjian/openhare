@@ -3,6 +3,7 @@ import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 
@@ -119,8 +120,18 @@ class SessionDrawerMetadata extends StatelessWidget {
 
       MetaDataNode? meta = sessionProvider.getMetadata();
       if (meta != null) {
-        final root = RootNode();
-        body = DataTree(roots: buildMetadataTree(root, [meta]).children);
+        final controller = sessionProvider.session!.metadataController;
+        // todo
+        if (controller == null) {
+          final root = RootNode();
+          sessionProvider.session!.metadataController =
+              TreeController<DataNode>(
+            roots: buildMetadataTree(root, [meta]).children,
+            childrenProvider: (DataNode node) => node.children,
+          );
+        }
+        body =
+            DataTree(controller: sessionProvider.session!.metadataController!);
       }
 
       return Column(
