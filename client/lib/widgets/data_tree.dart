@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
-import 'package:hugeicons/hugeicons.dart';
 
 abstract class DataNode {
   List<DataNode> get children;
   Widget builder(BuildContext context);
-  IconData closeIcons();
-  IconData openIcons();
+  Widget closeIcons(BuildContext context);
+  Widget openIcons(BuildContext context);
 }
 
 class DataTree extends StatefulWidget {
@@ -81,21 +80,9 @@ class _MyTreeTileState extends State<MyTreeTile> {
               child: Row(
                 children: [
                   FolderButton(
-                    openedIcon: HugeIcon(
-                      icon: widget.entry.node.openIcons(),
-                      color:
-                          Theme.of(context).iconTheme.color ?? Colors.black87,
-                    ),
-                    closedIcon: HugeIcon(
-                      icon: widget.entry.node.closeIcons(),
-                      color:
-                          Theme.of(context).iconTheme.color ?? Colors.black87,
-                    ),
-                    icon: HugeIcon(
-                      icon: widget.entry.node.openIcons(),
-                      color:
-                          Theme.of(context).iconTheme.color ?? Colors.black87,
-                    ),
+                    openedIcon: widget.entry.node.openIcons(context),
+                    closedIcon: widget.entry.node.closeIcons(context),
+                    icon: widget.entry.node.openIcons(context),
                     isOpen: widget.entry.hasChildren
                         ? widget.entry.isExpanded
                         : null,

@@ -20,13 +20,19 @@ class RootNode implements DataNode {
   }
 
   @override
-  IconData openIcons() {
-    return HugeIcons.strokeRoundedDatabase;
+  Widget openIcons(BuildContext context) {
+    return HugeIcon(
+      icon: HugeIcons.strokeRoundedDatabase,
+      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+    );
   }
 
   @override
-  IconData closeIcons() {
-    return HugeIcons.strokeRoundedDatabase;
+  Widget closeIcons(BuildContext context) {
+    return HugeIcon(
+      icon: HugeIcons.strokeRoundedDatabase,
+      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+    );
   }
 
   @override
@@ -42,13 +48,19 @@ class SchemaNode extends RootNode {
   SchemaNode(String name) : super(name: name);
 
   @override
-  IconData openIcons() {
-    return HugeIcons.strokeRoundedDatabase;
+  Widget openIcons(BuildContext context) {
+    return HugeIcon(
+      icon: HugeIcons.strokeRoundedDatabase,
+      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+    );
   }
 
   @override
-  IconData closeIcons() {
-    return HugeIcons.strokeRoundedDatabase;
+  Widget closeIcons(BuildContext context) {
+    return HugeIcon(
+      icon: HugeIcons.strokeRoundedDatabase,
+      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+    );
   }
 }
 
@@ -56,27 +68,36 @@ class TableNode extends RootNode {
   TableNode(String name) : super(name: name);
 
   @override
-  IconData openIcons() {
-    return HugeIcons.strokeRoundedTable;
+  Widget openIcons(BuildContext context) {
+    return HugeIcon(
+      icon: HugeIcons.strokeRoundedTable,
+      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+    );
   }
 
+
   @override
-  IconData closeIcons() {
-    return HugeIcons.strokeRoundedTable;
+  Widget closeIcons(BuildContext context) {
+    return HugeIcon(
+      icon: HugeIcons.strokeRoundedTable,
+      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+    );
   }
 }
 
 class ColumnNode extends RootNode {
-  ColumnNode(String name) : super(name: name);
+  DataType type;
+  ColumnNode(String name, this.type) : super(name: name);
 
   @override
-  IconData openIcons() {
-    return Icons.abc;
+  Widget openIcons(BuildContext context) {
+    return DataTypeIcon(type: type);
   }
 
+
   @override
-  IconData closeIcons() {
-    return Icons.abc;
+  Widget closeIcons(BuildContext context) {
+    return DataTypeIcon(type: type);
   }
 }
 
@@ -87,7 +108,8 @@ class SessionDrawerMetadata extends StatelessWidget {
     return switch (node.type) {
       MetaType.database => SchemaNode(node.value),
       MetaType.table => TableNode(node.value),
-      MetaType.column => ColumnNode(node.value),
+      MetaType.column =>
+        ColumnNode(node.value, node.getProp(MetaDataPropType.dataType)),
       _ => SchemaNode(node.value)
     };
   }

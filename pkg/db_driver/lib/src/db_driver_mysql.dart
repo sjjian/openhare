@@ -240,6 +240,31 @@ class MySQLConnection extends BaseConnection {
     return tables;
   }
 
+  static DataType getDataType(String dataType) {
+    return switch (dataType) {
+      "int" ||
+      "bigint" ||
+      "smallint" ||
+      "tinyint" ||
+      "decimal" ||
+      "double" ||
+      "float" =>
+        DataType.number,
+      "char" || "varchar" => DataType.char,
+      "datetime" || "time" || "timestamp" => DataType.time,
+      "text" ||
+      "blob" ||
+      "longblob" ||
+      "longtext" ||
+      "mediumblob" ||
+      "mediumtext" =>
+        DataType.blob,
+      "json" => DataType.json,
+      "set" || "enum" => DataType.dataSet,
+      _ => DataType.blob,
+    };
+  }
+
   Future<List<MetaDataNode>> getTableColumns(
       String schema, String table) async {
     List<MetaDataNode> columns = List.empty(growable: true);
@@ -248,8 +273,10 @@ class MySQLConnection extends BaseConnection {
         "select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT, EXTRA from information_schema.columns where TABLE_SCHEMA = '$schema' and TABLE_NAME = '$table'");
     final rows = results.rows;
     for (final result in rows) {
-      columns
-          .add(MetaDataNode(MetaType.column, result.getString("COLUMN_NAME")!));
+      final node = MetaDataNode(MetaType.column, result.getString("COLUMN_NAME")!)
+      ..withProp(MetaDataPropType.dataType, getDataType(result.getString("DATA_TYPE")!));
+
+      columns.add(node);
       // columns.add(TableColumnMeta.loadFromRow(result));
     }
     return columns;

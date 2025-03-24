@@ -4,8 +4,8 @@ class MetaDataNode {
   MetaType type;
   String value;
   List<MetaDataNode>? items;
-  List<MetaDataProp>? props;
-  MetaDataNode(this.type, this.value, {this.items, this.props});
+  final Map<MetaDataPropType, MetaDataProp> props = {};
+  MetaDataNode(this.type, this.value, {this.items});
 
   void visitor(bool Function(MetaDataNode node, MetaDataNode? parent) callback,
       [MetaDataNode? parent]) {
@@ -18,13 +18,23 @@ class MetaDataNode {
       }
     }
   }
+
+  MetaDataNode withProp(MetaDataPropType name, Object value){
+    props[name] = MetaDataProp(name, value);
+    return this;
+  }
+
+  T? getProp<T>(MetaDataPropType name) {
+    return props[name]?.value as T?;
+  }
 }
 
+enum MetaDataPropType { dataType, indexType }
+
 class MetaDataProp {
-  String name;
-  String value;
+  MetaDataPropType name;
+  Object value;
 
   MetaDataProp(this.name, this.value);
 }
 
-class MetaDataTree {}
