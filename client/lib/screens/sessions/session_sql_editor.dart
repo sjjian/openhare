@@ -14,49 +14,34 @@ class SQLEditor extends StatelessWidget {
   const SQLEditor({super.key, required this.codeController});
 
   List<CodeKeywordPrompt> buildMetadataKeyword(MetaDataNode metadata) {
-    return List.empty();
-    // List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
-    // for (var schemaMeta in metadata.items) {
-    //   keywordPrompt.add(CodeKeywordPrompt(word: schemaMeta.name));
-    //   for (var tableMeta in schemaMeta.tables) {
-    //     keywordPrompt.add(CodeKeywordPrompt(word: tableMeta.name));
-    //     if (tableMeta.columns != null) {
-    //       for (var column in tableMeta.columns!) {
-    //         keywordPrompt.add(CodeKeywordPrompt(word: column.name));
-    //       }
-    //     }
-    //     if (tableMeta.keys != null) {
-    //       for (var index in tableMeta.keys!) {
-    //         keywordPrompt.add(CodeKeywordPrompt(word: index.name));
-    //       }
-    //     }
-    //   }
-    // }
-    // return keywordPrompt;
+    List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
+    metadata.visitor((node, parent) {
+      keywordPrompt.add(CodeKeywordPrompt(word: node.value));
+      return true;
+    });
+    return keywordPrompt;
   }
 
   Map<String, List<CodePrompt>> buildRelatePrompts(
       MetaDataNode metadata, String? currentSchema) {
     Map<String, List<CodePrompt>> relatedPrompts = {};
-    // for (var schemaMeta in metadata) {
-    //   relatedPrompts[schemaMeta.name] = [
-    //     for (final table in schemaMeta.tables)
-    //       CodeKeywordPrompt(word: table.name),
-    //   ];
-    // }
-    // if (currentSchema != null) {
-    //   SchemaMeta currentSchemaMeta = metadata.firstWhere(
-    //       (meta) => meta.name == currentSchema,
-    //       orElse: () => SchemaMeta(currentSchema));
-    //   for (final table in currentSchemaMeta.tables) {
-    //     if (table.columns != null) {
-    //       relatedPrompts[table.name] = [
-    //         for (final table in table.columns!)
-    //           CodeKeywordPrompt(word: table.name),
-    //       ];
-    //     }
-    //   }
-    // }
+    // todo: 有一个缺陷，有下划线的变量无法relate, 当存在类似的prefix时，例如: 存在`t1`时, `t1_1`无法关联。
+    metadata.visitor((node, parent) {
+      if (parent == null) {
+        return true;
+      }
+      if (parent.value == "") {
+        return true;
+      }
+      if (node.type == MetaType.schema && node.value != currentSchema) {
+        return false;
+      }
+      final ps = relatedPrompts.putIfAbsent(
+          parent.value, () => List.empty(growable: true));
+
+      ps.add(CodeKeywordPrompt(word: node.value));
+      return true;
+    });
     return relatedPrompts;
   }
 
