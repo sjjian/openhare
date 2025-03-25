@@ -80,18 +80,19 @@ class SessionModel {
   Future<void> connect() async {
     try {
       conn2 = await ConnectionFactory.open(
-          type: DatabaseType.mysql,
+          type: (instance!.type == "mysql") ? DatabaseType.mysql:DatabaseType.pg,
           meta: ConnectMeta(
               addr: instance!.addr,
               port: instance!.port,
               user: instance!.user,
               password: instance!.password,
-              database: currentSchema),
+              database: instance!.databases,
+              schema: currentSchema),
           onCloseCallback: onConnClose,
           onSchemaChangedCallback: onSchemaChanged);
       connState = SQLConnectState.connected;
-    } catch (e) {
-      print("conn error: ${e}");
+    } catch (e, s) {
+      print("conn error: ${e}; ${s}");
       connState = SQLConnectState.failed;
     }
   }
@@ -103,7 +104,7 @@ class SessionModel {
     try {
       conn2!.close();
       connState = SQLConnectState.pending;
-      // conn = null;
+      conn2 = null;
     } catch (e) {
       // todo: handler error;
     }

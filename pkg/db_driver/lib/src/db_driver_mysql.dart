@@ -128,8 +128,8 @@ class MySQLConnection extends BaseConnection {
 
   static Future<BaseConnection> open({required ConnectMeta meta}) async {
     var dsn = "mysql://${meta.user}:${meta.password}@${meta.addr}:${meta.port}";
-    if (meta.database != null) {
-      dsn = "$dsn/${meta.database}";
+    if (meta.schema != null) {
+      dsn = "$dsn/${meta.schema}";
     }
     final conn = await ConnWrapper.open(dsn: dsn);
     return MySQLConnection(conn);

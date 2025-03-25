@@ -13,11 +13,13 @@ class ConnectionFactory {
       required ConnectMeta meta,
       Function()? onCloseCallback,
       Function(String)? onSchemaChangedCallback}) async {
-    final conn =  switch (type) {
-       DatabaseType.mysql=>  await MySQLConnection.open(meta: meta),
-       DatabaseType.pg =>await PGConnection.open(meta: meta),
+    final conn = switch (type) {
+      DatabaseType.mysql => await MySQLConnection.open(meta: meta),
+      DatabaseType.pg => await PGConnection.open(meta: meta),
     };
-    conn.listen(onCloseCallback: onCloseCallback, onSchemaChangedCallback: onSchemaChangedCallback);
+    conn.listen(
+        onCloseCallback: onCloseCallback,
+        onSchemaChangedCallback: onSchemaChangedCallback);
     return conn;
   }
 }

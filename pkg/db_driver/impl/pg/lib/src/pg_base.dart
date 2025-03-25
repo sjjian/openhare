@@ -8,7 +8,9 @@ class PGConn {
   PGConn(this.conn);
 
   static Future<PGConn> open({required Endpoint endpoint}) async {
-    final conn = await Connection.open(endpoint);
+    final conn = await Connection.open(endpoint, settings: ConnectionSettings(
+      sslMode: SslMode.disable, //todo: 需要判断是否需要开启ssl
+    ));
     return PGConn(conn);
   }
 

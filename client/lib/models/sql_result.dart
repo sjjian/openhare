@@ -8,7 +8,7 @@ class SQLResultModel {
   int id;
   SQLExecuteState state = SQLExecuteState.executing;
   String query;
-  Exception? error;
+  String? error;
   List<BaseQueryColumn>? columns;
   List<QueryResultRow>? rows;
   Duration? executeTime;
@@ -24,7 +24,7 @@ class SQLResultModel {
     state = SQLExecuteState.done;
   }
 
-  void setError(error) {
+  void setError(String error) {
     state = SQLExecuteState.error;
     this.error = error;
   }

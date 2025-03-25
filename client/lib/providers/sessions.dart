@@ -168,6 +168,7 @@ class SessionProvider with ChangeNotifier {
   }
 
   void onSchemaChanged(String schema) {
+    Storage().addInstanceActiveSchema(session!.instance!, schema);
     notifyListeners();
   }
 
@@ -205,7 +206,7 @@ class SessionProvider with ChangeNotifier {
           queryResult.affectedRows.toInt());
       _session!.queryState = SQLExecuteState.done;
     } catch (e) {
-      result.setError(e);
+      result.setError(e.toString());
       _session!.queryState = SQLExecuteState.error;
     } finally {
       notifyListeners();
@@ -228,6 +229,9 @@ class SessionProvider with ChangeNotifier {
 
   Future<void> loadMetadata() async {
     if (session!.metadata != null) {
+      return;
+    }
+    if (session!.connState != SQLConnectState.connected) {
       return;
     }
     session!.metadata = await session!.conn2!.metadata();

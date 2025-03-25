@@ -28,7 +28,7 @@ class PGQueryColumn extends BaseQueryColumn {
   PGQueryColumn(this._column);
 
   @override
-  String get name => _column.toString();
+  String get name => _column.columnName ?? "";
 
   @override
   DataType dataType() {
@@ -111,25 +111,34 @@ class PGConnection extends BaseConnection {
     await _conn.close();
   }
 
-    @override
+  @override
   Future<MetaDataNode> metadata() async {
-    return  MetaDataNode(MetaType.instance, "");
+    return MetaDataNode(MetaType.instance, "");
   }
 
-    @override
+  @override
   Future<void> setCurrentSchema(String schema) async {
+    await query("SET search_path TO $schema");
+    final currentSchema = await getCurrentSchema();
+    onSchemaChanged(currentSchema!);
     return;
-    // onSchemaChanged(_currentSchema!);
   }
 
   @override
   Future<String?> getCurrentSchema() async {
-    return "";
+    final results = await query("SELECT current_schema();");
+    final rows = results.rows;
+    final currentSchema = rows.first.getString("current_schema");
+    return currentSchema;
   }
 
   @override
-  Future<List<String>> schemas(){
-    List<String> schemas = List.empty();
-    return Future.value(schemas);
+  Future<List<String>> schemas() async {
+    List<String> schemas = List.empty(growable: true);
+    final results = await query("SELECT nspname FROM pg_namespace;");
+    for (final result in results.rows) {
+      schemas.add(result.getString("nspname") ?? "");
+    }
+    return schemas;
   }
 }
