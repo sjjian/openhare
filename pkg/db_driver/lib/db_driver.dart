@@ -6,3 +6,4 @@ library;
 export 'src/db_driver_base.dart';
 export 'src/db_driver_interface.dart';
 export 'src/db_driver_metadata.dart';
+export 'src/db_driver_conn_meta.dart';

@@ -2,8 +2,6 @@ import 'dart:math';
 
 import 'package:db_driver/src/db_driver_metadata.dart';
 
-enum DatabaseType { mysql, pg }
-
 class ConnectMeta {
   String addr;
   int port;
@@ -68,9 +66,9 @@ class QueryResultRow {
   }
 
   BaseQueryColumn? getColumn(String column) {
-     int? colIndex = index[column];
-     if (colIndex == null || colIndex >= values.length) return null;
-     return columns[colIndex];
+    int? colIndex = index[column];
+    if (colIndex == null || colIndex >= values.length) return null;
+    return columns[colIndex];
   }
 
   String? getString(String column) {
@@ -102,11 +100,14 @@ abstract class BaseConnection {
   Future<List<String>> schemas();
   Future<String?> getCurrentSchema();
   Future<void> setCurrentSchema(String schema);
-  
-  void listen({ Function()? onCloseCallback, Function(String)? onSchemaChangedCallback}) {
+
+  void listen(
+      {Function()? onCloseCallback,
+      Function(String)? onSchemaChangedCallback}) {
     this.onCloseCallback = onCloseCallback;
     this.onSchemaChangedCallback = onSchemaChangedCallback;
   }
+
   void onClose() => onCloseCallback?.call();
   void onSchemaChanged(String schema) => onSchemaChangedCallback?.call(schema);
 }

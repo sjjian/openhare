@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:db_driver/db_driver.dart';
 
 class InstancesProvider extends ChangeNotifier {
-  InstancesProvider();
+  String page = "instances";
   
+  InstancesProvider();
+
   Future<void> loadInstance() async {
     await Storage.load();
     await ConnectionFactory.init();
@@ -52,5 +54,10 @@ class InstancesProvider extends ChangeNotifier {
   List<InstanceModel> activeInstances() {
     Storage st = Storage();
     return st.getActiveInstances();
+  }
+
+  void goPage(String page) {
+    this.page = page;
+    notifyListeners();
   }
 }

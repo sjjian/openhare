@@ -111,7 +111,8 @@ class _InstanceTableState extends State<InstanceTable> {
                               child: FloatingActionButton.small(
                                 elevation: 2,
                                 onPressed: () => {
-                                  showAddInstanceDialog(context)
+                                  instancesProvider.goPage("add_instance")
+                                  // showAddInstanceDialog(context)
                                 },
                                 child: const Icon(Icons.add),
                               ),

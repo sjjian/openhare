@@ -1,4 +1,5 @@
 import 'db_driver_interface.dart';
+import 'db_driver_conn_meta.dart';
 import 'db_driver_mysql.dart';
 import 'package:mysql/mysql.dart' as mysql_lib;
 import 'db_driver_pg.dart';
@@ -23,3 +24,32 @@ class ConnectionFactory {
     return conn;
   }
 }
+
+List<ConnectionMeta> connectionMetas = [
+  ConnectionMeta(
+    displayName: "MySQL",
+    type: DatabaseType.mysql,
+    logoAssertPath: "assets/icons/mysql_icon.png",
+    connMeta: [
+      NameMeta(),
+      AddressMeta(),
+      UserMeta(),
+      PasswordMeta(),
+      DescMeta(),
+    ],
+  ),
+  ConnectionMeta(
+    displayName: "PostgreSQL",
+    type: DatabaseType.pg,
+    logoAssertPath: "assets/icons/mysql_icon.png",
+    connMeta: [
+      NameMeta(),
+      AddressMeta(),
+      UserMeta(),
+      PasswordMeta(),
+      DescMeta(),
+      CustomMeta(
+          name: "database", type: "text", group: "conn", isRequired: true),
+    ],
+  ),
+];
