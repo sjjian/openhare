@@ -80,14 +80,9 @@ class SessionModel {
   Future<void> connect() async {
     try {
       conn2 = await ConnectionFactory.open(
-          type: (instance!.type == "mysql") ? DatabaseType.mysql:DatabaseType.pg,
-          meta: ConnectMeta(
-              addr: instance!.addr,
-              port: instance!.port,
-              user: instance!.user,
-              password: instance!.password,
-              database: instance!.databases,
-              schema: currentSchema),
+          type: instance!.dbType,
+          meta: instance!.connectValue,
+          schema: currentSchema,
           onCloseCallback: onConnClose,
           onSchemaChangedCallback: onSchemaChanged);
       connState = SQLConnectState.connected;

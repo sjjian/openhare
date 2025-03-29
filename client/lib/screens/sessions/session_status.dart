@@ -46,7 +46,7 @@ class SessionStatus extends StatelessWidget {
                       String? outputFile = await FilePicker.platform.saveFile(
                         dialogTitle: 'Please select an output file:',
                         fileName:
-                            '${sessionProvider.session!.instance!.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+                            '${sessionProvider.session!.instance!.connectValue.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
                       );
                       if (outputFile == null) {
                         return;

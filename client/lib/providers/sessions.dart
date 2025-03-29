@@ -87,7 +87,9 @@ class SessionProvider with ChangeNotifier {
       _session!.unListenCallBack();
     }
     _session = session;
-    _session!.listenCallBack(onConnClose, onSchemaChanged);
+    if (session != null) {
+      _session!.listenCallBack(onConnClose, onSchemaChanged);
+    }
     notifyListeners();
   }
 
@@ -151,6 +153,9 @@ class SessionProvider with ChangeNotifier {
   void setConn(InstanceModel instance, {String? schema}) {
     // 记录使用的数据源
     Storage().addActiveInstance(instance);
+    if (schema != null) {
+      Storage().addInstanceActiveSchema(instance, schema);
+    }
     _session!.instance = instance;
     _session!.currentSchema = schema;
     notifyListeners();

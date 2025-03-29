@@ -75,7 +75,7 @@ class Storage {
 
   void updateInstance(InstanceModel target) {
     for (int i = 0; i < instances.length; i++) {
-      if (instances[i].name == target.name) {
+      if (instances[i].connectValue.name == target.connectValue.name) {
         instances[i] = target;
         break;
       }
@@ -84,14 +84,15 @@ class Storage {
   }
 
   void deleteInstance(InstanceModel instance) {
-    instances.removeWhere((element) => element.name == instance.name);
+    instances.removeWhere(
+        (element) => element.connectValue.name == instance.connectValue.name);
     removeActiveInstance(instance);
     _save();
   }
 
   bool isInstanceExist(String name) {
     for (var instance in instances) {
-      if (instance.name == name) {
+      if (instance.connectValue.name == name) {
         return true;
       }
     }
@@ -100,7 +101,7 @@ class Storage {
 
   InstanceModel? getInstance(String name) {
     for (var instance in instances) {
-      if (instance.name == name) {
+      if (instance.connectValue.name == name) {
         return instance;
       }
     }
@@ -113,10 +114,10 @@ class Storage {
     List<InstanceModel> filterList = key.isEmpty
         ? instances
         : instances.where((instance) {
-            return instance.name.contains(key) ||
-                instance.addr.contains(key) ||
-                (instance.desc ?? "").contains(key) ||
-                instance.port.toString().contains(key);
+            return instance.connectValue.name.contains(key) ||
+                instance.connectValue.host.contains(key) ||
+                (instance.connectValue.desc ?? "").contains(key) ||
+                instance.connectValue.port.toString().contains(key);
           }).toList();
 
     if (pageNumber == null || pageSize == null) {
@@ -140,12 +141,12 @@ class Storage {
   }
 
   void addActiveInstance(InstanceModel instance) {
-    activeInstances.add(instance.name);
+    activeInstances.add(instance.connectValue.name);
     _save();
   }
 
   void removeActiveInstance(InstanceModel instance) {
-    activeInstances.remove(instance.name);
+    activeInstances.remove(instance.connectValue.name);
   }
 
   void addInstanceActiveSchema(InstanceModel instance, String schema) {

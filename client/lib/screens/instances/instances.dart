@@ -1,5 +1,6 @@
 import 'package:client/providers/instances.dart';
 import 'package:client/screens/instances/instance_add.dart';
+import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:flutter/material.dart';
@@ -19,14 +20,17 @@ class InstancesPage extends StatelessWidget {
           ? Row(
               children: [
                 IconButton(
-                    onPressed: () => instancesProvider.goPage("instances"),
+                    onPressed: () => {instancesProvider.goPage("instances")},
                     icon: const Icon(Icons.arrow_back))
               ],
             )
           : null,
-      child: (instancesProvider.page == "instances")
-          ? const InstanceTable()
-          : const InstanceAdd(),
+      child: switch (instancesProvider.page) {
+        "instances" => const InstanceTable(),
+        "update_instance" =>
+          UpdateInstancePage(instance: instancesProvider.willUpdatedInstance!),
+        _ => InstanceAdd(),
+      },
     );
   }
 }

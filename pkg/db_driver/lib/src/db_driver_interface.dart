@@ -2,23 +2,6 @@ import 'dart:math';
 
 import 'package:db_driver/src/db_driver_metadata.dart';
 
-class ConnectMeta {
-  String addr;
-  int port;
-  String user;
-  String password;
-  String? database;
-  String? schema;
-
-  ConnectMeta(
-      {required this.addr,
-      required this.port,
-      required this.user,
-      required this.password,
-      this.database,
-      this.schema});
-}
-
 enum DataType {
   number,
   char,

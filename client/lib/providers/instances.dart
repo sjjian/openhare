@@ -5,7 +5,8 @@ import 'package:db_driver/db_driver.dart';
 
 class InstancesProvider extends ChangeNotifier {
   String page = "instances";
-  
+  InstanceModel? willUpdatedInstance;
+
   InstancesProvider();
 
   Future<void> loadInstance() async {
@@ -20,12 +21,8 @@ class InstancesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateInstance(InstanceModel instance){
+  void updateInstance(InstanceModel instance) {
     Storage st = Storage();
-    if (instance.port == 5432) {
-      instance.type = "pg";
-      instance.databases = "postgres";
-    }
     st.updateInstance(instance);
     notifyListeners();
   }
@@ -58,6 +55,12 @@ class InstancesProvider extends ChangeNotifier {
 
   void goPage(String page) {
     this.page = page;
+    notifyListeners();
+  }
+
+  void tryUpdateInstance(InstanceModel instance) {
+    page = "update_instance";
+    willUpdatedInstance = instance;
     notifyListeners();
   }
 }

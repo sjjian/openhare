@@ -6,6 +6,7 @@ import 'package:mysql/mysql.dart';
 import 'db_driver_interface.dart';
 import 'db_driver_metadata.dart';
 import 'package:common/parser.dart';
+import 'package:db_driver/src/db_driver_conn_meta.dart';
 
 class MysqlQueryValue extends BaseQueryValue {
   final QueryValue _value;
@@ -126,10 +127,10 @@ class MySQLConnection extends BaseConnection {
 
   MySQLConnection(this._conn);
 
-  static Future<BaseConnection> open({required ConnectMeta meta}) async {
-    var dsn = "mysql://${meta.user}:${meta.password}@${meta.addr}:${meta.port}";
-    if (meta.schema != null) {
-      dsn = "$dsn/${meta.schema}";
+  static Future<BaseConnection> open({required ConnectValue meta, String? schema}) async {
+    var dsn = "mysql://${meta.user}:${meta.password}@${meta.host}:${meta.port}";
+    if (schema != null) {
+      dsn = "$dsn/$schema";
     }
     final conn = await ConnWrapper.open(dsn: dsn);
     return MySQLConnection(conn);

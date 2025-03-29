@@ -4,80 +4,29 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:db_driver/db_driver.dart';
+import 'package:client/screens/instances/instance_add.dart';
 
-class InstanceAddFormController {
-  final TextEditingController nameCtrl = TextEditingController();
-  final TextEditingController descCtrl = TextEditingController();
-  final TextEditingController addrCtrl = TextEditingController();
-  final TextEditingController portCtrl = TextEditingController(text: "3306");
-  final TextEditingController userCtrl = TextEditingController();
-  final TextEditingController passwordCtrl = TextEditingController();
-  final Map<CustomMeta, TextEditingController> customCtrl = {};
-
-  InstanceAddFormController.fromConnectMeta() {
-    for (var connMeta in connectionMetas) {
-      for (var meta in connMeta.connMeta) {
-        if (meta is CustomMeta) {
-          customCtrl[meta] = TextEditingController();
-        }
-      }
-    }
-  }
-
-  void clear() {
-    nameCtrl.clear();
-    descCtrl.clear();
-    addrCtrl.clear();
-    portCtrl.clear();
-    userCtrl.clear();
-    passwordCtrl.clear();
-    for (final ctrl in customCtrl.values) {
-      ctrl.clear();
-    }
-  }
-
-  void loadFromMeta(ConnectValue connectValue) {
-    nameCtrl.text = connectValue.name;
-    descCtrl.text = connectValue.desc;
-    addrCtrl.text = connectValue.host;
-    portCtrl.text = connectValue.port.toString();
-    userCtrl.text = connectValue.user;
-    passwordCtrl.text = connectValue.password;
-
-    for (final meta in customCtrl.keys) {
-      customCtrl[meta]!.text = connectValue.getValue(meta.name);
-    }
-  }
-
-  static InstanceAddFormController controller =
-      InstanceAddFormController.fromConnectMeta();
-}
-
-class InstanceAdd extends StatefulWidget {
+class UpdateInstancePage extends StatefulWidget {
+  final InstanceModel instance;
   final InstanceAddFormController controller =
       InstanceAddFormController.controller;
 
-  InstanceAdd({Key? key}) : super(key: key);
+  UpdateInstancePage({Key? key, required this.instance}) : super(key: key) {
+    controller.loadFromMeta(instance.connectValue);
+  }
 
   @override
-  State<InstanceAdd> createState() => _InstanceAddState();
+  State<UpdateInstancePage> createState() => _InstanceUpdateState();
 }
 
-class _InstanceAddState extends State<InstanceAdd> {
-  get title => "添加数据源";
+class _InstanceUpdateState extends State<UpdateInstancePage> {
+  get title => "更新数据源";
 
   final formKey = GlobalKey<FormState>();
 
-  DatabaseType selectedDatabaseType = DatabaseType.mysql;
+  DatabaseType get selectedDatabaseType => widget.instance.dbType;
 
   String _selectedGroup = "";
-
-  void onDatabaseTypeChange(DatabaseType type) {
-    setState(() {
-      selectedDatabaseType = type;
-      _selectedGroup = "";
-    });
-  }
 
   List<String> get customSettingGroup {
     final connMeta = connectionMetaMap[selectedDatabaseType]?.connMeta;
@@ -152,7 +101,7 @@ class _InstanceAddState extends State<InstanceAdd> {
   }
 
   void onSubmit(BuildContext context) {
-    context.read<InstancesProvider>().addInstance(InstanceModel(
+    context.read<InstancesProvider>().updateInstance(InstanceModel(
         dbType: selectedDatabaseType, connectValue: getConnectValue()));
   }
 
@@ -161,19 +110,30 @@ class _InstanceAddState extends State<InstanceAdd> {
       if (value == null || value.isEmpty) {
         return "名称不能为空";
       }
-      if (context.read<InstancesProvider>().isInstanceExist(value)) {
-        return "名称已存在";
-      }
       return null;
     };
+  }
+
+  Widget nameFormField(TextEditingController ctrl,
+      {FormFieldValidator? validator}) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 80),
+      child: TextFormField(
+        readOnly: true,
+        controller: ctrl,
+        validator: validator,
+        decoration: InputDecoration(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+            labelText: "名称",
+            contentPadding: const EdgeInsets.all(10)),
+      ),
+    );
   }
 
   Widget buildBaseFormField(SettingMeta connMeta) {
     return switch (connMeta) {
       NameMeta() => CommonFormField(
-          label: "名称",
-          controller: widget.controller.nameCtrl,
-          validator: validatorName(context)),
+          label: "名称", controller: widget.controller.nameCtrl, readOnly: true),
       AddressMeta() => AddressFormField(
           addrController: widget.controller.addrCtrl,
           portController: widget.controller.portCtrl),
@@ -224,18 +184,10 @@ class _InstanceAddState extends State<InstanceAdd> {
                               if (formKey.currentState!.validate()) {
                                 onSubmit(context);
                                 widget.controller.clear();
-                              }
-                            },
-                            child: const Text("提交并继续添加")),
-                        TextButton(
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                onSubmit(context);
-                                widget.controller.clear();
                                 instancesProvider.goPage("instances");
                               }
                             },
-                            child: const Text("提交")),
+                            child: const Text("更新")),
                       ],
                     ),
                   ),
@@ -248,24 +200,14 @@ class _InstanceAddState extends State<InstanceAdd> {
                           children: [
                             Row(
                               children: [
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: [
-                                        for (final connMeta in connectionMetas)
-                                          DatabaseTypeCard(
-                                            name: connMeta.displayName,
-                                            type: connMeta.type,
-                                            logoPath: connMeta.logoAssertPath,
-                                            selected: connMeta.type ==
-                                                selectedDatabaseType,
-                                            onTap: (type) =>
-                                                onDatabaseTypeChange(type),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
+                                DatabaseTypeCard(
+                                  name: connectionMetaMap[selectedDatabaseType]!
+                                      .displayName,
+                                  type: selectedDatabaseType,
+                                  logoPath:
+                                      connectionMetaMap[selectedDatabaseType]!
+                                          .logoAssertPath,
+                                  selected: true,
                                 ),
                               ],
                             ),
@@ -304,7 +246,10 @@ class _InstanceAddState extends State<InstanceAdd> {
                                     ),
                                   ),
                                   const SizedBox(
-                                    width: 40,
+                                    width: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 20,
                                   ),
                                   Expanded(
                                       child: Container(
@@ -369,199 +314,6 @@ class _InstanceAddState extends State<InstanceAdd> {
           ),
         )),
       ],
-    );
-  }
-}
-
-class DatabaseTypeCard extends StatelessWidget {
-  final DatabaseType type;
-  final String name;
-  final String logoPath;
-  final bool selected;
-  final Function(DatabaseType type)? onTap;
-
-  const DatabaseTypeCard(
-      {Key? key,
-      required this.type,
-      required this.name,
-      required this.logoPath,
-      this.selected = false,
-      this.onTap})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 80, minWidth: 100),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: selected
-            ? Theme.of(context)
-                .colorScheme
-                .surfaceContainerHighest // db type card selected color
-            : null,
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: () {
-          if (!selected && onTap != null) {
-            onTap!(type);
-          }
-        },
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Image.asset(logoPath),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-              child: Text(name, style: Theme.of(context).textTheme.bodyMedium),
-            ),
-            if (selected)
-              Container(
-                padding: const EdgeInsets.only(bottom: 5),
-                width: 5,
-                height: 5,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.green, // Green when selected, grey when not
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PasswordFormField extends StatelessWidget {
-  final TextEditingController controller;
-  const PasswordFormField({Key? key, required this.controller})
-      : super(key: key);
-
-  FormFieldValidator validatorPassword() {
-    return (value) {
-      if (value == null || value.isEmpty) {
-        return "密码不能为空";
-      }
-      return null;
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 80),
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUnfocus,
-        obscureText: true,
-        controller: controller,
-        validator: validatorPassword(),
-        decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-          labelText: "密码",
-          contentPadding: const EdgeInsets.all(10),
-        ),
-      ),
-    );
-  }
-}
-
-class AddressFormField extends StatelessWidget {
-  final TextEditingController addrController;
-  final TextEditingController portController;
-  const AddressFormField(
-      {Key? key, required this.addrController, required this.portController})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 80),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: TextFormField(
-              controller: addrController,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  labelText: "地址",
-                  contentPadding: const EdgeInsets.all(10)),
-            ),
-          ),
-          const SizedBox(
-            width: 5,
-          ),
-          Container(
-            constraints: const BoxConstraints(maxWidth: 120),
-            child: TextFormField(
-              controller: portController,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  labelText: "端口",
-                  contentPadding: const EdgeInsets.all(10)),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class CommonFormField extends StatelessWidget {
-  final String label;
-  final TextEditingController controller;
-  final FormFieldValidator? validator;
-  final bool readOnly;
-
-  const CommonFormField(
-      {Key? key,
-      required this.label,
-      required this.controller,
-      this.validator,
-      this.readOnly = false})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 80),
-      child: TextFormField(
-        readOnly: readOnly,
-        autovalidateMode: AutovalidateMode.onUnfocus,
-        controller: controller,
-        validator: (readOnly) ? null : validator,
-        decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-            labelText: label,
-            contentPadding: const EdgeInsets.all(10)),
-      ),
-    );
-  }
-}
-
-class DescFormField extends StatelessWidget {
-  final TextEditingController controller;
-
-  const DescFormField({Key? key, required this.controller}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 120),
-      child: TextFormField(
-        controller: controller,
-        maxLength: 50,
-        maxLines: 4,
-        decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-            labelText: "描述",
-            contentPadding: const EdgeInsets.all(10)),
-      ),
     );
   }
 }

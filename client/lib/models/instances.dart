@@ -1,30 +1,23 @@
 import 'package:client/utils/active_set.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'instances.g.dart';
 
 @JsonSerializable()
 class InstanceModel {
-  String type = "mysql";
-  String name;
-  String? desc;
-  String addr;
-  int port;
-  String user;
-  String password;
-  String? databases;
+  @JsonKey(name: 'db_type')
+  DatabaseType dbType;
+
+  @JsonKey(name: 'connect_value')
+  ConnectValue connectValue;
+
   @JsonKey(name: "active_schemas")
   ActiveNameSet activeSchemas;
 
   InstanceModel({
-    this.type = "mysql",
-    required this.name,
-    this.desc,
-    required this.addr,
-    required this.port,
-    required this.user,
-    required this.password,
-    this.databases,
+    required this.dbType,
+    required this.connectValue,
     ActiveNameSet? activeSchemas,
   }) : activeSchemas = activeSchemas ?? ActiveNameSet.empty();
 

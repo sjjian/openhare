@@ -1,6 +1,7 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/tab_widget.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,9 +35,14 @@ class SessionTabs extends StatelessWidget {
             tabs: [
               for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
                 CommonTabWrap(
-                  avatar: Image.asset("assets/icons/mysql_icon.png"),
+                  avatar: sessionListProvider.sessions.data[i].instance != null
+                      ? Image.asset(connectionMetaMap[sessionListProvider
+                              .sessions.data[i].instance!.dbType]!
+                          .logoAssertPath)
+                      : null,
                   label: sessionListProvider.sessions.data[i].conn2 != null
-                      ? sessionListProvider.sessions.data[i].instance!.name
+                      ? sessionListProvider
+                          .sessions.data[i].instance!.connectValue.name
                       : "new",
                   items: <PopupMenuEntry>[
                     PopupMenuItem<String>(

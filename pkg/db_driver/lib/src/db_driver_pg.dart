@@ -1,5 +1,6 @@
 import 'package:pg/pg.dart';
 import 'db_driver_interface.dart';
+import 'db_driver_conn_meta.dart';
 import 'db_driver_metadata.dart';
 
 class PGQueryValue extends BaseQueryValue {
@@ -81,16 +82,22 @@ class PGConnection extends BaseConnection {
 
   PGConnection(this._conn);
 
-  static Future<BaseConnection> open({required ConnectMeta meta}) async {
+  static Future<BaseConnection> open(
+      {required ConnectValue meta, String? schema}) async {
     final conn = await PGConn.open(
         endpoint: Endpoint(
-      host: meta.addr,
+      host: meta.host,
       port: meta.port,
       password: meta.password,
       username: meta.user,
-      database: meta.database!, //todo: must not empty
+      database: meta.getValue("database", "postgres"),
     ));
-    return PGConnection(conn);
+
+    final pgConn = PGConnection(conn);
+    if (schema != null) {
+      pgConn.setCurrentSchema(schema);
+    }
+    return pgConn;
   }
 
   @override

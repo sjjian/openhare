@@ -11,12 +11,14 @@ class ConnectionFactory {
 
   static Future<BaseConnection> open(
       {required DatabaseType type,
-      required ConnectMeta meta,
+      required ConnectValue meta,
+      String? schema,
       Function()? onCloseCallback,
       Function(String)? onSchemaChangedCallback}) async {
     final conn = switch (type) {
-      DatabaseType.mysql => await MySQLConnection.open(meta: meta),
-      DatabaseType.pg => await PGConnection.open(meta: meta),
+      DatabaseType.mysql =>
+        await MySQLConnection.open(meta: meta, schema: schema),
+      DatabaseType.pg => await PGConnection.open(meta: meta, schema: schema),
     };
     conn.listen(
         onCloseCallback: onCloseCallback,
@@ -41,7 +43,7 @@ List<ConnectionMeta> connectionMetas = [
   ConnectionMeta(
     displayName: "PostgreSQL",
     type: DatabaseType.pg,
-    logoAssertPath: "assets/icons/mysql_icon.png",
+    logoAssertPath: "assets/icons/pg_icon.png",
     connMeta: [
       NameMeta(),
       AddressMeta(),
@@ -53,3 +55,10 @@ List<ConnectionMeta> connectionMetas = [
     ],
   ),
 ];
+
+List<DatabaseType> allDatabaseType =
+    connectionMetas.map((meta) => meta.type).toList();
+
+Map<DatabaseType, ConnectionMeta> connectionMetaMap = {
+  for (var meta in connectionMetas) meta.type: meta
+};
