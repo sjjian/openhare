@@ -1,44 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
-import 'package:hugeicons/hugeicons.dart';
 
-class DataNode {
-  final String value;
-  final String type;
-  late List<DataNode> children;
-  Widget Function(BuildContext context, DataNode node) builder;
-
-  DataNode({
-    required this.value,
-    required this.type,
-    required this.builder,
-  }) {
-    children = List.empty(growable: true);
-  }
-
-  IconData openIcons() {
-    if (type == "schema") {
-      return HugeIcons.strokeRoundedDatabase;
-    } else if (type == "table") {
-      return HugeIcons.strokeRoundedTable;
-    } else {
-      return HugeIcons.strokeRoundedDatabase;
-    }
-  }
-
-  IconData closeIcons() {
-    return HugeIcons.strokeRoundedDatabase;
-  }
-
-  void addChildren(DataNode node) {
-    children.add(node);
-  }
+abstract class DataNode {
+  List<DataNode> get children;
+  Widget builder(BuildContext context);
+  Widget closeIcons(BuildContext context);
+  Widget openIcons(BuildContext context);
 }
 
 class DataTree extends StatefulWidget {
-  final List<DataNode> roots;
+  final TreeController<DataNode> controller;
 
-  const DataTree({Key? key, required this.roots}) : super(key: key);
+  const DataTree({Key? key, required this.controller}) : super(key: key);
 
   @override
   State<DataTree> createState() => _DataTreeState();
@@ -47,18 +20,13 @@ class DataTree extends StatefulWidget {
 class _DataTreeState extends State<DataTree> {
   @override
   Widget build(BuildContext context) {
-    late final TreeController<DataNode> treeController;
-    treeController = TreeController<DataNode>(
-      roots: widget.roots,
-      childrenProvider: (DataNode node) => node.children,
-    );
     return TreeView<DataNode>(
-      treeController: treeController,
+      treeController: widget.controller,
       nodeBuilder: (BuildContext context, TreeEntry<DataNode> entry) {
         return MyTreeTile(
           key: ValueKey(entry.node),
           entry: entry,
-          onTap: () => treeController.toggleExpansion(entry.node),
+          onTap: () => widget.controller.toggleExpansion(entry.node),
         );
       },
     );
@@ -112,29 +80,16 @@ class _MyTreeTileState extends State<MyTreeTile> {
               child: Row(
                 children: [
                   FolderButton(
-                    openedIcon: HugeIcon(
-                      icon: widget.entry.node.openIcons(),
-                      color:
-                          Theme.of(context).iconTheme.color ?? Colors.black87,
-                    ),
-                    closedIcon: HugeIcon(
-                      icon: widget.entry.node.closeIcons(),
-                      color:
-                          Theme.of(context).iconTheme.color ?? Colors.black87,
-                    ),
-                    icon: HugeIcon(
-                      icon: widget.entry.node.openIcons(),
-                      color:
-                          Theme.of(context).iconTheme.color ?? Colors.black87,
-                    ),
+                    openedIcon: widget.entry.node.openIcons(context),
+                    closedIcon: widget.entry.node.closeIcons(context),
+                    icon: widget.entry.node.openIcons(context),
                     isOpen: widget.entry.hasChildren
                         ? widget.entry.isExpanded
                         : null,
                     onPressed: widget.entry.hasChildren ? widget.onTap : null,
                   ),
                   Expanded(
-                    child:
-                        widget.entry.node.builder(context, widget.entry.node),
+                    child: widget.entry.node.builder(context),
                   ),
                 ],
               ),

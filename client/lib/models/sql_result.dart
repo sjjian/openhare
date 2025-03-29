@@ -1,5 +1,6 @@
-import 'package:client/core/connection/result_set.dart';
 import 'package:excel/excel.dart';
+
+import 'package:db_driver/db_driver.dart';
 
 enum SQLExecuteState { executing, done, error }
 
@@ -7,19 +8,23 @@ class SQLResultModel {
   int id;
   SQLExecuteState state = SQLExecuteState.executing;
   String query;
-  Exception? error;
-  ResultSet? resultSet;
+  String? error;
+  List<BaseQueryColumn>? columns;
+  List<QueryResultRow>? rows;
   Duration? executeTime;
+  int affectedRows = 0;
 
   SQLResultModel(this.id, this.query);
 
-  void setDone(ResultSet resultSet, executeTime) {
-    state = SQLExecuteState.done;
-    this.resultSet = resultSet;
+  void setDone(List<BaseQueryColumn> columns, List<QueryResultRow> rows, Duration executeTime, int affectedRows) {
+    this.columns = columns;
+    this.rows = rows;
     this.executeTime = executeTime;
+    this.affectedRows = affectedRows;
+    state = SQLExecuteState.done;
   }
 
-  void setError(error) {
+  void setError(String error) {
     state = SQLExecuteState.error;
     this.error = error;
   }
@@ -27,12 +32,12 @@ class SQLResultModel {
   Excel toExcel() {
     Excel excel = Excel.createExcel();
     Sheet sheet = excel["Sheet1"];
-    sheet.appendRow(resultSet!.columns
+    sheet.appendRow(columns!
         .map<TextCellValue>((e) => TextCellValue(e.name))
         .toList());
-    for (final row in resultSet!.rows) {
-      sheet.appendRow(row.cells
-          .map<TextCellValue>((e) => TextCellValue(e.value.asString() ?? ""))
+    for (final row in rows!) {
+      sheet.appendRow(row.values
+          .map<TextCellValue>((e) => TextCellValue(e.getString() ?? ''))
           .toList());
     }
     return excel;

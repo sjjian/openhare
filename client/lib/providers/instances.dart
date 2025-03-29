@@ -1,12 +1,17 @@
 import 'package:client/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:flutter/material.dart';
+import 'package:db_driver/db_driver.dart';
 
 class InstancesProvider extends ChangeNotifier {
+  String page = "instances";
+  InstanceModel? willUpdatedInstance;
+
   InstancesProvider();
 
   Future<void> loadInstance() async {
     await Storage.load();
+    await ConnectionFactory.init();
     notifyListeners();
   }
 
@@ -16,7 +21,7 @@ class InstancesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateInstance(InstanceModel instance){
+  void updateInstance(InstanceModel instance) {
     Storage st = Storage();
     st.updateInstance(instance);
     notifyListeners();
@@ -46,5 +51,16 @@ class InstancesProvider extends ChangeNotifier {
   List<InstanceModel> activeInstances() {
     Storage st = Storage();
     return st.getActiveInstances();
+  }
+
+  void goPage(String page) {
+    this.page = page;
+    notifyListeners();
+  }
+
+  void tryUpdateInstance(InstanceModel instance) {
+    page = "update_instance";
+    willUpdatedInstance = instance;
+    notifyListeners();
   }
 }

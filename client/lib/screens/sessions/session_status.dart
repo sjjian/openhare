@@ -14,7 +14,7 @@ class SessionStatus extends StatelessWidget {
     // todo: 采用更通用的形式
     return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
       if (sessionProvider.initialized() &&
-          !sessionProvider.showRecord &&
+          !sessionProvider.session!.showRecord &&
           sessionProvider.getCurrentSQLResult() != null) {
         SQLResultModel result = sessionProvider.getCurrentSQLResult()!;
         if (result.state == SQLExecuteState.done) {
@@ -24,9 +24,9 @@ class SessionStatus extends StatelessWidget {
             child: Row(
               children: [
                 Tooltip(
-                    message: 'effect rows: ${result.resultSet!.affectedRows}',
+                    message: 'effect rows: ${result.affectedRows}',
                     child:
-                        Text('effect rows: ${result.resultSet!.affectedRows}')),
+                        Text('effect rows: ${result.affectedRows}')),
                 const Text("  |  "),
                 Tooltip(
                     message: 'duration: ${result.executeTime!.format()}',
@@ -46,7 +46,7 @@ class SessionStatus extends StatelessWidget {
                       String? outputFile = await FilePicker.platform.saveFile(
                         dialogTitle: 'Please select an output file:',
                         fileName:
-                            '${sessionProvider.session!.conn!.instance.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+                            '${sessionProvider.session!.instance!.connectValue.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
                       );
                       if (outputFile == null) {
                         return;

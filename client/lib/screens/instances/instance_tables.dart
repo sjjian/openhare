@@ -1,7 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/providers/instances.dart';
-import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/widgets/paginated_bar.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -38,16 +38,24 @@ class _InstanceTableState extends State<InstanceTable> {
           });
         },
         cells: [
-          DataCell(Text(instance.name)),
-          DataCell(Text(instance.desc ?? "-")),
-          DataCell(Text(instance.addr)),
-          DataCell(Text("${instance.port}")),
-          DataCell(Text(instance.user)),
+          DataCell(Row(
+            children: [
+              Image.asset(connectionMetaMap[instance.dbType]!.logoAssertPath),
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Text(instance.connectValue.name),
+              )
+            ],
+          )),
+          DataCell(Text(instance.connectValue.desc)),
+          DataCell(Text(instance.connectValue.host)),
+          DataCell(Text("${instance.connectValue.port}")),
+          DataCell(Text(instance.connectValue.user)),
           DataCell(Row(
             children: [
               IconButton(
                 onPressed: () {
-                  showUpdateInstanceDialog(context, instance);
+                  context.read<InstancesProvider>().tryUpdateInstance(instance);
                 },
                 icon: const Icon(Icons.edit),
               ),
@@ -110,9 +118,8 @@ class _InstanceTableState extends State<InstanceTable> {
                               height: 35,
                               child: FloatingActionButton.small(
                                 elevation: 2,
-                                onPressed: () => {
-                                  showAddInstanceDialog(context)
-                                },
+                                onPressed: () =>
+                                    {instancesProvider.goPage("add_instance")},
                                 child: const Icon(Icons.add),
                               ),
                             ),

@@ -4,6 +4,7 @@ import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/widgets/paginated_bar.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -93,7 +94,7 @@ class _AddSessionState extends State<AddSession> {
                         child: Row(
                           children: [
                             Image.asset(
-                              "assets/icons/mysql_icon.png",
+                              connectionMetaMap[inst.dbType]!.logoAssertPath,
                               height: 24,
                             ),
                             TextButton(
@@ -101,7 +102,7 @@ class _AddSessionState extends State<AddSession> {
                                   addSession(context, inst);
                                 },
                                 child: Text(
-                                  inst.name,
+                                  inst.connectValue.name,
                                   overflow: TextOverflow.ellipsis,
                                 )),
                           ],
@@ -180,14 +181,14 @@ class _AddSessionState extends State<AddSession> {
                         child: Row(
                           children: [
                             Image.asset(
-                              "assets/icons/mysql_icon.png",
+                              connectionMetaMap[inst.dbType]!.logoAssertPath,
                               height: 24,
                             ),
                             TextButton(
                                 onPressed: () {
                                   addSession(context, inst);
                                 },
-                                child: Text(inst.name,
+                                child: Text(inst.connectValue.name,
                                     overflow: TextOverflow.ellipsis)),
                           ],
                         ),
@@ -197,7 +198,7 @@ class _AddSessionState extends State<AddSession> {
                         width: 200,
                         child: Row(
                           children: [
-                            Text("${inst.addr}:${inst.port}",
+                            Text("${inst.connectValue.host}:${inst.connectValue.port}",
                                 overflow: TextOverflow.ellipsis),
                           ],
                         ),
@@ -207,7 +208,7 @@ class _AddSessionState extends State<AddSession> {
                         width: 200,
                         child: Row(
                           children: [
-                            Text(inst.desc ?? ""),
+                            Text(inst.connectValue.desc ?? ""),
                           ],
                         ),
                       ),

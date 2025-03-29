@@ -1,6 +1,4 @@
-import 'package:client/core/connection/metadata.dart';
-import 'package:client/core/connection/mysql.dart';
-import 'package:client/core/connection/result_set.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/storages/storages.dart';
@@ -20,7 +18,7 @@ class SessionListProvider with ChangeNotifier {
     // todo
     for (final s in sessions.data) {
       if (s == session) {
-        await session.conn!.connect();
+        await session.connect();
         notifyListeners();
         if (session == sessionProvider._session) {
           sessionProvider.update(session);
@@ -35,7 +33,7 @@ class SessionListProvider with ChangeNotifier {
     // todo
     for (final s in sessions.data) {
       if (s == session) {
-        await session.conn?.close();
+        await session.close();
         notifyListeners();
         if (session == sessionProvider._session) {
           sessionProvider.update(session);
@@ -65,7 +63,7 @@ class SessionListProvider with ChangeNotifier {
 
   void deleteSessionByIndex(int index) {
     SessionModel session = sessions.data.removeAt(index);
-    session.conn?.close();
+    session.close();
     notifyListeners();
     sessionProvider.update(sessions.data.selected());
   }
@@ -81,18 +79,22 @@ class SessionListProvider with ChangeNotifier {
 
 class SessionProvider with ChangeNotifier {
   SessionModel? _session;
-  bool showRecord = true;
-  bool isRightPageOpen = true;
 
   SessionProvider(this._session);
 
   void update(SessionModel? session) {
+    if (_session != null) {
+      _session!.unListenCallBack();
+    }
     _session = session;
+    if (session != null) {
+      _session!.listenCallBack(onConnClose, onSchemaChanged);
+    }
     notifyListeners();
   }
 
   void selectToRecord() {
-    showRecord = true;
+    _session!.showRecord = true;
     notifyListeners();
   }
 
@@ -101,7 +103,7 @@ class SessionProvider with ChangeNotifier {
       return;
     }
     _session!.sqlResults.removeAt(index);
-    if (_session!.sqlResults.isEmpty) showRecord = true;
+    if (_session!.sqlResults.isEmpty) _session!.showRecord = true;
     notifyListeners();
   }
 
@@ -109,7 +111,7 @@ class SessionProvider with ChangeNotifier {
     if (_session == null) {
       return;
     }
-    showRecord = false;
+    _session!.showRecord = false;
     _session!.sqlResults.select(index);
     notifyListeners();
   }
@@ -140,38 +142,38 @@ class SessionProvider with ChangeNotifier {
     if (_session == null) {
       return false;
     }
-    return (_session!.state != SQLExecuteState.executing &&
-        _session!.conn?.state == SQLConnectState.connected);
+    return (_session!.queryState != SQLExecuteState.executing &&
+        _session!.connState == SQLConnectState.connected);
   }
 
   bool initialized() {
-    return _session != null && _session!.conn != null;
+    return _session != null && _session!.instance != null;
   }
 
   void setConn(InstanceModel instance, {String? schema}) {
     // 记录使用的数据源
     Storage().addActiveInstance(instance);
-
-    SQLConnection conn =
-        SQLConnection(instance, onConnClose, currentSchema: schema, (schema) {
+    if (schema != null) {
       Storage().addInstanceActiveSchema(instance, schema);
-    });
-    if (_session == null) {
-      _session = SessionModel(conn: conn);
-    } else {
-      _session!.conn = conn;
     }
+    _session!.instance = instance;
+    _session!.currentSchema = schema;
     notifyListeners();
   }
 
   Future<void> connect() async {
     if (_session != null) {
-      await _session!.conn!.connect();
+      await _session!.connect();
       notifyListeners();
     }
   }
 
   void onConnClose() {
+    notifyListeners();
+  }
+
+  void onSchemaChanged(String schema) {
+    Storage().addInstanceActiveSchema(session!.instance!, schema);
     notifyListeners();
   }
 
@@ -182,7 +184,7 @@ class SessionProvider with ChangeNotifier {
       return;
     }
 
-    if (_session!.conn?.state != SQLConnectState.connected) {
+    if (_session!.connState != SQLConnectState.connected) {
       return;
     }
     SQLResultModel result;
@@ -196,35 +198,37 @@ class SessionProvider with ChangeNotifier {
       _session!.sqlResults.replace(cur, result);
     }
 
-    showRecord = false; // 如果执行query创建了新的tab则跳转过去
-    _session!.state = SQLExecuteState.executing;
+    _session!.showRecord = false; // 如果执行query创建了新的tab则跳转过去
+    _session!.queryState = SQLExecuteState.executing;
     notifyListeners();
 
     try {
       DateTime start = DateTime.now();
-      ResultSet resultSet = await _session!.conn!.execute(query);
+      BaseQueryResult queryResult = await _session!.conn2!.query(query);
+      List<QueryResultRow> rows = queryResult.rows;
       DateTime end = DateTime.now();
-      result.setDone(resultSet, end.difference(start));
-      _session!.state = SQLExecuteState.done;
+      result.setDone(queryResult.columns, rows, end.difference(start),
+          queryResult.affectedRows.toInt());
+      _session!.queryState = SQLExecuteState.done;
     } catch (e) {
-      result.setError(e);
-      _session!.state = SQLExecuteState.error;
+      result.setError(e.toString());
+      _session!.queryState = SQLExecuteState.error;
     } finally {
       notifyListeners();
     }
   }
 
   Future<void> setCurrentSchema(String schema) async {
-    await session!.conn!.setCurrentSchema(schema);
+    await session!.conn2!.setCurrentSchema(schema);
     notifyListeners();
   }
 
   String? getCurrentSchema() {
-    return session!.conn!.currentSchema;
+    return session!.currentSchema;
   }
 
   Future<List<String>> getSchemas() async {
-    List<String> schemas = await session!.conn!.schemas();
+    List<String> schemas = await session!.conn2!.schemas();
     return schemas;
   }
 
@@ -232,83 +236,60 @@ class SessionProvider with ChangeNotifier {
     if (session!.metadata != null) {
       return;
     }
-    List<SchemaMeta> metadata = List<SchemaMeta>.empty(growable: true);
-    List<String> schemas = await session!.conn!.schemas();
-    for (var schema in schemas) {
-      SchemaMeta schemaMeta = SchemaMeta(schema);
-      metadata.add(schemaMeta);
-      List<String> tables = await session!.conn!.getTables(schema);
-      for (var table in tables) {
-        TableMeta tableMeta = TableMeta(table);
-        schemaMeta.tables.add(tableMeta);
-        // todo: 一次性获取所有表信息
-        List<TableColumnMeta> columns =
-            await session!.conn!.getTableColumns(schema, table);
-        tableMeta.columns = columns;
-
-        List<TableKeyMeta> keys =
-            await session!.conn!.getTableKeys(schema, table);
-        tableMeta.keys = keys;
-      }
+    if (session!.connState != SQLConnectState.connected) {
+      return;
     }
-    session!.metadata = metadata;
+    session!.metadata = await session!.conn2!.metadata();
     notifyListeners();
   }
 
-  List<SchemaMeta>? getMetadata() {
+  MetaDataNode? getMetadata() {
     if (session!.metadata == null) {
       return null;
     }
     return session!.metadata;
   }
 
-  TableMeta? getTableMeta(String schema, String table) {
-    // todo: 使用map
-    for (var schemaMeta in session!.metadata!) {
-      if (schemaMeta.name == schema) {
-        for (var tableMeta in schemaMeta.tables) {
-          if (tableMeta.name == table) {
-            return tableMeta;
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  List<String> getMetadataKey() {
-    List<String> keys = List.empty(growable: true);
-    if (session!.metadata == null) {
-      return keys;
-    }
-    for (var schemaMeta in session!.metadata!) {
-      keys.add(schemaMeta.name);
-      for (var tableMeta in schemaMeta.tables) {
-        keys.add(tableMeta.name);
-        if (tableMeta.columns != null) {
-          for (var column in tableMeta.columns!) {
-            keys.add(column.name);
-          }
-        }
-        if (tableMeta.keys != null) {
-          for (var index in tableMeta.keys!) {
-            keys.add(index.name);
-          }
-        }
-      }
-    }
-    return keys;
-  }
-
   CodeLineEditingController getSQLEditCode() => _session!.code;
 
   void showRightPage() {
-    isRightPageOpen = true;
+    if (_session == null) {
+      return;
+    }
+    _session!.isRightPageOpen = true;
     notifyListeners();
   }
 
   void hideRightPage() {
-    isRightPageOpen = false;
+    if (_session == null) {
+      return;
+    }
+    _session!.isRightPageOpen = false;
+    notifyListeners();
+  }
+
+  bool isRightPageOpen() {
+    if (_session == null) {
+      return false;
+    }
+    return _session!.isRightPageOpen;
+  }
+
+  void goToTree() {
+    if (_session == null) {
+      return;
+    }
+    _session!.drawerPage = DrawerPage.metadataTree;
+    notifyListeners();
+  }
+
+  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
+    if (_session == null) {
+      return;
+    }
+    _session!.drawerPage = DrawerPage.sqlResult;
+    _session!.sqlColumn = column ?? _session!.sqlColumn;
+    _session!.sqlResult = result ?? _session!.sqlResult;
     notifyListeners();
   }
 }

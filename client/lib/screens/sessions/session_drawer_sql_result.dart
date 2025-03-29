@@ -1,27 +1,32 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:client/core/connection/result_set.dart';
-import 'package:client/screens/sessions/session_drawer_body.dart';
+import 'package:client/providers/sessions.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/file_type.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/atom-one-light.dart';
 
 class SessionDrawerSqlResult extends StatelessWidget {
-  final SessionDrawerController controller;
-
-  const SessionDrawerSqlResult({Key? key, required this.controller})
-      : super(key: key);
+  const SessionDrawerSqlResult({Key? key}) : super(key: key);
 
   Widget buildDisplayField(BuildContext context) {
-    ResultSetValue? result = controller.sqlResult;
-    if (result == null || result.asString() == null) {
+    SessionProvider sessionProvider =
+        Provider.of<SessionProvider>(context, listen: false);
+    BaseQueryValue? result = sessionProvider.session!.sqlResult;
+    if (result == null) {
       return const ValueDisplayField(data: "");
     }
-    if (result.type() == ValueType.bit) {
-      List<int> bytes = result.asByte();
-      FileType fileType = getFileType(result.asByte());
+    BaseQueryColumn? column = sessionProvider.session!.sqlColumn;
+    if (column == null) {
+      return ValueDisplayField(data: result.getString() ?? "");
+    }
+    final dataType = column.dataType();
+    if (dataType == DataType.blob) {
+      List<int> bytes = result.getBytes();
+      FileType fileType = getFileType(bytes);
       if (fileType == FileType.gif ||
           fileType == FileType.png ||
           fileType == FileType.jpeg) {
@@ -31,13 +36,13 @@ class SessionDrawerSqlResult extends StatelessWidget {
         );
       }
     }
-    if (result.type() == ValueType.json) {
+    if (dataType == DataType.json) {
       return ValueDisplayField(
-        data: formatJson(result.asString()!),
+        data: formatJson(result.getString() ?? "{}"),
         language: "json",
       );
     } else {
-      return ValueDisplayField(data: result.asString()!);
+      return ValueDisplayField(data: result.getString() ?? "");
     }
   }
 
@@ -47,11 +52,17 @@ class SessionDrawerSqlResult extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 32),
+          // const SizedBox(height: 32),
           // const Divider(
           //   endIndent: 10,
           // ),
-          Expanded(child: buildDisplayField(context)),
+          Expanded(
+            child: Consumer<SessionProvider>(
+                builder: (context, sessionProvider, _) {
+              return buildDisplayField(context);
+            }),
+            // child: buildDisplayField(context),
+          ),
         ]);
   }
 }

@@ -106,9 +106,9 @@ class SessionOpBar extends StatelessWidget {
             ),
             SchemaBar(
                 disable: canQuery ? false : true,
-                currentSchema: sessionProvider.session!.conn!.currentSchema),
+                currentSchema: sessionProvider.session!.currentSchema),
             const Spacer(),
-            if (sessionProvider.isRightPageOpen == false)
+            if (sessionProvider.isRightPageOpen() == false)
               IconButton(
                 onPressed: () {
                   sessionProvider.showRightPage();
