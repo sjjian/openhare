@@ -34,7 +34,7 @@ List<ConnectionMeta> connectionMetas = [
     logoAssertPath: "assets/icons/mysql_icon.png",
     connMeta: [
       NameMeta(),
-      AddressMeta(),
+      AddressMeta("3306"),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
@@ -46,12 +46,14 @@ List<ConnectionMeta> connectionMetas = [
     logoAssertPath: "assets/icons/pg_icon.png",
     connMeta: [
       NameMeta(),
-      AddressMeta(),
+      AddressMeta("5432"),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
       CustomMeta(
-          name: "database", type: "text", group: "conn", isRequired: true),
+          name: "database", type: "text", group: "conn", isRequired: true, defaultValue: "postgres"),
+      CustomMeta(
+          name: "ssl_enable", type: "text", group: "ssl", isRequired: true),
     ],
   ),
 ];

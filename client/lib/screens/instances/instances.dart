@@ -29,7 +29,7 @@ class InstancesPage extends StatelessWidget {
         "instances" => const InstanceTable(),
         "update_instance" =>
           UpdateInstancePage(instance: instancesProvider.willUpdatedInstance!),
-        _ => InstanceAdd(),
+        _ => const AddInstancePage(),
       },
     );
   }

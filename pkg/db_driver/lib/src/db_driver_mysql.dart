@@ -127,8 +127,10 @@ class MySQLConnection extends BaseConnection {
 
   MySQLConnection(this._conn);
 
-  static Future<BaseConnection> open({required ConnectValue meta, String? schema}) async {
-    var dsn = "mysql://${meta.user}:${meta.password}@${meta.host}:${meta.port}";
+  static Future<BaseConnection> open(
+      {required ConnectValue meta, String? schema}) async {
+    var dsn =
+        "mysql://${meta.user}:${meta.password}@${meta.host}:${meta.port ?? 3306}";
     if (schema != null) {
       dsn = "$dsn/$schema";
     }
@@ -274,8 +276,10 @@ class MySQLConnection extends BaseConnection {
         "select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT, EXTRA from information_schema.columns where TABLE_SCHEMA = '$schema' and TABLE_NAME = '$table'");
     final rows = results.rows;
     for (final result in rows) {
-      final node = MetaDataNode(MetaType.column, result.getString("COLUMN_NAME")!)
-      ..withProp(MetaDataPropType.dataType, getDataType(result.getString("DATA_TYPE")!));
+      final node =
+          MetaDataNode(MetaType.column, result.getString("COLUMN_NAME")!)
+            ..withProp(MetaDataPropType.dataType,
+                getDataType(result.getString("DATA_TYPE")!));
 
       columns.add(node);
       // columns.add(TableColumnMeta.loadFromRow(result));

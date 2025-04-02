@@ -60,12 +60,14 @@ class _AppState extends State<App> {
     final sessions = SessionsModel();
     final sessionProvider = SessionProvider(sessions.data.selected());
     final sessionListProvider = SessionListProvider(sessionProvider, sessions);
+    final addInstanceProvider = AddInstanceProvider();
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: sessionProvider),
         ChangeNotifierProvider.value(value: sessionListProvider),
-        ChangeNotifierProvider.value(value: instancesProvider)
+        ChangeNotifierProvider.value(value: instancesProvider),
+        ChangeNotifierProvider.value(value: addInstanceProvider),
       ],
       child: MaterialApp.router(
         title: 'Natuo',

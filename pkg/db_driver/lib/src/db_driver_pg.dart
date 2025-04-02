@@ -87,7 +87,7 @@ class PGConnection extends BaseConnection {
     final conn = await PGConn.open(
         endpoint: Endpoint(
       host: meta.host,
-      port: meta.port,
+      port: meta.port?? 5432,
       password: meta.password,
       username: meta.user,
       database: meta.getValue("database", "postgres"),

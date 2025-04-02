@@ -6,6 +6,54 @@ import 'package:provider/provider.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/instances/instance_add.dart';
 
+class InstanceAddFormController {
+  final TextEditingController nameCtrl = TextEditingController();
+  final TextEditingController descCtrl = TextEditingController();
+  final TextEditingController addrCtrl = TextEditingController();
+  final TextEditingController portCtrl = TextEditingController(text: "3306");
+  final TextEditingController userCtrl = TextEditingController();
+  final TextEditingController passwordCtrl = TextEditingController();
+  final Map<CustomMeta, TextEditingController> customCtrl = {};
+
+  InstanceAddFormController.fromConnectMeta() {
+    for (var connMeta in connectionMetas) {
+      for (var meta in connMeta.connMeta) {
+        if (meta is CustomMeta) {
+          customCtrl[meta] = TextEditingController();
+        }
+      }
+    }
+  }
+
+  void clear() {
+    nameCtrl.clear();
+    descCtrl.clear();
+    addrCtrl.clear();
+    portCtrl.clear();
+    userCtrl.clear();
+    passwordCtrl.clear();
+    for (final ctrl in customCtrl.values) {
+      ctrl.clear();
+    }
+  }
+
+  void loadFromMeta(ConnectValue connectValue) {
+    nameCtrl.text = connectValue.name;
+    descCtrl.text = connectValue.desc;
+    addrCtrl.text = connectValue.host;
+    portCtrl.text = connectValue.port.toString();
+    userCtrl.text = connectValue.user;
+    passwordCtrl.text = connectValue.password;
+
+    for (final meta in customCtrl.keys) {
+      customCtrl[meta]!.text = connectValue.getValue(meta.name);
+    }
+  }
+
+  static InstanceAddFormController controller =
+      InstanceAddFormController.fromConnectMeta();
+}
+
 class UpdateInstancePage extends StatefulWidget {
   final InstanceModel instance;
   final InstanceAddFormController controller =

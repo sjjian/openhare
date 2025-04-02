@@ -26,7 +26,11 @@ sealed class SettingMeta {
 
 class NameMeta extends SettingMeta {}
 
-class AddressMeta extends SettingMeta {}
+class AddressMeta extends SettingMeta {
+  final String defaultPort;
+
+  AddressMeta(this.defaultPort);
+}
 
 class UserMeta extends SettingMeta {}
 
@@ -61,7 +65,7 @@ class SettingValue<SettingMeta, E> {
 class ConnectValue {
   String name;
   String host;
-  int port;
+  int? port;
   String user;
   String password;
   String desc;
@@ -70,7 +74,7 @@ class ConnectValue {
   ConnectValue(
       {required this.name,
       required this.host,
-      required this.port,
+      this.port,
       required this.user,
       required this.password,
       required this.desc,
