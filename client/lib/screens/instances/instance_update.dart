@@ -1,200 +1,35 @@
 import 'package:client/models/instances.dart';
 import 'package:client/providers/instances.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/instances/instance_add.dart';
+import 'package:client/screens/page_skeleton.dart';
+import 'package:go_router/go_router.dart';
 
-class InstanceAddFormController {
-  final TextEditingController nameCtrl = TextEditingController();
-  final TextEditingController descCtrl = TextEditingController();
-  final TextEditingController addrCtrl = TextEditingController();
-  final TextEditingController portCtrl = TextEditingController(text: "3306");
-  final TextEditingController userCtrl = TextEditingController();
-  final TextEditingController passwordCtrl = TextEditingController();
-  final Map<CustomMeta, TextEditingController> customCtrl = {};
-
-  InstanceAddFormController.fromConnectMeta() {
-    for (var connMeta in connectionMetas) {
-      for (var meta in connMeta.connMeta) {
-        if (meta is CustomMeta) {
-          customCtrl[meta] = TextEditingController();
-        }
-      }
-    }
-  }
-
-  void clear() {
-    nameCtrl.clear();
-    descCtrl.clear();
-    addrCtrl.clear();
-    portCtrl.clear();
-    userCtrl.clear();
-    passwordCtrl.clear();
-    for (final ctrl in customCtrl.values) {
-      ctrl.clear();
-    }
-  }
-
-  void loadFromMeta(ConnectValue connectValue) {
-    nameCtrl.text = connectValue.name;
-    descCtrl.text = connectValue.desc;
-    addrCtrl.text = connectValue.host;
-    portCtrl.text = connectValue.port.toString();
-    userCtrl.text = connectValue.user;
-    passwordCtrl.text = connectValue.password;
-
-    for (final meta in customCtrl.keys) {
-      customCtrl[meta]!.text = connectValue.getValue(meta.name);
-    }
-  }
-
-  static InstanceAddFormController controller =
-      InstanceAddFormController.fromConnectMeta();
-}
-
-class UpdateInstancePage extends StatefulWidget {
-  final InstanceModel instance;
-  final InstanceAddFormController controller =
-      InstanceAddFormController.controller;
-
-  UpdateInstancePage({Key? key, required this.instance}) : super(key: key) {
-    controller.loadFromMeta(instance.connectValue);
-  }
+class UpdateInstancePage extends StatelessWidget {
+  const UpdateInstancePage({Key? key}) : super(key: key);
 
   @override
-  State<UpdateInstancePage> createState() => _InstanceUpdateState();
+  Widget build(BuildContext context) {
+    return PageSkeleton(
+      topBar: Row(
+        children: [
+          IconButton(
+              onPressed: () => GoRouter.of(context).go('/instances/list'),
+              icon: const Icon(Icons.arrow_back))
+        ],
+      ),
+      child: const UpdateInstance(),
+    );
+  }
 }
 
-class _InstanceUpdateState extends State<UpdateInstancePage> {
-  get title => "更新数据源";
+class UpdateInstance extends StatelessWidget {
+  const UpdateInstance({Key? key}) : super(key: key);
 
-  final formKey = GlobalKey<FormState>();
-
-  DatabaseType get selectedDatabaseType => widget.instance.dbType;
-
-  String _selectedGroup = "";
-
-  List<String> get customSettingGroup {
-    final connMeta = connectionMetaMap[selectedDatabaseType]?.connMeta;
-    if (connMeta == null) {
-      return [];
-    }
-    return connMeta
-        .groupFoldBy<String, List<String>>(
-          (meta) => meta.group,
-          (previous, meta) => (previous ?? [])..add(meta.group),
-        )
-        .keys
-        .whereNot((e) => e == "base")
-        .toList();
-  }
-
-  String? get selectedGroup {
-    if (customSettingGroup.isEmpty) {
-      return null;
-    }
-    if (_selectedGroup.isEmpty) {
-      return customSettingGroup.first;
-    }
-    return _selectedGroup;
-  }
-
-  void onGroupChange(String group) {
-    setState(() {
-      _selectedGroup = group;
-    });
-  }
-
-  List<SettingMeta> getSettingMeta(String? group) {
-    final connMeta = connectionMetaMap[selectedDatabaseType]?.connMeta;
-    if (connMeta == null) {
-      return [];
-    }
-    if (group == null || group.isEmpty) {
-      return [];
-    }
-    return connMeta
-        .groupListsBy((meta) => meta.group)
-        .entries
-        .where((entry) => entry.key == group)
-        .expand((entry) => entry.value)
-        .toList();
-  }
-
-  ConnectValue getConnectValue() {
-    final name = widget.controller.nameCtrl.text;
-    final addr = widget.controller.addrCtrl.text;
-    final port = int.tryParse(widget.controller.portCtrl.text ?? "3306");
-    final user = widget.controller.userCtrl.text;
-    final password = widget.controller.passwordCtrl.text;
-    final desc = widget.controller.descCtrl.text;
-
-    final custom = {
-      for (final meta in connectionMetaMap[selectedDatabaseType]!.connMeta)
-        if (meta is CustomMeta)
-          meta.name: widget.controller.customCtrl[meta]!.text
-    };
-
-    return ConnectValue(
-      name: name,
-      host: addr,
-      port: port ?? 3306,
-      user: user,
-      password: password,
-      desc: desc,
-      custom: custom,
-    );
-  }
-
-  void onSubmit(BuildContext context) {
-    context.read<InstancesProvider>().updateInstance(InstanceModel(
-        dbType: selectedDatabaseType, connectValue: getConnectValue()));
-  }
-
-  FormFieldValidator validatorName(BuildContext context) {
-    return (value) {
-      if (value == null || value.isEmpty) {
-        return "名称不能为空";
-      }
-      return null;
-    };
-  }
-
-  Widget nameFormField(TextEditingController ctrl,
-      {FormFieldValidator? validator}) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 80),
-      child: TextFormField(
-        readOnly: true,
-        controller: ctrl,
-        validator: validator,
-        decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-            labelText: "名称",
-            contentPadding: const EdgeInsets.all(10)),
-      ),
-    );
-  }
-
-  Widget buildBaseFormField(SettingMeta connMeta) {
-    return switch (connMeta) {
-      NameMeta() => CommonFormField(
-          label: "名称", controller: widget.controller.nameCtrl, readOnly: true),
-      AddressMeta() => AddressFormField(
-          addrController: widget.controller.addrCtrl,
-          portController: widget.controller.portCtrl),
-      UserMeta() =>
-        CommonFormField(label: "账号", controller: widget.controller.userCtrl),
-      PasswordMeta() =>
-        PasswordFormField(controller: widget.controller.passwordCtrl),
-      DescMeta() => DescFormField(controller: widget.controller.descCtrl),
-      CustomMeta() => CommonFormField(
-          label: connMeta.name,
-          controller: widget.controller.customCtrl[connMeta]!,
-        ),
-    };
+  void onSubmit(BuildContext context, InstanceModel instance) {
+    context.read<InstancesProvider>().updateInstance(instance);
   }
 
   @override
@@ -204,8 +39,8 @@ class _InstanceUpdateState extends State<UpdateInstancePage> {
         Expanded(
             child: Container(
           padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
-          child: Consumer<InstancesProvider>(
-            builder: (context, instancesProvider, _) {
+          child: Consumer<UpdateInstanceProvider>(
+            builder: (context, updateInstanceProvider, _) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -217,7 +52,7 @@ class _InstanceUpdateState extends State<UpdateInstancePage> {
                     child: Row(
                       children: [
                         Text(
-                          title,
+                          "更新数据源",
                           style: Theme.of(context).textTheme.titleLarge,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -229,10 +64,17 @@ class _InstanceUpdateState extends State<UpdateInstancePage> {
                             child: const Text("测试连接")),
                         TextButton(
                             onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                onSubmit(context);
-                                widget.controller.clear();
-                                instancesProvider.goPage("instances");
+                              if (updateInstanceProvider.validate()) {
+                                onSubmit(
+                                    context,
+                                    InstanceModel(
+                                        dbType: updateInstanceProvider
+                                            .selectedDatabaseType,
+                                        connectValue: updateInstanceProvider
+                                            .getConnectValue()));
+                                updateInstanceProvider.clear();
+                                GoRouter.of(context).go('/instances/list');
+                                // instancesProvider.goPage("instances");
                               }
                             },
                             child: const Text("更新")),
@@ -248,104 +90,33 @@ class _InstanceUpdateState extends State<UpdateInstancePage> {
                           children: [
                             Row(
                               children: [
-                                DatabaseTypeCard(
-                                  name: connectionMetaMap[selectedDatabaseType]!
-                                      .displayName,
-                                  type: selectedDatabaseType,
-                                  logoPath:
-                                      connectionMetaMap[selectedDatabaseType]!
-                                          .logoAssertPath,
-                                  selected: true,
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        DatabaseTypeCard(
+                                          name: connectionMetaMap[
+                                                  updateInstanceProvider
+                                                      .selectedDatabaseType]!
+                                              .displayName,
+                                          type: updateInstanceProvider
+                                              .selectedDatabaseType,
+                                          logoPath: connectionMetaMap[
+                                                  updateInstanceProvider
+                                                      .selectedDatabaseType]!
+                                              .logoAssertPath,
+                                          selected: true,
+                                        )
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 20),
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 500),
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(height: 5),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              "基础配置",
-                                              textAlign: TextAlign.left,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(height: 15),
-                                        Form(
-                                            key: formKey,
-                                            child: Column(
-                                              children: [
-                                                for (final w
-                                                    in getSettingMeta("base"))
-                                                  buildBaseFormField(w),
-                                              ],
-                                            ))
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 20,
-                                  ),
-                                  const SizedBox(
-                                    width: 20,
-                                  ),
-                                  Expanded(
-                                      child: Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 500),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            for (var group
-                                                in customSettingGroup)
-                                              TextButton(
-                                                onPressed: () {
-                                                  onGroupChange(group);
-                                                },
-                                                style: TextButton.styleFrom(
-                                                  backgroundColor: selectedGroup ==
-                                                          group
-                                                      ? Theme.of(context)
-                                                          .colorScheme
-                                                          .surfaceContainerHighest // custom config tab selected color
-                                                      : null,
-                                                ),
-                                                child: Text(
-                                                  group,
-                                                  textAlign: TextAlign.left,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium,
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Form(
-                                            // key: formKey,
-                                            child: Column(
-                                          children: [
-                                            for (final meta in getSettingMeta(
-                                                selectedGroup))
-                                              buildBaseFormField(meta),
-                                          ],
-                                        ))
-                                      ],
-                                    ),
-                                  ))
-                                ],
-                              ),
+                            const Expanded(
+                              child: UpdateInstanceForm(),
                             )
                           ]),
                     ),
@@ -363,5 +134,138 @@ class _InstanceUpdateState extends State<UpdateInstancePage> {
         )),
       ],
     );
+  }
+}
+
+class UpdateInstanceForm extends AddInstanceForm {
+  const UpdateInstanceForm({Key? key}) : super(key: key);
+
+  @override
+  Widget buildBaseFormField(BuildContext context, SettingMeta connMeta) {
+    UpdateInstanceProvider updateInstanceProvider =
+        context.read<UpdateInstanceProvider>();
+    return switch (connMeta) {
+      NameMeta() => CommonFormField(
+          label: "名称",
+          readOnly: true,
+          controller: updateInstanceProvider.nameCtrl,
+        ),
+      AddressMeta() => AddressFormField(
+          addrController: updateInstanceProvider.addrCtrl,
+          portController: updateInstanceProvider.portCtrl),
+      UserMeta() => CommonFormField(
+          label: "账号", controller: updateInstanceProvider.userCtrl),
+      PasswordMeta() =>
+        PasswordFormField(controller: updateInstanceProvider.passwordCtrl),
+      DescMeta() => DescFormField(controller: updateInstanceProvider.descCtrl),
+      CustomMeta() => CommonFormField(
+          state: updateInstanceProvider.states[connMeta]!.state,
+          label: connMeta.name,
+          controller: updateInstanceProvider.customCtrl[connMeta]!,
+          onValid: (isValid) {
+            context
+                .read<UpdateInstanceProvider>()
+                .updateValidState(connMeta, isValid);
+          },
+        ),
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<UpdateInstanceProvider>(
+        builder: (context, updateInstanceProvider, _) {
+      return Row(
+        children: [
+          Container(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: Column(
+              children: [
+                const SizedBox(height: 5),
+                Row(
+                  children: [
+                    Text(
+                      "基础配置",
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    )
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Form(
+                    key: updateInstanceProvider.formKey,
+                    child: Column(
+                      children: [
+                        for (final w
+                            in updateInstanceProvider.getSettingMeta("base"))
+                          buildBaseFormField(context, w),
+                      ],
+                    ))
+              ],
+            ),
+          ),
+          const SizedBox(
+            width: 40,
+          ),
+          Expanded(
+              child: Container(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    for (var group in updateInstanceProvider.customSettingGroup)
+                      TextButton(
+                        onPressed: () {
+                          updateInstanceProvider.onGroupChange(
+                              updateInstanceProvider.customSettingGroup
+                                  .indexOf(group));
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: updateInstanceProvider
+                                          .customSettingGroup[
+                                      updateInstanceProvider.selectedGroup] ==
+                                  group
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest // custom config tab selected color
+                              : null,
+                        ),
+                        child: Text(
+                          group,
+                          textAlign: TextAlign.left,
+                          style: Theme.of(context).textTheme.titleMedium!.merge(
+                              TextStyle(
+                                  color: !updateInstanceProvider
+                                          .isGroupValid(group)
+                                      ? Colors.red
+                                      : null)),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                IndexedStack(
+                  index: updateInstanceProvider.selectedGroup,
+                  children: [
+                    for (final group
+                        in updateInstanceProvider.customSettingGroup)
+                      Form(
+                          // key: formKey,
+                          child: Column(
+                        children: [
+                          for (final meta
+                              in updateInstanceProvider.getSettingMeta(group))
+                            buildBaseFormField(context, meta),
+                        ],
+                      ))
+                  ],
+                )
+              ],
+            ),
+          ))
+        ],
+      );
+    });
   }
 }

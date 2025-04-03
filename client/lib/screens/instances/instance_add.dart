@@ -3,9 +3,29 @@ import 'package:client/providers/instances.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:db_driver/db_driver.dart';
+import 'package:client/screens/page_skeleton.dart';
+import 'package:go_router/go_router.dart';
 
 class AddInstancePage extends StatelessWidget {
   const AddInstancePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PageSkeleton(
+      topBar: Row(
+        children: [
+          IconButton(
+              onPressed: () => GoRouter.of(context).go('/instances/list'),
+              icon: const Icon(Icons.arrow_back))
+        ],
+      ),
+      child: const AddInstance(),
+    );
+  }
+}
+
+class AddInstance extends StatelessWidget {
+  const AddInstance({Key? key}) : super(key: key);
 
   void onSubmit(BuildContext context, InstanceModel instance) {
     context.read<InstancesProvider>().addInstance(instance);
@@ -67,7 +87,7 @@ class AddInstancePage extends StatelessWidget {
                                         connectValue: addInstanceProvider
                                             .getConnectValue()));
                                 addInstanceProvider.clear();
-                                // instancesProvider.goPage("instances");
+                                GoRouter.of(context).go('/instances/list');
                               }
                             },
                             child: const Text("提交")),
@@ -295,7 +315,7 @@ class _CommonFormFieldState extends State<CommonFormField> {
       if (value == null || value.isEmpty) {
         widget.onValid?.call(false);
         return "值不能为空";
-      }else {
+      } else {
         widget.onValid?.call(true);
       }
       return null;
@@ -379,7 +399,9 @@ class AddInstanceForm extends StatelessWidget {
           label: connMeta.name,
           controller: addInstanceProvider.customCtrl[connMeta]!,
           onValid: (isValid) {
-            context.read<AddInstanceProvider>().updateValidState(connMeta, isValid);
+            context
+                .read<AddInstanceProvider>()
+                .updateValidState(connMeta, isValid);
           },
         ),
     };
@@ -450,9 +472,10 @@ class AddInstanceForm extends StatelessWidget {
                           textAlign: TextAlign.left,
                           style: Theme.of(context).textTheme.titleMedium!.merge(
                               TextStyle(
-                                  color: !addInstanceProvider.isGroupValid(group)
-                                      ? Colors.red
-                                      : null)),
+                                  color:
+                                      !addInstanceProvider.isGroupValid(group)
+                                          ? Colors.red
+                                          : null)),
                         ),
                       ),
                   ],

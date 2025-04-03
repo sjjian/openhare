@@ -235,3 +235,36 @@ class AddInstanceProvider extends ChangeNotifier {
     );
   }
 }
+
+class UpdateInstanceProvider extends AddInstanceProvider {
+  InstanceModel? instance;
+  
+  @override
+  DatabaseType get selectedDatabaseType => instance?.dbType ?? DatabaseType.mysql;
+
+  @override
+  void onDatabaseTypeChange(DatabaseType type) {
+    return;
+  }
+
+  UpdateInstanceProvider():super();
+
+  void loadFromMeta(ConnectValue connectValue) {
+    nameCtrl.text = connectValue.name;
+    descCtrl.text = connectValue.desc;
+    addrCtrl.text = connectValue.host;
+    portCtrl.text = connectValue.port.toString();
+    userCtrl.text = connectValue.user;
+    passwordCtrl.text = connectValue.password;
+
+    for (final meta in customCtrl.keys) {
+      customCtrl[meta]!.text = connectValue.getValue(meta.name);
+    }
+  }
+
+  void tryUpdateInstance(InstanceModel instance) {
+    this.instance = instance;
+    loadFromMeta(instance.connectValue);
+    notifyListeners();
+  }
+}

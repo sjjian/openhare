@@ -1,3 +1,4 @@
+import 'package:client/screens/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -41,36 +42,38 @@ class PageSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surfaceContainer, // 全局背景色
-      child: Column(children: [
-        Container(
+    return ScaffoldWithNavRail(
+      child: Material(
+        color: Theme.of(context).colorScheme.surfaceContainer, // 全局背景色
+        child: Column(children: [
+          Container(
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest, // header 背景色
+              height: 40,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: MoveWindow(
+                      // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
+                      child: topBar,
+                    ),
+                  ),
+                  if (!kIsWeb) const WindowButtons(),
+                ],
+              )),
+          Expanded(
+            child: child,
+          ),
+          Container(
+            height: 40,
             color: Theme.of(context)
                 .colorScheme
-                .surfaceContainerHighest, // header 背景色
-            height: 40,
-            child: Row(
-              children: [
-                Expanded(
-                  child: MoveWindow(
-                    // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
-                    child: topBar,
-                  ),
-                ),
-                if (!kIsWeb) const WindowButtons(),
-              ],
-            )),
-        Expanded(
-          child: child,
-        ),
-        Container(
-          height: 40,
-          color: Theme.of(context)
-              .colorScheme
-              .surfaceContainerHighest, // bottom 背景色
-          child: bottomBar,
-        )
-      ]),
+                .surfaceContainerHighest, // bottom 背景色
+            child: bottomBar,
+          )
+        ]),
+      ),
     );
   }
 }

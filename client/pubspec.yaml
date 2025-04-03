@@ -39,7 +39,7 @@ dependencies:
   mysql_client: ^0.0.27
   mysql1: ^0.20.0
   quiver: ^3.2.1
-  go_router: ^13.2.4
+  go_router: ^14.8.1
   path_provider: ^2.1.3
   json_annotation: ^4.9.0
   hugeicons: ^0.0.7

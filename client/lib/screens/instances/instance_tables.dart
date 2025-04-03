@@ -4,6 +4,20 @@ import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:client/screens/page_skeleton.dart';
+import 'package:go_router/go_router.dart';
+
+class InstancesPage extends StatelessWidget {
+  const InstancesPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const PageSkeleton(
+      key: Key("instances"),
+      child: InstanceTable(),
+    );
+  }
+}
 
 class InstanceTable extends StatefulWidget {
   const InstanceTable({super.key});
@@ -55,7 +69,10 @@ class _InstanceTableState extends State<InstanceTable> {
             children: [
               IconButton(
                 onPressed: () {
-                  context.read<InstancesProvider>().tryUpdateInstance(instance);
+                  context
+                      .read<UpdateInstanceProvider>()
+                      .tryUpdateInstance(instance);
+                  GoRouter.of(context).go('/instances/update');
                 },
                 icon: const Icon(Icons.edit),
               ),
@@ -119,7 +136,7 @@ class _InstanceTableState extends State<InstanceTable> {
                               child: FloatingActionButton.small(
                                 elevation: 2,
                                 onPressed: () =>
-                                    {instancesProvider.goPage("add_instance")},
+                                    GoRouter.of(context).go('/instances/add'),
                                 child: const Icon(Icons.add),
                               ),
                             ),
