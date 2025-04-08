@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'package:client/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
@@ -67,80 +67,64 @@ class InstancesProvider extends ChangeNotifier {
   }
 }
 
-class FormValidState {
+class FormInfo {
+  DatabaseType dbType;
+  final SettingMeta meta;
+  TextEditingController ctrl;
   GlobalKey<FormFieldState> state = GlobalKey<FormFieldState>();
   bool isValid = true;
+
+  FormInfo(this.dbType, this.meta)
+      : ctrl = TextEditingController(text: meta.defaultValue);
 }
 
 class AddInstanceProvider extends ChangeNotifier {
-  final TextEditingController nameCtrl = TextEditingController();
-  final TextEditingController descCtrl = TextEditingController();
-  final TextEditingController addrCtrl = TextEditingController();
-  final TextEditingController portCtrl = TextEditingController();
-  final TextEditingController userCtrl = TextEditingController();
-  final TextEditingController passwordCtrl = TextEditingController();
-  final Map<CustomMeta, TextEditingController> customCtrl = {};
-
-  final formKey = GlobalKey<FormState>();
-  final Map<CustomMeta, FormValidState> states = {};
+  final Map<DatabaseType, Map<String, FormInfo>> infos = {};
 
   DatabaseType selectedDatabaseType = DatabaseType.mysql;
-
-  int _selectedGroup = 0;
+  String? _selectedGroup;
 
   AddInstanceProvider() {
     for (var connMeta in connectionMetas) {
+      final dbInfos = infos.putIfAbsent(connMeta.type, () => {});
       for (var meta in connMeta.connMeta) {
-        if (meta is CustomMeta) {
-          customCtrl[meta] = TextEditingController(text: meta.defaultValue);
-          states[meta] = FormValidState();
-        }
+        dbInfos[meta.name] = FormInfo(connMeta.type, meta);
       }
     }
-    portCtrl.text = defaultPort;
   }
 
   void onDatabaseTypeChange(DatabaseType type) {
-    final isPortDefault = (portCtrl.text == defaultPort);
+    final isPortChanged = (infos[selectedDatabaseType]!["port"]!.ctrl.text != defaultPort);
     selectedDatabaseType = type;
-    _selectedGroup = 0;
+    _selectedGroup = null;
     // 数据库切换则port 默认值要切换，除非用户自己编辑了特殊端口
-    if (isPortDefault) {
-      portCtrl.text = defaultPort;
+    if (!isPortChanged) {
+      port = defaultPort;
     }
+
     notifyListeners();
   }
 
   void clear() {
-    nameCtrl.clear();
-    descCtrl.clear();
-    addrCtrl.clear();
-    userCtrl.clear();
-    passwordCtrl.clear();
-    for (var connMeta in connectionMetas) {
-      for (var meta in connMeta.connMeta) {
-        if (meta is CustomMeta) {
-          customCtrl[meta]!.clear();
-          customCtrl[meta]!.text = meta.defaultValue ?? "";
-        }
+    for (final dbInfos in infos.values) {
+      for (final info in dbInfos.values) {
+        info.ctrl.text = info.meta.defaultValue ?? "";
       }
     }
-    portCtrl.text = defaultPort;
   }
 
   String get defaultPort {
-    for (var connMeta in connectionMetaMap[selectedDatabaseType]!.connMeta) {
-      if (connMeta is AddressMeta) {
-        return connMeta.defaultPort;
-      }
-    }
-    return "";
+    return infos[selectedDatabaseType]!["port"]!.meta.defaultValue ?? "";
+  }
+
+  set port(String port) {
+    infos[selectedDatabaseType]!["port"]!.ctrl.text = port;
   }
 
   bool isGroupValid(String group) {
-    for (var connMeta in connectionMetaMap[selectedDatabaseType]!.connMeta) {
-      if (connMeta.group == group) {
-        if (states[connMeta]!.isValid == false) {
+    for (final info in infos[selectedDatabaseType]!.values) {
+      if (info.dbType == selectedDatabaseType && info.meta.group == group) {
+        if (!info.isValid) {
           return false;
         }
       }
@@ -150,24 +134,21 @@ class AddInstanceProvider extends ChangeNotifier {
 
   bool validate() {
     var isValid = true;
-    for (var connMeta in connectionMetaMap[selectedDatabaseType]!.connMeta) {
-      if (connMeta is CustomMeta) {
-        if (!states[connMeta]!.state.currentState!.validate()) {
+    for (final info in infos[selectedDatabaseType]!.values) {
+      if (info.dbType == selectedDatabaseType) {
+        if (!info.state.currentState!.validate()) {
           isValid = false;
         }
       }
     }
-    if (!formKey.currentState!.validate()) {
-      isValid = false;
-    }
     return isValid;
   }
 
-  void updateValidState(CustomMeta meta, bool isValid) {
-    if (states[meta]!.isValid == isValid) {
+  void updateValidState(FormInfo info, bool isValid) {
+    if (info.isValid == isValid) {
       return;
     }
-    states[meta]!.isValid = isValid;
+    info.isValid = isValid;
     notifyListeners();
   }
 
@@ -186,14 +167,11 @@ class AddInstanceProvider extends ChangeNotifier {
         .toList();
   }
 
-  int get selectedGroup {
-    if (customSettingGroup.isEmpty) {
-      return 0;
-    }
+  String? get selectedGroup {
     return _selectedGroup;
   }
 
-  void onGroupChange(int group) {
+  void onGroupChange(String group) {
     _selectedGroup = group;
     notifyListeners();
   }
@@ -212,17 +190,32 @@ class AddInstanceProvider extends ChangeNotifier {
   }
 
   ConnectValue getConnectValue() {
-    final name = nameCtrl.text;
-    final addr = addrCtrl.text;
-    final port = int.tryParse(portCtrl.text);
-    final user = userCtrl.text;
-    final password = passwordCtrl.text;
-    final desc = descCtrl.text;
+    String name = "";
+    String addr = "";
+    int? port = 0;
+    String user = "";
+    String password = "";
+    String desc = "";
+    Map<String, String> custom = {};
 
-    final custom = {
-      for (final meta in connectionMetaMap[selectedDatabaseType]!.connMeta)
-        if (meta is CustomMeta) meta.name: customCtrl[meta]!.text
-    };
+    for (final info in infos[selectedDatabaseType]!.values) {
+      switch (info.meta) {
+        case NameMeta():
+          name = info.ctrl.text;
+        case AddressMeta():
+          addr = info.ctrl.text;
+        case PortMeta():
+          port = int.tryParse(info.ctrl.text);
+        case UserMeta():
+          user = info.ctrl.text;
+        case PasswordMeta():
+          password = info.ctrl.text;
+        case DescMeta():
+          desc = info.ctrl.text;
+        case CustomMeta():
+          custom[(info.meta as CustomMeta).name] = info.ctrl.text;
+      }
+    }
 
     return ConnectValue(
       name: name,
@@ -234,31 +227,47 @@ class AddInstanceProvider extends ChangeNotifier {
       custom: custom,
     );
   }
+
+  void onSubmit(BuildContext context) {
+    context.read<InstancesProvider>().addInstance(InstanceModel(
+        dbType: selectedDatabaseType, connectValue: getConnectValue()));
+  }
 }
 
 class UpdateInstanceProvider extends AddInstanceProvider {
   InstanceModel? instance;
-  
+
   @override
-  DatabaseType get selectedDatabaseType => instance?.dbType ?? DatabaseType.mysql;
+  DatabaseType get selectedDatabaseType =>
+      instance?.dbType ?? DatabaseType.mysql;
 
   @override
   void onDatabaseTypeChange(DatabaseType type) {
     return;
   }
 
-  UpdateInstanceProvider():super();
+  UpdateInstanceProvider() : super();
 
   void loadFromMeta(ConnectValue connectValue) {
-    nameCtrl.text = connectValue.name;
-    descCtrl.text = connectValue.desc;
-    addrCtrl.text = connectValue.host;
-    portCtrl.text = connectValue.port.toString();
-    userCtrl.text = connectValue.user;
-    passwordCtrl.text = connectValue.password;
-
-    for (final meta in customCtrl.keys) {
-      customCtrl[meta]!.text = connectValue.getValue(meta.name);
+    for (final info in infos[selectedDatabaseType]!.values) {
+      if (info.dbType == selectedDatabaseType) {
+        switch (info.meta) {
+          case NameMeta():
+            info.ctrl.text = connectValue.name;
+          case AddressMeta():
+            info.ctrl.text = connectValue.host;
+          case PortMeta():
+            info.ctrl.text = connectValue.port.toString();
+          case UserMeta():
+            info.ctrl.text = connectValue.user;
+          case PasswordMeta():
+            info.ctrl.text = connectValue.password;
+          case DescMeta():
+            info.ctrl.text = connectValue.desc;
+          case CustomMeta():
+            info.ctrl.text = connectValue.getValue(info.meta.name);
+        }
+      }
     }
   }
 
@@ -266,5 +275,11 @@ class UpdateInstanceProvider extends AddInstanceProvider {
     this.instance = instance;
     loadFromMeta(instance.connectValue);
     notifyListeners();
+  }
+
+  @override
+  void onSubmit(BuildContext context) {
+    context.read<InstancesProvider>().updateInstance(InstanceModel(
+        dbType: selectedDatabaseType, connectValue: getConnectValue()));
   }
 }

@@ -1,9 +1,9 @@
-import 'package:client/models/instances.dart';
 import 'package:client/providers/instances.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/page_skeleton.dart';
+import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 
 class AddInstancePage extends StatelessWidget {
@@ -26,10 +26,6 @@ class AddInstancePage extends StatelessWidget {
 
 class AddInstance extends StatelessWidget {
   const AddInstance({Key? key}) : super(key: key);
-
-  void onSubmit(BuildContext context, InstanceModel instance) {
-    context.read<InstancesProvider>().addInstance(instance);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,15 +59,8 @@ class AddInstance extends StatelessWidget {
                             child: const Text("测试连接")),
                         TextButton(
                             onPressed: () {
-                              if (addInstanceProvider.formKey.currentState!
-                                  .validate()) {
-                                onSubmit(
-                                    context,
-                                    InstanceModel(
-                                        dbType: addInstanceProvider
-                                            .selectedDatabaseType,
-                                        connectValue: addInstanceProvider
-                                            .getConnectValue()));
+                              if (addInstanceProvider.validate()) {
+                                addInstanceProvider.onSubmit(context);
                                 addInstanceProvider.clear();
                               }
                             },
@@ -79,13 +68,7 @@ class AddInstance extends StatelessWidget {
                         TextButton(
                             onPressed: () {
                               if (addInstanceProvider.validate()) {
-                                onSubmit(
-                                    context,
-                                    InstanceModel(
-                                        dbType: addInstanceProvider
-                                            .selectedDatabaseType,
-                                        connectValue: addInstanceProvider
-                                            .getConnectValue()));
+                                addInstanceProvider.onSubmit(context);
                                 addInstanceProvider.clear();
                                 GoRouter.of(context).go('/instances/list');
                               }
@@ -126,8 +109,18 @@ class AddInstance extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            const Expanded(
-                              child: AddInstanceForm(),
+                            Expanded(
+                              child: AddInstanceForm(
+                                infos: addInstanceProvider.infos[
+                                    addInstanceProvider.selectedDatabaseType]!,
+                                selectedGroup: addInstanceProvider.selectedGroup, // todo
+                                onValid: (info, isValid) {
+                                  addInstanceProvider.updateValidState(info, isValid);
+                                },
+                                onGroupChange: (group) {
+                                  addInstanceProvider.onGroupChange(group);
+                                },
+                              ),
                             )
                           ]),
                     ),
@@ -210,90 +203,13 @@ class DatabaseTypeCard extends StatelessWidget {
   }
 }
 
-class PasswordFormField extends StatelessWidget {
-  final TextEditingController controller;
-  const PasswordFormField({Key? key, required this.controller})
-      : super(key: key);
-
-  FormFieldValidator validatorPassword() {
-    return (value) {
-      if (value == null || value.isEmpty) {
-        return "密码不能为空";
-      }
-      return null;
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 80),
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUnfocus,
-        obscureText: true,
-        controller: controller,
-        validator: validatorPassword(),
-        decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-          labelText: "密码",
-          contentPadding: const EdgeInsets.all(10),
-        ),
-      ),
-    );
-  }
-}
-
-class AddressFormField extends StatelessWidget {
-  final TextEditingController addrController;
-  final TextEditingController portController;
-  const AddressFormField(
-      {Key? key, required this.addrController, required this.portController})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 80),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: TextFormField(
-              controller: addrController,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  labelText: "地址",
-                  contentPadding: const EdgeInsets.all(10)),
-            ),
-          ),
-          const SizedBox(
-            width: 5,
-          ),
-          Container(
-            constraints: const BoxConstraints(maxWidth: 120),
-            child: TextFormField(
-              controller: portController,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  labelText: "端口",
-                  contentPadding: const EdgeInsets.all(10)),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
 class CommonFormField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
   final FormFieldValidator? validator;
   final bool readOnly;
   final GlobalKey<FormFieldState>? state;
-  final Function(bool isValid)? onValid;
+  final bool obscureText;
 
   const CommonFormField(
       {Key? key,
@@ -302,7 +218,7 @@ class CommonFormField extends StatefulWidget {
       this.state,
       this.validator,
       this.readOnly = false,
-      this.onValid})
+      this.obscureText = false})
       : super(key: key);
 
   @override
@@ -310,18 +226,6 @@ class CommonFormField extends StatefulWidget {
 }
 
 class _CommonFormFieldState extends State<CommonFormField> {
-  FormFieldValidator validatorName(BuildContext context) {
-    return (value) {
-      if (value == null || value.isEmpty) {
-        widget.onValid?.call(false);
-        return "值不能为空";
-      } else {
-        widget.onValid?.call(true);
-      }
-      return null;
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -329,9 +233,10 @@ class _CommonFormFieldState extends State<CommonFormField> {
       child: TextFormField(
         key: widget.state,
         readOnly: widget.readOnly,
+        obscureText: widget.obscureText,
         autovalidateMode: AutovalidateMode.onUnfocus,
         controller: widget.controller,
-        validator: validatorName(context),
+        validator: widget.validator,
         decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
             labelText: widget.label,
@@ -343,8 +248,10 @@ class _CommonFormFieldState extends State<CommonFormField> {
 
 class DescFormField extends StatelessWidget {
   final TextEditingController controller;
+  final GlobalKey<FormFieldState>? state;
 
-  const DescFormField({Key? key, required this.controller}) : super(key: key);
+  const DescFormField({Key? key, required this.controller, this.state})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -364,7 +271,31 @@ class DescFormField extends StatelessWidget {
 }
 
 class AddInstanceForm extends StatelessWidget {
-  const AddInstanceForm({Key? key}) : super(key: key);
+  final String? selectedGroup;
+  final Map<String, FormInfo> infos;
+  final Function(FormInfo info, bool isValid)? onValid;
+  final Function(String group)? onGroupChange;
+
+  const AddInstanceForm(
+      {Key? key,
+      required this.infos,
+      this.onValid,
+      this.onGroupChange,
+      this.selectedGroup})
+      : super(key: key);
+
+  FormFieldValidator validatorFn(
+      BuildContext context, FormInfo info, FormFieldValidator validate) {
+    return (value) {
+      final result = validate(value);
+      if (result == null) {
+        onValid?.call(info, true);
+      } else {
+        onValid?.call(info, false);
+      }
+      return result;
+    };
+  }
 
   FormFieldValidator validatorName(BuildContext context) {
     return (value) {
@@ -378,129 +309,212 @@ class AddInstanceForm extends StatelessWidget {
     };
   }
 
-  Widget buildBaseFormField(BuildContext context, SettingMeta connMeta) {
-    AddInstanceProvider addInstanceProvider =
-        context.read<AddInstanceProvider>();
-    return switch (connMeta) {
-      NameMeta() => CommonFormField(
-          label: "名称",
-          controller: addInstanceProvider.nameCtrl,
-          validator: validatorName(context)),
-      AddressMeta() => AddressFormField(
-          addrController: addInstanceProvider.addrCtrl,
-          portController: addInstanceProvider.portCtrl),
-      UserMeta() =>
-        CommonFormField(label: "账号", controller: addInstanceProvider.userCtrl),
-      PasswordMeta() =>
-        PasswordFormField(controller: addInstanceProvider.passwordCtrl),
-      DescMeta() => DescFormField(controller: addInstanceProvider.descCtrl),
-      CustomMeta() => CommonFormField(
-          state: addInstanceProvider.states[connMeta]!.state,
-          label: connMeta.name,
-          controller: addInstanceProvider.customCtrl[connMeta]!,
-          onValid: (isValid) {
-            context
-                .read<AddInstanceProvider>()
-                .updateValidState(connMeta, isValid);
-          },
-        ),
+  FormFieldValidator validatorValueRequired(BuildContext context) {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return "值不能为空";
+      }
+      return null;
     };
+  }
+
+  int get selectedGroupIndex {
+    if (selectedGroup == null) {
+      return 0;
+    }
+    return groups.indexOf(selectedGroup!);
+  }
+
+  List<String> get groups {
+    return infos.values
+        .groupListsBy((info) => info.meta.group)
+        .keys
+        .whereNot((e) => e == "base")
+        .toList();
+  }
+
+  Widget buildNameField(BuildContext context) {
+    FormInfo name = infos["name"]!;
+    return CommonFormField(
+      state: name.state,
+      label: "名称",
+      controller: name.ctrl,
+      validator: validatorFn(context, name, validatorName(context)),
+    );
+  }
+
+  Widget buildAddressField(BuildContext context) {
+    FormInfo addr = infos["addr"]!;
+    FormInfo port = infos["port"]!;
+    return Container(
+      constraints: const BoxConstraints(minHeight: 80),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: CommonFormField(
+              label: "地址",
+              controller: addr.ctrl,
+              state: addr.state,
+              validator:
+                  validatorFn(context, addr, validatorValueRequired(context)),
+            ),
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          Container(
+            constraints: const BoxConstraints(maxWidth: 120),
+            child: CommonFormField(
+              label: "端口",
+              controller: port.ctrl,
+              state: port.state,
+              validator:
+                  validatorFn(context, port, validatorValueRequired(context)),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildUserField(BuildContext context) {
+    FormInfo user = infos["user"]!;
+    return CommonFormField(
+      label: "账号",
+      controller: user.ctrl,
+      state: user.state,
+      validator: validatorFn(context, user, validatorValueRequired(context)),
+    );
+  }
+
+  Widget buildPasswordField(BuildContext context) {
+    FormInfo password = infos["password"]!;
+    return CommonFormField(
+      label: "密码",
+      controller: password.ctrl,
+      state: password.state,
+      obscureText: true,
+      validator:
+          validatorFn(context, password, validatorValueRequired(context)),
+    );
+  }
+
+  Widget buildDescField(BuildContext context) {
+    FormInfo user = infos["desc"]!;
+    return DescFormField(
+      controller: user.ctrl,
+      state: user.state,
+    );
+  }
+
+  List<Widget> buildCustomField(BuildContext context, String group) {
+    List<Widget> ws = [];
+    for (final info in infos.values) {
+      if (info.meta.group == group && info.meta is CustomMeta) {
+        ws.add(CommonFormField(
+            state: info.state,
+            label: info.meta.name,
+            controller: info.ctrl,
+            validator: validatorFn(
+              context,
+              info,
+              validatorValueRequired(context),
+            )));
+      }
+    }
+    return ws;
+  }
+
+  bool isGroupValid(String group) {
+    for (final info in infos.values) {
+      if (info.meta.group == group) {
+        if (!info.isValid) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AddInstanceProvider>(
-        builder: (context, addInstanceProvider, _) {
-      return Row(
-        children: [
-          Container(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: Column(
-              children: [
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    Text(
-                      "基础配置",
-                      textAlign: TextAlign.left,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    )
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Form(
-                    key: addInstanceProvider.formKey,
-                    child: Column(
-                      children: [
-                        for (final w
-                            in addInstanceProvider.getSettingMeta("base"))
-                          buildBaseFormField(context, w),
-                      ],
-                    ))
-              ],
-            ),
+    return Row(
+      children: [
+        Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Column(
+            children: [
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  Text(
+                    "基础配置",
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  )
+                ],
+              ),
+              const SizedBox(height: 15),
+              Column(
+                children: [
+                  buildNameField(context),
+                  buildAddressField(context),
+                  buildUserField(context),
+                  buildPasswordField(context),
+                  buildDescField(context)
+                ],
+              )
+            ],
           ),
-          const SizedBox(
-            width: 40,
-          ),
-          Expanded(
-              child: Container(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    for (var group in addInstanceProvider.customSettingGroup)
-                      TextButton(
-                        onPressed: () {
-                          addInstanceProvider.onGroupChange(addInstanceProvider
-                              .customSettingGroup
-                              .indexOf(group));
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: addInstanceProvider
-                                          .customSettingGroup[
-                                      addInstanceProvider.selectedGroup] ==
-                                  group
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHighest // custom config tab selected color
-                              : null,
-                        ),
-                        child: Text(
-                          group,
-                          textAlign: TextAlign.left,
-                          style: Theme.of(context).textTheme.titleMedium!.merge(
-                              TextStyle(
-                                  color:
-                                      !addInstanceProvider.isGroupValid(group)
-                                          ? Colors.red
-                                          : null)),
-                        ),
+        ),
+        const SizedBox(
+          width: 40,
+        ),
+        Expanded(
+            child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  for (var group in groups)
+                    TextButton(
+                      onPressed: () {
+                        onGroupChange?.call(group);
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: group == selectedGroup
+                            ? Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest // custom config tab selected color
+                            : null,
                       ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                IndexedStack(
-                  index: addInstanceProvider.selectedGroup,
-                  children: [
-                    for (final group in addInstanceProvider.customSettingGroup)
-                      Form(
-                          // key: formKey,
-                          child: Column(
-                        children: [
-                          for (final meta
-                              in addInstanceProvider.getSettingMeta(group))
-                            buildBaseFormField(context, meta),
-                        ],
-                      ))
-                  ],
-                )
-              ],
-            ),
-          ))
-        ],
-      );
-    });
+                      child: Text(
+                        group,
+                        textAlign: TextAlign.left,
+                        style: Theme.of(context).textTheme.titleMedium!.merge(
+                            TextStyle(
+                                color:
+                                    !isGroupValid(group) ? Colors.red : null)),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              IndexedStack(
+                index: selectedGroupIndex,
+                children: [
+                  for (final group in groups)
+                    Column(
+                      children: buildCustomField(context, group),
+                    )
+                ],
+              )
+            ],
+          ),
+        ))
+      ],
+    );
   }
 }

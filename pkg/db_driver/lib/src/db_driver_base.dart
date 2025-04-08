@@ -34,7 +34,8 @@ List<ConnectionMeta> connectionMetas = [
     logoAssertPath: "assets/icons/mysql_icon.png",
     connMeta: [
       NameMeta(),
-      AddressMeta("3306"),
+      AddressMeta(),
+      PortMeta("3306"),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
@@ -46,7 +47,8 @@ List<ConnectionMeta> connectionMetas = [
     logoAssertPath: "assets/icons/pg_icon.png",
     connMeta: [
       NameMeta(),
-      AddressMeta("5432"),
+      AddressMeta(),
+      PortMeta("5432"),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),

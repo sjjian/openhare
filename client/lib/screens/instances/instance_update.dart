@@ -1,4 +1,3 @@
-import 'package:client/models/instances.dart';
 import 'package:client/providers/instances.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,10 +26,6 @@ class UpdateInstancePage extends StatelessWidget {
 
 class UpdateInstance extends StatelessWidget {
   const UpdateInstance({Key? key}) : super(key: key);
-
-  void onSubmit(BuildContext context, InstanceModel instance) {
-    context.read<InstancesProvider>().updateInstance(instance);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,16 +60,9 @@ class UpdateInstance extends StatelessWidget {
                         TextButton(
                             onPressed: () {
                               if (updateInstanceProvider.validate()) {
-                                onSubmit(
-                                    context,
-                                    InstanceModel(
-                                        dbType: updateInstanceProvider
-                                            .selectedDatabaseType,
-                                        connectValue: updateInstanceProvider
-                                            .getConnectValue()));
+                                updateInstanceProvider.onSubmit(context);
                                 updateInstanceProvider.clear();
                                 GoRouter.of(context).go('/instances/list');
-                                // instancesProvider.goPage("instances");
                               }
                             },
                             child: const Text("更新")),
@@ -115,8 +103,13 @@ class UpdateInstance extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            const Expanded(
-                              child: UpdateInstanceForm(),
+                            Expanded(
+                              child: AddInstanceForm(
+                                infos: updateInstanceProvider.infos[
+                                    updateInstanceProvider
+                                        .selectedDatabaseType]!,
+                                selectedGroup: "conn",
+                              ),
                             )
                           ]),
                     ),
@@ -134,138 +127,5 @@ class UpdateInstance extends StatelessWidget {
         )),
       ],
     );
-  }
-}
-
-class UpdateInstanceForm extends AddInstanceForm {
-  const UpdateInstanceForm({Key? key}) : super(key: key);
-
-  @override
-  Widget buildBaseFormField(BuildContext context, SettingMeta connMeta) {
-    UpdateInstanceProvider updateInstanceProvider =
-        context.read<UpdateInstanceProvider>();
-    return switch (connMeta) {
-      NameMeta() => CommonFormField(
-          label: "名称",
-          readOnly: true,
-          controller: updateInstanceProvider.nameCtrl,
-        ),
-      AddressMeta() => AddressFormField(
-          addrController: updateInstanceProvider.addrCtrl,
-          portController: updateInstanceProvider.portCtrl),
-      UserMeta() => CommonFormField(
-          label: "账号", controller: updateInstanceProvider.userCtrl),
-      PasswordMeta() =>
-        PasswordFormField(controller: updateInstanceProvider.passwordCtrl),
-      DescMeta() => DescFormField(controller: updateInstanceProvider.descCtrl),
-      CustomMeta() => CommonFormField(
-          state: updateInstanceProvider.states[connMeta]!.state,
-          label: connMeta.name,
-          controller: updateInstanceProvider.customCtrl[connMeta]!,
-          onValid: (isValid) {
-            context
-                .read<UpdateInstanceProvider>()
-                .updateValidState(connMeta, isValid);
-          },
-        ),
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<UpdateInstanceProvider>(
-        builder: (context, updateInstanceProvider, _) {
-      return Row(
-        children: [
-          Container(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: Column(
-              children: [
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    Text(
-                      "基础配置",
-                      textAlign: TextAlign.left,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    )
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Form(
-                    key: updateInstanceProvider.formKey,
-                    child: Column(
-                      children: [
-                        for (final w
-                            in updateInstanceProvider.getSettingMeta("base"))
-                          buildBaseFormField(context, w),
-                      ],
-                    ))
-              ],
-            ),
-          ),
-          const SizedBox(
-            width: 40,
-          ),
-          Expanded(
-              child: Container(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    for (var group in updateInstanceProvider.customSettingGroup)
-                      TextButton(
-                        onPressed: () {
-                          updateInstanceProvider.onGroupChange(
-                              updateInstanceProvider.customSettingGroup
-                                  .indexOf(group));
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: updateInstanceProvider
-                                          .customSettingGroup[
-                                      updateInstanceProvider.selectedGroup] ==
-                                  group
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHighest // custom config tab selected color
-                              : null,
-                        ),
-                        child: Text(
-                          group,
-                          textAlign: TextAlign.left,
-                          style: Theme.of(context).textTheme.titleMedium!.merge(
-                              TextStyle(
-                                  color: !updateInstanceProvider
-                                          .isGroupValid(group)
-                                      ? Colors.red
-                                      : null)),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                IndexedStack(
-                  index: updateInstanceProvider.selectedGroup,
-                  children: [
-                    for (final group
-                        in updateInstanceProvider.customSettingGroup)
-                      Form(
-                          // key: formKey,
-                          child: Column(
-                        children: [
-                          for (final meta
-                              in updateInstanceProvider.getSettingMeta(group))
-                            buildBaseFormField(context, meta),
-                        ],
-                      ))
-                  ],
-                )
-              ],
-            ),
-          ))
-        ],
-      );
-    });
   }
 }

@@ -21,26 +21,57 @@ class ConnectionMeta {
 
 sealed class SettingMeta {
   String group;
+
+  String get name;
+
+  String? get defaultValue => "";
+
   SettingMeta({this.group = "base"});
 }
 
-class NameMeta extends SettingMeta {}
-
-class AddressMeta extends SettingMeta {
-  final String defaultPort;
-
-  AddressMeta(this.defaultPort);
+class NameMeta extends SettingMeta {
+  @override
+  String get name => "name";
 }
 
-class UserMeta extends SettingMeta {}
+class AddressMeta extends SettingMeta {
+  @override
+  String get name => "addr";
 
-class PasswordMeta extends SettingMeta {}
+  AddressMeta();
+}
 
-class DescMeta extends SettingMeta {}
+class PortMeta extends SettingMeta {
+  @override
+  String get name => "port";
+  @override
+  final String? defaultValue;
+
+  PortMeta(this.defaultValue);
+}
+
+class UserMeta extends SettingMeta {
+  @override
+  String get name => "user";
+}
+
+class PasswordMeta extends SettingMeta {
+  @override
+  String get name => "password";
+}
+
+class DescMeta extends SettingMeta {
+  @override
+  String get name => "desc";
+}
 
 class CustomMeta extends SettingMeta {
+  @override
   String name;
+  
   String type;
+
+  @override
   String? defaultValue;
   String? comment;
   bool isRequired = false;
