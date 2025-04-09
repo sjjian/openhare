@@ -53,9 +53,7 @@ List<ConnectionMeta> connectionMetas = [
       PasswordMeta(),
       DescMeta(),
       CustomMeta(
-          name: "database", type: "text", group: "conn", isRequired: true, defaultValue: "postgres"),
-      CustomMeta(
-          name: "ssl_enable", type: "text", group: "ssl", isRequired: true),
+          name: "database", type: "text", group: "connection", isRequired: true, defaultValue: "postgres"),
     ],
   ),
 ];
