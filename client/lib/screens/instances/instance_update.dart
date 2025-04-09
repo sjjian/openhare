@@ -76,39 +76,23 @@ class UpdateInstance extends StatelessWidget {
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: [
-                                        DatabaseTypeCard(
-                                          name: connectionMetaMap[
-                                                  updateInstanceProvider
-                                                      .selectedDatabaseType]!
-                                              .displayName,
-                                          type: updateInstanceProvider
-                                              .selectedDatabaseType,
-                                          logoPath: connectionMetaMap[
-                                                  updateInstanceProvider
-                                                      .selectedDatabaseType]!
-                                              .logoAssertPath,
-                                          selected: true,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            DatabaseTypeCardList(connectionMetas: [
+                              connectionMetaMap[
+                                  updateInstanceProvider.selectedDatabaseType]!
+                            ]),
                             const SizedBox(height: 20),
                             Expanded(
-                              child: AddInstanceForm(
-                                infos: updateInstanceProvider.infos[
-                                    updateInstanceProvider
-                                        .selectedDatabaseType]!,
-                                selectedGroup: "conn",
+                              child: UpdateInstanceForm(
+                                infos: updateInstanceProvider.dbInfos,
+                                selectedGroup:
+                                    updateInstanceProvider.selectedGroup,
+                                onValid: (info, isValid) {
+                                  updateInstanceProvider.updateValidState(
+                                      info, isValid);
+                                },
+                                onGroupChange: (group) {
+                                  updateInstanceProvider.onGroupChange(group);
+                                },
                               ),
                             )
                           ]),
@@ -126,6 +110,36 @@ class UpdateInstance extends StatelessWidget {
           ),
         )),
       ],
+    );
+  }
+}
+
+class UpdateInstanceForm extends AddInstanceForm {
+  const UpdateInstanceForm(
+      {super.key,
+      required super.infos,
+      required super.selectedGroup,
+      super.onGroupChange,
+      super.onValid});
+  @override
+  FormFieldValidator validatorName(BuildContext context) {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return "名称不能为空";
+      }
+      return null;
+    };
+  }
+
+  @override
+  Widget buildNameField(BuildContext context) {
+    FormInfo name = infos[settingMetaNameName]!;
+    return CommonFormField(
+      readOnly: true,
+      state: name.state,
+      label: "名称",
+      controller: name.ctrl,
+      validator: validatorFn(context, name, validatorName(context)),
     );
   }
 }

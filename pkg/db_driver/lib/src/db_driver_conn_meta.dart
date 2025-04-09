@@ -4,6 +4,16 @@ part 'db_driver_conn_meta.g.dart';
 
 enum DatabaseType { mysql, pg }
 
+const String settingMetaGroupBase = "base";
+
+const String settingMetaNameName = "name";
+const String settingMetaNameAddr = "addr";
+const String settingMetaNamePort = "port";
+const String settingMetaNameUser = "user";
+const String settingMetaNamePassword = "password";
+const String settingMetaNameDesc = "desc";
+
+
 class ConnectionMeta {
   String displayName;
   DatabaseType type;
@@ -20,30 +30,30 @@ class ConnectionMeta {
 }
 
 sealed class SettingMeta {
-  String group;
+  final String group;
 
   String get name;
 
   String? get defaultValue => "";
 
-  SettingMeta({this.group = "base"});
+  SettingMeta({this.group = settingMetaGroupBase});
 }
 
 class NameMeta extends SettingMeta {
   @override
-  String get name => "name";
+  String get name => settingMetaNameName;
 }
 
 class AddressMeta extends SettingMeta {
   @override
-  String get name => "addr";
+  String get name => settingMetaNameAddr;
 
   AddressMeta();
 }
 
 class PortMeta extends SettingMeta {
   @override
-  String get name => "port";
+  String get name => settingMetaNamePort;
   @override
   final String? defaultValue;
 
@@ -52,17 +62,17 @@ class PortMeta extends SettingMeta {
 
 class UserMeta extends SettingMeta {
   @override
-  String get name => "user";
+  String get name => settingMetaNameUser;
 }
 
 class PasswordMeta extends SettingMeta {
   @override
-  String get name => "password";
+  String get name => settingMetaNamePassword;
 }
 
 class DescMeta extends SettingMeta {
   @override
-  String get name => "desc";
+  String get name => settingMetaNameDesc;
 }
 
 class CustomMeta extends SettingMeta {

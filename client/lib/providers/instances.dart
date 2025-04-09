@@ -94,9 +94,24 @@ class AddInstanceProvider extends ChangeNotifier {
   }
 
   void onDatabaseTypeChange(DatabaseType type) {
-    final isPortChanged = (infos[selectedDatabaseType]!["port"]!.ctrl.text != defaultPort);
+    final isPortChanged =
+        (infos[selectedDatabaseType]![settingMetaNamePort]!.ctrl.text !=
+            defaultPort);
+    final name = infos[selectedDatabaseType]![settingMetaNameName]!.ctrl.text;
+    final desc = infos[selectedDatabaseType]![settingMetaNameDesc]!.ctrl.text;
+    final addr = infos[selectedDatabaseType]![settingMetaNameAddr]!.ctrl.text;
+    final user = infos[selectedDatabaseType]![settingMetaNameUser]!.ctrl.text;
+    final password =
+        infos[selectedDatabaseType]![settingMetaNamePassword]!.ctrl.text;
+
     selectedDatabaseType = type;
     _selectedGroup = null;
+
+    infos[type]![settingMetaNameName]!.ctrl.text = name;
+    infos[type]![settingMetaNameDesc]!.ctrl.text = desc;
+    infos[type]![settingMetaNameAddr]!.ctrl.text = addr;
+    infos[type]![settingMetaNameUser]!.ctrl.text = user;
+    infos[type]![settingMetaNamePassword]!.ctrl.text = password;
     // 数据库切换则port 默认值要切换，除非用户自己编辑了特殊端口
     if (!isPortChanged) {
       port = defaultPort;
@@ -113,12 +128,19 @@ class AddInstanceProvider extends ChangeNotifier {
     }
   }
 
+  Map<String, FormInfo> get dbInfos {
+    return infos[selectedDatabaseType]!;
+  }
+
   String get defaultPort {
-    return infos[selectedDatabaseType]!["port"]!.meta.defaultValue ?? "";
+    return infos[selectedDatabaseType]![settingMetaNamePort]!
+            .meta
+            .defaultValue ??
+        "";
   }
 
   set port(String port) {
-    infos[selectedDatabaseType]!["port"]!.ctrl.text = port;
+    infos[selectedDatabaseType]![settingMetaNamePort]!.ctrl.text = port;
   }
 
   bool isGroupValid(String group) {
@@ -163,7 +185,7 @@ class AddInstanceProvider extends ChangeNotifier {
           (previous, meta) => (previous ?? [])..add(meta.group),
         )
         .keys
-        .whereNot((e) => e == "base")
+        .whereNot((e) => e == settingMetaGroupBase)
         .toList();
   }
 

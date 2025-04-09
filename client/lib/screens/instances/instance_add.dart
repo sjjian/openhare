@@ -84,38 +84,23 @@ class AddInstance extends StatelessWidget {
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: [
-                                        for (final connMeta in connectionMetas)
-                                          DatabaseTypeCard(
-                                            name: connMeta.displayName,
-                                            type: connMeta.type,
-                                            logoPath: connMeta.logoAssertPath,
-                                            selected: connMeta.type ==
-                                                addInstanceProvider
-                                                    .selectedDatabaseType,
-                                            onTap: (type) => addInstanceProvider
-                                                .onDatabaseTypeChange(type),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            DatabaseTypeCardList(
+                              connectionMetas: connectionMetas,
+                              selectedDatabaseType:
+                                  addInstanceProvider.selectedDatabaseType,
+                              onDatabaseTypeChange: (type) {
+                                addInstanceProvider.onDatabaseTypeChange(type);
+                              },
                             ),
                             const SizedBox(height: 20),
                             Expanded(
                               child: AddInstanceForm(
-                                infos: addInstanceProvider.infos[
-                                    addInstanceProvider.selectedDatabaseType]!,
-                                selectedGroup: addInstanceProvider.selectedGroup, // todo
+                                infos: addInstanceProvider.dbInfos,
+                                selectedGroup:
+                                    addInstanceProvider.selectedGroup,
                                 onValid: (info, isValid) {
-                                  addInstanceProvider.updateValidState(info, isValid);
+                                  addInstanceProvider.updateValidState(
+                                      info, isValid);
                                 },
                                 onGroupChange: (group) {
                                   addInstanceProvider.onGroupChange(group);
@@ -203,6 +188,48 @@ class DatabaseTypeCard extends StatelessWidget {
   }
 }
 
+class DatabaseTypeCardList extends StatelessWidget {
+  final List<ConnectionMeta> connectionMetas;
+  final Function(DatabaseType type)? onDatabaseTypeChange;
+  final DatabaseType? _selectedDatabaseType;
+
+  const DatabaseTypeCardList(
+      {Key? key,
+      required this.connectionMetas,
+      this.onDatabaseTypeChange,
+      DatabaseType? selectedDatabaseType})
+      : _selectedDatabaseType = selectedDatabaseType,
+        super(key: key);
+
+  DatabaseType? get selectedDatabaseType =>
+      _selectedDatabaseType ?? connectionMetas.first.type;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final connMeta in connectionMetas)
+                  DatabaseTypeCard(
+                    name: connMeta.displayName,
+                    type: connMeta.type,
+                    logoPath: connMeta.logoAssertPath,
+                    selected: connMeta.type == selectedDatabaseType,
+                    onTap: (type) => onDatabaseTypeChange?.call(type),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class CommonFormField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
@@ -258,6 +285,7 @@ class DescFormField extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(minHeight: 120),
       child: TextFormField(
+        key: state,
         controller: controller,
         maxLength: 50,
         maxLines: 4,
@@ -329,12 +357,12 @@ class AddInstanceForm extends StatelessWidget {
     return infos.values
         .groupListsBy((info) => info.meta.group)
         .keys
-        .whereNot((e) => e == "base")
+        .whereNot((e) => e == settingMetaGroupBase)
         .toList();
   }
 
   Widget buildNameField(BuildContext context) {
-    FormInfo name = infos["name"]!;
+    FormInfo name = infos[settingMetaNameName]!;
     return CommonFormField(
       state: name.state,
       label: "名称",
@@ -344,8 +372,8 @@ class AddInstanceForm extends StatelessWidget {
   }
 
   Widget buildAddressField(BuildContext context) {
-    FormInfo addr = infos["addr"]!;
-    FormInfo port = infos["port"]!;
+    FormInfo addr = infos[settingMetaNameAddr]!;
+    FormInfo port = infos[settingMetaNamePort]!;
     return Container(
       constraints: const BoxConstraints(minHeight: 80),
       child: Row(
@@ -379,7 +407,7 @@ class AddInstanceForm extends StatelessWidget {
   }
 
   Widget buildUserField(BuildContext context) {
-    FormInfo user = infos["user"]!;
+    FormInfo user = infos[settingMetaNameUser]!;
     return CommonFormField(
       label: "账号",
       controller: user.ctrl,
@@ -389,7 +417,7 @@ class AddInstanceForm extends StatelessWidget {
   }
 
   Widget buildPasswordField(BuildContext context) {
-    FormInfo password = infos["password"]!;
+    FormInfo password = infos[settingMetaNamePassword]!;
     return CommonFormField(
       label: "密码",
       controller: password.ctrl,
@@ -401,10 +429,10 @@ class AddInstanceForm extends StatelessWidget {
   }
 
   Widget buildDescField(BuildContext context) {
-    FormInfo user = infos["desc"]!;
+    FormInfo desc = infos[settingMetaNameDesc]!;
     return DescFormField(
-      controller: user.ctrl,
-      state: user.state,
+      controller: desc.ctrl,
+      state: desc.state,
     );
   }
 
