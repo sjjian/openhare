@@ -35,6 +35,7 @@ List<ConnectionMeta> connectionMetas = [
     connMeta: [
       NameMeta(),
       AddressMeta(),
+      PortMeta("3306"),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
@@ -47,11 +48,12 @@ List<ConnectionMeta> connectionMetas = [
     connMeta: [
       NameMeta(),
       AddressMeta(),
+      PortMeta("5432"),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
       CustomMeta(
-          name: "database", type: "text", group: "conn", isRequired: true),
+          name: "database", type: "text", group: "connection", isRequired: true, defaultValue: "postgres"),
     ],
   ),
 ];

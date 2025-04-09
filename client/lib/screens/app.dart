@@ -1,7 +1,9 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
-import 'package:client/screens/instances/instances.dart';
+import 'package:client/screens/instances/instance_add.dart';
+import 'package:client/screens/instances/instance_tables.dart';
+import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
@@ -21,34 +23,56 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
+String lastInstancePage = "/instances/list";
+
 class _AppState extends State<App> {
+
+
   final GoRouter _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: '/sessions',
       debugLogDiagnostics: true,
       routes: [
+        GoRoute(
+          path: "/sessions",
+          pageBuilder: (context, state) =>
+              const NoTransitionPage<void>(child: SessionsPage()),
+        ),
+        GoRoute(
+          path: '/settings',
+          pageBuilder: (context, state) =>
+              const NoTransitionPage<void>(child: SettingsPage()),
+        ),
         ShellRoute(
             navigatorKey: _shellNavigatorKey,
-            builder: (BuildContext context, GoRouterState state, Widget child) {
-              return ScaffoldWithNavRail(
-                child: child,
-              );
+            pageBuilder:
+                (BuildContext context, GoRouterState state, Widget child) {
+              return NoTransitionPage<void>(child: child);
             },
             routes: [
+              GoRoute(path: "/instances", redirect: (context, state) {
+                return lastInstancePage;
+              },),
               GoRoute(
-                path: '/sessions',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage<void>(child: SessionsPage()),
+                path: '/instances/list',
+                pageBuilder: (context, state) {
+                  lastInstancePage = '/instances/list';
+                  return const NoTransitionPage<void>(child: InstancesPage());
+                },
               ),
               GoRoute(
-                path: '/instances',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage<void>(child: InstancesPage()),
+                path: '/instances/add',
+                pageBuilder: (context, state) {
+                  lastInstancePage = '/instances/add';
+                  return const NoTransitionPage<void>(child: AddInstancePage());
+                },
               ),
               GoRoute(
-                path: '/settings',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage<void>(child: SettingsPage()),
+                path: '/instances/update',
+                pageBuilder: (context, state) {
+                  lastInstancePage = '/instances/update';
+                  return const NoTransitionPage<void>(child: UpdateInstancePage());
+                },
               ),
             ]),
       ]);
@@ -60,12 +84,16 @@ class _AppState extends State<App> {
     final sessions = SessionsModel();
     final sessionProvider = SessionProvider(sessions.data.selected());
     final sessionListProvider = SessionListProvider(sessionProvider, sessions);
+    final addInstanceProvider = AddInstanceProvider();
+    final updateInstanceProvider = UpdateInstanceProvider();
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: sessionProvider),
         ChangeNotifierProvider.value(value: sessionListProvider),
-        ChangeNotifierProvider.value(value: instancesProvider)
+        ChangeNotifierProvider.value(value: instancesProvider),
+        ChangeNotifierProvider.value(value: addInstanceProvider),
+        ChangeNotifierProvider.value(value: updateInstanceProvider),
       ],
       child: MaterialApp.router(
         title: 'Natuo',
@@ -182,6 +210,9 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
   }
 
   void _onItemTapped(int index, BuildContext context) {
+    if (index == _ScaffoldWithNavRailState._calculateSelectedIndex(context)) {
+      return;
+    }
     switch (index) {
       case 0:
         GoRouter.of(context).go('/sessions');

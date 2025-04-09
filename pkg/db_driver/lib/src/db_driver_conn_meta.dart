@@ -4,6 +4,16 @@ part 'db_driver_conn_meta.g.dart';
 
 enum DatabaseType { mysql, pg }
 
+const String settingMetaGroupBase = "base";
+
+const String settingMetaNameName = "name";
+const String settingMetaNameAddr = "addr";
+const String settingMetaNamePort = "port";
+const String settingMetaNameUser = "user";
+const String settingMetaNamePassword = "password";
+const String settingMetaNameDesc = "desc";
+
+
 class ConnectionMeta {
   String displayName;
   DatabaseType type;
@@ -20,23 +30,58 @@ class ConnectionMeta {
 }
 
 sealed class SettingMeta {
-  String group;
-  SettingMeta({this.group = "base"});
+  final String group;
+
+  String get name;
+
+  String? get defaultValue => "";
+
+  SettingMeta({this.group = settingMetaGroupBase});
 }
 
-class NameMeta extends SettingMeta {}
+class NameMeta extends SettingMeta {
+  @override
+  String get name => settingMetaNameName;
+}
 
-class AddressMeta extends SettingMeta {}
+class AddressMeta extends SettingMeta {
+  @override
+  String get name => settingMetaNameAddr;
 
-class UserMeta extends SettingMeta {}
+  AddressMeta();
+}
 
-class PasswordMeta extends SettingMeta {}
+class PortMeta extends SettingMeta {
+  @override
+  String get name => settingMetaNamePort;
+  @override
+  final String? defaultValue;
 
-class DescMeta extends SettingMeta {}
+  PortMeta(this.defaultValue);
+}
+
+class UserMeta extends SettingMeta {
+  @override
+  String get name => settingMetaNameUser;
+}
+
+class PasswordMeta extends SettingMeta {
+  @override
+  String get name => settingMetaNamePassword;
+}
+
+class DescMeta extends SettingMeta {
+  @override
+  String get name => settingMetaNameDesc;
+}
 
 class CustomMeta extends SettingMeta {
+  @override
   String name;
+  
   String type;
+
+  @override
   String? defaultValue;
   String? comment;
   bool isRequired = false;
@@ -61,7 +106,7 @@ class SettingValue<SettingMeta, E> {
 class ConnectValue {
   String name;
   String host;
-  int port;
+  int? port;
   String user;
   String password;
   String desc;
@@ -70,7 +115,7 @@ class ConnectValue {
   ConnectValue(
       {required this.name,
       required this.host,
-      required this.port,
+      this.port,
       required this.user,
       required this.password,
       required this.desc,
