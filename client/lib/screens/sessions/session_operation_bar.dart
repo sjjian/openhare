@@ -195,7 +195,7 @@ class _SchemaBarState extends State<SchemaBar> {
                 : null,
             child: Row(
               children: [
-                const HugeIcon(
+                HugeIcon(
                   icon: HugeIcons.strokeRoundedDatabase,
                   color: Colors.black,
                   size: 20,

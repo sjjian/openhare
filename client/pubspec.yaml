@@ -51,7 +51,7 @@ dependencies:
   re_editor: ^0.6.0
   collection: ^1.18.0
   sql_editor:
-    path:  ../sql-editor/
+    path:  ../pkg/sql-editor/
   sql_parser:
     path: ../pkg/sql_parser/
   db_driver:
