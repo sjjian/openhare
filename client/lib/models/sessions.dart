@@ -7,7 +7,7 @@ import 'package:client/widgets/data_tree.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:sql_editor/re_editor.dart';
-import 'package:common/parser.dart';
+import 'package:sql_parser/parser.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/models/instances.dart';
 

@@ -52,8 +52,8 @@ dependencies:
   collection: ^1.18.0
   sql_editor:
     path:  ../sql-editor/
-  common:
-    path: ../common/
+  sql_parser:
+    path: ../pkg/sql_parser/
   db_driver:
     path: ../pkg/db_driver/
 

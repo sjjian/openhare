@@ -1,7 +1,7 @@
 import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:common/parser.dart';
+import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:sql_editor/re_editor.dart';
 

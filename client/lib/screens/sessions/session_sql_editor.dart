@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
-import 'package:common/parser.dart';
+import 'package:sql_parser/parser.dart';
 
 class SQLEditor extends StatelessWidget {
   final CodeLineEditingController codeController;

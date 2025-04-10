@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:mysql/mysql.dart';
 import 'db_driver_interface.dart';
 import 'db_driver_metadata.dart';
-import 'package:common/parser.dart';
+import 'package:sql_parser/parser.dart';
 import 'package:db_driver/src/db_driver_conn_meta.dart';
 
 class MysqlQueryValue extends BaseQueryValue {
