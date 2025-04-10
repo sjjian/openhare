@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:common/parser.dart';
+import 'package:sql_parser/parser.dart';
 
 const sqlLightTheme = {
   TokenType.keyword: TextStyle(color: Color(0xffa626a4)),

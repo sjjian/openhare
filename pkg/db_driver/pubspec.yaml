@@ -14,8 +14,8 @@ dependencies:
     path: impl/mysql/
   pg:
     path: impl/pg/
-  common:
-    path: ../../common/
+  sql_parser:
+    path: ../sql_parser/
 
 dev_dependencies:
   lints: ^4.0.0
