@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:client/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
+import 'package:sql_editor/re_editor.dart';
+import 'package:sql_parser/parser.dart';
+import 'package:client/utils/sql_highlight.dart';
 
 class InstancesProvider extends ChangeNotifier {
   String page = "instances";
@@ -80,6 +83,16 @@ class FormInfo {
 
 class AddInstanceProvider extends ChangeNotifier {
   final Map<DatabaseType, Map<String, FormInfo>> infos = {};
+  CodeLineEditingController code = CodeLineEditingController(
+      spanBuilder: ({required codeLines, required context, required style}) {
+    return TextSpan(
+        children: Lexer(codeLines.asString(TextLineBreak.lf))
+            .tokens()
+            .map<TextSpan>((tok) => TextSpan(
+                text: tok.content,
+                style: style.merge(getStyle(tok.id) ?? style)))
+            .toList());
+  });
 
   DatabaseType selectedDatabaseType = DatabaseType.mysql;
   String? _selectedGroup;

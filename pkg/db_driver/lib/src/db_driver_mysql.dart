@@ -129,11 +129,13 @@ class MySQLConnection extends BaseConnection {
 
   static Future<BaseConnection> open(
       {required ConnectValue meta, String? schema}) async {
-    var dsn =
-        "mysql://${meta.user}:${meta.password}@${meta.host}:${meta.port ?? 3306}";
-    if (schema != null) {
-      dsn = "$dsn/$schema";
-    }
+    final dsn = Uri(
+      scheme: "mysql",
+      userInfo: '${meta.user}:${Uri.encodeComponent(meta.password)}',
+      host: meta.host,
+      port: meta.port ?? 3306,
+      path: schema ?? "",
+    ).toString();
     final conn = await ConnWrapper.open(dsn: dsn);
     return MySQLConnection(conn);
   }

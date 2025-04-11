@@ -5,6 +5,9 @@ import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sql_editor/re_editor.dart';
+import 'package:re_highlight/languages/sql.dart';
+import 'package:re_highlight/styles/atom-one-light.dart';
 
 class AddInstancePage extends StatelessWidget {
   const AddInstancePage({Key? key}) : super(key: key);
@@ -105,6 +108,7 @@ class AddInstance extends StatelessWidget {
                                 onGroupChange: (group) {
                                   addInstanceProvider.onGroupChange(group);
                                 },
+                                codeController: addInstanceProvider.code,
                               ),
                             )
                           ]),
@@ -303,13 +307,15 @@ class AddInstanceForm extends StatelessWidget {
   final Map<String, FormInfo> infos;
   final Function(FormInfo info, bool isValid)? onValid;
   final Function(String group)? onGroupChange;
+  final CodeLineEditingController codeController;
 
   const AddInstanceForm(
       {Key? key,
       required this.infos,
       this.onValid,
       this.onGroupChange,
-      this.selectedGroup})
+      this.selectedGroup,
+      required this.codeController})
       : super(key: key);
 
   FormFieldValidator validatorFn(
@@ -354,11 +360,13 @@ class AddInstanceForm extends StatelessWidget {
   }
 
   List<String> get groups {
-    return infos.values
+    final groups = infos.values
         .groupListsBy((info) => info.meta.group)
         .keys
         .whereNot((e) => e == settingMetaGroupBase)
         .toList();
+    groups.add("bash");
+    return groups;
   }
 
   Widget buildNameField(BuildContext context) {
@@ -437,6 +445,29 @@ class AddInstanceForm extends StatelessWidget {
   }
 
   List<Widget> buildCustomField(BuildContext context, String group) {
+    if (group == "bash") {
+      return [
+        Container(
+            constraints: const BoxConstraints(maxHeight: 200),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest // db type card selected color
+              ,
+            ),
+            child: CodeEditor(
+              style: CodeEditorStyle(
+                  codeTheme: CodeHighlightTheme(
+                      theme: atomOneLightTheme,
+                      languages: <String, CodeHighlightThemeMode>{
+                    'sql': CodeHighlightThemeMode(mode: langSql),
+                  })),
+              controller: codeController,
+              wordWrap: false,
+            ))
+      ];
+    }
     List<Widget> ws = [];
     for (final info in infos.values) {
       if (info.meta.group == group && info.meta is CustomMeta) {
@@ -536,7 +567,7 @@ class AddInstanceForm extends StatelessWidget {
                   for (final group in groups)
                     Column(
                       children: buildCustomField(context, group),
-                    )
+                    ),
                 ],
               )
             ],

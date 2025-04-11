@@ -53,7 +53,23 @@ List<ConnectionMeta> connectionMetas = [
       PasswordMeta(),
       DescMeta(),
       CustomMeta(
-          name: "database", type: "text", group: "connection", isRequired: true, defaultValue: "postgres"),
+          name: "database",
+          type: "text",
+          group: "connection",
+          isRequired: true,
+          defaultValue: "postgres"),
+      CustomMeta(
+        name: "connectTimeout",
+        type: "text",
+        group: "connection",
+        defaultValue: "10",
+      ),
+      CustomMeta(
+        name: "queryTimeout",
+        type: "text",
+        group: "connection",
+        defaultValue: "600",
+      )
     ],
   ),
 ];

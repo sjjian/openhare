@@ -125,6 +125,11 @@ class ConnectValue {
     return custom[name] ?? defaultValue;
   }
 
+  int getIntValue(String name, [int defaultValue = 0]) {
+    return int.tryParse(custom[name]?? "")?? defaultValue;
+  }
+
+
   factory ConnectValue.fromJson(Map<String, dynamic> json) =>
       _$ConnectValueFromJson(json);
 
