@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:re_highlight/languages/sql.dart';
 import 'package:re_highlight/styles/atom-one-light.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AddInstancePage extends StatelessWidget {
   const AddInstancePage({Key? key}) : super(key: key);
@@ -365,7 +366,7 @@ class AddInstanceForm extends StatelessWidget {
         .keys
         .whereNot((e) => e == settingMetaGroupBase)
         .toList();
-    groups.add("bash");
+    groups.add("initize");
     return groups;
   }
 
@@ -445,10 +446,10 @@ class AddInstanceForm extends StatelessWidget {
   }
 
   List<Widget> buildCustomField(BuildContext context, String group) {
-    if (group == "bash") {
+    if (group == "initize") {
       return [
         Container(
-            constraints: const BoxConstraints(maxHeight: 200),
+            constraints: const BoxConstraints(maxHeight: 430),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Theme.of(context)
@@ -456,13 +457,30 @@ class AddInstanceForm extends StatelessWidget {
                   .surfaceContainerHighest // db type card selected color
               ,
             ),
-            child: CodeEditor(
+            child: CodeEditor( // todo: 抽取公共方法.
               style: CodeEditorStyle(
-                  codeTheme: CodeHighlightTheme(
-                      theme: atomOneLightTheme,
-                      languages: <String, CodeHighlightThemeMode>{
-                    'sql': CodeHighlightThemeMode(mode: langSql),
-                  })),
+                backgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerHigh, // SQL 编辑器背景色
+                textStyle: GoogleFonts.robotoMono(
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
+                    color:
+                        Theme.of(context).colorScheme.onSurface), // SQL 编辑器文字颜色
+              ),
+              indicatorBuilder:
+                  (context, editingController, chunkController, notifier) {
+                return Row(
+                  children: [
+                    DefaultCodeLineNumber(
+                      controller: editingController,
+                      notifier: notifier,
+                    ),
+                    DefaultCodeChunkIndicator(
+                        width: 20,
+                        controller: chunkController,
+                        notifier: notifier)
+                  ],
+                );
+              },
               controller: codeController,
               wordWrap: false,
             ))

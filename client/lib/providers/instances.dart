@@ -83,7 +83,8 @@ class FormInfo {
 
 class AddInstanceProvider extends ChangeNotifier {
   final Map<DatabaseType, Map<String, FormInfo>> infos = {};
-  CodeLineEditingController code = CodeLineEditingController(
+
+  final CodeLineEditingController code = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
     return TextSpan(
         children: Lexer(codeLines.asString(TextLineBreak.lf))
@@ -104,6 +105,7 @@ class AddInstanceProvider extends ChangeNotifier {
         dbInfos[meta.name] = FormInfo(connMeta.type, meta);
       }
     }
+    code.text = connectionMetaMap[selectedDatabaseType]!.initQueryText();
   }
 
   void onDatabaseTypeChange(DatabaseType type) {
@@ -129,7 +131,7 @@ class AddInstanceProvider extends ChangeNotifier {
     if (!isPortChanged) {
       port = defaultPort;
     }
-
+    code.text = connectionMetaMap[selectedDatabaseType]!.initQueryText();
     notifyListeners();
   }
 
@@ -251,7 +253,11 @@ class AddInstanceProvider extends ChangeNotifier {
           custom[(info.meta as CustomMeta).name] = info.ctrl.text;
       }
     }
-
+    List<String> querys = Splitter(code.text.trim(), ";")
+        .split()
+        .map((e) => e.content.trim())
+        .whereNot((e) => e.trim() == "")
+        .toList();
     return ConnectValue(
       name: name,
       host: addr,
@@ -260,6 +266,7 @@ class AddInstanceProvider extends ChangeNotifier {
       password: password,
       desc: desc,
       custom: custom,
+      initQuerys: querys,
     );
   }
 
@@ -304,6 +311,7 @@ class UpdateInstanceProvider extends AddInstanceProvider {
         }
       }
     }
+    code.text = connectValue.initQueryText();
   }
 
   void tryUpdateInstance(InstanceModel instance) {
