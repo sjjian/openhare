@@ -93,6 +93,7 @@ class UpdateInstance extends StatelessWidget {
                                 onGroupChange: (group) {
                                   updateInstanceProvider.onGroupChange(group);
                                 },
+                                codeController: updateInstanceProvider.code,
                               ),
                             )
                           ]),
@@ -120,7 +121,8 @@ class UpdateInstanceForm extends AddInstanceForm {
       required super.infos,
       required super.selectedGroup,
       super.onGroupChange,
-      super.onValid});
+      super.onValid,
+      required super.codeController});
   @override
   FormFieldValidator validatorName(BuildContext context) {
     return (value) {

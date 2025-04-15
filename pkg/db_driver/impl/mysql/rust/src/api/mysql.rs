@@ -1,7 +1,4 @@
-use std::any::Any;
-
-use mysql_async::consts::ColumnType;
-use mysql_async::{prelude::*, Conn, Opts, Value};
+use mysql_async::{prelude::*, Conn, Opts, OptsBuilder, Value};
 use chrono::NaiveDate;
 
 pub enum DataType {
@@ -78,31 +75,6 @@ pub struct QueryRow {
 impl QueryColumn {
     #[flutter_rust_bridge::frb(ignore)]
     pub fn from_column(col: &mysql_async::Column) -> Self {
-        // QueryColumn {
-        //     name: col.name_str().to_string(),
-        //     column_type: match col.column_type() {
-        //         ColumnType::MYSQL_TYPE_STRING
-        //         | ColumnType::MYSQL_TYPE_VARCHAR
-        //         | ColumnType::MYSQL_TYPE_VAR_STRING => DataType::Char,
-        //         ColumnType::MYSQL_TYPE_BLOB
-        //         | ColumnType::MYSQL_TYPE_TINY_BLOB
-        //         | ColumnType::MYSQL_TYPE_MEDIUM_BLOB
-        //         | ColumnType::MYSQL_TYPE_LONG_BLOB => DataType::Blob,
-        //         ColumnType::MYSQL_TYPE_JSON => DataType::Json,
-        //         ColumnType::MYSQL_TYPE_DATE
-        //         | ColumnType::MYSQL_TYPE_DATETIME
-        //         | ColumnType::MYSQL_TYPE_TIMESTAMP => DataType::Time,
-        //         ColumnType::MYSQL_TYPE_TINY
-        //         | ColumnType::MYSQL_TYPE_SHORT
-        //         | ColumnType::MYSQL_TYPE_LONG
-        //         | ColumnType::MYSQL_TYPE_LONGLONG
-        //         | ColumnType::MYSQL_TYPE_INT24
-        //         | ColumnType::MYSQL_TYPE_NEWDECIMAL
-        //         | ColumnType::MYSQL_TYPE_FLOAT
-        //         | ColumnType::MYSQL_TYPE_DOUBLE => DataType::Number,
-        //         _ => DataType::Char,
-        //     },
-        // }
         QueryColumn {name:col.name_str().to_string(), column_type: col.column_type() as u8}
     }
 }

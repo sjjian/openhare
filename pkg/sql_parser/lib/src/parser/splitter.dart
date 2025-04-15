@@ -33,7 +33,7 @@ class Splitter {
     Pos startPos = l.startPos;
     while (true) {
       Token? tok = l.scanWhere(
-        (tok) => (tok.id == TokenType.punctuation && tok.content == ';'),
+        (tok) => (tok.id == TokenType.punctuation && tok.content == delimiter),
       );
       if (tok == null) {
         sqlList.add(SQLChunk(startPos, l.scanner.pos,
@@ -43,17 +43,10 @@ class Splitter {
       sqlList.add(SQLChunk(
           startPos, tok.endPos, l.scanner.subString(startPos, tok.endPos)));
       startPos = l.scanner.pos;
+      // 当最后一个字符是";", 直接跳过了.
+      if (!l.scanner.hasNext()) {
+        return sqlList;
+      }
     }
-
-    // String leftContent = content.substring(0, tok.endPos.cursor + 1);
-    // String rightContent = content.substring(tok.endPos.cursor + 1);
-
-    // sqlList.add(leftContent);
-    // if (rightContent.isEmpty) {
-    //   return sqlList;
-    // }
-    // List<String> nextSplit = Splitter(rightContent, delimiter).split();
-    // if (nextSplit.isNotEmpty) sqlList.addAll(nextSplit);
-    // return sqlList;
   }
 }

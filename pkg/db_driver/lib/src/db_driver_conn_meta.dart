@@ -13,7 +13,6 @@ const String settingMetaNameUser = "user";
 const String settingMetaNamePassword = "password";
 const String settingMetaNameDesc = "desc";
 
-
 class ConnectionMeta {
   String displayName;
   DatabaseType type;
@@ -22,11 +21,28 @@ class ConnectionMeta {
 
   List<SettingMeta> connMeta = [];
 
+  List<String> initQuerys;
+
   ConnectionMeta(
       {required this.connMeta,
       required this.type,
       this.logoAssertPath = "",
-      required this.displayName});
+      required this.displayName,
+      this.initQuerys = const []});
+
+  String initQueryText() {
+    if (initQuerys.isEmpty) {
+      return "";
+    }
+    return initQuerys.map((e) {
+      e = e.trimRight();
+      if (e.endsWith(";")) {
+        return e;
+      } else {
+        return "$e;";
+      }
+    }).join("\n");
+  }
 }
 
 sealed class SettingMeta {
@@ -78,7 +94,6 @@ class DescMeta extends SettingMeta {
 class CustomMeta extends SettingMeta {
   @override
   String name;
-  
   String type;
 
   @override
@@ -111,6 +126,7 @@ class ConnectValue {
   String password;
   String desc;
   Map<String, String> custom = {};
+  List<String> initQuerys;
 
   ConnectValue(
       {required this.name,
@@ -119,10 +135,29 @@ class ConnectValue {
       required this.user,
       required this.password,
       required this.desc,
-      required this.custom});
+      required this.custom,
+      this.initQuerys = const []});
 
   String getValue(String name, [String defaultValue = ""]) {
     return custom[name] ?? defaultValue;
+  }
+
+  int getIntValue(String name, [int defaultValue = 0]) {
+    return int.tryParse(custom[name] ?? "") ?? defaultValue;
+  }
+
+  String initQueryText() {
+    if (initQuerys.isEmpty) {
+      return "";
+    }
+    return initQuerys.map((e) {
+      e = e.trimRight();
+      if (e.endsWith(";")) {
+        return e;
+      } else {
+        return "$e;";
+      }
+    }).join("\n");
   }
 
   factory ConnectValue.fromJson(Map<String, dynamic> json) =>

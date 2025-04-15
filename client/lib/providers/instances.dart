@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:client/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
+import 'package:sql_editor/re_editor.dart';
+import 'package:sql_parser/parser.dart';
+import 'package:client/utils/sql_highlight.dart';
 
 class InstancesProvider extends ChangeNotifier {
   String page = "instances";
@@ -81,6 +84,17 @@ class FormInfo {
 class AddInstanceProvider extends ChangeNotifier {
   final Map<DatabaseType, Map<String, FormInfo>> infos = {};
 
+  final CodeLineEditingController code = CodeLineEditingController(
+      spanBuilder: ({required codeLines, required context, required style}) {
+    return TextSpan(
+        children: Lexer(codeLines.asString(TextLineBreak.lf))
+            .tokens()
+            .map<TextSpan>((tok) => TextSpan(
+                text: tok.content,
+                style: style.merge(getStyle(tok.id) ?? style)))
+            .toList());
+  });
+
   DatabaseType selectedDatabaseType = DatabaseType.mysql;
   String? _selectedGroup;
 
@@ -91,6 +105,7 @@ class AddInstanceProvider extends ChangeNotifier {
         dbInfos[meta.name] = FormInfo(connMeta.type, meta);
       }
     }
+    code.text = connectionMetaMap[selectedDatabaseType]!.initQueryText();
   }
 
   void onDatabaseTypeChange(DatabaseType type) {
@@ -116,7 +131,7 @@ class AddInstanceProvider extends ChangeNotifier {
     if (!isPortChanged) {
       port = defaultPort;
     }
-
+    code.text = connectionMetaMap[selectedDatabaseType]!.initQueryText();
     notifyListeners();
   }
 
@@ -238,7 +253,11 @@ class AddInstanceProvider extends ChangeNotifier {
           custom[(info.meta as CustomMeta).name] = info.ctrl.text;
       }
     }
-
+    List<String> querys = Splitter(code.text.trim(), ";")
+        .split()
+        .map((e) => e.content.trim())
+        .whereNot((e) => e.trim() == "")
+        .toList();
     return ConnectValue(
       name: name,
       host: addr,
@@ -247,6 +266,7 @@ class AddInstanceProvider extends ChangeNotifier {
       password: password,
       desc: desc,
       custom: custom,
+      initQuerys: querys,
     );
   }
 
@@ -291,6 +311,7 @@ class UpdateInstanceProvider extends AddInstanceProvider {
         }
       }
     }
+    code.text = connectValue.initQueryText();
   }
 
   void tryUpdateInstance(InstanceModel instance) {

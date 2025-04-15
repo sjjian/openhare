@@ -85,13 +85,16 @@ class PGConnection extends BaseConnection {
   static Future<BaseConnection> open(
       {required ConnectValue meta, String? schema}) async {
     final conn = await PGConn.open(
-        endpoint: Endpoint(
-      host: meta.host,
-      port: meta.port?? 5432,
-      password: meta.password,
-      username: meta.user,
-      database: meta.getValue("database", "postgres"),
-    ));
+      endpoint: Endpoint(
+        host: meta.host,
+        port: meta.port ?? 5432,
+        password: meta.password,
+        username: meta.user,
+        database: meta.getValue("database", "postgres"),
+      ),
+      connectTimeout: Duration(seconds: meta.getIntValue("connectTimeout", 10)),
+      queryTimeout: Duration(seconds: meta.getIntValue("queryTimeout", 600)),
+    );
 
     final pgConn = PGConnection(conn);
     if (schema != null) {

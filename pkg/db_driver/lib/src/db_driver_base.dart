@@ -23,6 +23,10 @@ class ConnectionFactory {
     conn.listen(
         onCloseCallback: onCloseCallback,
         onSchemaChangedCallback: onSchemaChangedCallback);
+
+    for (var sql in meta.initQuerys) {
+      await conn.query(sql);
+    }
     return conn;
   }
 }
@@ -40,6 +44,12 @@ List<ConnectionMeta> connectionMetas = [
       PasswordMeta(),
       DescMeta(),
     ],
+    initQuerys: [
+      "SET NAMES utf8mb4;",
+      "SET CHARACTER SET utf8mb4;",
+      "SET character_set_connection=utf8mb4;",
+      "SET sql_mode = 'STRICT_ALL_TABLES';",
+    ],
   ),
   ConnectionMeta(
     displayName: "PostgreSQL",
@@ -53,8 +63,28 @@ List<ConnectionMeta> connectionMetas = [
       PasswordMeta(),
       DescMeta(),
       CustomMeta(
-          name: "database", type: "text", group: "connection", isRequired: true, defaultValue: "postgres"),
+          name: "database",
+          type: "text",
+          group: "connection",
+          isRequired: true,
+          defaultValue: "postgres"),
+      CustomMeta(
+        name: "connectTimeout",
+        type: "text",
+        group: "connection",
+        defaultValue: "10",
+      ),
+      CustomMeta(
+        name: "queryTimeout",
+        type: "text",
+        group: "connection",
+        defaultValue: "600",
+      ),
     ],
+    // postgresql init sql
+    initQuerys: [
+      "SET client_encoding = 'UTF8';",
+    ]
   ),
 ];
 
