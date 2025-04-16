@@ -15,17 +15,23 @@ class ConnectionFactory {
       String? schema,
       Function()? onCloseCallback,
       Function(String)? onSchemaChangedCallback}) async {
-    final conn = switch (type) {
-      DatabaseType.mysql =>
-        await MySQLConnection.open(meta: meta, schema: schema),
-      DatabaseType.pg => await PGConnection.open(meta: meta, schema: schema),
-    };
-    conn.listen(
-        onCloseCallback: onCloseCallback,
-        onSchemaChangedCallback: onSchemaChangedCallback);
+    BaseConnection? conn;
+    try {
+      conn = switch (type) {
+        DatabaseType.mysql =>
+          await MySQLConnection.open(meta: meta, schema: schema),
+        DatabaseType.pg => await PGConnection.open(meta: meta, schema: schema),
+      };
+      conn.listen(
+          onCloseCallback: onCloseCallback,
+          onSchemaChangedCallback: onSchemaChangedCallback);
 
-    for (var sql in meta.initQuerys) {
-      await conn.query(sql);
+      for (var sql in meta.initQuerys) {
+        await conn.query(sql);
+      }
+    } catch (e) {
+      conn?.close();
+      rethrow;
     }
     return conn;
   }
@@ -52,40 +58,39 @@ List<ConnectionMeta> connectionMetas = [
     ],
   ),
   ConnectionMeta(
-    displayName: "PostgreSQL",
-    type: DatabaseType.pg,
-    logoAssertPath: "assets/icons/pg_icon.png",
-    connMeta: [
-      NameMeta(),
-      AddressMeta(),
-      PortMeta("5432"),
-      UserMeta(),
-      PasswordMeta(),
-      DescMeta(),
-      CustomMeta(
-          name: "database",
+      displayName: "PostgreSQL",
+      type: DatabaseType.pg,
+      logoAssertPath: "assets/icons/pg_icon.png",
+      connMeta: [
+        NameMeta(),
+        AddressMeta(),
+        PortMeta("5432"),
+        UserMeta(),
+        PasswordMeta(),
+        DescMeta(),
+        CustomMeta(
+            name: "database",
+            type: "text",
+            group: "connection",
+            isRequired: true,
+            defaultValue: "postgres"),
+        CustomMeta(
+          name: "connectTimeout",
           type: "text",
           group: "connection",
-          isRequired: true,
-          defaultValue: "postgres"),
-      CustomMeta(
-        name: "connectTimeout",
-        type: "text",
-        group: "connection",
-        defaultValue: "10",
-      ),
-      CustomMeta(
-        name: "queryTimeout",
-        type: "text",
-        group: "connection",
-        defaultValue: "600",
-      ),
-    ],
-    // postgresql init sql
-    initQuerys: [
-      "SET client_encoding = 'UTF8';",
-    ]
-  ),
+          defaultValue: "10",
+        ),
+        CustomMeta(
+          name: "queryTimeout",
+          type: "text",
+          group: "connection",
+          defaultValue: "600",
+        ),
+      ],
+      // postgresql init sql
+      initQuerys: [
+        "SET client_encoding = 'UTF8';",
+      ]),
 ];
 
 List<DatabaseType> allDatabaseType =

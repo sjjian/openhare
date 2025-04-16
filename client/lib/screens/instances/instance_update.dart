@@ -19,6 +19,14 @@ class UpdateInstancePage extends StatelessWidget {
               icon: const Icon(Icons.arrow_back))
         ],
       ),
+      bottomBar: Consumer<UpdateInstanceProvider>(
+          builder: (context, updateInstanceProvider, _) {
+        return AddInstanceBottomBar(
+          isDatabasePingDoing: updateInstanceProvider.isDatabasePingDoing,
+          isDatabaseConnectable: updateInstanceProvider.isDatabaseConnectable,
+          databaseConnectError: updateInstanceProvider.databaseConnectError,
+        );
+      }),
       child: const UpdateInstance(),
     );
   }
@@ -26,6 +34,20 @@ class UpdateInstancePage extends StatelessWidget {
 
 class UpdateInstance extends StatelessWidget {
   const UpdateInstance({Key? key}) : super(key: key);
+
+  Color? selectedColor(UpdateInstanceProvider updateInstanceProvider) {
+    if (updateInstanceProvider.isDatabasePingDoing) {
+      return null;
+    }
+    if (updateInstanceProvider.isDatabaseConnectable == null) {
+      return null;
+    }
+    if (updateInstanceProvider.isDatabaseConnectable == true) {
+      return Colors.green;
+    } else {
+      return Colors.red;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +75,15 @@ class UpdateInstance extends StatelessWidget {
                         ),
                         const Spacer(),
                         TextButton(
-                            onPressed: () {
-                              // showAddInstanceDialog(context);
-                            },
-                            child: const Text("测试连接")),
+                            onPressed:
+                                updateInstanceProvider.isDatabasePingDoing
+                                    ? null
+                                    : () {
+                                        updateInstanceProvider.databasePing();
+                                      },
+                            child: updateInstanceProvider.isDatabasePingDoing
+                                ? const Text("测试中")
+                                : const Text("测试连接")),
                         TextButton(
                             onPressed: () {
                               if (updateInstanceProvider.validate()) {
@@ -76,10 +103,14 @@ class UpdateInstance extends StatelessWidget {
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            DatabaseTypeCardList(connectionMetas: [
-                              connectionMetaMap[
-                                  updateInstanceProvider.selectedDatabaseType]!
-                            ]),
+                            DatabaseTypeCardList(
+                              connectionMetas: [
+                                connectionMetaMap[updateInstanceProvider
+                                    .selectedDatabaseType]!
+                              ],
+                              selectedColor:
+                                  selectedColor(updateInstanceProvider),
+                            ),
                             const SizedBox(height: 20),
                             Expanded(
                               child: UpdateInstanceForm(

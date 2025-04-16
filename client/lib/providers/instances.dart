@@ -98,6 +98,10 @@ class AddInstanceProvider extends ChangeNotifier {
   DatabaseType selectedDatabaseType = DatabaseType.mysql;
   String? _selectedGroup;
 
+  bool? isDatabaseConnectable;
+  bool isDatabasePingDoing = false;
+  String? databaseConnectError;
+
   AddInstanceProvider() {
     for (var connMeta in connectionMetas) {
       final dbInfos = infos.putIfAbsent(connMeta.type, () => {});
@@ -273,6 +277,26 @@ class AddInstanceProvider extends ChangeNotifier {
   void onSubmit(BuildContext context) {
     context.read<InstancesProvider>().addInstance(InstanceModel(
         dbType: selectedDatabaseType, connectValue: getConnectValue()));
+  }
+
+  Future<void> databasePing() async {
+    final connectValue = getConnectValue();
+    BaseConnection? conn;
+    try {
+      isDatabasePingDoing = true;
+      notifyListeners();
+      conn = await ConnectionFactory.open(
+          type: selectedDatabaseType, meta: connectValue);
+      isDatabaseConnectable = true;
+      databaseConnectError = null;
+      conn.close();
+    } catch (e) {
+      isDatabaseConnectable = false;
+      databaseConnectError = e.toString();
+    } finally {
+      isDatabasePingDoing = false;
+      notifyListeners();
+    }
   }
 }
 
