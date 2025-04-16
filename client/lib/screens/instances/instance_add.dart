@@ -6,8 +6,6 @@ import 'package:client/screens/page_skeleton.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sql_editor/re_editor.dart';
-import 'package:re_highlight/languages/sql.dart';
-import 'package:re_highlight/styles/atom-one-light.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AddInstancePage extends StatelessWidget {
@@ -23,6 +21,14 @@ class AddInstancePage extends StatelessWidget {
               icon: const Icon(Icons.arrow_back))
         ],
       ),
+      bottomBar: Consumer<AddInstanceProvider>(
+          builder: (context, addInstanceProvider, _) {
+        return AddInstanceBottomBar(
+          isDatabasePingDoing: addInstanceProvider.isDatabasePingDoing,
+          isDatabaseConnectable: addInstanceProvider.isDatabaseConnectable,
+          databaseConnectError: addInstanceProvider.databaseConnectError,
+        );
+      }),
       child: const AddInstance(),
     );
   }
@@ -30,6 +36,20 @@ class AddInstancePage extends StatelessWidget {
 
 class AddInstance extends StatelessWidget {
   const AddInstance({Key? key}) : super(key: key);
+
+  Color? selectedColor(AddInstanceProvider addInstanceProvider) {
+    if (addInstanceProvider.isDatabasePingDoing) {
+      return null;
+    }
+    if (addInstanceProvider.isDatabaseConnectable == null) {
+      return null;
+    }
+    if (addInstanceProvider.isDatabaseConnectable == true) {
+      return Colors.green;
+    } else {
+      return Colors.red;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +77,12 @@ class AddInstance extends StatelessWidget {
                         ),
                         const Spacer(),
                         TextButton(
-                            onPressed: () {
-                              // showAddInstanceDialog(context);
-                            },
+                            onPressed: addInstanceProvider.isDatabasePingDoing
+                                ? null
+                                : () {
+                                    addInstanceProvider.databasePing();
+                                    // showAddInstanceDialog(context);
+                                  },
                             child: const Text("测试连接")),
                         TextButton(
                             onPressed: () {
@@ -95,6 +118,7 @@ class AddInstance extends StatelessWidget {
                               onDatabaseTypeChange: (type) {
                                 addInstanceProvider.onDatabaseTypeChange(type);
                               },
+                              selectedColor: selectedColor(addInstanceProvider),
                             ),
                             const SizedBox(height: 20),
                             Expanded(
@@ -136,6 +160,7 @@ class DatabaseTypeCard extends StatelessWidget {
   final String name;
   final String logoPath;
   final bool selected;
+  final Color? selectedColor;
   final Function(DatabaseType type)? onTap;
 
   const DatabaseTypeCard(
@@ -144,6 +169,7 @@ class DatabaseTypeCard extends StatelessWidget {
       required this.name,
       required this.logoPath,
       this.selected = false,
+      this.selectedColor,
       this.onTap})
       : super(key: key);
 
@@ -181,9 +207,9 @@ class DatabaseTypeCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 5),
                 width: 5,
                 height: 5,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.green, // Green when selected, grey when not
+                  color: selectedColor, // Green when selected, grey when not
                 ),
               ),
           ],
@@ -197,13 +223,15 @@ class DatabaseTypeCardList extends StatelessWidget {
   final List<ConnectionMeta> connectionMetas;
   final Function(DatabaseType type)? onDatabaseTypeChange;
   final DatabaseType? _selectedDatabaseType;
+  final Color? selectedColor;
 
-  const DatabaseTypeCardList(
-      {Key? key,
-      required this.connectionMetas,
-      this.onDatabaseTypeChange,
-      DatabaseType? selectedDatabaseType})
-      : _selectedDatabaseType = selectedDatabaseType,
+  const DatabaseTypeCardList({
+    Key? key,
+    required this.connectionMetas,
+    this.onDatabaseTypeChange,
+    DatabaseType? selectedDatabaseType,
+    this.selectedColor,
+  })  : _selectedDatabaseType = selectedDatabaseType,
         super(key: key);
 
   DatabaseType? get selectedDatabaseType =>
@@ -224,6 +252,7 @@ class DatabaseTypeCardList extends StatelessWidget {
                     type: connMeta.type,
                     logoPath: connMeta.logoAssertPath,
                     selected: connMeta.type == selectedDatabaseType,
+                    selectedColor: selectedColor,
                     onTap: (type) => onDatabaseTypeChange?.call(type),
                   ),
               ],
@@ -457,10 +486,12 @@ class AddInstanceForm extends StatelessWidget {
                   .surfaceContainerHighest // db type card selected color
               ,
             ),
-            child: CodeEditor( // todo: 抽取公共方法.
+            child: CodeEditor(
+              // todo: 抽取公共方法.
               style: CodeEditorStyle(
-                backgroundColor:
-                    Theme.of(context).colorScheme.surfaceContainerHigh, // SQL 编辑器背景色
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHigh, // SQL 编辑器背景色
                 textStyle: GoogleFonts.robotoMono(
                     textStyle: Theme.of(context).textTheme.bodyMedium,
                     color:
@@ -591,6 +622,56 @@ class AddInstanceForm extends StatelessWidget {
             ],
           ),
         ))
+      ],
+    );
+  }
+}
+
+class AddInstanceBottomBar extends StatelessWidget {
+  final bool? isDatabaseConnectable;
+  final String? databaseConnectError;
+  final bool isDatabasePingDoing;
+
+  const AddInstanceBottomBar(
+      {Key? key,
+      this.databaseConnectError,
+      required this.isDatabasePingDoing,
+      this.isDatabaseConnectable})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Widget msg;
+    Widget status;
+
+    if (isDatabasePingDoing) {
+      msg = const Text("连接测试中");
+      status = const CircularProgressIndicator(
+        strokeWidth: 2
+      );
+    } else if (isDatabaseConnectable == null) {
+      msg = const Text("");
+      status = const Spacer();
+    } else if (isDatabaseConnectable == true) {
+      msg = const Text("连接成功");
+      status = const Icon(Icons.check_circle,size: 20, color: Colors.green);
+    } else {
+      msg = Text(databaseConnectError ?? "", overflow: TextOverflow.ellipsis);
+      status = const Icon(Icons.error,size: 20, color: Colors.red);
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10,0,10,0),
+          child: SizedBox(
+            height: 20,
+            width: 20,
+            child: status,
+          ),
+        ),
+        Expanded(child: msg)
       ],
     );
   }
