@@ -111,6 +111,12 @@ class _InstanceTableState extends State<InstanceTable> {
             builder: (context, instancesProvider, _) {
               instanceTableController.setCount(instancesProvider.instanceCount(
                   instanceTableController.searchTextController.text));
+
+              final instacnes = instancesProvider.instances(
+                  instanceTableController.searchTextController.text,
+                  instanceTableController.pageSize,
+                  instanceTableController.pageNumber);
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -166,31 +172,24 @@ class _InstanceTableState extends State<InstanceTable> {
                           checkboxHorizontalMargin: 0,
                           showBottomBorder: true,
                           columns: column,
-                          rows: instancesProvider
-                              .instances(
-                                  instanceTableController
-                                      .searchTextController.text,
-                                  instanceTableController.pageSize,
-                                  instanceTableController.pageNumber)
-                              .map((instance) {
+                          rows: instacnes.map((instance) {
                             return buildDataRow(instance);
                           }).toList(),
                           sortAscending: false,
                           showCheckboxColumn: true,
-                          onSelectAll: (state) {
+                          onSelectAll: (state) async {
                             setState(() {
                               if (state == null || !state) {
                                 instanceTableController.selectedInstances
                                     .clear();
-                              } else {
-                                instanceTableController.selectedInstances
-                                    .addAll(instancesProvider.instances(
-                                        instanceTableController
-                                            .searchTextController.text,
-                                        instanceTableController.pageSize,
-                                        instanceTableController.currentPage));
                               }
                             });
+                            if (state != null && state) {
+                              setState(() {
+                                instanceTableController.selectedInstances
+                                    .addAll(instacnes);
+                              });
+                            }
                           }),
                     ),
                   ),

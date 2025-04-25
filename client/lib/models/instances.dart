@@ -1,39 +1,97 @@
 import 'package:client/utils/active_set.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:objectbox/objectbox.dart';
+import 'dart:convert';
 
-part 'instances.g.dart';
-
-@JsonSerializable()
+@Entity()
 class InstanceModel {
-  @JsonKey(name: 'db_type')
+  @Id()
+  int id;
+
+  @Transient()
   DatabaseType dbType;
 
-  @JsonKey(name: 'connect_value')
-  ConnectValue connectValue;
+  int get stDbType => dbType.index;
 
-  @JsonKey(name: "active_schemas")
-  ActiveNameSet activeSchemas;
+  set stDbType(int value) {
+    dbType = DatabaseType.values[value];
+  }
+
+  String name;
+  String host;
+  int? port;
+  String user;
+  String password;
+  String desc;
+
+  @Transient()
+  Map<String, String> custom = {};
+
+  String get stCustom => jsonEncode(custom);
+
+  set stCustom(String value) {
+    custom = jsonDecode(value).map((key, value) => MapEntry(key, value.toString()));
+  }
+
+  List<String> initQuerys;
+
+  @Property(type: PropertyType.date)
+  DateTime createdAt;
+
+  @Property(type: PropertyType.date)
+  DateTime? latestOpenAt;
+
+  @Transient()
+  ConnectValue get connectValue => ConnectValue(
+      name: name,
+      host: host,
+      port: port,
+      user: user,
+      password: password,
+      desc: desc,
+      custom: custom,
+      initQuerys: initQuerys);
+
+  @Transient()
+  ActiveSet<String> activeSchemas;
+  List<String> get stActiveSchemas => activeSchemas.toList();
+
+  set stActiveSchemas(List<String> value) {
+    activeSchemas = ActiveSet<String>(value);
+  }
 
   InstanceModel({
+    this.id = 0,
+    required int stDbType,
+    required this.name,
+    required this.host,
+    this.port,
+    required this.user,
+    required this.password,
+    required this.desc,
+    required String stCustom,
+    required this.initQuerys,
+    ActiveSet<String>? activeSchemas,
+    DateTime? createdAt,
+    DateTime? latestOpenAt,
+  })  : activeSchemas = activeSchemas ?? ActiveSet<String>(List.empty()),
+        dbType = DatabaseType.values[stDbType],
+        // custom = jsonDecode(stCustom),
+        createdAt = createdAt ?? DateTime.now();
+
+  InstanceModel.one({
+    this.id = 0,
     required this.dbType,
-    required this.connectValue,
-    ActiveNameSet? activeSchemas,
-  }) : activeSchemas = activeSchemas ?? ActiveNameSet.empty();
-
-  factory InstanceModel.fromJson(Map<String, dynamic> json) =>
-      _$InstanceModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$InstanceModelToJson(this);
-}
-
-@JsonSerializable()
-class ActiveNameSet extends ActiveSet<String> {
-  ActiveNameSet(List<String> data) : super(data);
-
-  ActiveNameSet.empty() : super(List.empty());
-
-  factory ActiveNameSet.fromJson(List<String> data) => ActiveNameSet(data);
-
-  List<String> toJson() => toList();
+    required ConnectValue connectValue,
+    ActiveSet<String>? activeSchemas,
+  })  : name = connectValue.name,
+        host = connectValue.host,
+        port = connectValue.port,
+        user = connectValue.user,
+        password = connectValue.password,
+        desc = connectValue.desc,
+        custom = connectValue.custom,
+        initQuerys = connectValue.initQuerys,
+        activeSchemas = activeSchemas ?? ActiveSet<String>(List.empty()),
+        createdAt = DateTime.now();
 }

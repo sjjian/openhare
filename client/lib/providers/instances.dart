@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:client/storages/storages.dart';
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:client/utils/sql_highlight.dart';
+import 'package:client/models/objectbox.dart';
 
 class InstancesProvider extends ChangeNotifier {
   String page = "instances";
@@ -15,47 +15,39 @@ class InstancesProvider extends ChangeNotifier {
   InstancesProvider();
 
   Future<void> loadInstance() async {
-    await Storage.load();
     await ConnectionFactory.init();
     notifyListeners();
   }
 
-  void addInstance(InstanceModel instance) {
-    Storage st = Storage();
-    st.addInstance(instance);
+  Future<void> addInstance(InstanceModel instance) async {
+    await objectbox.addInstance(instance);
     notifyListeners();
   }
 
-  void updateInstance(InstanceModel instance) {
-    Storage st = Storage();
-    st.updateInstance(instance);
+  Future<void> updateInstance(InstanceModel instance)async  {
+    objectbox.updateInstance(instance);
     notifyListeners();
   }
 
-  void deleteInstance(InstanceModel instance) {
-    Storage st = Storage();
-    st.deleteInstance(instance);
+  Future<void> deleteInstance(InstanceModel instance)async {
+    objectbox.deleteInstance(instance);
     notifyListeners(); // 默认能删除成功
   }
 
   bool isInstanceExist(String name) {
-    Storage st = Storage();
-    return st.isInstanceExist(name);
+    return objectbox.isInstanceExist(name);
   }
 
   List<InstanceModel> instances(String key, int pageSize, int pageNumber) {
-    Storage st = Storage();
-    return st.searchInstances(key, pageNumber: pageNumber, pageSize: pageSize);
+    return objectbox.searchInstances(key, pageNumber: pageNumber, pageSize: pageSize);
   }
 
   int instanceCount(String key) {
-    Storage st = Storage();
-    return st.instanceCount(key);
+    return objectbox.instanceCount(key);
   }
 
   List<InstanceModel> activeInstances() {
-    Storage st = Storage();
-    return st.getActiveInstances();
+    return objectbox.getActiveInstances(5);
   }
 
   void goPage(String page) {
@@ -274,8 +266,8 @@ class AddInstanceProvider extends ChangeNotifier {
     );
   }
 
-  void onSubmit(BuildContext context) {
-    context.read<InstancesProvider>().addInstance(InstanceModel(
+  Future<void> onSubmit(BuildContext context) async {
+    context.read<InstancesProvider>().addInstance(InstanceModel.one(
         dbType: selectedDatabaseType, connectValue: getConnectValue()));
   }
 
@@ -345,8 +337,8 @@ class UpdateInstanceProvider extends AddInstanceProvider {
   }
 
   @override
-  void onSubmit(BuildContext context) {
-    context.read<InstancesProvider>().updateInstance(InstanceModel(
+  Future<void> onSubmit(BuildContext context) async {
+    context.read<InstancesProvider>().updateInstance(InstanceModel.one(
         dbType: selectedDatabaseType, connectValue: getConnectValue()));
   }
 }

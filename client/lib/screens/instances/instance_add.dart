@@ -85,17 +85,17 @@ class AddInstance extends StatelessWidget {
                                   },
                             child: const Text("测试连接")),
                         TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (addInstanceProvider.validate()) {
-                                addInstanceProvider.onSubmit(context);
+                                await addInstanceProvider.onSubmit(context);
                                 addInstanceProvider.clear();
                               }
                             },
                             child: const Text("提交并继续添加")),
                         TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (addInstanceProvider.validate()) {
-                                addInstanceProvider.onSubmit(context);
+                                await addInstanceProvider.onSubmit(context);
                                 addInstanceProvider.clear();
                                 GoRouter.of(context).go('/instances/list');
                               }
@@ -366,9 +366,14 @@ class AddInstanceForm extends StatelessWidget {
       if (value == null || value.isEmpty) {
         return "名称不能为空";
       }
-      if (context.read<InstancesProvider>().isInstanceExist(value)) {
-        return "名称已存在";
-      }
+      // final exist = context.read<InstancesProvider>().isInstanceExist(value);
+      // if (exist is Future<bool>) {
+      //   exist.then((exists) {
+      //     if (exists) {
+      //       // Handle validation error asynchronously if needed
+      //     }
+      //   });
+      // }
       return null;
     };
   }

@@ -1,10 +1,10 @@
 import 'package:db_driver/db_driver.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/models/sql_result.dart';
-import 'package:client/storages/storages.dart';
 import 'package:flutter/material.dart';
 import 'package:client/models/instances.dart';
 import 'package:sql_editor/re_editor.dart';
+import 'package:client/models/objectbox.dart';
 
 class InitializedProvider with ChangeNotifier {}
 
@@ -152,9 +152,9 @@ class SessionProvider with ChangeNotifier {
 
   void setConn(InstanceModel instance, {String? schema}) {
     // 记录使用的数据源
-    Storage().addActiveInstance(instance);
+    objectbox.addActiveInstance(instance);
     if (schema != null) {
-      Storage().addInstanceActiveSchema(instance, schema);
+      objectbox.addInstanceActiveSchema(instance, schema);
     }
     _session!.instance = instance;
     _session!.currentSchema = schema;
@@ -173,7 +173,7 @@ class SessionProvider with ChangeNotifier {
   }
 
   void onSchemaChanged(String schema) {
-    Storage().addInstanceActiveSchema(session!.instance!, schema);
+    objectbox.addInstanceActiveSchema(session!.instance!, schema);
     notifyListeners();
   }
 
