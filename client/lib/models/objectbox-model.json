@@ -76,10 +76,42 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:454752810459549654",
+      "lastPropertyId": "4:606756865288630829",
+      "name": "SessionModel",
+      "properties": [
+        {
+          "id": "1:2062278927629664025",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:418794745715759520",
+          "name": "instanceId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "1:889985545779702376",
+          "relationTarget": "InstanceModel"
+        },
+        {
+          "id": "3:9187762313325828498",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "4:606756865288630829",
+          "name": "currentSchema",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:4999595895273969633",
-  "lastIndexId": "0:0",
+  "lastEntityId": "2:454752810459549654",
+  "lastIndexId": "1:889985545779702376",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

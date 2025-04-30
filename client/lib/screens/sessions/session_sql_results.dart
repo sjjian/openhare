@@ -39,8 +39,8 @@ class _SqlResultTablesState extends State<SqlResultTables> {
                 constraints: const BoxConstraints(maxHeight: 35),
                 child: Consumer<SessionProvider>(
                   builder: (context, sessionProvider, _) {
-                    final results = sessionProvider.getAllSQLResult();
-                    final currentResult = sessionProvider.getCurrentSQLResult();
+                    final results = sessionProvider.session!.getAllSQLResult();
+                    final currentResult = sessionProvider.session!.getCurrentSQLResult();
                     final showRecord = sessionProvider.session!.showRecord;
                     if (results == null) {
                       return const Spacer();
@@ -150,7 +150,7 @@ class _SqlResultTableState extends State<SqlResultTable> {
       final color = Theme.of(context)
           .colorScheme
           .surfaceContainerLow; // sql result body 的背景色
-      final result = sessionProvider.getCurrentSQLResult();
+      final result = sessionProvider.session!.getCurrentSQLResult();
       if (sessionProvider.session!.showRecord) {
         return Container(
             alignment: Alignment.center,

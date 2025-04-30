@@ -6,8 +6,8 @@ import 'package:client/providers/sessions.dart';
 import 'package:client/models/sql_result.dart';
 import 'package:client/utils/duration_extend.dart';
 
-class SessionStatus extends StatelessWidget {
-  const SessionStatus({Key? key}) : super(key: key);
+class SessionStatusTab extends StatelessWidget {
+  const SessionStatusTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +15,8 @@ class SessionStatus extends StatelessWidget {
     return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
       if (sessionProvider.initialized() &&
           !sessionProvider.session!.showRecord &&
-          sessionProvider.getCurrentSQLResult() != null) {
-        SQLResultModel result = sessionProvider.getCurrentSQLResult()!;
+          sessionProvider.session!.getCurrentSQLResult() != null) {
+        SQLResultModel result = sessionProvider.session!.getCurrentSQLResult()!;
         if (result.state == SQLExecuteState.done) {
           return Container(
             padding: const EdgeInsets.only(left: 5),
@@ -46,7 +46,7 @@ class SessionStatus extends StatelessWidget {
                       String? outputFile = await FilePicker.platform.saveFile(
                         dialogTitle: 'Please select an output file:',
                         fileName:
-                            '${sessionProvider.session!.instance!.connectValue.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+                            '${sessionProvider.session!.model.instance.target!.connectValue.name}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
                       );
                       if (outputFile == null) {
                         return;

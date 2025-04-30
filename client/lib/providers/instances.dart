@@ -24,13 +24,13 @@ class InstancesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateInstance(InstanceModel instance)async  {
-    objectbox.updateInstance(instance);
+  Future<void> updateInstance(InstanceModel instance) async {
+    await objectbox.updateInstance(instance);
     notifyListeners();
   }
 
-  Future<void> deleteInstance(InstanceModel instance)async {
-    objectbox.deleteInstance(instance);
+  Future<void> deleteInstance(InstanceModel instance) async {
+    await objectbox.deleteInstance(instance);
     notifyListeners(); // 默认能删除成功
   }
 
@@ -39,7 +39,8 @@ class InstancesProvider extends ChangeNotifier {
   }
 
   List<InstanceModel> instances(String key, int pageSize, int pageNumber) {
-    return objectbox.searchInstances(key, pageNumber: pageNumber, pageSize: pageSize);
+    return objectbox.searchInstances(key,
+        pageNumber: pageNumber, pageSize: pageSize);
   }
 
   int instanceCount(String key) {
@@ -339,6 +340,8 @@ class UpdateInstanceProvider extends AddInstanceProvider {
   @override
   Future<void> onSubmit(BuildContext context) async {
     context.read<InstancesProvider>().updateInstance(InstanceModel.one(
-        dbType: selectedDatabaseType, connectValue: getConnectValue()));
+        id: instance!.id,
+        dbType: selectedDatabaseType,
+        connectValue: getConnectValue()));
   }
 }

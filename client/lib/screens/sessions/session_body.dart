@@ -18,14 +18,14 @@ class SessionBodyPage extends StatelessWidget {
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
         final Widget left = Column(
           children: [
-            SessionOpBar(codeController: sessionProvider.getSQLEditCode()),
+            SessionOpBar(codeController: sessionProvider.session!.getSQLEditCode()),
             Expanded(
               child: SplitView(
                 controller: sessionProvider.session!.multiSplitViewCtrl,
                 axis: Axis.vertical,
                 first: SQLEditor(
-                    key: ValueKey(sessionProvider.getSQLEditCode()),
-                    codeController: sessionProvider.getSQLEditCode()),
+                    key: ValueKey(sessionProvider.session!.getSQLEditCode()),
+                    codeController: sessionProvider.session!.getSQLEditCode()),
                 second: const SqlResultTables(),
               ),
             ),

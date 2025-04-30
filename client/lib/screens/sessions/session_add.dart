@@ -32,21 +32,23 @@ class _AddSessionState extends State<AddSession> {
     SessionProvider sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
 
-    SessionListProvider sessionListProvider =
-        Provider.of<SessionListProvider>(context, listen: false);
+    SessionsProvider sessionListProvider =
+        Provider.of<SessionsProvider>(context, listen: false);
 
-    if (sessionProvider.session == null) {
-      SessionModel session = SessionModel();
+     Session session = Session(SessionModel());
       sessionListProvider.addSession(session);
       sessionProvider.setConn(inst, schema: schema);
       // 添加会话自动建立连接
       sessionListProvider.connect(session);
-    } else {
-      sessionProvider.setConn(inst, schema: schema);
-      // 添加会话自动建立连接
-      sessionProvider.connect();
-    }
-    sessionListProvider.refresh();
+
+    // if (sessionProvider.session == null) {
+     
+    // } else {
+    //   sessionProvider.setConn(inst, schema: schema);
+    //   // 添加会话自动建立连接
+    //   sessionProvider.connect();
+    // }
+    // sessionListProvider.refresh();
   }
 
   @override

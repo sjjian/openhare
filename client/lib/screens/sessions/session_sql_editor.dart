@@ -50,8 +50,8 @@ class SQLEditor extends StatelessWidget {
     SessionProvider sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
 
-    MetaDataNode? metadata = sessionProvider.getMetadata();
-    String? currentSchema = sessionProvider.getCurrentSchema();
+    MetaDataNode? metadata = sessionProvider.session!.getMetadata();
+    String? currentSchema = sessionProvider.session!.currentSchema;
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords)

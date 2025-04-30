@@ -1,6 +1,7 @@
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'instances.dart';
+import 'sessions.dart';
 
 import 'objectbox.g.dart'; // created by `flutter pub run build_runner build`
 
@@ -12,10 +13,12 @@ class ObjectBox {
 
   /// A Box of tasks.
   late final Box<InstanceModel> _instanceBox;
+  late final Box<SessionModel> _sessionBox;
 
   ObjectBox._create(this.store) {
     objectbox = this;
     _instanceBox = store.box();
+    _sessionBox = store.box();
   }
 
   /// Create an instance of ObjectBox to use throughout the app.
@@ -67,8 +70,10 @@ class ObjectBox {
   }
 
   List<InstanceModel> getActiveInstances(int top) {
-    final build =
-        _instanceBox.query(InstanceModel_.latestOpenAt.notNull()).order(InstanceModel_.latestOpenAt).build();
+    final build = _instanceBox
+        .query(InstanceModel_.latestOpenAt.notNull())
+        .order(InstanceModel_.latestOpenAt)
+        .build();
     build.limit = top;
     return build.find();
   }
@@ -84,4 +89,14 @@ class ObjectBox {
     updateInstance(instance);
     return;
   }
+
+  Future<void> addSession(SessionModel session) =>
+      _sessionBox.putAsync(session);
+
+  Future<void> updateSession(SessionModel target) async {
+    _sessionBox.putAsync(target);
+  }
+
+  Future<void> deleteSession(SessionModel session) =>
+      _sessionBox.removeAsync(session.id);
 }

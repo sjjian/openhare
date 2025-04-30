@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
 import '../models/instances.dart';
+import '../models/sessions.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -92,6 +93,37 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(2, 454752810459549654),
+      name: 'SessionModel',
+      lastPropertyId: const obx_int.IdUid(4, 606756865288630829),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 2062278927629664025),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 418794745715759520),
+            name: 'instanceId',
+            type: 11,
+            flags: 520,
+            indexId: const obx_int.IdUid(1, 889985545779702376),
+            relationTarget: 'InstanceModel'),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 9187762313325828498),
+            name: 'text',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 606756865288630829),
+            name: 'currentSchema',
+            type: 9,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -130,8 +162,8 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(1, 4999595895273969633),
-      lastIndexId: const obx_int.IdUid(0, 0),
+      lastEntityId: const obx_int.IdUid(2, 454752810459549654),
+      lastIndexId: const obx_int.IdUid(1, 889985545779702376),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
@@ -231,6 +263,45 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 .vTableGet(buffer, rootOffset, 28, []);
 
           return object;
+        }),
+    SessionModel: obx_int.EntityDefinition<SessionModel>(
+        model: _entities[1],
+        toOneRelations: (SessionModel object) => [object.instance],
+        toManyRelations: (SessionModel object) => {},
+        getId: (SessionModel object) => object.id,
+        setId: (SessionModel object, int id) {
+          object.id = id;
+        },
+        objectToFB: (SessionModel object, fb.Builder fbb) {
+          final textOffset =
+              object.text == null ? null : fbb.writeString(object.text!);
+          final currentSchemaOffset = object.currentSchema == null
+              ? null
+              : fbb.writeString(object.currentSchema!);
+          fbb.startTable(5);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.instance.targetId);
+          fbb.addOffset(2, textOffset);
+          fbb.addOffset(3, currentSchemaOffset);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final textParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGetNullable(buffer, rootOffset, 8);
+          final currentSchemaParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 10);
+          final object = SessionModel(
+              id: idParam, text: textParam, currentSchema: currentSchemaParam);
+          object.instance.targetId =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          object.instance.attach(store);
+          return object;
         })
   };
 
@@ -290,4 +361,23 @@ class InstanceModel_ {
   /// See [InstanceModel.stActiveSchemas].
   static final stActiveSchemas =
       obx.QueryStringVectorProperty<InstanceModel>(_entities[0].properties[12]);
+}
+
+/// [SessionModel] entity fields to define ObjectBox queries.
+class SessionModel_ {
+  /// See [SessionModel.id].
+  static final id =
+      obx.QueryIntegerProperty<SessionModel>(_entities[1].properties[0]);
+
+  /// See [SessionModel.instance].
+  static final instance = obx.QueryRelationToOne<SessionModel, InstanceModel>(
+      _entities[1].properties[1]);
+
+  /// See [SessionModel.text].
+  static final text =
+      obx.QueryStringProperty<SessionModel>(_entities[1].properties[2]);
+
+  /// See [SessionModel.currentSchema].
+  static final currentSchema =
+      obx.QueryStringProperty<SessionModel>(_entities[1].properties[3]);
 }

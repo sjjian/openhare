@@ -10,8 +10,7 @@ class SessionTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SessionListProvider>(
-        builder: (context, sessionListProvider, _) {
+    return Consumer<SessionsProvider>(builder: (context, sessionsProvider, _) {
       return Padding(
         padding: const EdgeInsets.only(top: 6),
         child: CommonTabBar(
@@ -27,59 +26,86 @@ class SessionTabs extends StatelessWidget {
                   .surfaceDim, // session tab 鼠标移入的颜色
             ),
             addTab: () {
-              sessionListProvider.addSession(SessionModel());
+              sessionsProvider.newSession();
             },
             onReorder: (oldIndex, newIndex) {
-              sessionListProvider.reorderSession(oldIndex, newIndex);
+              sessionsProvider.reorderSession(oldIndex, newIndex);
             },
             tabs: [
-              for (var i = 0; i < sessionListProvider.sessions.data.length; i++)
-                CommonTabWrap(
-                  avatar: sessionListProvider.sessions.data[i].instance != null
-                      ? Image.asset(connectionMetaMap[sessionListProvider
-                              .sessions.data[i].instance!.dbType]!
-                          .logoAssertPath)
-                      : null,
-                  label: sessionListProvider.sessions.data[i].conn2 != null
-                      ? sessionListProvider
-                          .sessions.data[i].instance!.connectValue.name
-                      : "new",
-                  items: <PopupMenuEntry>[
-                    PopupMenuItem<String>(
-                      height: 30,
+              for (var i = 0; i < sessionsProvider.sessions.data.length; i++)
+                switch (sessionsProvider.sessions.data[i]) {
+                  UnInitSession() => CommonTabWrap(
+                      label: "new",
                       onTap: () {
-                        sessionListProvider
-                            .connect(sessionListProvider.sessions.data[i]);
+                        sessionsProvider.selectSessionByIndex(i);
                       },
-                      child: const Text("连接"),
+                      onDeleted: () {
+                        sessionsProvider.deleteSessionByIndex(i);
+                      },
+                      selected: sessionsProvider.sessions.data
+                          .isSelected(sessionsProvider.sessions.data[i]),
                     ),
-                    const PopupMenuDivider(height: 0.1),
-                    PopupMenuItem<String>(
-                      height: 30,
+                  Session() => CommonTabWrap(
+                      avatar: (sessionsProvider.sessions.data[i] as Session)
+                                  .model
+                                  .instance
+                                  .target !=
+                              null
+                          ? Image.asset(connectionMetaMap[
+                                  (sessionsProvider.sessions.data[i] as Session)
+                                      .model
+                                      .instance
+                                      .target!
+                                      .dbType]!
+                              .logoAssertPath)
+                          : null,
+                      label: (sessionsProvider.sessions.data[i] as Session)
+                                  .conn2 !=
+                              null
+                          ? (sessionsProvider.sessions.data[i] as Session)
+                              .model
+                              .instance
+                              .target!
+                              .connectValue
+                              .name
+                          : "new",
+                      items: <PopupMenuEntry>[
+                        PopupMenuItem<String>(
+                          height: 30,
+                          onTap: () {
+                            sessionsProvider.connect(
+                                (sessionsProvider.sessions.data[i] as Session));
+                          },
+                          child: const Text("连接"),
+                        ),
+                        const PopupMenuDivider(height: 0.1),
+                        PopupMenuItem<String>(
+                          height: 30,
+                          onTap: () {
+                            sessionsProvider.close(
+                                (sessionsProvider.sessions.data[i] as Session));
+                          },
+                          child: const Text("断开"),
+                        ),
+                        const PopupMenuDivider(height: 0.1),
+                        PopupMenuItem<String>(
+                          height: 30,
+                          onTap: () {
+                            sessionsProvider.deleteSessionByIndex(i);
+                          },
+                          child: const Text("关闭"),
+                        ),
+                      ],
                       onTap: () {
-                        sessionListProvider
-                            .close(sessionListProvider.sessions.data[i]);
+                        sessionsProvider.selectSessionByIndex(i);
                       },
-                      child: const Text("断开"),
-                    ),
-                    const PopupMenuDivider(height: 0.1),
-                    PopupMenuItem<String>(
-                      height: 30,
-                      onTap: () {
-                        sessionListProvider.deleteSessionByIndex(i);
+                      onDeleted: () {
+                        sessionsProvider.deleteSessionByIndex(i);
                       },
-                      child: const Text("关闭"),
-                    ),
-                  ],
-                  onTap: () {
-                    sessionListProvider.selectSessionByIndex(i);
-                  },
-                  onDeleted: () {
-                    sessionListProvider.deleteSessionByIndex(i);
-                  },
-                  selected: sessionListProvider.sessions.data
-                      .isSelected(sessionListProvider.sessions.data[i]),
-                )
+                      selected: sessionsProvider.sessions.data
+                          .isSelected(sessionsProvider.sessions.data[i]),
+                    )
+                }
             ]),
       );
     });

@@ -15,16 +15,17 @@ class SessionsPage extends StatelessWidget {
     return PageSkeleton(
         key: const Key("sessions"),
         topBar: const SessionTabs(),
-        bottomBar: const SessionStatus(),
+        bottomBar: const SessionStatusTab(),
         child: Container(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child:
-              Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-            if (sessionProvider.initialized()) {
-              return const SessionBodyPage();
-            } else {
-              return const AddSession();
-            }
+          child: Consumer2<SessionProvider, NewSessionProvider>(
+              builder: (context, sessionProvider, newSessionProvider, _) {
+            SessionsProvider sessionsProvider =
+                Provider.of<SessionsProvider>(context);
+            return switch (sessionsProvider.sessions.data.selected()!) {
+              UnInitSession() => const AddSession(),
+              Session() => const SessionBodyPage(),
+            };
           }),
         ));
   }

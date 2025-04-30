@@ -41,7 +41,7 @@ class SessionOpBar extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(maxHeight: height),
       child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        final canQuery = sessionProvider.canQuery();
+        final canQuery = sessionProvider.session!.canQuery();
         return Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,7 +106,7 @@ class SessionOpBar extends StatelessWidget {
             ),
             SchemaBar(
                 disable: canQuery ? false : true,
-                currentSchema: sessionProvider.session!.currentSchema),
+                currentSchema: sessionProvider.session!.model.currentSchema),
             const Spacer(),
             if (sessionProvider.isRightPageOpen() == false)
               IconButton(
@@ -164,7 +164,7 @@ class _SchemaBarState extends State<SchemaBar> {
 
           SessionProvider sessionProvider =
               Provider.of<SessionProvider>(context, listen: false);
-          List<String> schemas = await sessionProvider.getSchemas();
+          List<String> schemas = await sessionProvider.session!.getSchemas();
 
           // todo
           showMenu(

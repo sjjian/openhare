@@ -76,7 +76,6 @@ class InstanceModel {
     DateTime? latestOpenAt,
   })  : activeSchemas = activeSchemas ?? ActiveSet<String>(List.empty()),
         dbType = DatabaseType.values[stDbType],
-        // custom = jsonDecode(stCustom),
         createdAt = createdAt ?? DateTime.now();
 
   InstanceModel.one({

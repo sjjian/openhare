@@ -1,4 +1,3 @@
-import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances/instance_add.dart';
@@ -26,8 +25,6 @@ class App extends StatefulWidget {
 String lastInstancePage = "/instances/list";
 
 class _AppState extends State<App> {
-
-
   final GoRouter _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: '/sessions',
@@ -50,9 +47,12 @@ class _AppState extends State<App> {
               return NoTransitionPage<void>(child: child);
             },
             routes: [
-              GoRoute(path: "/instances", redirect: (context, state) {
-                return lastInstancePage;
-              },),
+              GoRoute(
+                path: "/instances",
+                redirect: (context, state) {
+                  return lastInstancePage;
+                },
+              ),
               GoRoute(
                 path: '/instances/list',
                 pageBuilder: (context, state) {
@@ -71,7 +71,8 @@ class _AppState extends State<App> {
                 path: '/instances/update',
                 pageBuilder: (context, state) {
                   lastInstancePage = '/instances/update';
-                  return const NoTransitionPage<void>(child: UpdateInstancePage());
+                  return const NoTransitionPage<void>(
+                      child: UpdateInstancePage());
                 },
               ),
             ]),
@@ -81,9 +82,11 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     final instancesProvider = InstancesProvider();
     instancesProvider.loadInstance();
-    final sessions = SessionsModel();
-    final sessionProvider = SessionProvider(sessions.data.selected());
-    final sessionListProvider = SessionListProvider(sessionProvider, sessions);
+    final sessions = Sessions();
+    final sessionProvider = SessionProvider(sessions);
+    final newSessionProvider = NewSessionProvider(sessions);
+    final sessionListProvider =
+        SessionsProvider(sessionProvider, newSessionProvider, sessions);
     final addInstanceProvider = AddInstanceProvider();
     final updateInstanceProvider = UpdateInstanceProvider();
 
@@ -94,6 +97,7 @@ class _AppState extends State<App> {
         ChangeNotifierProvider.value(value: instancesProvider),
         ChangeNotifierProvider.value(value: addInstanceProvider),
         ChangeNotifierProvider.value(value: updateInstanceProvider),
+        ChangeNotifierProvider.value(value: newSessionProvider),
       ],
       child: MaterialApp.router(
         title: 'Natuo',

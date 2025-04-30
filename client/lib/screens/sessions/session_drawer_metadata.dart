@@ -140,7 +140,7 @@ class SessionDrawerMetadata extends StatelessWidget {
         ),
       );
 
-      MetaDataNode? meta = sessionProvider.getMetadata();
+      MetaDataNode? meta = sessionProvider.session!.getMetadata();
       if (meta != null) {
         final controller = sessionProvider.session!.metadataController;
         // todo

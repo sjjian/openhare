@@ -58,6 +58,8 @@ dependencies:
     path: ../pkg/db_driver/
   objectbox: ^4.2.0
   objectbox_sync_flutter_libs: any
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +75,7 @@ dev_dependencies:
   build_runner: ^2.4.9
   test: ^1.25.2
   objectbox_generator: any
+  riverpod_generator: ^2.6.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
