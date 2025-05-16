@@ -1,14 +1,15 @@
-// import 'package:client/core/connection/metadata.dart';
-import 'package:client/providers/sessions.dart';
+import 'package:client/models/interface.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:sql_parser/parser.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/providers/model.dart';
+import 'package:client/models/sessions.dart';
 
-class SQLEditor extends StatelessWidget {
+class SQLEditor extends ConsumerWidget {
   final CodeLineEditingController codeController;
 
   const SQLEditor({super.key, required this.codeController});
@@ -46,12 +47,11 @@ class SQLEditor extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    SessionProvider sessionProvider =
-        Provider.of<SessionProvider>(context, listen: false);
+  Widget build(BuildContext context, WidgetRef ref) {
+    CurrentSession session = ref.watch(currentSessionProvider)!;
 
-    MetaDataNode? metadata = sessionProvider.session!.getMetadata();
-    String? currentSchema = sessionProvider.session!.currentSchema;
+    MetaDataNode? metadata = (session as Session).getMetadata();
+    String? currentSchema = session.currentSchema;
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords)
@@ -75,6 +75,7 @@ class SQLEditor extends StatelessWidget {
             : const {},
       ),
       child: CodeEditor(
+        wordWrap: false,
         style: CodeEditorStyle(
           backgroundColor:
               Theme.of(context).colorScheme.surfaceBright, // SQL 编辑器背景色

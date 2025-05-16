@@ -1,22 +1,23 @@
-import 'package:db_driver/db_driver.dart';
+import 'package:client/providers/session_sql_result.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:client/widgets/tab_widget.dart';
-import 'package:client/models/sql_result.dart';
+import 'package:client/models/session_sql_result.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/utils/reorder_list.dart';
 
-class SqlResultTables extends StatefulWidget {
+class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);
 
   @override
-  State<SqlResultTables> createState() => _SqlResultTablesState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    SQLResultModel? sqlResult = ref.watch(sQLResultControllerProvider)!;
+    ReorderSelectedList<SQLResultModel> sqlResults =
+        ref.watch(sQLResultTabControllerProvider);
 
-class _SqlResultTablesState extends State<SqlResultTables> {
-  @override
-  Widget build(BuildContext context) {
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
       labelAlign: TextAlign.center,
@@ -29,6 +30,52 @@ class _SqlResultTablesState extends State<SqlResultTables> {
           .colorScheme
           .surfaceContainer, // sql result tab 的鼠标移入色
     );
+
+    // final results = sqlResults.getAllSQLResult();
+    // final currentResult = session.getCurrentSQLResult();
+    // final showRecord = session.showRecord;
+
+    Widget tab;
+    if (sqlResults.isEmpty) {
+      tab = const Spacer();
+    } else {
+      tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        CommonTab(
+          label: "执行记录",
+          selected: false, // todo
+          width: 100,
+          style: style,
+          onTap: () {
+            // session.selectToRecord();
+          },
+        ),
+        Expanded(
+            child: CommonTabBar(
+                height: 35,
+                color: Theme.of(context).colorScheme.surfaceContainer,
+                tabStyle: style,
+                onReorder: (oldIndex, newIndex) {
+                  ref.read(sQLResultTabControllerProvider.notifier).reorderSQLResult(oldIndex, newIndex);
+                },
+                tabs: [
+              for (var i = 0; i < sqlResults.length; i++)
+                CommonTabWrap(
+                  label: "${sqlResults[i].id + 1}",
+                  selected: sqlResults[i] == sqlResult,
+                  onTap: () {
+                    ref.read(sQLResultTabControllerProvider.notifier).selectSQLResultByIndex(i);
+                  },
+                  onDeleted: () {
+                    ref.read(sQLResultTabControllerProvider.notifier).deleteSQLResultByIndex(i);
+                  },
+                  avatar: const Icon(
+                    Icons.grid_on,
+                  ),
+                )
+            ]))
+      ]);
+    }
+
     return Row(
       children: [
         Expanded(
@@ -37,57 +84,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
               Container(
                 alignment: Alignment.centerLeft,
                 constraints: const BoxConstraints(maxHeight: 35),
-                child: Consumer<SessionProvider>(
-                  builder: (context, sessionProvider, _) {
-                    final results = sessionProvider.session!.getAllSQLResult();
-                    final currentResult = sessionProvider.session!.getCurrentSQLResult();
-                    final showRecord = sessionProvider.session!.showRecord;
-                    if (results == null) {
-                      return const Spacer();
-                    }
-                    return Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          CommonTab(
-                            label: "执行记录",
-                            selected: showRecord,
-                            width: 100,
-                            style: style,
-                            onTap: () {
-                              sessionProvider.selectToRecord();
-                            },
-                          ),
-                          Expanded(
-                              child: CommonTabBar(
-                                  height: 35,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceContainer,
-                                  tabStyle: style,
-                                  onReorder: (oldIndex, newIndex) {
-                                    sessionProvider.reorderSQLResult(
-                                        oldIndex, newIndex);
-                                  },
-                                  tabs: [
-                                for (var i = 0; i < results.length; i++)
-                                  CommonTabWrap(
-                                    label: "${results[i].id + 1}",
-                                    selected: !showRecord &&
-                                        results[i] == currentResult,
-                                    onTap: () {
-                                      sessionProvider.selectSQLResultByIndex(i);
-                                    },
-                                    onDeleted: () {
-                                      sessionProvider.deleteSQLResultByIndex(i);
-                                    },
-                                    avatar: const Icon(
-                                      Icons.grid_on,
-                                    ),
-                                  )
-                              ]))
-                        ]);
-                  },
-                ),
+                child: tab,
               ),
               const Expanded(child: SqlResultTable())
             ],
@@ -98,18 +95,8 @@ class _SqlResultTablesState extends State<SqlResultTables> {
   }
 }
 
-class SqlResultTable extends StatefulWidget {
+class SqlResultTable extends ConsumerWidget {
   const SqlResultTable({super.key});
-
-  @override
-  State<SqlResultTable> createState() => _SqlResultTableState();
-}
-
-class _SqlResultTableState extends State<SqlResultTable> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   List<PlutoColumn> buildColumns(List<BaseQueryColumn> columns) {
     return columns
@@ -145,69 +132,67 @@ class _SqlResultTableState extends State<SqlResultTable> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-      final color = Theme.of(context)
-          .colorScheme
-          .surfaceContainerLow; // sql result body 的背景色
-      final result = sessionProvider.session!.getCurrentSQLResult();
-      if (sessionProvider.session!.showRecord) {
-        return Container(
-            alignment: Alignment.center,
-            color: color,
-            child: const Text('执行记录'));
-      }
-      if (result == null) {
-        return Container(
-            alignment: Alignment.center,
-            color: color,
-            child: const Text('no data'));
-      }
-      if (result.state == SQLExecuteState.done) {
-        return PlutoGrid(
-          key: ObjectKey(result),
-          mode: PlutoGridMode.selectWithOneTap,
-          onSelected: (event) {
-            sessionProvider.showSQLResult(
-              result: result.rows![event.rowIdx!]
-                  .getValue(event.cell!.column.title),
-              column: result.rows![event.rowIdx!]
-                  .getColumn(event.cell!.column.title), 
-            );
-          },
-          configuration: PlutoGridConfiguration(
-            localeText: const PlutoGridLocaleText.china(),
-            style: PlutoGridStyleConfig(
-              rowHeight: 30,
-              columnHeight: 36,
-              gridBorderColor: color,
-              rowColor: color,
-              activatedColor: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainer, // sql result table 行选中的颜色
-              gridBackgroundColor: color,
-            ),
+  Widget build(BuildContext context, WidgetRef ref) {
+   SQLResultModel? sqlResult = ref.watch(sQLResultControllerProvider);
+
+    final color = Theme.of(context)
+        .colorScheme
+        .surfaceContainerLow; // sql result body 的背景色
+
+    if (sqlResult == null) {
+      return Container(
+          alignment: Alignment.center, color: color, child: const Text('执行记录'));
+    }
+    if (sqlResult == null) {
+      return Container(
+          alignment: Alignment.center,
+          color: color,
+          child: const Text('no data'));
+    }
+    if (sqlResult.state == SQLExecuteState.done) {
+      return PlutoGrid(
+        key: ObjectKey(sqlResult),
+        mode: PlutoGridMode.selectWithOneTap,
+        onSelected: (event) {
+          ref.read(sessionDrawerControllerProvider.notifier).showSQLResult(
+            result: sqlResult.rows![event.rowIdx!]
+                .getValue(event.cell!.column.title),
+            column: sqlResult.rows![event.rowIdx!]
+                .getColumn(event.cell!.column.title),
+          );
+        },
+        configuration: PlutoGridConfiguration(
+          localeText: const PlutoGridLocaleText.china(),
+          style: PlutoGridStyleConfig(
+            rowHeight: 30,
+            columnHeight: 36,
+            gridBorderColor: color,
+            rowColor: color,
+            activatedColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainer, // sql result table 行选中的颜色
+            gridBackgroundColor: color,
           ),
-          columns: buildColumns(result.columns!),
-          rows: buildRows(result.rows!),
-        );
-      } else if (result.state == SQLExecuteState.error) {
-        return Container(
-            alignment: Alignment.topLeft,
-            color: color,
-            child: Text('${result.error}'));
-      } else {
-        return Container(
-            alignment: Alignment.topLeft,
-            color: color,
-            child: const Center(
-              child: SizedBox(
-                height: 40,
-                width: 40,
-                child: CircularProgressIndicator(),
-              ),
-            ));
-      }
-    });
+        ),
+        columns: buildColumns(sqlResult.columns!),
+        rows: buildRows(sqlResult.rows!),
+      );
+    } else if (sqlResult.state == SQLExecuteState.error) {
+      return Container(
+          alignment: Alignment.topLeft,
+          color: color,
+          child: Text('${sqlResult.error}'));
+    } else {
+      return Container(
+          alignment: Alignment.topLeft,
+          color: color,
+          child: const Center(
+            child: SizedBox(
+              height: 40,
+              width: 40,
+              child: CircularProgressIndicator(),
+            ),
+          ));
+    }
   }
 }

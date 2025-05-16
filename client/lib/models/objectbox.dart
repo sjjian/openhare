@@ -5,7 +5,7 @@ import 'sessions.dart';
 
 import 'objectbox.g.dart'; // created by `flutter pub run build_runner build`
 
-late ObjectBox objectbox;
+late ObjectBox objectbox2;
 
 class ObjectBox {
   /// The Store of this app.
@@ -13,10 +13,10 @@ class ObjectBox {
 
   /// A Box of tasks.
   late final Box<InstanceModel> _instanceBox;
-  late final Box<SessionModel> _sessionBox;
+  late final Box<SessionStorage> _sessionBox;
 
   ObjectBox._create(this.store) {
-    objectbox = this;
+    objectbox2 = this;
     _instanceBox = store.box();
     _sessionBox = store.box();
   }
@@ -25,6 +25,7 @@ class ObjectBox {
   static Future<ObjectBox> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
+    print("load stor from: ${docsDir.path}/objectbox");
     final store = await openStore(
         directory: p.join(docsDir.path, "objectbox"),
         macosApplicationGroup: "objectbox.store");
@@ -84,19 +85,19 @@ class ObjectBox {
     return;
   }
 
-  void addInstanceActiveSchema(InstanceModel instance, String schema) {
+  Future<void> addInstanceActiveSchema(InstanceModel instance, String schema) async{
     instance.activeSchemas.add(schema);
-    updateInstance(instance);
+    await updateInstance(instance);
     return;
   }
 
-  Future<void> addSession(SessionModel session) =>
+  Future<void> addSession(SessionStorage session) =>
       _sessionBox.putAsync(session);
 
-  Future<void> updateSession(SessionModel target) async {
+  Future<void> updateSession(SessionStorage target) async {
     _sessionBox.putAsync(target);
   }
 
-  Future<void> deleteSession(SessionModel session) =>
+  Future<void> deleteSession(SessionStorage session) =>
       _sessionBox.removeAsync(session.id);
 }

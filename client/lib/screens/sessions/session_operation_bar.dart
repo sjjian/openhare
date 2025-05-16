@@ -1,18 +1,21 @@
+import 'package:client/models/interface.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:sql_editor/re_editor.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:client/providers/model.dart';
+import 'package:client/models/sessions.dart';
 
-class SessionOpBar extends StatelessWidget {
+class SessionOpBar extends ConsumerWidget {
   final CodeLineEditingController codeController;
   final double height;
 
   const SessionOpBar({Key? key, required this.codeController, this.height = 36})
       : super(key: key);
 
-  String getQuery(SessionProvider sessionProvider) {
+  String getQuery() {
     var content = codeController.text.toString();
     List<SQLChunk> querys = Splitter(content, ";").split();
     CodeLineSelection s = codeController.selection;
@@ -37,92 +40,101 @@ class SessionOpBar extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    BaseSession session = ref.watch(currentSessionProvider)!;
+    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
+
+    final canQuery = (session as Session).canQuery();
     return Container(
       constraints: BoxConstraints(maxHeight: height),
-      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        final canQuery = sessionProvider.session!.canQuery();
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton(
-                iconSize: height,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(2),
-                onPressed: canQuery
-                    ? () {
-                        String query = getQuery(sessionProvider);
-                        if (query.isNotEmpty) {
-                          sessionProvider.query(query, false);
-                        }
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconButton(
+              iconSize: height,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(2),
+              onPressed: canQuery
+                  ? () {
+                      String query = getQuery();
+                      if (query.isNotEmpty) {
+                        ref
+                            .read(sessionProviderProvider.notifier)
+                            .query(query, false);
                       }
-                    : null,
-                icon: Icon(Icons.play_arrow_rounded,
-                    color: canQuery ? Colors.green : Colors.grey)),
-            IconButton(
-                iconSize: height,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(2),
-                onPressed: canQuery
-                    ? () {
-                        String query = getQuery(sessionProvider);
-                        if (query.isNotEmpty) {
-                          sessionProvider.query(query, true);
-                        }
+                    }
+                  : null,
+              icon: Icon(Icons.play_arrow_rounded,
+                  color: canQuery ? Colors.green : Colors.grey)),
+          IconButton(
+              iconSize: height,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(2),
+              onPressed: canQuery
+                  ? () {
+                      String query = getQuery();
+                      if (query.isNotEmpty) {
+                        ref
+                            .read(sessionProviderProvider.notifier)
+                            .query(query, true);
                       }
-                    : null,
-                icon: Stack(alignment: Alignment.center, children: [
-                  Icon(Icons.play_arrow_rounded,
-                      color: canQuery ? Colors.green : Colors.grey),
-                  const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 12,
-                  ),
-                ])),
-            IconButton(
-                iconSize: height,
-                padding: const EdgeInsets.all(2),
-                alignment: Alignment.topLeft,
-                onPressed: canQuery
-                    ? () {
-                        String query = getQuery(sessionProvider);
-                        if (query.isNotEmpty) {
-                          sessionProvider.query("explain $query", true);
-                        }
+                    }
+                  : null,
+              icon: Stack(alignment: Alignment.center, children: [
+                Icon(Icons.play_arrow_rounded,
+                    color: canQuery ? Colors.green : Colors.grey),
+                const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 12,
+                ),
+              ])),
+          IconButton(
+              iconSize: height,
+              padding: const EdgeInsets.all(2),
+              alignment: Alignment.topLeft,
+              onPressed: canQuery
+                  ? () {
+                      String query = getQuery();
+                      if (query.isNotEmpty) {
+                        ref
+                            .read(sessionProviderProvider.notifier)
+                            .query("explain $query", true);
                       }
-                    : null,
-                icon: Icon(
-                  Icons.e_mobiledata,
-                  color: canQuery
-                      ? const Color.fromARGB(255, 241, 192, 84)
-                      : Colors.grey,
-                )),
-            // schema list
-            const VerticalDivider(
-              indent: 5,
-              endIndent: 5,
-            ),
-            SchemaBar(
-                disable: canQuery ? false : true,
-                currentSchema: sessionProvider.session!.model.currentSchema),
-            const Spacer(),
-            if (sessionProvider.isRightPageOpen() == false)
-              IconButton(
-                onPressed: () {
-                  sessionProvider.showRightPage();
-                },
-                icon: const Icon(Icons.format_indent_decrease),
-              )
-          ],
-        );
-      }),
+                    }
+                  : null,
+              icon: Icon(
+                Icons.e_mobiledata,
+                color: canQuery
+                    ? const Color.fromARGB(255, 241, 192, 84)
+                    : Colors.grey,
+              )),
+          // schema list
+          const VerticalDivider(
+            indent: 5,
+            endIndent: 5,
+          ),
+          SchemaBar(
+              disable: canQuery ? false : true,
+              currentSchema: session.model.currentSchema),
+          const Spacer(),
+          if (sessionDrawer.isRightPageOpen == false)
+            IconButton(
+              onPressed: () {
+                ref
+                    .read(sessionDrawerControllerProvider.notifier)
+                    .showRightPage();
+              },
+              icon: const Icon(Icons.format_indent_decrease),
+            )
+        ],
+      ),
     );
   }
 }
 
-class SchemaBar extends StatefulWidget {
+class SchemaBar extends HookConsumerWidget {
   final String? currentSchema;
   final bool disable;
 
@@ -133,28 +145,20 @@ class SchemaBar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<SchemaBar> createState() => _SchemaBarState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    BaseSession session = ref.watch(currentSessionProvider)!;
+    const isEnter = false;
 
-class _SchemaBarState extends State<SchemaBar> {
-  bool isEnter = false;
-
-  @override
-  Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) {
-        setState(() {
-          isEnter = true;
-        });
+        // isEnter. = true;
       },
       onExit: (_) {
-        setState(() {
-          isEnter = false;
-        });
+        // isEnter.value = false;
       },
       child: GestureDetector(
         onTapUp: (detail) async {
-          if (widget.disable) {
+          if (disable) {
             return;
           }
           final position = detail.globalPosition;
@@ -162,9 +166,7 @@ class _SchemaBarState extends State<SchemaBar> {
               Overlay.of(context).context.findRenderObject() as RenderBox;
           final overlayPos = overlay.localToGlobal(Offset.zero);
 
-          SessionProvider sessionProvider =
-              Provider.of<SessionProvider>(context, listen: false);
-          List<String> schemas = await sessionProvider.session!.getSchemas();
+          List<String> schemas = await (session as Session).getSchemas();
 
           // todo
           showMenu(
@@ -179,23 +181,23 @@ class _SchemaBarState extends State<SchemaBar> {
                 return PopupMenuItem<String>(
                     height: 30,
                     onTap: () {
-                      SessionProvider sessionProvider =
-                          Provider.of<SessionProvider>(context, listen: false);
-                      sessionProvider.setCurrentSchema(schema);
+                      ref
+                          .read(sessionProviderProvider.notifier)
+                          .setCurrentSchema(schema);
                     },
                     child: Text(schema));
               }).toList());
         },
         child: Container(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-            color: (isEnter && !widget.disable)
+            color: (isEnter && !disable)
                 ? Theme.of(context)
                     .colorScheme
                     .surfaceContainerHigh // schema 鼠标移入的颜色
                 : null,
             child: Row(
               children: [
-                HugeIcon(
+                const HugeIcon(
                   icon: HugeIcons.strokeRoundedDatabase,
                   color: Colors.black,
                   size: 20,
@@ -206,7 +208,7 @@ class _SchemaBarState extends State<SchemaBar> {
                     child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          widget.currentSchema ?? "",
+                          currentSchema ?? "",
                           overflow: TextOverflow.ellipsis,
                         ))),
               ],

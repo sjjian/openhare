@@ -20,35 +20,35 @@ class InstancesProvider extends ChangeNotifier {
   }
 
   Future<void> addInstance(InstanceModel instance) async {
-    await objectbox.addInstance(instance);
+    await objectbox2.addInstance(instance);
     notifyListeners();
   }
 
   Future<void> updateInstance(InstanceModel instance) async {
-    await objectbox.updateInstance(instance);
+    await objectbox2.updateInstance(instance);
     notifyListeners();
   }
 
   Future<void> deleteInstance(InstanceModel instance) async {
-    await objectbox.deleteInstance(instance);
+    await objectbox2.deleteInstance(instance);
     notifyListeners(); // 默认能删除成功
   }
 
   bool isInstanceExist(String name) {
-    return objectbox.isInstanceExist(name);
+    return objectbox2.isInstanceExist(name);
   }
 
   List<InstanceModel> instances(String key, int pageSize, int pageNumber) {
-    return objectbox.searchInstances(key,
+    return objectbox2.searchInstances(key,
         pageNumber: pageNumber, pageSize: pageSize);
   }
 
   int instanceCount(String key) {
-    return objectbox.instanceCount(key);
+    return objectbox2.instanceCount(key);
   }
 
   List<InstanceModel> activeInstances() {
-    return objectbox.getActiveInstances(5);
+    return objectbox2.getActiveInstances(5);
   }
 
   void goPage(String page) {

@@ -4,73 +4,73 @@
   "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
   "entities": [
     {
-      "id": "1:4999595895273969633",
-      "lastPropertyId": "13:5222152869857811735",
+      "id": "1:2337054309787130658",
+      "lastPropertyId": "13:6240731715311715320",
       "name": "InstanceModel",
       "properties": [
         {
-          "id": "1:4639099768893004178",
+          "id": "1:1068673039516140319",
           "name": "id",
           "type": 6,
           "flags": 1
         },
         {
-          "id": "2:1196432484688770113",
+          "id": "2:2444282396815681296",
           "name": "name",
           "type": 9
         },
         {
-          "id": "3:6567651566695670849",
+          "id": "3:3819354148116989262",
           "name": "host",
           "type": 9
         },
         {
-          "id": "4:3280199338402412129",
+          "id": "4:1269356550240711578",
           "name": "port",
           "type": 6
         },
         {
-          "id": "5:8666235755422372202",
+          "id": "5:3083677470025788707",
           "name": "user",
           "type": 9
         },
         {
-          "id": "6:7297224442226520245",
+          "id": "6:5393863909825457828",
           "name": "password",
           "type": 9
         },
         {
-          "id": "7:6533289254459277737",
+          "id": "7:8586016253506548755",
           "name": "desc",
           "type": 9
         },
         {
-          "id": "8:5922042905076136019",
+          "id": "8:3561901691489447168",
           "name": "initQuerys",
           "type": 30
         },
         {
-          "id": "9:3907568892307594433",
+          "id": "9:5409374289286026809",
           "name": "createdAt",
           "type": 10
         },
         {
-          "id": "10:7078576145528544270",
+          "id": "10:4182326172125869917",
           "name": "latestOpenAt",
           "type": 10
         },
         {
-          "id": "11:550858925713797689",
+          "id": "11:8912672256894972030",
           "name": "stDbType",
           "type": 6
         },
         {
-          "id": "12:8894071960470411706",
+          "id": "12:3672922828336339035",
           "name": "stCustom",
           "type": 9
         },
         {
-          "id": "13:5222152869857811735",
+          "id": "13:6240731715311715320",
           "name": "stActiveSchemas",
           "type": 30
         }
@@ -78,31 +78,31 @@
       "relations": []
     },
     {
-      "id": "2:454752810459549654",
-      "lastPropertyId": "4:606756865288630829",
-      "name": "SessionModel",
+      "id": "3:7441090307358647010",
+      "lastPropertyId": "4:8334821086287975041",
+      "name": "SessionStorage",
       "properties": [
         {
-          "id": "1:2062278927629664025",
+          "id": "1:8760477999454096726",
           "name": "id",
           "type": 6,
           "flags": 1
         },
         {
-          "id": "2:418794745715759520",
+          "id": "2:7692203999183118092",
           "name": "instanceId",
           "type": 11,
           "flags": 520,
-          "indexId": "1:889985545779702376",
+          "indexId": "2:708832223320989491",
           "relationTarget": "InstanceModel"
         },
         {
-          "id": "3:9187762313325828498",
+          "id": "3:6684081352487788395",
           "name": "text",
           "type": 9
         },
         {
-          "id": "4:606756865288630829",
+          "id": "4:8334821086287975041",
           "name": "currentSchema",
           "type": 9
         }
@@ -110,15 +110,22 @@
       "relations": []
     }
   ],
-  "lastEntityId": "2:454752810459549654",
-  "lastIndexId": "1:889985545779702376",
+  "lastEntityId": "3:7441090307358647010",
+  "lastIndexId": "2:708832223320989491",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    2551589113259349744
+  ],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    4656797399256525930,
+    5364523647379872428,
+    5365713597779821200,
+    5614951218081375489
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

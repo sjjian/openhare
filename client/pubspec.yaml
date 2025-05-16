@@ -20,6 +20,7 @@ version: 1.0.0+1
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
+  flutter: ">=3.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -60,6 +61,8 @@ dependencies:
   objectbox_sync_flutter_libs: any
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
+  hooks_riverpod: ^2.6.1
+  freezed_annotation: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -72,10 +75,11 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   json_serializable: ^6.8.0
-  build_runner: ^2.4.9
+  build_runner: ^2.4.15
   test: ^1.25.2
   objectbox_generator: any
-  riverpod_generator: ^2.6.3
+  riverpod_generator: ^2.6.5
+  freezed: ^3.0.6
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

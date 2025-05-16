@@ -1,6 +1,7 @@
 import 'package:client/screens/app.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/models/objectbox.dart';
 
 void main() async {
@@ -9,7 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ObjectBox.create();
   
-  runApp(const App());
+  runApp(const ProviderScope(child: App()));
 
   doWhenWindowReady(() {
     const initialSize = Size(1400, 1000);

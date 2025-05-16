@@ -1,60 +1,19 @@
-import 'package:client/models/instances.dart';
-import 'package:client/models/sessions.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as provider;
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class AddSession extends StatefulWidget {
+class AddSession extends HookConsumerWidget {
   const AddSession({Key? key}) : super(key: key);
 
   @override
-  State<AddSession> createState() => _AddSessionState();
-}
-
-class _AddSessionState extends State<AddSession> {
-  @override
-  void initState() {
-    super.initState();
-    instanceTableController.addListener(() => mounted ? setState(() {}) : null);
-  }
-
-  @override
-  void dispose() {
-    instanceTableController.removeListener(() {});
-    super.dispose();
-  }
-
-  void addSession(BuildContext context, InstanceModel inst, {String? schema}) {
-    SessionProvider sessionProvider =
-        Provider.of<SessionProvider>(context, listen: false);
-
-    SessionsProvider sessionListProvider =
-        Provider.of<SessionsProvider>(context, listen: false);
-
-     Session session = Session(SessionModel());
-      sessionListProvider.addSession(session);
-      sessionProvider.setConn(inst, schema: schema);
-      // 添加会话自动建立连接
-      sessionListProvider.connect(session);
-
-    // if (sessionProvider.session == null) {
-     
-    // } else {
-    //   sessionProvider.setConn(inst, schema: schema);
-    //   // 添加会话自动建立连接
-    //   sessionProvider.connect();
-    // }
-    // sessionListProvider.refresh();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     InstancesProvider instancesProvider =
-        Provider.of<InstancesProvider>(context);
+        provider.Provider.of<InstancesProvider>(context);
 
     instanceTableController.setCount(instancesProvider
         .instanceCount(instanceTableController.searchTextController.text));
@@ -101,7 +60,9 @@ class _AddSessionState extends State<AddSession> {
                             ),
                             TextButton(
                                 onPressed: () {
-                                  addSession(context, inst);
+                                  ref
+                                      .read(sessionTabProviderProvider.notifier)
+                                      .addSession(inst);
                                 },
                                 child: Text(
                                   inst.connectValue.name,
@@ -116,7 +77,9 @@ class _AddSessionState extends State<AddSession> {
                       for (final schema in inst.activeSchemas.toList())
                         TextButton(
                           onPressed: () {
-                            addSession(context, inst, schema: schema);
+                            ref
+                                .read(sessionTabProviderProvider.notifier)
+                                .addSession(inst, schema: schema);
                           },
                           child: Text(schema, overflow: TextOverflow.ellipsis),
                         )
@@ -188,7 +151,9 @@ class _AddSessionState extends State<AddSession> {
                             ),
                             TextButton(
                                 onPressed: () {
-                                  addSession(context, inst);
+                                  ref
+                                      .read(sessionTabProviderProvider.notifier)
+                                      .addSession(inst);
                                 },
                                 child: Text(inst.connectValue.name,
                                     overflow: TextOverflow.ellipsis)),
@@ -200,7 +165,8 @@ class _AddSessionState extends State<AddSession> {
                         width: 200,
                         child: Row(
                           children: [
-                            Text("${inst.connectValue.host}:${inst.connectValue.port}",
+                            Text(
+                                "${inst.connectValue.host}:${inst.connectValue.port}",
                                 overflow: TextOverflow.ellipsis),
                           ],
                         ),
@@ -225,5 +191,20 @@ class _AddSessionState extends State<AddSession> {
     );
   }
 }
+
+// class _AddSessionState extends State<AddSession> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     instanceTableController.addListener(() => mounted ? setState(() {}) : null);
+//   }
+
+//   @override
+//   void dispose() {
+//     instanceTableController.removeListener(() {});
+//     super.dispose();
+//   }
+
+// }
 
 InstanceTableController instanceTableController = InstanceTableController();

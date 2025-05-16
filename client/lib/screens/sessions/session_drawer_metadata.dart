@@ -5,7 +5,8 @@ import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/models/sessions.dart';
 
 class RootNode implements DataNode {
   final String name;
@@ -75,7 +76,6 @@ class TableNode extends RootNode {
     );
   }
 
-
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
@@ -94,14 +94,13 @@ class ColumnNode extends RootNode {
     return DataTypeIcon(type: type);
   }
 
-
   @override
   Widget closeIcons(BuildContext context) {
     return DataTypeIcon(type: type);
   }
 }
 
-class SessionDrawerMetadata extends StatelessWidget {
+class SessionDrawerMetadata extends ConsumerWidget {
   const SessionDrawerMetadata({Key? key}) : super(key: key);
 
   DataNode buildDataNode(MetaDataNode node) {
@@ -129,44 +128,43 @@ class SessionDrawerMetadata extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-      Widget body = const Align(
-        alignment: Alignment.center,
-        child: SizedBox(
-          height: 40,
-          width: 40,
-          child: CircularProgressIndicator(),
-        ),
-      );
+  Widget build(BuildContext context, WidgetRef ref) {
+    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
 
-      MetaDataNode? meta = sessionProvider.session!.getMetadata();
-      if (meta != null) {
-        final controller = sessionProvider.session!.metadataController;
-        // todo
-        if (controller == null) {
-          final root = RootNode();
-          sessionProvider.session!.metadataController =
-              TreeController<DataNode>(
-            roots: buildMetadataTree(root, [meta]).children,
-            childrenProvider: (DataNode node) => node.children,
-          );
-        }
-        body =
-            DataTree(controller: sessionProvider.session!.metadataController!);
+    Widget body = const Align(
+      alignment: Alignment.center,
+      child: SizedBox(
+        height: 40,
+        width: 40,
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    // MetaDataNode? meta = sessionDrawer.getMetadata();
+    MetaDataNode? meta;
+    if (meta != null) {
+      final controller = sessionDrawer.metadataController;
+      // todo
+      if (controller == null) {
+        final root = RootNode();
+        session.metadataController = TreeController<DataNode>(
+          roots: buildMetadataTree(root, [meta]).children,
+          childrenProvider: (DataNode node) => node.children,
+        );
       }
+      body = DataTree(controller: session.metadataController!);
+    }
 
-      return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // SessionMetadataTitle(),
-            // const Divider(
-            //   endIndent: 10,
-            // ),
-            Expanded(child: body),
-          ]);
-    });
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // SessionMetadataTitle(),
+          // const Divider(
+          //   endIndent: 10,
+          // ),
+          Expanded(child: body),
+        ]);
   }
 }
 

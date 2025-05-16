@@ -4,4 +4,7 @@ targets:
     builders:
       source_gen:combining_builder:
         generate_for:
-          - "lib/models/objectbox.g.dart"
+          - "lib/**/[!objectbox]**.dart"
+          - "lib/providers/**.dart"
+          - "lib/models/sessions.dart"
+          - "lib/models/session_sql_result.dart"

@@ -1,5 +1,4 @@
 import 'package:client/providers/instances.dart';
-import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/screens/instances/instance_update.dart';
@@ -82,22 +81,22 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     final instancesProvider = InstancesProvider();
     instancesProvider.loadInstance();
-    final sessions = Sessions();
-    final sessionProvider = SessionProvider(sessions);
-    final newSessionProvider = NewSessionProvider(sessions);
-    final sessionListProvider =
-        SessionsProvider(sessionProvider, newSessionProvider, sessions);
+    // final sessions = Sessions();
+    // final sessionProvider = SessionProvider(sessions);
+    // final newSessionProvider = NewSessionProvider(sessions);
+    // final sessionListProvider =
+    //     SessionsProvider(sessionProvider, newSessionProvider, sessions);
     final addInstanceProvider = AddInstanceProvider();
     final updateInstanceProvider = UpdateInstanceProvider();
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: sessionProvider),
-        ChangeNotifierProvider.value(value: sessionListProvider),
+        // ChangeNotifierProvider.value(value: sessionProvider),
+        // ChangeNotifierProvider.value(value: sessionListProvider),
         ChangeNotifierProvider.value(value: instancesProvider),
         ChangeNotifierProvider.value(value: addInstanceProvider),
         ChangeNotifierProvider.value(value: updateInstanceProvider),
-        ChangeNotifierProvider.value(value: newSessionProvider),
+        // ChangeNotifierProvider.value(value: newSessionProvider),
       ],
       child: MaterialApp.router(
         title: 'Natuo',
