@@ -1,8 +1,33 @@
-import 'package:client/models/session_sql_result.dart';
+import 'package:client/repositories/session_sql_result.dart';
+import 'package:client/models/interface.dart';
+import 'package:client/providers/sessions.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:client/utils/reorder_list.dart';
 
 part 'session_sql_result.g.dart';
+
+@Riverpod(keepAlive: true)
+ReorderSelectedList<SQLResultModel> currentSQLResults(Ref ref) {
+   SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdControllerProvider);
+  if (sessionIdModel == null) {
+    return ReorderSelectedList();
+  }
+  SQLResultRepo sqlResults = ref.watch(sqlResultsRepoProvider);
+  return sqlResults.sessionSqlResults(sessionIdModel.sessionId);
+}
+
+
+@Riverpod(keepAlive: true)
+SQLResultModel? currentSQLResult(Ref ref) {
+  SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdControllerProvider);
+  if (sessionIdModel == null) {
+    return null;
+  }
+  SQLResultRepo sqlResults = ref.watch(sqlResultsRepoProvider);
+  return sqlResults.current(sessionIdModel.sessionId);
+}
+
 
 @Riverpod(keepAlive: true)
 class SQLResultController extends _$SQLResultController {

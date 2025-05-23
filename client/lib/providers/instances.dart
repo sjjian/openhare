@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:client/models/instances.dart';
+import 'package:client/repositories/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:client/utils/sql_highlight.dart';
-import 'package:client/models/objectbox.dart';
+import 'package:client/repositories/repo.dart';
 
 class InstancesProvider extends ChangeNotifier {
   String page = "instances";

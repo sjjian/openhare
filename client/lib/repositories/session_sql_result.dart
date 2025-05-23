@@ -1,7 +1,5 @@
-import 'package:client/models/interface.dart';
-import 'package:client/models/sessions.dart';
+import 'package:client/core/conn.dart';
 import 'package:excel/excel.dart';
-
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,8 +36,6 @@ class SQLResults implements SQLResultRepo {
     sessionSqlResults(sessionId).add(sqlResult);
   }
 }
-
-enum SQLExecuteState { executing, done, error }
 
 class SQLResultModel {
   int id;
@@ -84,25 +80,4 @@ class SQLResultModel {
 @Riverpod(keepAlive: true)
 SQLResultRepo sqlResultsRepo(Ref ref) {
   return SQLResults();
-}
-
-@Riverpod(keepAlive: true)
-ReorderSelectedList<SQLResultModel> currentSQLResults(Ref ref) {
-  CurrentSession? session =  ref.watch(currentSessionProvider);
-  if (session == null) {
-    return ReorderSelectedList();
-  }
-  SQLResultRepo sqlResults = ref.watch(sqlResultsRepoProvider);
-  return sqlResults.sessionSqlResults(session.model.id);
-}
-
-
-@Riverpod(keepAlive: true)
-SQLResultModel? currentSQLResult(Ref ref) {
-  CurrentSession? session =  ref.watch(currentSessionProvider);
-  if (session == null) {
-    return null;
-  }
-  SQLResultRepo sqlResults = ref.watch(sqlResultsRepoProvider);
-  return sqlResults.current(session.model.id);
 }

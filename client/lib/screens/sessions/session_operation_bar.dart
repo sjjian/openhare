@@ -1,12 +1,11 @@
 import 'package:client/models/interface.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:client/providers/session_conn.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:client/providers/model.dart';
-import 'package:client/models/sessions.dart';
 
 class SessionOpBar extends ConsumerWidget {
   final CodeLineEditingController codeController;
@@ -41,10 +40,13 @@ class SessionOpBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    BaseSession session = ref.watch(currentSessionProvider)!;
-    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
+    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId))!;
+    CurrentSessionDrawer sessionDrawer =
+        ref.watch(sessionDrawerControllerProvider)!;
 
-    final canQuery = (session as Session).canQuery();
+    final canQuery = sessionConnModel.conn.canQuery();
+
     return Container(
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
@@ -59,9 +61,9 @@ class SessionOpBar extends ConsumerWidget {
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
-                        ref
-                            .read(sessionProviderProvider.notifier)
-                            .query(query, false);
+                        // ref
+                        //     .read(sessionConnControllerProvider(sessionId).notifier)
+                        //     .query(query, false);
                       }
                     }
                   : null,
@@ -75,9 +77,9 @@ class SessionOpBar extends ConsumerWidget {
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
-                        ref
-                            .read(sessionProviderProvider.notifier)
-                            .query(query, true);
+                        // ref
+                        //     .read(sessionConnControllerProvider(sessionId).notifier)
+                        //     .query(query, true);
                       }
                     }
                   : null,
@@ -98,9 +100,9 @@ class SessionOpBar extends ConsumerWidget {
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
-                        ref
-                            .read(sessionProviderProvider.notifier)
-                            .query("explain $query", true);
+                        // ref
+                        //     .read(sessionConnControllerProvider(sessionId).notifier)
+                        //     .query("explain $query", true);
                       }
                     }
                   : null,
@@ -117,7 +119,7 @@ class SessionOpBar extends ConsumerWidget {
           ),
           SchemaBar(
               disable: canQuery ? false : true,
-              currentSchema: session.model.currentSchema),
+              currentSchema: sessionConnModel.conn.model.currentSchema),
           const Spacer(),
           if (sessionDrawer.isRightPageOpen == false)
             IconButton(
@@ -134,10 +136,9 @@ class SessionOpBar extends ConsumerWidget {
   }
 }
 
-class SchemaBar extends HookConsumerWidget {
+class SchemaBar extends ConsumerStatefulWidget {
   final String? currentSchema;
   final bool disable;
-
   const SchemaBar({
     Key? key,
     required this.disable,
@@ -145,20 +146,30 @@ class SchemaBar extends HookConsumerWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    BaseSession session = ref.watch(currentSessionProvider)!;
-    const isEnter = false;
+  ConsumerState<SchemaBar> createState() => _SchemaBarState();
+}
 
+class _SchemaBarState extends ConsumerState<SchemaBar> {
+  bool isEnter = false;
+
+  @override
+  Widget build(BuildContext context) {
+    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId))!;
     return MouseRegion(
       onEnter: (_) {
-        // isEnter. = true;
+        setState(() {
+          isEnter = true;
+        });
       },
       onExit: (_) {
-        // isEnter.value = false;
+        setState(() {
+          isEnter = false;
+        });
       },
       child: GestureDetector(
         onTapUp: (detail) async {
-          if (disable) {
+          if (widget.disable) {
             return;
           }
           final position = detail.globalPosition;
@@ -166,7 +177,9 @@ class SchemaBar extends HookConsumerWidget {
               Overlay.of(context).context.findRenderObject() as RenderBox;
           final overlayPos = overlay.localToGlobal(Offset.zero);
 
-          List<String> schemas = await (session as Session).getSchemas();
+          List<String> schemas = await ref
+              .read(sessionConnControllerProvider(sessionIdModel.sessionId).notifier)
+              .getSchemas();
 
           // todo
           showMenu(
@@ -182,7 +195,7 @@ class SchemaBar extends HookConsumerWidget {
                     height: 30,
                     onTap: () {
                       ref
-                          .read(sessionProviderProvider.notifier)
+                          .read(sessionConnControllerProvider(sessionIdModel.sessionId).notifier)
                           .setCurrentSchema(schema);
                     },
                     child: Text(schema));
@@ -190,7 +203,7 @@ class SchemaBar extends HookConsumerWidget {
         },
         child: Container(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-            color: (isEnter && !disable)
+            color: (isEnter && !widget.disable)
                 ? Theme.of(context)
                     .colorScheme
                     .surfaceContainerHigh // schema 鼠标移入的颜色
@@ -208,7 +221,7 @@ class SchemaBar extends HookConsumerWidget {
                     child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          currentSchema ?? "",
+                          sessionConnModel.conn.currentSchema ?? "",
                           overflow: TextOverflow.ellipsis,
                         ))),
               ],

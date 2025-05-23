@@ -123,4 +123,4 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 
 objectbox:
-  output_dir: models
+  output_dir: repositories

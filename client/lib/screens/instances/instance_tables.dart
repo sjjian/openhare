@@ -1,4 +1,4 @@
-import 'package:client/models/instances.dart';
+import 'package:client/repositories/instances.dart';
 import 'package:client/providers/instances.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';

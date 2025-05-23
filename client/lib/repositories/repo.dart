@@ -1,9 +1,14 @@
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'instances.dart';
 import 'sessions.dart';
 
-import 'objectbox.g.dart'; // created by `flutter pub run build_runner build`
+import 'objectbox.g.dart';
+
+part 'repo.g.dart';
 
 late ObjectBox objectbox2;
 
@@ -90,14 +95,9 @@ class ObjectBox {
     await updateInstance(instance);
     return;
   }
+}
 
-  Future<void> addSession(SessionStorage session) =>
-      _sessionBox.putAsync(session);
-
-  Future<void> updateSession(SessionStorage target) async {
-    _sessionBox.putAsync(target);
-  }
-
-  Future<void> deleteSession(SessionStorage session) =>
-      _sessionBox.removeAsync(session.id);
+@Riverpod(keepAlive: true)
+ObjectBox objectbox(Ref ref) {
+  return objectbox2;
 }

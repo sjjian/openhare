@@ -1,21 +1,17 @@
-import 'package:client/providers/model.dart';
+import 'package:client/models/interface.dart';
 import 'package:client/providers/sessions.dart';
+import 'package:client/providers/session_conn.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:client/providers/model.dart';
-import 'package:client/models/sessions.dart';
 
 class SessionTabs extends ConsumerWidget {
   const SessionTabs({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionsCache sessions = ref.watch(sessionsProvider);
-    // SessionsCache sessions = ref.watch(sessionTabProviderProvider);
-    print("SessionTabs page rebuild, session count: ${sessions.data.length}, hash: ${sessions.hashCode}");
-    // print("SessionTabs page rebuild, session count: ${sessions.data.length}");
+    SessionTab sessionTab = ref.watch(sessionTabControllerProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: CommonTabBar(
@@ -30,80 +26,81 @@ class SessionTabs extends ConsumerWidget {
                 Theme.of(context).colorScheme.surfaceDim, // session tab 鼠标移入的颜色
           ),
           addTab: () {
-            ref.read(sessionTabProviderProvider.notifier).newSession();
+            ref.read(sessionTabControllerProvider.notifier).newSession();
           },
           onReorder: (oldIndex, newIndex) {
-            ref.read(sessionTabProviderProvider.notifier).reorderSession(oldIndex, newIndex);
+            ref
+                .read(sessionTabControllerProvider.notifier)
+                .reorderSession(oldIndex, newIndex);
           },
           tabs: [
-            for (var i = 0; i < sessions.data.length; i++)
-              switch (sessions.data[i]) {
-                UnInitSession() => CommonTabWrap(
-                    label: "new",
-                    onTap: () {
-                      ref.read(sessionTabProviderProvider.notifier).selectSessionByIndex(i);
-                    },
-                    onDeleted: () {
-                      ref.read(sessionTabProviderProvider.notifier).deleteSessionByIndex(i);
-                    },
-                    selected: sessions.data.isSelected(sessions.data[i]),
-                  ),
-                Session() => CommonTabWrap(
-                    avatar:
-                        (sessions.data[i] as Session).model.instance.target !=
-                                null
-                            ? Image.asset(connectionMetaMap[
-                                    (sessions.data[i] as Session)
-                                        .model
-                                        .instance
-                                        .target!
-                                        .dbType]!
-                                .logoAssertPath)
-                            : null,
-                    label: (sessions.data[i] as Session).conn2 != null
-                        ? (sessions.data[i] as Session)
-                            .model
-                            .instance
-                            .target!
-                            .connectValue
-                            .name
-                        : "new",
-                    items: <PopupMenuEntry>[
-                      PopupMenuItem<String>(
-                        height: 30,
-                        onTap: () {
-                          ref.read(sessionTabProviderProvider.notifier).connect(
-                              (sessions.data[i] as Session));
-                        },
-                        child: const Text("连接"),
-                      ),
-                      const PopupMenuDivider(height: 0.1),
-                      PopupMenuItem<String>(
-                        height: 30,
-                        onTap: () {
-                          ref.read(sessionTabProviderProvider.notifier).close(
-                              (sessions.data[i] as Session));
-                        },
-                        child: const Text("断开"),
-                      ),
-                      const PopupMenuDivider(height: 0.1),
-                      PopupMenuItem<String>(
-                        height: 30,
-                        onTap: () {
-                          ref.read(sessionTabProviderProvider.notifier).deleteSessionByIndex(i);
-                        },
-                        child: const Text("关闭"),
-                      ),
-                    ],
-                    onTap: () {
-                      ref.read(sessionTabProviderProvider.notifier).selectSessionByIndex(i);
-                    },
-                    onDeleted: () {
-                      ref.read(sessionTabProviderProvider.notifier).deleteSessionByIndex(i);
-                    },
-                    selected: sessions.data.isSelected(sessions.data[i]),
-                  )
-              }
+            for (var i = 0; i < sessionTab.sessions.length; i++)
+              (sessionTab.sessions[i].instance.target == null)
+                  ? CommonTabWrap(
+                      label: "new",
+                      onTap: () {
+                        ref
+                            .read(sessionTabControllerProvider.notifier)
+                            .selectSessionByIndex(i);
+                      },
+                      onDeleted: () {
+                        ref
+                            .read(sessionTabControllerProvider.notifier)
+                            .deleteSessionByIndex(i);
+                      },
+                      selected: sessionTab.sessions
+                          .isSelected(sessionTab.sessions[i]),
+                    )
+                  : CommonTabWrap(
+                      avatar: Image.asset(connectionMetaMap[
+                              sessionTab.sessions[i].instance.target!.dbType]!
+                          .logoAssertPath),
+                      label: sessionTab
+                          .sessions[i].instance.target!.connectValue.name,
+                      items: <PopupMenuEntry>[
+                        PopupMenuItem<String>(
+                          height: 30,
+                          onTap: () {
+                            ref
+                                .read(sessionConnControllerProvider(sessionTab.sessions[i].id).notifier)
+                                .connect();
+                          },
+                          child: const Text("连接"),
+                        ),
+                        const PopupMenuDivider(height: 0.1),
+                        PopupMenuItem<String>(
+                          height: 30,
+                          onTap: () {
+                            ref
+                                .read(sessionConnControllerProvider(sessionTab.sessions[i].id).notifier)
+                                .close();
+                          },
+                          child: const Text("断开"),
+                        ),
+                        const PopupMenuDivider(height: 0.1),
+                        PopupMenuItem<String>(
+                          height: 30,
+                          onTap: () {
+                            ref
+                                .read(sessionTabControllerProvider.notifier)
+                                .deleteSessionByIndex(i);
+                          },
+                          child: const Text("关闭"),
+                        ),
+                      ],
+                      onTap: () {
+                        ref
+                            .read(sessionTabControllerProvider.notifier)
+                            .selectSessionByIndex(i);
+                      },
+                      onDeleted: () {
+                        ref
+                            .read(sessionTabControllerProvider.notifier)
+                            .deleteSessionByIndex(i);
+                      },
+                      selected: sessionTab.sessions
+                          .isSelected(sessionTab.sessions[i]),
+                    )
           ]),
     );
   }

@@ -8,3 +8,5 @@ targets:
           - "lib/providers/**.dart"
           - "lib/models/sessions.dart"
           - "lib/models/session_sql_result.dart"
+          - "lib/repositories/sessions.dart"
+          - "lib/core/**.dart"

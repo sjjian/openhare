@@ -6,41 +6,8 @@ part of 'sessions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionRepoHash() => r'e430ea4ab66b65bcd4bb1647ce2a886b6e32b66a';
-
-/// See also [sessionRepo].
-@ProviderFor(sessionRepo)
-final sessionRepoProvider = Provider<SessionRepo>.internal(
-  sessionRepo,
-  name: r'sessionRepoProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$sessionRepoHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef SessionRepoRef = ProviderRef<SessionRepo>;
-String _$currentSessionHash() => r'7a845125b710449daef1784e4ab318cd5500a0d0';
-
-/// See also [currentSession].
-@ProviderFor(currentSession)
-final currentSessionProvider = Provider<CurrentSession?>.internal(
-  currentSession,
-  name: r'currentSessionProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentSessionHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CurrentSessionRef = ProviderRef<CurrentSession?>;
 String _$sessionDrawerStateHash() =>
-    r'626fd64b436d1add45920f977dfa0f878fda5258';
+    r'253c562fbed2294539c4066cb1ed1458efdb5087';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -68,7 +35,7 @@ class _SystemHash {
 const sessionDrawerStateProvider = SessionDrawerStateFamily();
 
 /// See also [sessionDrawerState].
-class SessionDrawerStateFamily extends Family<CurrentSessionDrawer?> {
+class SessionDrawerStateFamily extends Family<CurrentSessionDrawer> {
   /// See also [sessionDrawerState].
   const SessionDrawerStateFamily();
 
@@ -106,7 +73,7 @@ class SessionDrawerStateFamily extends Family<CurrentSessionDrawer?> {
 }
 
 /// See also [sessionDrawerState].
-class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer?> {
+class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer> {
   /// See also [sessionDrawerState].
   SessionDrawerStateProvider(
     int sessionId,
@@ -141,7 +108,7 @@ class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer?> {
 
   @override
   Override overrideWith(
-    CurrentSessionDrawer? Function(SessionDrawerStateRef provider) create,
+    CurrentSessionDrawer Function(SessionDrawerStateRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -158,7 +125,7 @@ class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer?> {
   }
 
   @override
-  ProviderElement<CurrentSessionDrawer?> createElement() {
+  ProviderElement<CurrentSessionDrawer> createElement() {
     return _SessionDrawerStateProviderElement(this);
   }
 
@@ -178,42 +145,43 @@ class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer?> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionDrawerStateRef on ProviderRef<CurrentSessionDrawer?> {
+mixin SessionDrawerStateRef on ProviderRef<CurrentSessionDrawer> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
 class _SessionDrawerStateProviderElement
-    extends ProviderElement<CurrentSessionDrawer?> with SessionDrawerStateRef {
+    extends ProviderElement<CurrentSessionDrawer> with SessionDrawerStateRef {
   _SessionDrawerStateProviderElement(super.provider);
 
   @override
   int get sessionId => (origin as SessionDrawerStateProvider).sessionId;
 }
 
-String _$sessionConnHash() => r'a25cd0d5b7b77efd136a24d69ae097cb2d4370ad';
+String _$sessionSplitViewStateHash() =>
+    r'78724f95d90323f72d5adb3c2508ada6ae45a8aa';
 
-/// See also [sessionConn].
-@ProviderFor(sessionConn)
-const sessionConnProvider = SessionConnFamily();
+/// See also [sessionSplitViewState].
+@ProviderFor(sessionSplitViewState)
+const sessionSplitViewStateProvider = SessionSplitViewStateFamily();
 
-/// See also [sessionConn].
-class SessionConnFamily extends Family<SessionConn> {
-  /// See also [sessionConn].
-  const SessionConnFamily();
+/// See also [sessionSplitViewState].
+class SessionSplitViewStateFamily extends Family<CurrentSessionSplitView> {
+  /// See also [sessionSplitViewState].
+  const SessionSplitViewStateFamily();
 
-  /// See also [sessionConn].
-  SessionConnProvider call(
+  /// See also [sessionSplitViewState].
+  SessionSplitViewStateProvider call(
     int sessionId,
   ) {
-    return SessionConnProvider(
+    return SessionSplitViewStateProvider(
       sessionId,
     );
   }
 
   @override
-  SessionConnProvider getProviderOverride(
-    covariant SessionConnProvider provider,
+  SessionSplitViewStateProvider getProviderOverride(
+    covariant SessionSplitViewStateProvider provider,
   ) {
     return call(
       provider.sessionId,
@@ -232,32 +200,32 @@ class SessionConnFamily extends Family<SessionConn> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'sessionConnProvider';
+  String? get name => r'sessionSplitViewStateProvider';
 }
 
-/// See also [sessionConn].
-class SessionConnProvider extends Provider<SessionConn> {
-  /// See also [sessionConn].
-  SessionConnProvider(
+/// See also [sessionSplitViewState].
+class SessionSplitViewStateProvider extends Provider<CurrentSessionSplitView> {
+  /// See also [sessionSplitViewState].
+  SessionSplitViewStateProvider(
     int sessionId,
   ) : this._internal(
-          (ref) => sessionConn(
-            ref as SessionConnRef,
+          (ref) => sessionSplitViewState(
+            ref as SessionSplitViewStateRef,
             sessionId,
           ),
-          from: sessionConnProvider,
-          name: r'sessionConnProvider',
+          from: sessionSplitViewStateProvider,
+          name: r'sessionSplitViewStateProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$sessionConnHash,
-          dependencies: SessionConnFamily._dependencies,
+                  : _$sessionSplitViewStateHash,
+          dependencies: SessionSplitViewStateFamily._dependencies,
           allTransitiveDependencies:
-              SessionConnFamily._allTransitiveDependencies,
+              SessionSplitViewStateFamily._allTransitiveDependencies,
           sessionId: sessionId,
         );
 
-  SessionConnProvider._internal(
+  SessionSplitViewStateProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -271,12 +239,12 @@ class SessionConnProvider extends Provider<SessionConn> {
 
   @override
   Override overrideWith(
-    SessionConn Function(SessionConnRef provider) create,
+    CurrentSessionSplitView Function(SessionSplitViewStateRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: SessionConnProvider._internal(
-        (ref) => create(ref as SessionConnRef),
+      override: SessionSplitViewStateProvider._internal(
+        (ref) => create(ref as SessionSplitViewStateRef),
         from: from,
         name: null,
         dependencies: null,
@@ -288,13 +256,14 @@ class SessionConnProvider extends Provider<SessionConn> {
   }
 
   @override
-  ProviderElement<SessionConn> createElement() {
-    return _SessionConnProviderElement(this);
+  ProviderElement<CurrentSessionSplitView> createElement() {
+    return _SessionSplitViewStateProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SessionConnProvider && other.sessionId == sessionId;
+    return other is SessionSplitViewStateProvider &&
+        other.sessionId == sessionId;
   }
 
   @override
@@ -308,17 +277,281 @@ class SessionConnProvider extends Provider<SessionConn> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionConnRef on ProviderRef<SessionConn> {
+mixin SessionSplitViewStateRef on ProviderRef<CurrentSessionSplitView> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
-class _SessionConnProviderElement extends ProviderElement<SessionConn>
-    with SessionConnRef {
-  _SessionConnProviderElement(super.provider);
+class _SessionSplitViewStateProviderElement
+    extends ProviderElement<CurrentSessionSplitView>
+    with SessionSplitViewStateRef {
+  _SessionSplitViewStateProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SessionConnProvider).sessionId;
+  int get sessionId => (origin as SessionSplitViewStateProvider).sessionId;
+}
+
+String _$sessionMetadataStateHash() =>
+    r'1c6d6dd0214abf854c807d3227fb564145ffb104';
+
+/// See also [sessionMetadataState].
+@ProviderFor(sessionMetadataState)
+const sessionMetadataStateProvider = SessionMetadataStateFamily();
+
+/// See also [sessionMetadataState].
+class SessionMetadataStateFamily extends Family<CurrentSessionMetadata> {
+  /// See also [sessionMetadataState].
+  const SessionMetadataStateFamily();
+
+  /// See also [sessionMetadataState].
+  SessionMetadataStateProvider call(
+    int sessionId,
+  ) {
+    return SessionMetadataStateProvider(
+      sessionId,
+    );
+  }
+
+  @override
+  SessionMetadataStateProvider getProviderOverride(
+    covariant SessionMetadataStateProvider provider,
+  ) {
+    return call(
+      provider.sessionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'sessionMetadataStateProvider';
+}
+
+/// See also [sessionMetadataState].
+class SessionMetadataStateProvider extends Provider<CurrentSessionMetadata> {
+  /// See also [sessionMetadataState].
+  SessionMetadataStateProvider(
+    int sessionId,
+  ) : this._internal(
+          (ref) => sessionMetadataState(
+            ref as SessionMetadataStateRef,
+            sessionId,
+          ),
+          from: sessionMetadataStateProvider,
+          name: r'sessionMetadataStateProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sessionMetadataStateHash,
+          dependencies: SessionMetadataStateFamily._dependencies,
+          allTransitiveDependencies:
+              SessionMetadataStateFamily._allTransitiveDependencies,
+          sessionId: sessionId,
+        );
+
+  SessionMetadataStateProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.sessionId,
+  }) : super.internal();
+
+  final int sessionId;
+
+  @override
+  Override overrideWith(
+    CurrentSessionMetadata Function(SessionMetadataStateRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SessionMetadataStateProvider._internal(
+        (ref) => create(ref as SessionMetadataStateRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        sessionId: sessionId,
+      ),
+    );
+  }
+
+  @override
+  ProviderElement<CurrentSessionMetadata> createElement() {
+    return _SessionMetadataStateProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SessionMetadataStateProvider &&
+        other.sessionId == sessionId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, sessionId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SessionMetadataStateRef on ProviderRef<CurrentSessionMetadata> {
+  /// The parameter `sessionId` of this provider.
+  int get sessionId;
+}
+
+class _SessionMetadataStateProviderElement
+    extends ProviderElement<CurrentSessionMetadata>
+    with SessionMetadataStateRef {
+  _SessionMetadataStateProviderElement(super.provider);
+
+  @override
+  int get sessionId => (origin as SessionMetadataStateProvider).sessionId;
+}
+
+String _$sessionEditorHash() => r'75d1f688113bd1cd339190c83477842de7bebebb';
+
+/// See also [sessionEditor].
+@ProviderFor(sessionEditor)
+const sessionEditorProvider = SessionEditorFamily();
+
+/// See also [sessionEditor].
+class SessionEditorFamily extends Family<CurrentSessionEditor> {
+  /// See also [sessionEditor].
+  const SessionEditorFamily();
+
+  /// See also [sessionEditor].
+  SessionEditorProvider call(
+    int sessionId,
+  ) {
+    return SessionEditorProvider(
+      sessionId,
+    );
+  }
+
+  @override
+  SessionEditorProvider getProviderOverride(
+    covariant SessionEditorProvider provider,
+  ) {
+    return call(
+      provider.sessionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'sessionEditorProvider';
+}
+
+/// See also [sessionEditor].
+class SessionEditorProvider extends Provider<CurrentSessionEditor> {
+  /// See also [sessionEditor].
+  SessionEditorProvider(
+    int sessionId,
+  ) : this._internal(
+          (ref) => sessionEditor(
+            ref as SessionEditorRef,
+            sessionId,
+          ),
+          from: sessionEditorProvider,
+          name: r'sessionEditorProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sessionEditorHash,
+          dependencies: SessionEditorFamily._dependencies,
+          allTransitiveDependencies:
+              SessionEditorFamily._allTransitiveDependencies,
+          sessionId: sessionId,
+        );
+
+  SessionEditorProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.sessionId,
+  }) : super.internal();
+
+  final int sessionId;
+
+  @override
+  Override overrideWith(
+    CurrentSessionEditor Function(SessionEditorRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SessionEditorProvider._internal(
+        (ref) => create(ref as SessionEditorRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        sessionId: sessionId,
+      ),
+    );
+  }
+
+  @override
+  ProviderElement<CurrentSessionEditor> createElement() {
+    return _SessionEditorProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SessionEditorProvider && other.sessionId == sessionId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, sessionId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SessionEditorRef on ProviderRef<CurrentSessionEditor> {
+  /// The parameter `sessionId` of this provider.
+  int get sessionId;
+}
+
+class _SessionEditorProviderElement
+    extends ProviderElement<CurrentSessionEditor> with SessionEditorRef {
+  _SessionEditorProviderElement(super.provider);
+
+  @override
+  int get sessionId => (origin as SessionEditorProvider).sessionId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

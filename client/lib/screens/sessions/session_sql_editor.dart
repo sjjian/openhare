@@ -1,4 +1,6 @@
 import 'package:client/models/interface.dart';
+import 'package:client/providers/sessions.dart';
+import 'package:client/providers/session_conn.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,8 +8,6 @@ import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:sql_parser/parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:client/providers/model.dart';
-import 'package:client/models/sessions.dart';
 
 class SQLEditor extends ConsumerWidget {
   final CodeLineEditingController codeController;
@@ -48,10 +48,13 @@ class SQLEditor extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSession session = ref.watch(currentSessionProvider)!;
+    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    CurrentSessionMetadata sessionMeta = ref.watch(sessionMetadataControllerProvider);
+    SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId));
 
-    MetaDataNode? metadata = (session as Session).getMetadata();
-    String? currentSchema = session.currentSchema;
+    print("session editor build: ${sessionIdModel.sessionId}");
+    MetaDataNode? metadata = sessionMeta.metadata;
+    String? currentSchema = sessionConnModel.conn.currentSchema;
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords)

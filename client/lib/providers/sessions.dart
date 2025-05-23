@@ -1,247 +1,20 @@
 import 'package:client/models/interface.dart';
-import 'package:client/providers/model.dart';
+import 'package:client/repositories/sessions.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/models/session_sql_result.dart';
-import 'package:client/models/instances.dart';
-import 'package:client/models/objectbox.dart';
+import 'package:client/repositories/instances.dart';
+import 'package:client/repositories/repo.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sessions.g.dart';
-
-@riverpod
-class SessionTabProvider extends _$SessionTabProvider {
-  @override
-  ReorderSelectedList<BaseSession> build() {
-    return ref.watch(sessionRepoProvider).getSessions();
-  }
-
-  Future<void> connect(Session session) async {
-    // todo
-    for (final s in state) {
-      if (s == session) {
-        await session.connect();
-        return;
-      }
-    }
-  }
-
-  Future<void> close(Session session) async {
-    for (final s in state) {
-      if (s == session) {
-        await session.close();
-        return;
-      }
-    }
-  }
-
-  void selectSessionByIndex(int index) {
-    if (state.select(index)) {
-      ref.invalidate(sessionRepoProvider);
-    }
-  }
-
-  void reorderSession(int oldIndex, int newIndex) {
-    state.reorder(oldIndex, newIndex);
-    ref.invalidate(sessionRepoProvider);
-  }
-
-  void addSession(InstanceModel instance, {String? schema}) {
-    print("addSession");
-    Session session = Session(SessionStorage());
-    session.model.instance.target = instance;
-    session.model.currentSchema = schema;
-
-    ObjectBox ob = ref.watch(objectboxProvider);
-    // 记录使用的数据源
-    ob.addActiveInstance(instance);
-    if (schema != null) {
-      ob.addInstanceActiveSchema(instance, schema);
-    }
-    state.replace(state.selected()!, session);
-
-    ref.invalidateSelf();
-    ref.invalidate(sessionRepoProvider);
-    print("addSession refresh");
-    connect(session);
-  }
-
-  void newSession() {
-    final s = UnInitSession();
-    state.add(s);
-    ref.invalidate(sessionRepoProvider);
-  }
-
-  void deleteSessionByIndex(int index) {
-    state.removeAt(index);
-    ref.invalidate(sessionRepoProvider);
-  }
-}
-
-@riverpod
-class SessionConnController extends _$SessionConnController {
-  @override
-  SessionConn build() {
-    CurrentSession? session = ref.watch(currentSessionProvider);
-    return ref.watch(sessionConnProvider(session!.model.id))!;
-  }
-  // Future<void> connect() async {
-  //   BaseSession? session = ref.watch(currentSessionProvider);
-  //   if (session == null || session is UnInitSession) {
-  //     return;
-  //   }
-  //   await state.connect();
-  //   ref.invalidateSelf();
-  // }
-  
-  Future<void> connect() async {
-    try {
-      final conn = await ConnectionFactory.open(
-          type: state.model.instance.target!.dbType,
-          meta: state.model.instance.target!.connectValue,
-          schema: state.model.currentSchema,
-          onCloseCallback: state.onConnClose,
-          onSchemaChangedCallback: state.onSchemaChanged);
-      // state.state = SQLConnectState.connected;
-      state = state.copyWith(conn2: conn, state: SQLConnectState.connected);
-    } catch (e, s) {
-      print("conn error: ${e}; ${s}");
-      // state.state = SQLConnectState.failed;
-      state = state.copyWith(conn2: null, state: SQLConnectState.failed);
-    }
-  }
-
-  Future<void> close() async {
-    if (conn2 == null || connState != SQLConnectState.connected) {
-      return;
-    }
-    try {
-      conn2!.close();
-      connState = SQLConnectState.pending;
-      conn2 = null;
-    } catch (e) {
-      // todo: handler error;
-    }
-  }
-}
-
-@riverpod
-class SessionController extends _$SessionController {
-  @override
-  CurrentSession build() {
-    return ref.watch(currentSessionProvider)!;
-  }
-
-  // void update(Session? targetSession) {
-  //   BaseSession? session = ref.watch(currentSessionProvider);
-  //   if (session != null) {
-  //     session!.unListenCallBack();
-  //   }
-  //   if (targetSession != null) {
-  //     session!.listenCallBack(onConnClose, onSchemaChanged);
-  //   }
-  //   notifyListeners();
-  // }
-
-  // bool initialized() {
-  //   return session != null && session!.model.instance.target != null;
-  // }
-
-  // Future<void> setConn(InstanceModel instance, {String? schema}) async {
-  //   ObjectBox ob = await ref.watch(objectboxProvider);
-  //   // 记录使用的数据源
-  //   ob.addActiveInstance(instance);
-  //   if (schema != null) {
-  //     ob.addInstanceActiveSchema(instance, schema);
-  //   }
-  //   state =
-  //   BaseSession? session = ref.watch(currentSessionProvider);
-  //   // state as Session;
-  //   // state = ;
-  //   // state
-  //   // state.model.instance.target = instance;
-  //   // session!.model.currentSchema = schema;
-  //   // notifyListeners();
-  // }
-
-  Future<void> connect() async {
-    BaseSession? session = ref.watch(currentSessionProvider);
-    if (session == null || session is UnInitSession) {
-      return;
-    }
-    await state.connect();
-    ref.invalidateSelf();
-  }
-
-  // void onConnClose() {
-  //   notifyListeners();
-  // }
-
-  Future<void> onSchemaChanged(String schema) async {
-    BaseSession? session = ref.watch(currentSessionProvider);
-    ObjectBox ob = ref.read(objectboxProvider);
-    await ob.addInstanceActiveSchema(
-        (session as Session).model.instance.target!, schema);
-    ref.invalidateSelf();
-  }
-
-  Future<void> query(String query, bool newResult) async {
-    BaseSession? session = ref.watch(currentSessionProvider);
-    if (session == null || session is UnInitSession) {
-      return;
-    }
-
-    if ((session as Session).connState != SQLConnectState.connected) {
-      return;
-    }
-    SQLResultModel result;
-
-    SQLResultModel? cur = session.sqlResults.selected();
-    if (newResult || cur == null) {
-      result = SQLResultModel(session.genSQLResultId(), query);
-      session.sqlResults.add(result);
-    } else {
-      result = SQLResultModel(cur.id, query);
-      session.sqlResults.replace(cur, result);
-    }
-
-    session.showRecord = false; // 如果执行query创建了新的tab则跳转过去
-    session.queryState = SQLExecuteState.executing;
-    // notifyListeners();
-
-    try {
-      DateTime start = DateTime.now();
-      BaseQueryResult queryResult = await session.conn2!.query(query);
-      List<QueryResultRow> rows = queryResult.rows;
-      DateTime end = DateTime.now();
-      result.setDone(queryResult.columns, rows, end.difference(start),
-          queryResult.affectedRows.toInt());
-      session.queryState = SQLExecuteState.done;
-    } catch (e) {
-      result.setError(e.toString());
-      session.queryState = SQLExecuteState.error;
-    } finally {
-      // notifyListeners();
-    }
-  }
-
-  Future<void> setCurrentSchema(String schema) async {
-    BaseSession? session = ref.watch(currentSessionProvider);
-    if (session == null || session is UnInitSession) {
-      return;
-    }
-    await (session as Session).conn2!.setCurrentSchema(schema);
-    ref.invalidateSelf();
-  }
-}
 
 @Riverpod(keepAlive: true)
 class SessionDrawerController extends _$SessionDrawerController {
   @override
   CurrentSessionDrawer build() {
-    CurrentSession? session = ref.watch(currentSessionProvider);
-    return ref.watch(sessionDrawerStateProvider(session!.model.id))!;
+    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
   }
 
   Future<void> loadMetadata() async {
@@ -276,11 +49,127 @@ class SessionDrawerController extends _$SessionDrawerController {
       sqlResult: result ?? state.sqlResult,
     );
   }
+
   void goToTree() {
     state = state.copyWith(
       drawerPage: DrawerPage.metadataTree,
       sqlColumn: null,
       sqlResult: null,
     );
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SessionSplitViewController extends _$SessionSplitViewController {
+  @override
+  CurrentSessionSplitView build() {
+    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    return ref.watch(sessionSplitViewStateProvider(sessionIdModel.sessionId));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SessionMetadataController extends _$SessionMetadataController {
+  @override
+  CurrentSessionMetadata build() {
+    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    return ref.watch(sessionMetadataStateProvider(sessionIdModel.sessionId));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SessionEditorController extends _$SessionEditorController {
+  @override
+  CurrentSessionEditor build() {
+    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
+  }
+}
+
+@riverpod
+class SessionTabController extends _$SessionTabController {
+  @override
+  SessionTab build() {
+    List<SessionStorage> sessions =
+        ref.watch(sessionRepoProvider).getSessions();
+    return SessionTab(sessions: ReorderSelectedList(data: sessions));
+  }
+
+  void selectSessionByIndex(int index) {
+    if (state.sessions.select(index)) {
+      // refresh
+      state = state.copyWith(sessions: state.sessions);
+    }
+  }
+
+  void reorderSession(int oldIndex, int newIndex) {
+    state.sessions.reorder(oldIndex, newIndex);
+    // refresh
+    state = state.copyWith(sessions: state.sessions);
+  }
+
+  void addSession(InstanceModel instance, {String? schema}) {
+    SessionRepo sessionRepo = ref.read(sessionRepoProvider);
+
+    ObjectBox ob = ref.watch(objectboxProvider);
+    // 记录使用的数据源
+    ob.addActiveInstance(instance);
+    if (schema != null) {
+      ob.addInstanceActiveSchema(instance, schema);
+    }
+
+    SessionStorage? session = state.sessions.selected();
+    if (session == null) {
+      session = SessionStorage();
+      state.sessions.add(session);
+      sessionRepo.addSession(session);
+    }
+    session.instance.target = instance;
+    session.currentSchema = schema;
+    sessionRepo.updateSession(session);
+    // refresh
+    state = state.copyWith(sessions: state.sessions);
+
+
+    // ref.invalidate(sessionsRepoProvider);
+    // ref.invalidateSelf();
+    // ref.invalidate(sessionRepoProvider);
+    // print("addSession refresh");
+    // connect(session);
+  }
+
+  void newSession() {
+    SessionRepo sessionRepo = ref.read(sessionRepoProvider);
+    SessionStorage session = SessionStorage();
+    state.sessions.add(session);
+    sessionRepo.addSession(session);
+    state = state.copyWith(sessions: state.sessions);
+  }
+
+  void deleteSessionByIndex(int index) {
+    SessionRepo sessionRepo = ref.read(sessionRepoProvider);
+    final session = state.sessions.removeAt(index);
+    sessionRepo.deleteSession(session);
+    // refresh
+    state = state.copyWith(sessions: state.sessions);
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSessionIdController extends _$SelectedSessionIdController {
+  @override
+  SelectedSessionId build() {
+    int sessionId =
+        ref.watch(sessionTabControllerProvider.select((s){
+          if (s.sessions.selected() == null || s.sessions.selected()!.instance.target == null) {
+            return 0;
+          }
+          return s.sessions.selected()!.id;
+        }));
+    if (sessionId == 0) {
+      return const SelectedSessionId(sessionId: 0, instanceId: 0);
+    }
+    SessionStorage session = ref.read(sessionRepoProvider).getSession(sessionId)!; 
+    return SelectedSessionId(sessionId: sessionId, instanceId: session.instance.target?.id);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:client/models/interface.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:client/models/sessions.dart';
 
 class RootNode implements DataNode {
   final String name;
@@ -129,7 +129,7 @@ class SessionDrawerMetadata extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
+    CurrentSessionMetadata sessionMetadata = ref.watch(sessionMetadataControllerProvider)!;
 
     Widget body = const Align(
       alignment: Alignment.center,
@@ -143,16 +143,16 @@ class SessionDrawerMetadata extends ConsumerWidget {
     // MetaDataNode? meta = sessionDrawer.getMetadata();
     MetaDataNode? meta;
     if (meta != null) {
-      final controller = sessionDrawer.metadataController;
+      final controller = sessionMetadata.metadataController;
       // todo
       if (controller == null) {
         final root = RootNode();
-        session.metadataController = TreeController<DataNode>(
+        final metadataController = TreeController<DataNode>(
           roots: buildMetadataTree(root, [meta]).children,
           childrenProvider: (DataNode node) => node.children,
         );
       }
-      body = DataTree(controller: session.metadataController!);
+      body = DataTree(controller: sessionMetadata.metadataController!);
     }
 
     return Column(

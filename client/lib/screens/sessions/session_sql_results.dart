@@ -1,10 +1,11 @@
+import 'package:client/core/conn.dart';
 import 'package:client/providers/session_sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/tab_widget.dart';
-import 'package:client/models/session_sql_result.dart';
+import 'package:client/repositories/session_sql_result.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/utils/reorder_list.dart';
@@ -14,7 +15,7 @@ class SqlResultTables extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SQLResultModel? sqlResult = ref.watch(sQLResultControllerProvider)!;
+    SQLResultModel? sqlResult = ref.watch(sQLResultControllerProvider);
     ReorderSelectedList<SQLResultModel> sqlResults =
         ref.watch(sQLResultTabControllerProvider);
 

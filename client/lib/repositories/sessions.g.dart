@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'model.dart';
+part of 'sessions.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$objectboxHash() => r'df8ef9590e00862907ac745977280e90aa28f36c';
+String _$sessionRepoHash() => r'c41c1ebe21ea28332c8c0113442f1f0484310b57';
 
-/// See also [objectbox].
-@ProviderFor(objectbox)
-final objectboxProvider = Provider<ObjectBox>.internal(
-  objectbox,
-  name: r'objectboxProvider',
+/// See also [sessionRepo].
+@ProviderFor(sessionRepo)
+final sessionRepoProvider = Provider<SessionRepo>.internal(
+  sessionRepo,
+  name: r'sessionRepoProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$objectboxHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$sessionRepoHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ObjectboxRef = ProviderRef<ObjectBox>;
+typedef SessionRepoRef = ProviderRef<SessionRepo>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

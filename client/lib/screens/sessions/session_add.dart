@@ -18,6 +18,10 @@ class AddSession extends HookConsumerWidget {
     instanceTableController.setCount(instancesProvider
         .instanceCount(instanceTableController.searchTextController.text));
 
+    final i1 = instancesProvider.activeInstances();
+    final i2 = instancesProvider.activeInstances();
+    print("i1 hashCode: ${i1.hashCode}; i2 hashCode: ${i2.hashCode}");
+
     return Container(
       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
       child: Row(
@@ -61,7 +65,8 @@ class AddSession extends HookConsumerWidget {
                             TextButton(
                                 onPressed: () {
                                   ref
-                                      .read(sessionTabProviderProvider.notifier)
+                                      .read(
+                                          sessionTabControllerProvider.notifier)
                                       .addSession(inst);
                                 },
                                 child: Text(
@@ -78,7 +83,7 @@ class AddSession extends HookConsumerWidget {
                         TextButton(
                           onPressed: () {
                             ref
-                                .read(sessionTabProviderProvider.notifier)
+                                .read(sessionTabControllerProvider.notifier)
                                 .addSession(inst, schema: schema);
                           },
                           child: Text(schema, overflow: TextOverflow.ellipsis),
@@ -152,7 +157,8 @@ class AddSession extends HookConsumerWidget {
                             TextButton(
                                 onPressed: () {
                                   ref
-                                      .read(sessionTabProviderProvider.notifier)
+                                      .read(
+                                          sessionTabControllerProvider.notifier)
                                       .addSession(inst);
                                 },
                                 child: Text(inst.connectValue.name,

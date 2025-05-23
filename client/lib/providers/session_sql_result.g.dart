@@ -6,6 +6,41 @@ part of 'session_sql_result.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$currentSQLResultsHash() => r'883d23be1841adca58d208fd76b6f04d178d1710';
+
+/// See also [currentSQLResults].
+@ProviderFor(currentSQLResults)
+final currentSQLResultsProvider =
+    Provider<ReorderSelectedList<SQLResultModel>>.internal(
+  currentSQLResults,
+  name: r'currentSQLResultsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentSQLResultsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CurrentSQLResultsRef = ProviderRef<ReorderSelectedList<SQLResultModel>>;
+String _$currentSQLResultHash() => r'ea6dcb2820de2d362fa6551a54833d08cc3eddf7';
+
+/// See also [currentSQLResult].
+@ProviderFor(currentSQLResult)
+final currentSQLResultProvider = Provider<SQLResultModel?>.internal(
+  currentSQLResult,
+  name: r'currentSQLResultProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentSQLResultHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CurrentSQLResultRef = ProviderRef<SQLResultModel?>;
 String _$sQLResultControllerHash() =>
     r'09511afedc7c8884b204db7f16b73a84df41df24';
 

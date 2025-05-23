@@ -1,6 +1,5 @@
 import 'package:client/models/interface.dart';
-import 'package:client/providers/model.dart';
-import 'package:client/models/sessions.dart';
+import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
@@ -14,18 +13,20 @@ class SessionBodyPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSession session = ref.watch(currentSessionProvider)!;
+    CurrentSessionEditor sessionEditor = ref.watch(sessionEditorControllerProvider)!;
+    CurrentSessionSplitView sessionSplitView = ref.watch(sessionSplitViewControllerProvider);
+    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider);
 
     final Widget left = Column(
       children: [
-        SessionOpBar(codeController: (session as Session).getSQLEditCode()),
+        SessionOpBar(codeController: sessionEditor.code),
         Expanded(
           child: SplitView(
-            controller: session.multiSplitViewCtrl,
+            controller: sessionSplitView.multiSplitViewCtrl,
             axis: Axis.vertical,
             first: SQLEditor(
-                key: ValueKey(session.getSQLEditCode()),
-                codeController: session.getSQLEditCode()),
+                key: ValueKey(sessionEditor.code),
+                codeController: sessionEditor.code),
             second: const SqlResultTables(),
           ),
         ),
@@ -34,10 +35,10 @@ class SessionBodyPage extends ConsumerWidget {
     return Container(
       alignment: Alignment.topLeft,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-      child: session.isRightPageOpen
+      child: sessionDrawer.isRightPageOpen
           ? SplitView(
               axis: Axis.horizontal,
-              controller: session.metaDataSplitViewCtrl,
+              controller: sessionSplitView.metaDataSplitViewCtrl,
               first: left,
               second: const SessionDrawerBody(),
             )

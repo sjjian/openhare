@@ -2,7 +2,7 @@ import 'package:client/screens/app.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:client/models/objectbox.dart';
+import 'package:client/repositories/repo.dart';
 
 void main() async {
   // This is required so ObjectBox can get the application directory

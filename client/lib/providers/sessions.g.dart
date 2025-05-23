@@ -6,59 +6,8 @@ part of 'sessions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionTabProviderHash() =>
-    r'a0bea35a0ded25838b92c8d47e945ac7e106ad6e';
-
-/// See also [SessionTabProvider].
-@ProviderFor(SessionTabProvider)
-final sessionTabProviderProvider = AutoDisposeNotifierProvider<
-    SessionTabProvider, ReorderSelectedList<BaseSession>>.internal(
-  SessionTabProvider.new,
-  name: r'sessionTabProviderProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sessionTabProviderHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SessionTabProvider
-    = AutoDisposeNotifier<ReorderSelectedList<BaseSession>>;
-String _$sessionConnControllerHash() =>
-    r'11d8bb1e04b702e7c635d4df6f519c91fcc88ad4';
-
-/// See also [SessionConnController].
-@ProviderFor(SessionConnController)
-final sessionConnControllerProvider =
-    AutoDisposeNotifierProvider<SessionConnController, SessionConn>.internal(
-  SessionConnController.new,
-  name: r'sessionConnControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sessionConnControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SessionConnController = AutoDisposeNotifier<SessionConn>;
-String _$sessionControllerHash() => r'c5997d36b8c860bb200beb43bbbbaee7322bc2e8';
-
-/// See also [SessionController].
-@ProviderFor(SessionController)
-final sessionControllerProvider =
-    AutoDisposeNotifierProvider<SessionController, CurrentSession>.internal(
-  SessionController.new,
-  name: r'sessionControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sessionControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SessionController = AutoDisposeNotifier<CurrentSession>;
 String _$sessionDrawerControllerHash() =>
-    r'032e05fb445d1d489805a2f5b3a65d0f274cb863';
+    r'2620fc4492f6c3f1871ecd8dee48d40506099d10';
 
 /// See also [SessionDrawerController].
 @ProviderFor(SessionDrawerController)
@@ -74,5 +23,90 @@ final sessionDrawerControllerProvider =
 );
 
 typedef _$SessionDrawerController = Notifier<CurrentSessionDrawer>;
+String _$sessionSplitViewControllerHash() =>
+    r'e72b25f9746278f7a3756c865c1ed12ac77ed278';
+
+/// See also [SessionSplitViewController].
+@ProviderFor(SessionSplitViewController)
+final sessionSplitViewControllerProvider = NotifierProvider<
+    SessionSplitViewController, CurrentSessionSplitView>.internal(
+  SessionSplitViewController.new,
+  name: r'sessionSplitViewControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionSplitViewControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SessionSplitViewController = Notifier<CurrentSessionSplitView>;
+String _$sessionMetadataControllerHash() =>
+    r'1088b46fb31f81888a183764e68fb933b4ec9604';
+
+/// See also [SessionMetadataController].
+@ProviderFor(SessionMetadataController)
+final sessionMetadataControllerProvider = NotifierProvider<
+    SessionMetadataController, CurrentSessionMetadata>.internal(
+  SessionMetadataController.new,
+  name: r'sessionMetadataControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionMetadataControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SessionMetadataController = Notifier<CurrentSessionMetadata>;
+String _$sessionEditorControllerHash() =>
+    r'3b88477b6b9d633a2ad60200e6e87bad35680cb0';
+
+/// See also [SessionEditorController].
+@ProviderFor(SessionEditorController)
+final sessionEditorControllerProvider =
+    NotifierProvider<SessionEditorController, CurrentSessionEditor>.internal(
+  SessionEditorController.new,
+  name: r'sessionEditorControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionEditorControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SessionEditorController = Notifier<CurrentSessionEditor>;
+String _$sessionTabControllerHash() =>
+    r'0795984b5e5d22fe334ee22623da2a9ce3d27d36';
+
+/// See also [SessionTabController].
+@ProviderFor(SessionTabController)
+final sessionTabControllerProvider =
+    AutoDisposeNotifierProvider<SessionTabController, SessionTab>.internal(
+  SessionTabController.new,
+  name: r'sessionTabControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionTabControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SessionTabController = AutoDisposeNotifier<SessionTab>;
+String _$selectedSessionIdControllerHash() =>
+    r'a8e40cb9bdd5ea1c5ff6a326d995adc43b0880a0';
+
+/// See also [SelectedSessionIdController].
+@ProviderFor(SelectedSessionIdController)
+final selectedSessionIdControllerProvider =
+    NotifierProvider<SelectedSessionIdController, SelectedSessionId>.internal(
+  SelectedSessionIdController.new,
+  name: r'selectedSessionIdControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedSessionIdControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedSessionIdController = Notifier<SelectedSessionId>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

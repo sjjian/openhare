@@ -1,81 +1,26 @@
+import 'package:client/core/conn.dart';
 import 'package:client/models/sessions.dart';
+import 'package:client/repositories/sessions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
-
-import 'package:client/models/instances.dart';
-import 'package:objectbox/objectbox.dart';
 import 'package:client/utils/reorder_list.dart';
-import 'package:client/models/session_sql_result.dart';
+import 'package:client/repositories/session_sql_result.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:flutter/material.dart';
 import 'package:sql_editor/re_editor.dart';
-import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
-import 'package:multi_split_view/multi_split_view.dart';
-import 'package:sql_parser/parser.dart';
 
 part 'interface.freezed.dart';
 
-abstract class SessionRepo {
-  ReorderSelectedList<BaseSession> getSessions();
-  // session
-  CurrentSession? currentSession(); 
-
-  SessionStorage getSession(int sessionId);
-  // void setCurrentSession(CurrentSession session);
-
-  // // session drawer
-  // CurrentSessionDrawer? getCurrentSessionDrawer();
-  // set currentSessionDrawer(CurrentSessionDrawer drawer);
-  // // session split view
-  // CurrentSessionSplitView get currentSessionSplitView;
-  // set currentSessionSplitView(CurrentSessionSplitView splitView);
-  // // session sql result
-  // CurrentSessionSQLResult get currentSessionSQLResult;
+@freezed
+abstract class SessionConnModel with _$SessionConnModel {
+  const factory SessionConnModel({
+    required SessionConn conn,
+  }) = _SessionConnModel;
 }
 
 @freezed
-abstract class SessionTabs  with _$SessionTabs {
-    const factory SessionTabs({
-    required String firstName,
-    required String lastName,
-    required int age,
-  }) = _SessionTabs;
-
-}
-
-@freezed
-abstract class SessionStatus  with _$SessionStatus {
-    const factory SessionStatus({
-    MetaDataNode? metadata,
-    TreeController<DataNode>? metadataController,
-  }) = _SessionStatus;
-}
-
-@freezed 
-abstract class CurrentSession with _$CurrentSession {
-  const factory CurrentSession({
-    required SessionStorage model,
-    BaseConnection? conn2,
-    required SQLConnectState state,
-    String? text,
-    String? currentSchema,
-  }) = _CurrentSession;
-}
-
-@freezed
-abstract class SessionConn with _$SessionConn {
-  const factory SessionConn({
-    required SessionStorage model,
-    BaseConnection? conn2,
-    required SQLConnectState state,
-    String? currentSchema,
-  }) = _SessionConn;
-}
-
-@freezed 
 abstract class CurrentSessionDrawer with _$CurrentSessionDrawer {
   const factory CurrentSessionDrawer({
     required DrawerPage drawerPage,
@@ -91,8 +36,6 @@ abstract class CurrentSessionSplitView with _$CurrentSessionSplitView {
   const factory CurrentSessionSplitView({
     required SplitViewController multiSplitViewCtrl,
     required SplitViewController metaDataSplitViewCtrl,
-    required CodeLineEditingController code,
-    required bool isRightPageOpen,
   }) = _CurrentSessionSplitView;
 }
 
@@ -104,3 +47,32 @@ abstract class CurrentSessionSQLResult with _$CurrentSessionSQLResult {
   }) = _CurrentSessionSQLResult;
 }
 
+@freezed
+abstract class CurrentSessionMetadata with _$CurrentSessionMetadata {
+  const factory CurrentSessionMetadata({
+    MetaDataNode? metadata,
+    TreeController<DataNode>? metadataController,
+  }) = _CurrentSessionMetadata;
+}
+
+@freezed
+abstract class CurrentSessionEditor with _$CurrentSessionEditor {
+  const factory CurrentSessionEditor({
+    required CodeLineEditingController code,
+  }) = _CurrentSessionEditor;
+}
+
+@freezed
+abstract class SelectedSessionId with _$SelectedSessionId {
+  const factory SelectedSessionId({
+    required int sessionId,
+    int? instanceId,
+  }) = _SelectedSessionId;
+}
+
+@freezed
+abstract class SessionTab with _$SessionTab {
+  const factory SessionTab({
+    required ReorderSelectedList<SessionStorage> sessions,
+  }) = _SessionTab;
+}

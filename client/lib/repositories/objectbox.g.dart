@@ -14,92 +14,92 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
-import '../models/instances.dart';
-import '../models/sessions.dart';
+import '../repositories/instances.dart';
+import '../repositories/sessions.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(1, 2337054309787130658),
+    id: const obx_int.IdUid(1, 7771770525022327494),
     name: 'InstanceModel',
-    lastPropertyId: const obx_int.IdUid(13, 6240731715311715320),
+    lastPropertyId: const obx_int.IdUid(13, 9103170210888742968),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 1068673039516140319),
+        id: const obx_int.IdUid(1, 4402971908614233426),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 2444282396815681296),
+        id: const obx_int.IdUid(2, 2557526817954957013),
         name: 'name',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 3819354148116989262),
+        id: const obx_int.IdUid(3, 1533736204012627434),
         name: 'host',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 1269356550240711578),
+        id: const obx_int.IdUid(4, 8657086904403898878),
         name: 'port',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 3083677470025788707),
+        id: const obx_int.IdUid(5, 7449270155428902133),
         name: 'user',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 5393863909825457828),
+        id: const obx_int.IdUid(6, 7099609988433500239),
         name: 'password',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(7, 8586016253506548755),
+        id: const obx_int.IdUid(7, 8699536140751700883),
         name: 'desc',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(8, 3561901691489447168),
+        id: const obx_int.IdUid(8, 6180271050918009273),
         name: 'initQuerys',
         type: 30,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(9, 5409374289286026809),
+        id: const obx_int.IdUid(9, 7938579034731173175),
         name: 'createdAt',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(10, 4182326172125869917),
+        id: const obx_int.IdUid(10, 5382849423225960488),
         name: 'latestOpenAt',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 8912672256894972030),
+        id: const obx_int.IdUid(11, 451105937567216074),
         name: 'stDbType',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(12, 3672922828336339035),
+        id: const obx_int.IdUid(12, 3794023625132426927),
         name: 'stCustom',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(13, 6240731715311715320),
+        id: const obx_int.IdUid(13, 9103170210888742968),
         name: 'stActiveSchemas',
         type: 30,
         flags: 0,
@@ -109,33 +109,33 @@ final _entities = <obx_int.ModelEntity>[
     backlinks: <obx_int.ModelBacklink>[],
   ),
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(3, 7441090307358647010),
+    id: const obx_int.IdUid(2, 4777369979113529251),
     name: 'SessionStorage',
-    lastPropertyId: const obx_int.IdUid(4, 8334821086287975041),
+    lastPropertyId: const obx_int.IdUid(4, 2576353234273015585),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 8760477999454096726),
+        id: const obx_int.IdUid(1, 6339393024853594017),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 7692203999183118092),
+        id: const obx_int.IdUid(2, 2012876000864412152),
         name: 'instanceId',
         type: 11,
         flags: 520,
-        indexId: const obx_int.IdUid(2, 708832223320989491),
+        indexId: const obx_int.IdUid(1, 5329851757416928171),
         relationTarget: 'InstanceModel',
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 6684081352487788395),
+        id: const obx_int.IdUid(3, 3055836543278863247),
         name: 'text',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 8334821086287975041),
+        id: const obx_int.IdUid(4, 2576353234273015585),
         name: 'currentSchema',
         type: 9,
         flags: 0,
@@ -184,18 +184,13 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(3, 7441090307358647010),
-    lastIndexId: const obx_int.IdUid(2, 708832223320989491),
+    lastEntityId: const obx_int.IdUid(2, 4777369979113529251),
+    lastIndexId: const obx_int.IdUid(1, 5329851757416928171),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
-    retiredEntityUids: const [2551589113259349744],
+    retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [
-      4656797399256525930,
-      5364523647379872428,
-      5365713597779821200,
-      5614951218081375489,
-    ],
+    retiredPropertyUids: const [],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
