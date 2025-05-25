@@ -127,7 +127,8 @@ class ConnManager {
 }
 
 enum SQLConnectState { pending, connecting, connected, failed }
-enum SQLExecuteState {init, executing, done, error }
+
+enum SQLExecuteState { init, executing, done, error }
 
 class SessionConn {
   final SessionStorage model;
@@ -135,7 +136,7 @@ class SessionConn {
   SQLConnectState state = SQLConnectState.pending;
   SQLExecuteState queryState = SQLExecuteState.init;
   String? currentSchema;
-  
+
   SessionConn({
     required this.model,
     this.currentSchema,
@@ -174,6 +175,18 @@ class SessionConn {
   bool canQuery() {
     return (queryState != SQLExecuteState.executing &&
         state == SQLConnectState.connected);
+  }
+
+  Future<BaseQueryResult?> query(String query) async {
+    try {
+      queryState = SQLExecuteState.executing;
+      BaseQueryResult queryResult = await conn2!.query(query);
+      return queryResult;
+    } catch (e) {
+      rethrow;
+    } finally {
+      queryState = SQLExecuteState.init;
+    }
   }
 
   Future<void> onSchemaChanged(String schema) async {

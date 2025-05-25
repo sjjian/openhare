@@ -42,7 +42,7 @@ abstract class CurrentSessionSplitView with _$CurrentSessionSplitView {
 @freezed
 abstract class CurrentSessionSQLResult with _$CurrentSessionSQLResult {
   const factory CurrentSessionSQLResult({
-    required ReorderSelectedList<SQLResultModel> sqlResults,
+    required ReorderSelectedList<SQLResult> sqlResults,
     required SQLExecuteState? queryState,
   }) = _CurrentSessionSQLResult;
 }

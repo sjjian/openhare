@@ -13,7 +13,8 @@ part 'sessions.g.dart';
 class SessionDrawerController extends _$SessionDrawerController {
   @override
   CurrentSessionDrawer build() {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider)!;
     return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
   }
 
@@ -63,7 +64,8 @@ class SessionDrawerController extends _$SessionDrawerController {
 class SessionSplitViewController extends _$SessionSplitViewController {
   @override
   CurrentSessionSplitView build() {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider)!;
     return ref.watch(sessionSplitViewStateProvider(sessionIdModel.sessionId));
   }
 }
@@ -72,7 +74,8 @@ class SessionSplitViewController extends _$SessionSplitViewController {
 class SessionMetadataController extends _$SessionMetadataController {
   @override
   CurrentSessionMetadata build() {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider)!;
     return ref.watch(sessionMetadataStateProvider(sessionIdModel.sessionId));
   }
 }
@@ -81,7 +84,8 @@ class SessionMetadataController extends _$SessionMetadataController {
 class SessionEditorController extends _$SessionEditorController {
   @override
   CurrentSessionEditor build() {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider)!;
     return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
   }
 }
@@ -130,7 +134,6 @@ class SessionTabController extends _$SessionTabController {
     // refresh
     state = state.copyWith(sessions: state.sessions);
 
-
     // ref.invalidate(sessionsRepoProvider);
     // ref.invalidateSelf();
     // ref.invalidate(sessionRepoProvider);
@@ -159,17 +162,19 @@ class SessionTabController extends _$SessionTabController {
 class SelectedSessionIdController extends _$SelectedSessionIdController {
   @override
   SelectedSessionId build() {
-    int sessionId =
-        ref.watch(sessionTabControllerProvider.select((s){
-          if (s.sessions.selected() == null || s.sessions.selected()!.instance.target == null) {
-            return 0;
-          }
-          return s.sessions.selected()!.id;
-        }));
+    int sessionId = ref.watch(sessionTabControllerProvider.select((s) {
+      if (s.sessions.selected() == null ||
+          s.sessions.selected()!.instance.target == null) {
+        return 0;
+      }
+      return s.sessions.selected()!.id;
+    }));
     if (sessionId == 0) {
       return const SelectedSessionId(sessionId: 0, instanceId: 0);
     }
-    SessionStorage session = ref.read(sessionRepoProvider).getSession(sessionId)!; 
-    return SelectedSessionId(sessionId: sessionId, instanceId: session.instance.target?.id);
+    SessionStorage session =
+        ref.read(sessionRepoProvider).getSession(sessionId)!;
+    return SelectedSessionId(
+        sessionId: sessionId, instanceId: session.instance.target?.id);
   }
 }

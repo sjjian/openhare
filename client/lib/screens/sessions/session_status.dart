@@ -21,7 +21,7 @@ class SessionStatusTab extends ConsumerWidget {
         height: 30,
       );
     }
-    SQLResultModel? sqlResult = ref.watch(sQLResultControllerProvider);
+    SQLResult? sqlResult = ref.watch(sQLResultControllerProvider);
     SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId));
     // todo: 采用更通用的形式
     if (sqlResult == null) {

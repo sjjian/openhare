@@ -7,19 +7,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_sql_result.g.dart';
 
-abstract class SQLResultRepo {
-  ReorderSelectedList<SQLResultModel> sessionSqlResults(int sessionId);
-  // session
-  SQLResultModel? current(int sessionId); 
-
-  void add(int sessionId, SQLResultModel sqlResult);
-}
-
-class SQLResults implements SQLResultRepo {
-  Map<int, ReorderSelectedList<SQLResultModel>> sqlResults = {};
+class SQLResultRepo {
+  Map<int, ReorderSelectedList<SQLResult>> sqlResults = {};
 
   @override
-  ReorderSelectedList<SQLResultModel> sessionSqlResults(int sessionId) {
+  ReorderSelectedList<SQLResult> sessionSqlResults(int sessionId) {
     if (!sqlResults.containsKey(sessionId)) {
       sqlResults[sessionId] = ReorderSelectedList();
     }
@@ -27,17 +19,21 @@ class SQLResults implements SQLResultRepo {
   }
 
   @override
-  SQLResultModel? current(int sessionId) {
+  SQLResult? current(int sessionId) {
     return sessionSqlResults(sessionId).selected();
   }
 
+  void updateSQLResult(int sessionId, int index, SQLResult result) {
+    sessionSqlResults(sessionId).replace(origin, target)
+  }
+
   @override
-  void add(int sessionId, SQLResultModel sqlResult) {
+  void add(int sessionId, SQLResult sqlResult) {
     sessionSqlResults(sessionId).add(sqlResult);
   }
 }
 
-class SQLResultModel {
+class SQLResult {
   int id;
   SQLExecuteState state = SQLExecuteState.executing;
   String query;
@@ -47,7 +43,7 @@ class SQLResultModel {
   Duration? executeTime;
   int affectedRows = 0;
 
-  SQLResultModel(this.id, this.query);
+  SQLResult(this.id, this.query);
 
   void setDone(List<BaseQueryColumn> columns, List<QueryResultRow> rows, Duration executeTime, int affectedRows) {
     this.columns = columns;
@@ -79,5 +75,5 @@ class SQLResultModel {
 
 @Riverpod(keepAlive: true)
 SQLResultRepo sqlResultsRepo(Ref ref) {
-  return SQLResults();
+  return SQLResultRepo();
 }

@@ -15,8 +15,8 @@ class SqlResultTables extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SQLResultModel? sqlResult = ref.watch(sQLResultControllerProvider);
-    ReorderSelectedList<SQLResultModel> sqlResults =
+    SQLResult? sqlResult = ref.watch(sQLResultControllerProvider);
+    ReorderSelectedList<SQLResult> sqlResults =
         ref.watch(sQLResultTabControllerProvider);
 
     CommonTabStyle style = CommonTabStyle(
@@ -134,7 +134,7 @@ class SqlResultTable extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-   SQLResultModel? sqlResult = ref.watch(sQLResultControllerProvider);
+   SQLResult? sqlResult = ref.watch(sQLResultControllerProvider);
 
     final color = Theme.of(context)
         .colorScheme

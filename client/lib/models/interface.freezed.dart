@@ -580,7 +580,7 @@ class __$CurrentSessionSplitViewCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$CurrentSessionSQLResult implements DiagnosticableTreeMixin {
-  ReorderSelectedList<SQLResultModel> get sqlResults;
+  ReorderSelectedList<SQLResult> get sqlResults;
   SQLExecuteState? get queryState;
 
   /// Create a copy of CurrentSessionSQLResult
@@ -627,7 +627,7 @@ abstract mixin class $CurrentSessionSQLResultCopyWith<$Res> {
       _$CurrentSessionSQLResultCopyWithImpl;
   @useResult
   $Res call(
-      {ReorderSelectedList<SQLResultModel> sqlResults,
+      {ReorderSelectedList<SQLResult> sqlResults,
       SQLExecuteState? queryState});
 }
 
@@ -651,7 +651,7 @@ class _$CurrentSessionSQLResultCopyWithImpl<$Res>
       sqlResults: null == sqlResults
           ? _self.sqlResults
           : sqlResults // ignore: cast_nullable_to_non_nullable
-              as ReorderSelectedList<SQLResultModel>,
+              as ReorderSelectedList<SQLResult>,
       queryState: freezed == queryState
           ? _self.queryState
           : queryState // ignore: cast_nullable_to_non_nullable
@@ -669,7 +669,7 @@ class _CurrentSessionSQLResult
       {required this.sqlResults, required this.queryState});
 
   @override
-  final ReorderSelectedList<SQLResultModel> sqlResults;
+  final ReorderSelectedList<SQLResult> sqlResults;
   @override
   final SQLExecuteState? queryState;
 
@@ -720,7 +720,7 @@ abstract mixin class _$CurrentSessionSQLResultCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {ReorderSelectedList<SQLResultModel> sqlResults,
+      {ReorderSelectedList<SQLResult> sqlResults,
       SQLExecuteState? queryState});
 }
 
@@ -744,7 +744,7 @@ class __$CurrentSessionSQLResultCopyWithImpl<$Res>
       sqlResults: null == sqlResults
           ? _self.sqlResults
           : sqlResults // ignore: cast_nullable_to_non_nullable
-              as ReorderSelectedList<SQLResultModel>,
+              as ReorderSelectedList<SQLResult>,
       queryState: freezed == queryState
           ? _self.queryState
           : queryState // ignore: cast_nullable_to_non_nullable

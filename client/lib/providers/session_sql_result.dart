@@ -8,7 +8,7 @@ import 'package:client/utils/reorder_list.dart';
 part 'session_sql_result.g.dart';
 
 @Riverpod(keepAlive: true)
-ReorderSelectedList<SQLResultModel> currentSQLResults(Ref ref) {
+ReorderSelectedList<SQLResult> currentSQLResults(Ref ref) {
    SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdControllerProvider);
   if (sessionIdModel == null) {
     return ReorderSelectedList();
@@ -19,7 +19,7 @@ ReorderSelectedList<SQLResultModel> currentSQLResults(Ref ref) {
 
 
 @Riverpod(keepAlive: true)
-SQLResultModel? currentSQLResult(Ref ref) {
+SQLResult? currentSQLResult(Ref ref) {
   SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdControllerProvider);
   if (sessionIdModel == null) {
     return null;
@@ -32,7 +32,7 @@ SQLResultModel? currentSQLResult(Ref ref) {
 @Riverpod(keepAlive: true)
 class SQLResultController extends _$SQLResultController {
   @override
-  SQLResultModel? build() {
+  SQLResult? build() {
     return ref.watch(currentSQLResultProvider);
   }
 }
@@ -40,7 +40,7 @@ class SQLResultController extends _$SQLResultController {
 @Riverpod(keepAlive: true)
 class SQLResultTabController extends _$SQLResultTabController {
   @override
-  ReorderSelectedList<SQLResultModel> build() {
+  ReorderSelectedList<SQLResult> build() {
     return ref.watch(currentSQLResultsProvider);
   }
 
