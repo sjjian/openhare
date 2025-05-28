@@ -1,7 +1,5 @@
 
 import 'package:client/models/interface.dart';
-import 'package:client/repositories/session_sql_result.dart';
-import 'package:client/repositories/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:client/utils/sql_highlight.dart';

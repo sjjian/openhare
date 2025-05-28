@@ -52,7 +52,6 @@ class SQLEditor extends ConsumerWidget {
     CurrentSessionMetadata sessionMeta = ref.watch(sessionMetadataControllerProvider);
     SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId));
 
-    print("session editor build: ${sessionIdModel.sessionId}");
     MetaDataNode? metadata = sessionMeta.metadata;
     String? currentSchema = sessionConnModel.conn.currentSchema;
 

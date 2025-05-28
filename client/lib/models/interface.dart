@@ -40,14 +40,6 @@ abstract class CurrentSessionSplitView with _$CurrentSessionSplitView {
 }
 
 @freezed
-abstract class CurrentSessionSQLResult with _$CurrentSessionSQLResult {
-  const factory CurrentSessionSQLResult({
-    required ReorderSelectedList<SQLResult> sqlResults,
-    required SQLExecuteState? queryState,
-  }) = _CurrentSessionSQLResult;
-}
-
-@freezed
 abstract class CurrentSessionMetadata with _$CurrentSessionMetadata {
   const factory CurrentSessionMetadata({
     MetaDataNode? metadata,
@@ -75,4 +67,20 @@ abstract class SessionTab with _$SessionTab {
   const factory SessionTab({
     required ReorderSelectedList<SessionStorage> sessions,
   }) = _SessionTab;
+}
+
+@freezed
+abstract class SQLResultsModel with _$SQLResultsModel {
+  const factory SQLResultsModel({
+    required int sessionId,
+    required ReorderSelectedList<SQLResult> sqlResults,
+  }) = _SQLResultsModel;
+}
+
+@freezed
+abstract class SQLResultModel with _$SQLResultModel {
+  const factory SQLResultModel({
+    required int sessionId,
+    required SQLResult result,
+  }) = _SQLResultModel;
 }

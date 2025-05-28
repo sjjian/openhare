@@ -7,7 +7,7 @@ part of 'session_conn.dart';
 // **************************************************************************
 
 String _$sessionConnControllerHash() =>
-    r'4981c9d121f7ba0eb7c14996ccb714c22331f524';
+    r'7801c5a2148c19e6a95b08f2da8b7c82cfbbf603';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,7 +31,7 @@ class _SystemHash {
 }
 
 abstract class _$SessionConnController
-    extends BuildlessAutoDisposeNotifier<SessionConnModel> {
+    extends BuildlessNotifier<SessionConnModel> {
   late final int sessionId;
 
   SessionConnModel build(
@@ -82,8 +82,8 @@ class SessionConnControllerFamily extends Family<SessionConnModel> {
 }
 
 /// See also [SessionConnController].
-class SessionConnControllerProvider extends AutoDisposeNotifierProviderImpl<
-    SessionConnController, SessionConnModel> {
+class SessionConnControllerProvider
+    extends NotifierProviderImpl<SessionConnController, SessionConnModel> {
   /// See also [SessionConnController].
   SessionConnControllerProvider(
     int sessionId,
@@ -139,7 +139,7 @@ class SessionConnControllerProvider extends AutoDisposeNotifierProviderImpl<
   }
 
   @override
-  AutoDisposeNotifierProviderElement<SessionConnController, SessionConnModel>
+  NotifierProviderElement<SessionConnController, SessionConnModel>
       createElement() {
     return _SessionConnControllerProviderElement(this);
   }
@@ -161,19 +161,36 @@ class SessionConnControllerProvider extends AutoDisposeNotifierProviderImpl<
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionConnControllerRef
-    on AutoDisposeNotifierProviderRef<SessionConnModel> {
+mixin SessionConnControllerRef on NotifierProviderRef<SessionConnModel> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
 class _SessionConnControllerProviderElement
-    extends AutoDisposeNotifierProviderElement<SessionConnController,
-        SessionConnModel> with SessionConnControllerRef {
+    extends NotifierProviderElement<SessionConnController, SessionConnModel>
+    with SessionConnControllerRef {
   _SessionConnControllerProviderElement(super.provider);
 
   @override
   int get sessionId => (origin as SessionConnControllerProvider).sessionId;
 }
+
+String _$selectedSessionConnControllerHash() =>
+    r'a22e0176f9f1baa3cf0f91c50192dcee0d58beb5';
+
+/// See also [SelectedSessionConnController].
+@ProviderFor(SelectedSessionConnController)
+final selectedSessionConnControllerProvider =
+    NotifierProvider<SelectedSessionConnController, SessionConnModel?>.internal(
+  SelectedSessionConnController.new,
+  name: r'selectedSessionConnControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedSessionConnControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedSessionConnController = Notifier<SessionConnModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

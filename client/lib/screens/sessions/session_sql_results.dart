@@ -1,23 +1,21 @@
 import 'package:client/core/conn.dart';
+import 'package:client/models/interface.dart';
 import 'package:client/providers/session_sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/tab_widget.dart';
-import 'package:client/repositories/session_sql_result.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:client/utils/reorder_list.dart';
 
 class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SQLResult? sqlResult = ref.watch(sQLResultControllerProvider);
-    ReorderSelectedList<SQLResult> sqlResults =
-        ref.watch(sQLResultTabControllerProvider);
+    SQLResultsModel? sqlResultsModel =
+        ref.watch(selectedSQLResultTabControllerProvider);
 
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
@@ -32,12 +30,8 @@ class SqlResultTables extends ConsumerWidget {
           .surfaceContainer, // sql result tab 的鼠标移入色
     );
 
-    // final results = sqlResults.getAllSQLResult();
-    // final currentResult = session.getCurrentSQLResult();
-    // final showRecord = session.showRecord;
-
     Widget tab;
-    if (sqlResults.isEmpty) {
+    if (sqlResultsModel == null) {
       tab = const Spacer();
     } else {
       tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -56,18 +50,31 @@ class SqlResultTables extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.surfaceContainer,
                 tabStyle: style,
                 onReorder: (oldIndex, newIndex) {
-                  ref.read(sQLResultTabControllerProvider.notifier).reorderSQLResult(oldIndex, newIndex);
+                  ref
+                      .read(sQLResultTabControllerProvider(
+                              sqlResultsModel.sessionId)
+                          .notifier)
+                      .reorderSQLResult(oldIndex, newIndex);
                 },
                 tabs: [
-              for (var i = 0; i < sqlResults.length; i++)
+              for (var i = 0; i < sqlResultsModel.sqlResults.length; i++)
                 CommonTabWrap(
-                  label: "${sqlResults[i].id + 1}",
-                  selected: sqlResults[i] == sqlResult,
+                  label: "${sqlResultsModel.sqlResults[i].id + 1}",
+                  selected: sqlResultsModel.sqlResults
+                      .isSelected(sqlResultsModel.sqlResults[i]),
                   onTap: () {
-                    ref.read(sQLResultTabControllerProvider.notifier).selectSQLResultByIndex(i);
+                    ref
+                        .read(sQLResultTabControllerProvider(
+                                sqlResultsModel.sessionId)
+                            .notifier)
+                        .selectSQLResultByIndex(i);
                   },
                   onDeleted: () {
-                    ref.read(sQLResultTabControllerProvider.notifier).deleteSQLResultByIndex(i);
+                    ref
+                        .read(sQLResultTabControllerProvider(
+                                sqlResultsModel.sessionId)
+                            .notifier)
+                        .deleteSQLResultByIndex(i);
                   },
                   avatar: const Icon(
                     Icons.grid_on,
@@ -134,33 +141,29 @@ class SqlResultTable extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-   SQLResult? sqlResult = ref.watch(sQLResultControllerProvider);
-
     final color = Theme.of(context)
         .colorScheme
         .surfaceContainerLow; // sql result body 的背景色
 
-    if (sqlResult == null) {
-      return Container(
-          alignment: Alignment.center, color: color, child: const Text('执行记录'));
-    }
-    if (sqlResult == null) {
+    SQLResultModel? sqlResultModel =
+        ref.watch(selectedSQLResultControllerProvider);
+    if (sqlResultModel == null) {
       return Container(
           alignment: Alignment.center,
           color: color,
           child: const Text('no data'));
     }
-    if (sqlResult.state == SQLExecuteState.done) {
+    if (sqlResultModel.result.state == SQLExecuteState.done) {
       return PlutoGrid(
-        key: ObjectKey(sqlResult),
+        key: ObjectKey(sqlResultModel.result),
         mode: PlutoGridMode.selectWithOneTap,
         onSelected: (event) {
           ref.read(sessionDrawerControllerProvider.notifier).showSQLResult(
-            result: sqlResult.rows![event.rowIdx!]
-                .getValue(event.cell!.column.title),
-            column: sqlResult.rows![event.rowIdx!]
-                .getColumn(event.cell!.column.title),
-          );
+                result: sqlResultModel.result.data!.rows[event.rowIdx!]
+                    .getValue(event.cell!.column.title),
+                column: sqlResultModel.result.data!.rows[event.rowIdx!]
+                    .getColumn(event.cell!.column.title),
+              );
         },
         configuration: PlutoGridConfiguration(
           localeText: const PlutoGridLocaleText.china(),
@@ -175,14 +178,14 @@ class SqlResultTable extends ConsumerWidget {
             gridBackgroundColor: color,
           ),
         ),
-        columns: buildColumns(sqlResult.columns!),
-        rows: buildRows(sqlResult.rows!),
+        columns: buildColumns(sqlResultModel.result.data!.columns),
+        rows: buildRows(sqlResultModel.result.data!.rows),
       );
-    } else if (sqlResult.state == SQLExecuteState.error) {
+    } else if (sqlResultModel.result.state == SQLExecuteState.error) {
       return Container(
           alignment: Alignment.topLeft,
           color: color,
-          child: Text('${sqlResult.error}'));
+          child: Text('${sqlResultModel.result.error}'));
     } else {
       return Container(
           alignment: Alignment.topLeft,

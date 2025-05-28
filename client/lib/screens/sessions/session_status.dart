@@ -6,7 +6,6 @@ import 'package:client/providers/sessions.dart';
 import 'package:client/providers/session_conn.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:client/repositories/session_sql_result.dart';
 import 'package:client/utils/duration_extend.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,40 +14,41 @@ class SessionStatusTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // todo: 删除
     SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider);
     if (sessionIdModel.instanceId == null || sessionIdModel.sessionId == 0) {
       return Container(
         height: 30,
       );
     }
-    SQLResult? sqlResult = ref.watch(sQLResultControllerProvider);
+    SQLResultModel? sqlResultModel = ref.watch(selectedSQLResultControllerProvider);
     SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId));
     // todo: 采用更通用的形式
-    if (sqlResult == null) {
+    if (sqlResultModel == null) {
       return Container(
         height: 30,
       );
     }
-    if (sqlResult.state == SQLExecuteState.done) {
+    if (sqlResultModel.result.state == SQLExecuteState.done) {
       return Container(
         padding: const EdgeInsets.only(left: 5),
         height: 30,
         child: Row(
           children: [
             Tooltip(
-                message: 'effect rows: ${sqlResult.affectedRows}',
-                child: Text('effect rows: ${sqlResult.affectedRows}')),
+                message: 'effect rows: ${sqlResultModel.result.data!.affectedRows}',
+                child: Text('effect rows: ${sqlResultModel.result.data!.affectedRows}')),
             const Text("  |  "),
             Tooltip(
-                message: 'duration: ${sqlResult.executeTime!.format()}',
-                child: Text('duration: ${sqlResult.executeTime!.format()}')),
+                message: 'duration: ${sqlResultModel.result.executeTime!.format()}',
+                child: Text('duration: ${sqlResultModel.result.executeTime!.format()}')),
             const Text("  |  "),
             Tooltip(
-              message: sqlResult.query,
+              message: sqlResultModel.result.query,
               child: SizedBox(
                   width: 200,
                   child: Text(
-                      "query: ${sqlResult.query.trimLeft().split("\n")[0]}",
+                      "query: ${sqlResultModel.result.query!.trimLeft().split("\n")[0]}",
                       overflow: TextOverflow.ellipsis)),
             ),
             const Text("  |  "),
@@ -63,7 +63,7 @@ class SessionStatusTab extends ConsumerWidget {
                     return;
                   }
                   File file = File(outputFile);
-                  await file.writeAsBytes(sqlResult.toExcel().save()!);
+                  await file.writeAsBytes(sqlResultModel.result.toExcel().save()!);
                 },
                 icon: const Icon(
                   Icons.download_rounded,

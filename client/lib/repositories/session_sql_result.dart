@@ -10,7 +10,16 @@ part 'session_sql_result.g.dart';
 class SQLResultRepo {
   Map<int, ReorderSelectedList<SQLResult>> sqlResults = {};
 
-  @override
+  int genSQLResultId(int sessionId) {
+    return sessionSqlResults(sessionId).isEmpty
+        ? 0
+        : sessionSqlResults(sessionId).fold(
+                0,
+                (previousId, element) =>
+                    previousId < element.id ? element.id : previousId) +
+            1;
+  }
+
   ReorderSelectedList<SQLResult> sessionSqlResults(int sessionId) {
     if (!sqlResults.containsKey(sessionId)) {
       sqlResults[sessionId] = ReorderSelectedList();
@@ -18,38 +27,55 @@ class SQLResultRepo {
     return sqlResults[sessionId]!;
   }
 
-  @override
-  SQLResult? current(int sessionId) {
+  SQLResult getReuslt(int sessionId, int resultId) {
+    return sessionSqlResults(sessionId)
+        .where(
+          (element) => element.id == resultId,
+        )
+        .first;
+  }
+
+  void select(int sessionId, int index) {
+    sessionSqlResults(sessionId).select(index);
+  }
+
+  void reorder(int sessionId, int oldIndex, int newIndex) {
+    sessionSqlResults(sessionId).reorder(oldIndex, newIndex);
+  }
+
+  SQLResult? selected(int sessionId) {
     return sessionSqlResults(sessionId).selected();
   }
 
-  void updateSQLResult(int sessionId, int index, SQLResult result) {
-    sessionSqlResults(sessionId).replace(origin, target)
+  void update(int sessionId, int index, SQLResult result) {
+    sessionSqlResults(sessionId)
+        .replace(sessionSqlResults(sessionId).selected()!, result);
   }
 
-  @override
-  void add(int sessionId, SQLResult sqlResult) {
-    sessionSqlResults(sessionId).add(sqlResult);
+  void newSQLResult(int sessionId) {
+    SQLResult result = SQLResult(genSQLResultId(sessionId), sessionId);
+    sessionSqlResults(sessionId).add(result);
+  }
+
+  void remove(int sessionId, int index) {
+    sessionSqlResults(sessionId).removeAt(index);
   }
 }
 
 class SQLResult {
+  int sessionId;
   int id;
+  String? query;
   SQLExecuteState state = SQLExecuteState.executing;
-  String query;
   String? error;
-  List<BaseQueryColumn>? columns;
-  List<QueryResultRow>? rows;
+  BaseQueryResult? data;
   Duration? executeTime;
-  int affectedRows = 0;
 
-  SQLResult(this.id, this.query);
+  SQLResult(this.id, this.sessionId);
 
-  void setDone(List<BaseQueryColumn> columns, List<QueryResultRow> rows, Duration executeTime, int affectedRows) {
-    this.columns = columns;
-    this.rows = rows;
+  void setDone(BaseQueryResult data, Duration executeTime) {
+    this.data = data;
     this.executeTime = executeTime;
-    this.affectedRows = affectedRows;
     state = SQLExecuteState.done;
   }
 
@@ -61,10 +87,10 @@ class SQLResult {
   Excel toExcel() {
     Excel excel = Excel.createExcel();
     Sheet sheet = excel["Sheet1"];
-    sheet.appendRow(columns!
+    sheet.appendRow(data!.columns
         .map<TextCellValue>((e) => TextCellValue(e.name))
         .toList());
-    for (final row in rows!) {
+    for (final row in data!.rows) {
       sheet.appendRow(row.values
           .map<TextCellValue>((e) => TextCellValue(e.getString() ?? ''))
           .toList());

@@ -579,181 +579,6 @@ class __$CurrentSessionSplitViewCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$CurrentSessionSQLResult implements DiagnosticableTreeMixin {
-  ReorderSelectedList<SQLResult> get sqlResults;
-  SQLExecuteState? get queryState;
-
-  /// Create a copy of CurrentSessionSQLResult
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $CurrentSessionSQLResultCopyWith<CurrentSessionSQLResult> get copyWith =>
-      _$CurrentSessionSQLResultCopyWithImpl<CurrentSessionSQLResult>(
-          this as CurrentSessionSQLResult, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'CurrentSessionSQLResult'))
-      ..add(DiagnosticsProperty('sqlResults', sqlResults))
-      ..add(DiagnosticsProperty('queryState', queryState));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is CurrentSessionSQLResult &&
-            const DeepCollectionEquality()
-                .equals(other.sqlResults, sqlResults) &&
-            (identical(other.queryState, queryState) ||
-                other.queryState == queryState));
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(sqlResults), queryState);
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CurrentSessionSQLResult(sqlResults: $sqlResults, queryState: $queryState)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $CurrentSessionSQLResultCopyWith<$Res> {
-  factory $CurrentSessionSQLResultCopyWith(CurrentSessionSQLResult value,
-          $Res Function(CurrentSessionSQLResult) _then) =
-      _$CurrentSessionSQLResultCopyWithImpl;
-  @useResult
-  $Res call(
-      {ReorderSelectedList<SQLResult> sqlResults,
-      SQLExecuteState? queryState});
-}
-
-/// @nodoc
-class _$CurrentSessionSQLResultCopyWithImpl<$Res>
-    implements $CurrentSessionSQLResultCopyWith<$Res> {
-  _$CurrentSessionSQLResultCopyWithImpl(this._self, this._then);
-
-  final CurrentSessionSQLResult _self;
-  final $Res Function(CurrentSessionSQLResult) _then;
-
-  /// Create a copy of CurrentSessionSQLResult
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? sqlResults = null,
-    Object? queryState = freezed,
-  }) {
-    return _then(_self.copyWith(
-      sqlResults: null == sqlResults
-          ? _self.sqlResults
-          : sqlResults // ignore: cast_nullable_to_non_nullable
-              as ReorderSelectedList<SQLResult>,
-      queryState: freezed == queryState
-          ? _self.queryState
-          : queryState // ignore: cast_nullable_to_non_nullable
-              as SQLExecuteState?,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _CurrentSessionSQLResult
-    with DiagnosticableTreeMixin
-    implements CurrentSessionSQLResult {
-  const _CurrentSessionSQLResult(
-      {required this.sqlResults, required this.queryState});
-
-  @override
-  final ReorderSelectedList<SQLResult> sqlResults;
-  @override
-  final SQLExecuteState? queryState;
-
-  /// Create a copy of CurrentSessionSQLResult
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$CurrentSessionSQLResultCopyWith<_CurrentSessionSQLResult> get copyWith =>
-      __$CurrentSessionSQLResultCopyWithImpl<_CurrentSessionSQLResult>(
-          this, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'CurrentSessionSQLResult'))
-      ..add(DiagnosticsProperty('sqlResults', sqlResults))
-      ..add(DiagnosticsProperty('queryState', queryState));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _CurrentSessionSQLResult &&
-            const DeepCollectionEquality()
-                .equals(other.sqlResults, sqlResults) &&
-            (identical(other.queryState, queryState) ||
-                other.queryState == queryState));
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(sqlResults), queryState);
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CurrentSessionSQLResult(sqlResults: $sqlResults, queryState: $queryState)';
-  }
-}
-
-/// @nodoc
-abstract mixin class _$CurrentSessionSQLResultCopyWith<$Res>
-    implements $CurrentSessionSQLResultCopyWith<$Res> {
-  factory _$CurrentSessionSQLResultCopyWith(_CurrentSessionSQLResult value,
-          $Res Function(_CurrentSessionSQLResult) _then) =
-      __$CurrentSessionSQLResultCopyWithImpl;
-  @override
-  @useResult
-  $Res call(
-      {ReorderSelectedList<SQLResult> sqlResults,
-      SQLExecuteState? queryState});
-}
-
-/// @nodoc
-class __$CurrentSessionSQLResultCopyWithImpl<$Res>
-    implements _$CurrentSessionSQLResultCopyWith<$Res> {
-  __$CurrentSessionSQLResultCopyWithImpl(this._self, this._then);
-
-  final _CurrentSessionSQLResult _self;
-  final $Res Function(_CurrentSessionSQLResult) _then;
-
-  /// Create a copy of CurrentSessionSQLResult
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? sqlResults = null,
-    Object? queryState = freezed,
-  }) {
-    return _then(_CurrentSessionSQLResult(
-      sqlResults: null == sqlResults
-          ? _self.sqlResults
-          : sqlResults // ignore: cast_nullable_to_non_nullable
-              as ReorderSelectedList<SQLResult>,
-      queryState: freezed == queryState
-          ? _self.queryState
-          : queryState // ignore: cast_nullable_to_non_nullable
-              as SQLExecuteState?,
-    ));
-  }
-}
-
-/// @nodoc
 mixin _$CurrentSessionMetadata implements DiagnosticableTreeMixin {
   MetaDataNode? get metadata;
   TreeController<DataNode>? get metadataController;
@@ -1376,6 +1201,336 @@ class __$SessionTabCopyWithImpl<$Res> implements _$SessionTabCopyWith<$Res> {
           ? _self.sessions
           : sessions // ignore: cast_nullable_to_non_nullable
               as ReorderSelectedList<SessionStorage>,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$SQLResultsModel implements DiagnosticableTreeMixin {
+  int get sessionId;
+  ReorderSelectedList<SQLResult> get sqlResults;
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SQLResultsModelCopyWith<SQLResultsModel> get copyWith =>
+      _$SQLResultsModelCopyWithImpl<SQLResultsModel>(
+          this as SQLResultsModel, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SQLResultsModel'))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('sqlResults', sqlResults));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SQLResultsModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            const DeepCollectionEquality()
+                .equals(other.sqlResults, sqlResults));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, sessionId, const DeepCollectionEquality().hash(sqlResults));
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SQLResultsModel(sessionId: $sessionId, sqlResults: $sqlResults)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SQLResultsModelCopyWith<$Res> {
+  factory $SQLResultsModelCopyWith(
+          SQLResultsModel value, $Res Function(SQLResultsModel) _then) =
+      _$SQLResultsModelCopyWithImpl;
+  @useResult
+  $Res call({int sessionId, ReorderSelectedList<SQLResult> sqlResults});
+}
+
+/// @nodoc
+class _$SQLResultsModelCopyWithImpl<$Res>
+    implements $SQLResultsModelCopyWith<$Res> {
+  _$SQLResultsModelCopyWithImpl(this._self, this._then);
+
+  final SQLResultsModel _self;
+  final $Res Function(SQLResultsModel) _then;
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sessionId = null,
+    Object? sqlResults = null,
+  }) {
+    return _then(_self.copyWith(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      sqlResults: null == sqlResults
+          ? _self.sqlResults
+          : sqlResults // ignore: cast_nullable_to_non_nullable
+              as ReorderSelectedList<SQLResult>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _SQLResultsModel with DiagnosticableTreeMixin implements SQLResultsModel {
+  const _SQLResultsModel({required this.sessionId, required this.sqlResults});
+
+  @override
+  final int sessionId;
+  @override
+  final ReorderSelectedList<SQLResult> sqlResults;
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SQLResultsModelCopyWith<_SQLResultsModel> get copyWith =>
+      __$SQLResultsModelCopyWithImpl<_SQLResultsModel>(this, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SQLResultsModel'))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('sqlResults', sqlResults));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SQLResultsModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            const DeepCollectionEquality()
+                .equals(other.sqlResults, sqlResults));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, sessionId, const DeepCollectionEquality().hash(sqlResults));
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SQLResultsModel(sessionId: $sessionId, sqlResults: $sqlResults)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SQLResultsModelCopyWith<$Res>
+    implements $SQLResultsModelCopyWith<$Res> {
+  factory _$SQLResultsModelCopyWith(
+          _SQLResultsModel value, $Res Function(_SQLResultsModel) _then) =
+      __$SQLResultsModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int sessionId, ReorderSelectedList<SQLResult> sqlResults});
+}
+
+/// @nodoc
+class __$SQLResultsModelCopyWithImpl<$Res>
+    implements _$SQLResultsModelCopyWith<$Res> {
+  __$SQLResultsModelCopyWithImpl(this._self, this._then);
+
+  final _SQLResultsModel _self;
+  final $Res Function(_SQLResultsModel) _then;
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? sessionId = null,
+    Object? sqlResults = null,
+  }) {
+    return _then(_SQLResultsModel(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      sqlResults: null == sqlResults
+          ? _self.sqlResults
+          : sqlResults // ignore: cast_nullable_to_non_nullable
+              as ReorderSelectedList<SQLResult>,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$SQLResultModel implements DiagnosticableTreeMixin {
+  int get sessionId;
+  SQLResult get result;
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SQLResultModelCopyWith<SQLResultModel> get copyWith =>
+      _$SQLResultModelCopyWithImpl<SQLResultModel>(
+          this as SQLResultModel, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SQLResultModel'))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('result', result));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SQLResultModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.result, result) || other.result == result));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, sessionId, result);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SQLResultModel(sessionId: $sessionId, result: $result)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SQLResultModelCopyWith<$Res> {
+  factory $SQLResultModelCopyWith(
+          SQLResultModel value, $Res Function(SQLResultModel) _then) =
+      _$SQLResultModelCopyWithImpl;
+  @useResult
+  $Res call({int sessionId, SQLResult result});
+}
+
+/// @nodoc
+class _$SQLResultModelCopyWithImpl<$Res>
+    implements $SQLResultModelCopyWith<$Res> {
+  _$SQLResultModelCopyWithImpl(this._self, this._then);
+
+  final SQLResultModel _self;
+  final $Res Function(SQLResultModel) _then;
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sessionId = null,
+    Object? result = null,
+  }) {
+    return _then(_self.copyWith(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      result: null == result
+          ? _self.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as SQLResult,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _SQLResultModel with DiagnosticableTreeMixin implements SQLResultModel {
+  const _SQLResultModel({required this.sessionId, required this.result});
+
+  @override
+  final int sessionId;
+  @override
+  final SQLResult result;
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SQLResultModelCopyWith<_SQLResultModel> get copyWith =>
+      __$SQLResultModelCopyWithImpl<_SQLResultModel>(this, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SQLResultModel'))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('result', result));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SQLResultModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.result, result) || other.result == result));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, sessionId, result);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SQLResultModel(sessionId: $sessionId, result: $result)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SQLResultModelCopyWith<$Res>
+    implements $SQLResultModelCopyWith<$Res> {
+  factory _$SQLResultModelCopyWith(
+          _SQLResultModel value, $Res Function(_SQLResultModel) _then) =
+      __$SQLResultModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int sessionId, SQLResult result});
+}
+
+/// @nodoc
+class __$SQLResultModelCopyWithImpl<$Res>
+    implements _$SQLResultModelCopyWith<$Res> {
+  __$SQLResultModelCopyWithImpl(this._self, this._then);
+
+  final _SQLResultModel _self;
+  final $Res Function(_SQLResultModel) _then;
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? sessionId = null,
+    Object? result = null,
+  }) {
+    return _then(_SQLResultModel(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      result: null == result
+          ? _self.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as SQLResult,
     ));
   }
 }

@@ -144,7 +144,6 @@ class SessionConn {
 
   Future<void> connect() async {
     try {
-      print("conn session id: ${model.id}");
       conn2 = await ConnectionFactory.open(
         type: model.instance.target!.dbType,
         meta: model.instance.target!.connectValue,
@@ -152,6 +151,7 @@ class SessionConn {
         // onCloseCallback: state.onConnClose,
         // onSchemaChangedCallback: state.onSchemaChanged,
       );
+      state = SQLConnectState.connected;
       //  = state.copyWith(conn2: conn, state: SQLConnectState.connected);
     } catch (e, s) {
       print("conn error: ${e}; ${s}");

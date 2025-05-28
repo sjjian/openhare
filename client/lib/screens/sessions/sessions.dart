@@ -13,12 +13,8 @@ class SessionsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ref.watch(sessionTabControllerProvider);
-    print("session page rebuild");
     SelectedSessionId? sessionIdModel =
         ref.watch(selectedSessionIdControllerProvider);
-
-    print("session id: ${sessionIdModel?.sessionId}");
     return PageSkeleton(
         key: const Key("sessions"),
         topBar: const SessionTabs(),

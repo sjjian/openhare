@@ -1,4 +1,5 @@
 import 'package:client/models/interface.dart';
+import 'package:client/providers/session_sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:client/providers/session_conn.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +41,9 @@ class SessionOpBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
-    SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId))!;
+    SelectedSessionId sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider)!;
+    SessionConnModel sessionConnModel = ref.watch(selectedSessionConnControllerProvider)!;
     CurrentSessionDrawer sessionDrawer =
         ref.watch(sessionDrawerControllerProvider)!;
 
@@ -62,8 +64,8 @@ class SessionOpBar extends ConsumerWidget {
                       String query = getQuery();
                       if (query.isNotEmpty) {
                         // ref
-                        //     .read(sessionConnControllerProvider(sessionId).notifier)
-                        //     .query(query, false);
+                        //     .read(sQLResultControllerProvider.notifier)
+                        //     .loadFromQuery(query);
                       }
                     }
                   : null,
@@ -77,9 +79,16 @@ class SessionOpBar extends ConsumerWidget {
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
-                        // ref
-                        //     .read(sessionConnControllerProvider(sessionId).notifier)
-                        //     .query(query, true);
+                        final result = ref
+                            .read(sQLResultTabControllerProvider(
+                                    sessionIdModel.sessionId)
+                                .notifier)
+                            .addSQLResult();
+                        ref
+                            .read(sQLResultControllerProvider(
+                                    sessionIdModel.sessionId, result!.id)
+                                .notifier)
+                            .loadFromQuery(query);
                       }
                     }
                   : null,
@@ -100,9 +109,16 @@ class SessionOpBar extends ConsumerWidget {
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
-                        // ref
-                        //     .read(sessionConnControllerProvider(sessionId).notifier)
-                        //     .query("explain $query", true);
+                        final result = ref
+                            .read(sQLResultTabControllerProvider(
+                                    sessionIdModel.sessionId)
+                                .notifier)
+                            .addSQLResult();
+                        ref
+                            .read(sQLResultControllerProvider(
+                                    sessionIdModel.sessionId, result!.id)
+                                .notifier)
+                            .loadFromQuery("explain $query");
                       }
                     }
                   : null,
@@ -154,8 +170,9 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
 
   @override
   Widget build(BuildContext context) {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
-    SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId))!;
+    SessionConnModel sessionConnModel = ref.watch(selectedSessionConnControllerProvider)!;
+    SelectedSessionId sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider)!;
     return MouseRegion(
       onEnter: (_) {
         setState(() {
@@ -178,7 +195,8 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
           final overlayPos = overlay.localToGlobal(Offset.zero);
 
           List<String> schemas = await ref
-              .read(sessionConnControllerProvider(sessionIdModel.sessionId).notifier)
+              .read(sessionConnControllerProvider(sessionIdModel.sessionId)
+                  .notifier)
               .getSchemas();
 
           // todo
@@ -195,7 +213,9 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     height: 30,
                     onTap: () {
                       ref
-                          .read(sessionConnControllerProvider(sessionIdModel.sessionId).notifier)
+                          .read(sessionConnControllerProvider(
+                                  sessionIdModel.sessionId)
+                              .notifier)
                           .setCurrentSchema(schema);
                     },
                     child: Text(schema));
