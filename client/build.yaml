@@ -6,6 +6,8 @@ targets:
         generate_for:
           - "lib/**/[!objectbox]**.dart"
           - "lib/providers/**.dart"
+          - "lib/services/**.dart"
+          - "lib/screens/**.dart"
           - "lib/models/sessions.dart"
           - "lib/models/session_sql_result.dart"
           - "lib/repositories/sessions.dart"

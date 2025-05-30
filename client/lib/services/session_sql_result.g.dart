@@ -303,11 +303,9 @@ class _SqlResultProviderElement extends ProviderElement<SQLResultModel?>
   int get resultId => (origin as SqlResultProvider).resultId;
 }
 
-String _$sQLResultControllerHash() =>
-    r'b0ebf68f846e99886fae05ea49c67ea29f45c261';
+String _$sQLResultServicesHash() => r'377e2397697893f603e272cde341dcdcc082726b';
 
-abstract class _$SQLResultController
-    extends BuildlessNotifier<SQLResultModel?> {
+abstract class _$SQLResultServices extends BuildlessNotifier<SQLResultModel?> {
   late final int sessionId;
   late final int resultId;
 
@@ -317,29 +315,29 @@ abstract class _$SQLResultController
   );
 }
 
-/// See also [SQLResultController].
-@ProviderFor(SQLResultController)
-const sQLResultControllerProvider = SQLResultControllerFamily();
+/// See also [SQLResultServices].
+@ProviderFor(SQLResultServices)
+const sQLResultServicesProvider = SQLResultServicesFamily();
 
-/// See also [SQLResultController].
-class SQLResultControllerFamily extends Family<SQLResultModel?> {
-  /// See also [SQLResultController].
-  const SQLResultControllerFamily();
+/// See also [SQLResultServices].
+class SQLResultServicesFamily extends Family<SQLResultModel?> {
+  /// See also [SQLResultServices].
+  const SQLResultServicesFamily();
 
-  /// See also [SQLResultController].
-  SQLResultControllerProvider call(
+  /// See also [SQLResultServices].
+  SQLResultServicesProvider call(
     int sessionId,
     int resultId,
   ) {
-    return SQLResultControllerProvider(
+    return SQLResultServicesProvider(
       sessionId,
       resultId,
     );
   }
 
   @override
-  SQLResultControllerProvider getProviderOverride(
-    covariant SQLResultControllerProvider provider,
+  SQLResultServicesProvider getProviderOverride(
+    covariant SQLResultServicesProvider provider,
   ) {
     return call(
       provider.sessionId,
@@ -359,34 +357,34 @@ class SQLResultControllerFamily extends Family<SQLResultModel?> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'sQLResultControllerProvider';
+  String? get name => r'sQLResultServicesProvider';
 }
 
-/// See also [SQLResultController].
-class SQLResultControllerProvider
-    extends NotifierProviderImpl<SQLResultController, SQLResultModel?> {
-  /// See also [SQLResultController].
-  SQLResultControllerProvider(
+/// See also [SQLResultServices].
+class SQLResultServicesProvider
+    extends NotifierProviderImpl<SQLResultServices, SQLResultModel?> {
+  /// See also [SQLResultServices].
+  SQLResultServicesProvider(
     int sessionId,
     int resultId,
   ) : this._internal(
-          () => SQLResultController()
+          () => SQLResultServices()
             ..sessionId = sessionId
             ..resultId = resultId,
-          from: sQLResultControllerProvider,
-          name: r'sQLResultControllerProvider',
+          from: sQLResultServicesProvider,
+          name: r'sQLResultServicesProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$sQLResultControllerHash,
-          dependencies: SQLResultControllerFamily._dependencies,
+                  : _$sQLResultServicesHash,
+          dependencies: SQLResultServicesFamily._dependencies,
           allTransitiveDependencies:
-              SQLResultControllerFamily._allTransitiveDependencies,
+              SQLResultServicesFamily._allTransitiveDependencies,
           sessionId: sessionId,
           resultId: resultId,
         );
 
-  SQLResultControllerProvider._internal(
+  SQLResultServicesProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -402,7 +400,7 @@ class SQLResultControllerProvider
 
   @override
   SQLResultModel? runNotifierBuild(
-    covariant SQLResultController notifier,
+    covariant SQLResultServices notifier,
   ) {
     return notifier.build(
       sessionId,
@@ -411,10 +409,10 @@ class SQLResultControllerProvider
   }
 
   @override
-  Override overrideWith(SQLResultController Function() create) {
+  Override overrideWith(SQLResultServices Function() create) {
     return ProviderOverride(
       origin: this,
-      override: SQLResultControllerProvider._internal(
+      override: SQLResultServicesProvider._internal(
         () => create()
           ..sessionId = sessionId
           ..resultId = resultId,
@@ -430,14 +428,13 @@ class SQLResultControllerProvider
   }
 
   @override
-  NotifierProviderElement<SQLResultController, SQLResultModel?>
-      createElement() {
-    return _SQLResultControllerProviderElement(this);
+  NotifierProviderElement<SQLResultServices, SQLResultModel?> createElement() {
+    return _SQLResultServicesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SQLResultControllerProvider &&
+    return other is SQLResultServicesProvider &&
         other.sessionId == sessionId &&
         other.resultId == resultId;
   }
@@ -454,7 +451,7 @@ class SQLResultControllerProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SQLResultControllerRef on NotifierProviderRef<SQLResultModel?> {
+mixin SQLResultServicesRef on NotifierProviderRef<SQLResultModel?> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 
@@ -462,21 +459,21 @@ mixin SQLResultControllerRef on NotifierProviderRef<SQLResultModel?> {
   int get resultId;
 }
 
-class _SQLResultControllerProviderElement
-    extends NotifierProviderElement<SQLResultController, SQLResultModel?>
-    with SQLResultControllerRef {
-  _SQLResultControllerProviderElement(super.provider);
+class _SQLResultServicesProviderElement
+    extends NotifierProviderElement<SQLResultServices, SQLResultModel?>
+    with SQLResultServicesRef {
+  _SQLResultServicesProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SQLResultControllerProvider).sessionId;
+  int get sessionId => (origin as SQLResultServicesProvider).sessionId;
   @override
-  int get resultId => (origin as SQLResultControllerProvider).resultId;
+  int get resultId => (origin as SQLResultServicesProvider).resultId;
 }
 
-String _$sQLResultTabControllerHash() =>
-    r'18140d7dd565524c4964104732db2812b58620ed';
+String _$sQLResultsServicesHash() =>
+    r'8e2d3bc223b60198608219ac1fe99a5d78a6a348';
 
-abstract class _$SQLResultTabController
+abstract class _$SQLResultsServices
     extends BuildlessNotifier<SQLResultsModel?> {
   late final int sessionId;
 
@@ -485,27 +482,27 @@ abstract class _$SQLResultTabController
   );
 }
 
-/// See also [SQLResultTabController].
-@ProviderFor(SQLResultTabController)
-const sQLResultTabControllerProvider = SQLResultTabControllerFamily();
+/// See also [SQLResultsServices].
+@ProviderFor(SQLResultsServices)
+const sQLResultsServicesProvider = SQLResultsServicesFamily();
 
-/// See also [SQLResultTabController].
-class SQLResultTabControllerFamily extends Family<SQLResultsModel?> {
-  /// See also [SQLResultTabController].
-  const SQLResultTabControllerFamily();
+/// See also [SQLResultsServices].
+class SQLResultsServicesFamily extends Family<SQLResultsModel?> {
+  /// See also [SQLResultsServices].
+  const SQLResultsServicesFamily();
 
-  /// See also [SQLResultTabController].
-  SQLResultTabControllerProvider call(
+  /// See also [SQLResultsServices].
+  SQLResultsServicesProvider call(
     int sessionId,
   ) {
-    return SQLResultTabControllerProvider(
+    return SQLResultsServicesProvider(
       sessionId,
     );
   }
 
   @override
-  SQLResultTabControllerProvider getProviderOverride(
-    covariant SQLResultTabControllerProvider provider,
+  SQLResultsServicesProvider getProviderOverride(
+    covariant SQLResultsServicesProvider provider,
   ) {
     return call(
       provider.sessionId,
@@ -524,30 +521,30 @@ class SQLResultTabControllerFamily extends Family<SQLResultsModel?> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'sQLResultTabControllerProvider';
+  String? get name => r'sQLResultsServicesProvider';
 }
 
-/// See also [SQLResultTabController].
-class SQLResultTabControllerProvider
-    extends NotifierProviderImpl<SQLResultTabController, SQLResultsModel?> {
-  /// See also [SQLResultTabController].
-  SQLResultTabControllerProvider(
+/// See also [SQLResultsServices].
+class SQLResultsServicesProvider
+    extends NotifierProviderImpl<SQLResultsServices, SQLResultsModel?> {
+  /// See also [SQLResultsServices].
+  SQLResultsServicesProvider(
     int sessionId,
   ) : this._internal(
-          () => SQLResultTabController()..sessionId = sessionId,
-          from: sQLResultTabControllerProvider,
-          name: r'sQLResultTabControllerProvider',
+          () => SQLResultsServices()..sessionId = sessionId,
+          from: sQLResultsServicesProvider,
+          name: r'sQLResultsServicesProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$sQLResultTabControllerHash,
-          dependencies: SQLResultTabControllerFamily._dependencies,
+                  : _$sQLResultsServicesHash,
+          dependencies: SQLResultsServicesFamily._dependencies,
           allTransitiveDependencies:
-              SQLResultTabControllerFamily._allTransitiveDependencies,
+              SQLResultsServicesFamily._allTransitiveDependencies,
           sessionId: sessionId,
         );
 
-  SQLResultTabControllerProvider._internal(
+  SQLResultsServicesProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -561,7 +558,7 @@ class SQLResultTabControllerProvider
 
   @override
   SQLResultsModel? runNotifierBuild(
-    covariant SQLResultTabController notifier,
+    covariant SQLResultsServices notifier,
   ) {
     return notifier.build(
       sessionId,
@@ -569,10 +566,10 @@ class SQLResultTabControllerProvider
   }
 
   @override
-  Override overrideWith(SQLResultTabController Function() create) {
+  Override overrideWith(SQLResultsServices Function() create) {
     return ProviderOverride(
       origin: this,
-      override: SQLResultTabControllerProvider._internal(
+      override: SQLResultsServicesProvider._internal(
         () => create()..sessionId = sessionId,
         from: from,
         name: null,
@@ -585,15 +582,14 @@ class SQLResultTabControllerProvider
   }
 
   @override
-  NotifierProviderElement<SQLResultTabController, SQLResultsModel?>
+  NotifierProviderElement<SQLResultsServices, SQLResultsModel?>
       createElement() {
-    return _SQLResultTabControllerProviderElement(this);
+    return _SQLResultsServicesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SQLResultTabControllerProvider &&
-        other.sessionId == sessionId;
+    return other is SQLResultsServicesProvider && other.sessionId == sessionId;
   }
 
   @override
@@ -607,39 +603,22 @@ class SQLResultTabControllerProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SQLResultTabControllerRef on NotifierProviderRef<SQLResultsModel?> {
+mixin SQLResultsServicesRef on NotifierProviderRef<SQLResultsModel?> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
-class _SQLResultTabControllerProviderElement
-    extends NotifierProviderElement<SQLResultTabController, SQLResultsModel?>
-    with SQLResultTabControllerRef {
-  _SQLResultTabControllerProviderElement(super.provider);
+class _SQLResultsServicesProviderElement
+    extends NotifierProviderElement<SQLResultsServices, SQLResultsModel?>
+    with SQLResultsServicesRef {
+  _SQLResultsServicesProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SQLResultTabControllerProvider).sessionId;
+  int get sessionId => (origin as SQLResultsServicesProvider).sessionId;
 }
 
-String _$selectedSQLResultControllerHash() =>
-    r'98c7b34436bc6f1655edcd547cfceddfb470af4c';
-
-/// See also [SelectedSQLResultController].
-@ProviderFor(SelectedSQLResultController)
-final selectedSQLResultControllerProvider =
-    NotifierProvider<SelectedSQLResultController, SQLResultModel?>.internal(
-  SelectedSQLResultController.new,
-  name: r'selectedSQLResultControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$selectedSQLResultControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SelectedSQLResultController = Notifier<SQLResultModel?>;
 String _$selectedSQLResultTabControllerHash() =>
-    r'654f1be0891d05ed9276e74de2c21e5585b97236';
+    r'bb3b6e28366a3b9b4ff7c5bba6e08a61a2f75b26';
 
 /// See also [SelectedSQLResultTabController].
 @ProviderFor(SelectedSQLResultTabController)
@@ -655,5 +634,22 @@ final selectedSQLResultTabControllerProvider =
 );
 
 typedef _$SelectedSQLResultTabController = Notifier<SQLResultsModel?>;
+String _$selectedSQLResultControllerHash() =>
+    r'caa5a96c575850e27d9b8173eee09d442cba258f';
+
+/// See also [SelectedSQLResultController].
+@ProviderFor(SelectedSQLResultController)
+final selectedSQLResultControllerProvider =
+    NotifierProvider<SelectedSQLResultController, SQLResultModel?>.internal(
+  SelectedSQLResultController.new,
+  name: r'selectedSQLResultControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedSQLResultControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedSQLResultController = Notifier<SQLResultModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

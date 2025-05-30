@@ -1,5 +1,5 @@
 import 'package:client/providers/instances.dart';
-import 'package:client/providers/sessions.dart';
+import 'package:client/services/sessions.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
@@ -66,7 +66,7 @@ class AddSession extends HookConsumerWidget {
                                 onPressed: () {
                                   ref
                                       .read(
-                                          sessionTabControllerProvider.notifier)
+                                          sessionsServicesProvider.notifier)
                                       .addSession(inst);
                                 },
                                 child: Text(
@@ -83,7 +83,7 @@ class AddSession extends HookConsumerWidget {
                         TextButton(
                           onPressed: () {
                             ref
-                                .read(sessionTabControllerProvider.notifier)
+                                .read(sessionsServicesProvider.notifier)
                                 .addSession(inst, schema: schema);
                           },
                           child: Text(schema, overflow: TextOverflow.ellipsis),
@@ -158,7 +158,7 @@ class AddSession extends HookConsumerWidget {
                                 onPressed: () {
                                   ref
                                       .read(
-                                          sessionTabControllerProvider.notifier)
+                                          sessionsServicesProvider.notifier)
                                       .addSession(inst);
                                 },
                                 child: Text(inst.connectValue.name,

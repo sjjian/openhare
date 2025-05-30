@@ -1,6 +1,6 @@
 import 'package:client/core/conn.dart';
 import 'package:client/models/interface.dart';
-import 'package:client/providers/session_sql_result.dart';
+import 'package:client/services/session_sql_result.dart';
 import 'package:client/providers/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
@@ -51,7 +51,7 @@ class SqlResultTables extends ConsumerWidget {
                 tabStyle: style,
                 onReorder: (oldIndex, newIndex) {
                   ref
-                      .read(sQLResultTabControllerProvider(
+                      .read(sQLResultsServicesProvider(
                               sqlResultsModel.sessionId)
                           .notifier)
                       .reorderSQLResult(oldIndex, newIndex);
@@ -64,14 +64,14 @@ class SqlResultTables extends ConsumerWidget {
                       .isSelected(sqlResultsModel.sqlResults[i]),
                   onTap: () {
                     ref
-                        .read(sQLResultTabControllerProvider(
+                        .read(sQLResultsServicesProvider(
                                 sqlResultsModel.sessionId)
                             .notifier)
                         .selectSQLResultByIndex(i);
                   },
                   onDeleted: () {
                     ref
-                        .read(sQLResultTabControllerProvider(
+                        .read(sQLResultsServicesProvider(
                                 sqlResultsModel.sessionId)
                             .notifier)
                         .deleteSQLResultByIndex(i);

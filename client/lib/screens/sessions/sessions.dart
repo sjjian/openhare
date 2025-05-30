@@ -15,15 +15,14 @@ class SessionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     SelectedSessionId? sessionIdModel =
         ref.watch(selectedSessionIdControllerProvider);
+    print("sessions page build: ${sessionIdModel?.sessionId}");
     return PageSkeleton(
         key: const Key("sessions"),
         topBar: const SessionTabs(),
         bottomBar: const SessionStatusTab(),
         child: Container(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: (sessionIdModel == null ||
-                  sessionIdModel.sessionId == 0 ||
-                  sessionIdModel.instanceId == null)
+          child: (sessionIdModel == null)
               ? const AddSession()
               : const SessionBodyPage(),
         ));

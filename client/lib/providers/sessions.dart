@@ -1,20 +1,65 @@
 import 'package:client/models/interface.dart';
+import 'package:client/services/sessions.dart';
 import 'package:client/repositories/sessions.dart';
-import 'package:client/utils/reorder_list.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:client/models/sessions.dart';
-import 'package:client/repositories/instances.dart';
-import 'package:client/repositories/repo.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
+import 'package:sql_editor/re_editor.dart';
+import 'package:client/utils/sql_highlight.dart';
+import 'package:client/widgets/split_view.dart';
+import 'package:multi_split_view/multi_split_view.dart';
+import 'package:sql_parser/parser.dart';
 
 part 'sessions.g.dart';
+
+@Riverpod(keepAlive: true)
+CurrentSessionDrawer sessionDrawerState(Ref ref, int sessionId) {
+  return const CurrentSessionDrawer(
+      drawerPage: DrawerPage.metadataTree,
+      sqlResult: null,
+      sqlColumn: null,
+      showRecord: false,
+      isRightPageOpen: true);
+}
+
+@Riverpod(keepAlive: true)
+CurrentSessionSplitView sessionSplitViewState(Ref ref, int sessionId) {
+  return CurrentSessionSplitView(
+      multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
+      metaDataSplitViewCtrl:
+          SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
+}
+
+@Riverpod(keepAlive: true)
+CurrentSessionMetadata sessionMetadataState(Ref ref, int sessionId) {
+  return const CurrentSessionMetadata();
+}
+
+@Riverpod(keepAlive: true)
+CurrentSessionEditor sessionEditor(Ref ref, int sessionId) {
+  return CurrentSessionEditor(code: CodeLineEditingController(
+      spanBuilder: ({required codeLines, required context, required style}) {
+    return TextSpan(
+        children: Lexer(codeLines.asString(TextLineBreak.lf))
+            .tokens()
+            .map<TextSpan>((tok) => TextSpan(
+                text: tok.content,
+                style: style.merge(getStyle(tok.id) ?? style)))
+            .toList());
+  }));
+}
+
 
 @Riverpod(keepAlive: true)
 class SessionDrawerController extends _$SessionDrawerController {
   @override
   CurrentSessionDrawer build() {
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionDrawerStateProvider(0));
+    }
     return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
   }
 
@@ -64,8 +109,11 @@ class SessionDrawerController extends _$SessionDrawerController {
 class SessionSplitViewController extends _$SessionSplitViewController {
   @override
   CurrentSessionSplitView build() {
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionSplitViewStateProvider(0));
+    }
     return ref.watch(sessionSplitViewStateProvider(sessionIdModel.sessionId));
   }
 }
@@ -74,8 +122,11 @@ class SessionSplitViewController extends _$SessionSplitViewController {
 class SessionMetadataController extends _$SessionMetadataController {
   @override
   CurrentSessionMetadata build() {
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionMetadataStateProvider(0));
+    }
     return ref.watch(sessionMetadataStateProvider(sessionIdModel.sessionId));
   }
 }
@@ -84,97 +135,45 @@ class SessionMetadataController extends _$SessionMetadataController {
 class SessionEditorController extends _$SessionEditorController {
   @override
   CurrentSessionEditor build() {
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionEditorProvider(0));
+    }
     return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
   }
 }
 
-@riverpod
-class SessionTabController extends _$SessionTabController {
-  @override
-  SessionTab build() {
-    List<SessionStorage> sessions =
-        ref.watch(sessionRepoProvider).getSessions();
-    return SessionTab(sessions: ReorderSelectedList(data: sessions));
-  }
 
-  void selectSessionByIndex(int index) {
-    if (state.sessions.select(index)) {
-      // refresh
-      state = state.copyWith(sessions: state.sessions);
-    }
-  }
-
-  void reorderSession(int oldIndex, int newIndex) {
-    state.sessions.reorder(oldIndex, newIndex);
-    // refresh
-    state = state.copyWith(sessions: state.sessions);
-  }
-
-  void addSession(InstanceModel instance, {String? schema}) {
-    SessionRepo sessionRepo = ref.read(sessionRepoProvider);
-
-    ObjectBox ob = ref.watch(objectboxProvider);
-    // 记录使用的数据源
-    ob.addActiveInstance(instance);
-    if (schema != null) {
-      ob.addInstanceActiveSchema(instance, schema);
-    }
-
-    SessionStorage? session = state.sessions.selected();
-    if (session == null) {
-      session = SessionStorage();
-      state.sessions.add(session);
-      sessionRepo.addSession(session);
-    }
-    session.instance.target = instance;
-    session.currentSchema = schema;
-    sessionRepo.updateSession(session);
-    // refresh
-    state = state.copyWith(sessions: state.sessions);
-
-    // ref.invalidate(sessionsRepoProvider);
-    // ref.invalidateSelf();
-    // ref.invalidate(sessionRepoProvider);
-    // print("addSession refresh");
-    // connect(session);
-  }
-
-  void newSession() {
-    SessionRepo sessionRepo = ref.read(sessionRepoProvider);
-    SessionStorage session = SessionStorage();
-    state.sessions.add(session);
-    sessionRepo.addSession(session);
-    state = state.copyWith(sessions: state.sessions);
-  }
-
-  void deleteSessionByIndex(int index) {
-    SessionRepo sessionRepo = ref.read(sessionRepoProvider);
-    final session = state.sessions.removeAt(index);
-    sessionRepo.deleteSession(session);
-    // refresh
-    state = state.copyWith(sessions: state.sessions);
-  }
-}
 
 @Riverpod(keepAlive: true)
 class SelectedSessionIdController extends _$SelectedSessionIdController {
   @override
-  SelectedSessionId build() {
-    int sessionId = ref.watch(sessionTabControllerProvider.select((s) {
+  SelectedSessionId? build() {
+    int sessionId = ref.watch(sessionsServicesProvider.select((s) {
+      print("notify sessionTabControllerProvider");
       if (s.sessions.selected() == null ||
           s.sessions.selected()!.instance.target == null) {
         return 0;
       }
       return s.sessions.selected()!.id;
     }));
+    print("SelectedSessionIdController1 build: $sessionId");
     if (sessionId == 0) {
-      return const SelectedSessionId(sessionId: 0, instanceId: 0);
+      return null;
     }
-    SessionStorage session =
-        ref.read(sessionRepoProvider).getSession(sessionId)!;
+    print("SelectedSessionIdController2 build: $sessionId");
+    SessionStorage? session =
+        ref.read(sessionRepoProvider).getSession(sessionId);
+    
+    if (session == null || session.instance.target == null) {
+      print("SelectedSessionIdController build 1: session is null or instance is null");
+      return null;
+    }
+    print("SelectedSessionIdController build 2: $sessionId");
     return SelectedSessionId(
-        sessionId: sessionId, instanceId: session.instance.target?.id);
+        sessionId: sessionId, instanceId: session.instance.target!.id);
   }
 }
+
+

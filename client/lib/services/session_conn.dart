@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_conn.g.dart';
 
 @Riverpod(keepAlive: true)
-class SessionConnController extends _$SessionConnController {
+class SessionConnServices extends _$SessionConnServices {
   @override
   SessionConnModel build(int sessionId) {
     SessionConn conn = ref.watch(sessionConnProvider(sessionId));
@@ -46,8 +46,11 @@ class SessionConnController extends _$SessionConnController {
 class SelectedSessionConnController extends _$SelectedSessionConnController {
   @override
   SessionConnModel? build() {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
-    SessionConnModel? model = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId));
+    SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdControllerProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
+    SessionConnModel? model = ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
     return model;
   }
 }

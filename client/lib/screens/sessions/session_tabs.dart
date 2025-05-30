@@ -1,6 +1,6 @@
 import 'package:client/models/interface.dart';
-import 'package:client/providers/sessions.dart';
-import 'package:client/providers/session_conn.dart';
+import 'package:client/services/sessions.dart';
+import 'package:client/services/session_conn.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class SessionTabs extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionTab sessionTab = ref.watch(sessionTabControllerProvider);
+    SessionTab sessionTab = ref.watch(sessionsServicesProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: CommonTabBar(
@@ -26,11 +26,11 @@ class SessionTabs extends ConsumerWidget {
                 Theme.of(context).colorScheme.surfaceDim, // session tab 鼠标移入的颜色
           ),
           addTab: () {
-            ref.read(sessionTabControllerProvider.notifier).newSession();
+            ref.read(sessionsServicesProvider.notifier).newSession();
           },
           onReorder: (oldIndex, newIndex) {
             ref
-                .read(sessionTabControllerProvider.notifier)
+                .read(sessionsServicesProvider.notifier)
                 .reorderSession(oldIndex, newIndex);
           },
           tabs: [
@@ -40,12 +40,12 @@ class SessionTabs extends ConsumerWidget {
                       label: "new",
                       onTap: () {
                         ref
-                            .read(sessionTabControllerProvider.notifier)
+                            .read(sessionsServicesProvider.notifier)
                             .selectSessionByIndex(i);
                       },
                       onDeleted: () {
                         ref
-                            .read(sessionTabControllerProvider.notifier)
+                            .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
                       selected: sessionTab.sessions
@@ -62,7 +62,7 @@ class SessionTabs extends ConsumerWidget {
                           height: 30,
                           onTap: () {
                             ref
-                                .read(sessionConnControllerProvider(sessionTab.sessions[i].id).notifier)
+                                .read(sessionConnServicesProvider(sessionTab.sessions[i].id).notifier)
                                 .connect();
                           },
                           child: const Text("连接"),
@@ -72,7 +72,7 @@ class SessionTabs extends ConsumerWidget {
                           height: 30,
                           onTap: () {
                             ref
-                                .read(sessionConnControllerProvider(sessionTab.sessions[i].id).notifier)
+                                .read(sessionConnServicesProvider(sessionTab.sessions[i].id).notifier)
                                 .close();
                           },
                           child: const Text("断开"),
@@ -82,7 +82,7 @@ class SessionTabs extends ConsumerWidget {
                           height: 30,
                           onTap: () {
                             ref
-                                .read(sessionTabControllerProvider.notifier)
+                                .read(sessionsServicesProvider.notifier)
                                 .deleteSessionByIndex(i);
                           },
                           child: const Text("关闭"),
@@ -90,12 +90,12 @@ class SessionTabs extends ConsumerWidget {
                       ],
                       onTap: () {
                         ref
-                            .read(sessionTabControllerProvider.notifier)
+                            .read(sessionsServicesProvider.notifier)
                             .selectSessionByIndex(i);
                       },
                       onDeleted: () {
                         ref
-                            .read(sessionTabControllerProvider.notifier)
+                            .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
                       selected: sessionTab.sessions

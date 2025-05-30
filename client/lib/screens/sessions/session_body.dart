@@ -13,7 +13,8 @@ class SessionBodyPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSessionEditor sessionEditor = ref.watch(sessionEditorControllerProvider)!;
+    print("SessionBodyPage build");
+    CurrentSessionEditor sessionEditor = ref.watch(sessionEditorControllerProvider);
     CurrentSessionSplitView sessionSplitView = ref.watch(sessionSplitViewControllerProvider);
     CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider);
 

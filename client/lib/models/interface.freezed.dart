@@ -898,7 +898,7 @@ class __$CurrentSessionEditorCopyWithImpl<$Res>
 /// @nodoc
 mixin _$SelectedSessionId implements DiagnosticableTreeMixin {
   int get sessionId;
-  int? get instanceId;
+  int get instanceId;
 
   /// Create a copy of SelectedSessionId
   /// with the given fields replaced by the non-null parameter values.
@@ -942,7 +942,7 @@ abstract mixin class $SelectedSessionIdCopyWith<$Res> {
           SelectedSessionId value, $Res Function(SelectedSessionId) _then) =
       _$SelectedSessionIdCopyWithImpl;
   @useResult
-  $Res call({int sessionId, int? instanceId});
+  $Res call({int sessionId, int instanceId});
 }
 
 /// @nodoc
@@ -959,17 +959,17 @@ class _$SelectedSessionIdCopyWithImpl<$Res>
   @override
   $Res call({
     Object? sessionId = null,
-    Object? instanceId = freezed,
+    Object? instanceId = null,
   }) {
     return _then(_self.copyWith(
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
               as int,
-      instanceId: freezed == instanceId
+      instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -979,12 +979,12 @@ class _$SelectedSessionIdCopyWithImpl<$Res>
 class _SelectedSessionId
     with DiagnosticableTreeMixin
     implements SelectedSessionId {
-  const _SelectedSessionId({required this.sessionId, this.instanceId});
+  const _SelectedSessionId({required this.sessionId, required this.instanceId});
 
   @override
   final int sessionId;
   @override
-  final int? instanceId;
+  final int instanceId;
 
   /// Create a copy of SelectedSessionId
   /// with the given fields replaced by the non-null parameter values.
@@ -1030,7 +1030,7 @@ abstract mixin class _$SelectedSessionIdCopyWith<$Res>
       __$SelectedSessionIdCopyWithImpl;
   @override
   @useResult
-  $Res call({int sessionId, int? instanceId});
+  $Res call({int sessionId, int instanceId});
 }
 
 /// @nodoc
@@ -1047,17 +1047,17 @@ class __$SelectedSessionIdCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? sessionId = null,
-    Object? instanceId = freezed,
+    Object? instanceId = null,
   }) {
     return _then(_SelectedSessionId(
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
               as int,
-      instanceId: freezed == instanceId
+      instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -1531,6 +1531,288 @@ class __$SQLResultModelCopyWithImpl<$Res>
           ? _self.result
           : result // ignore: cast_nullable_to_non_nullable
               as SQLResult,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$SessionStatusModel implements DiagnosticableTreeMixin {
+  int get sessionId;
+  String get instanceName; // sql result
+  int? get resultId;
+  SQLExecuteState get state;
+  Duration? get executeTime;
+  BigInt? get affectedRows;
+  String? get query;
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SessionStatusModelCopyWith<SessionStatusModel> get copyWith =>
+      _$SessionStatusModelCopyWithImpl<SessionStatusModel>(
+          this as SessionStatusModel, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SessionStatusModel'))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('instanceName', instanceName))
+      ..add(DiagnosticsProperty('resultId', resultId))
+      ..add(DiagnosticsProperty('state', state))
+      ..add(DiagnosticsProperty('executeTime', executeTime))
+      ..add(DiagnosticsProperty('affectedRows', affectedRows))
+      ..add(DiagnosticsProperty('query', query));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SessionStatusModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.instanceName, instanceName) ||
+                other.instanceName == instanceName) &&
+            (identical(other.resultId, resultId) ||
+                other.resultId == resultId) &&
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.executeTime, executeTime) ||
+                other.executeTime == executeTime) &&
+            (identical(other.affectedRows, affectedRows) ||
+                other.affectedRows == affectedRows) &&
+            (identical(other.query, query) || other.query == query));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, sessionId, instanceName,
+      resultId, state, executeTime, affectedRows, query);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SessionStatusModelCopyWith<$Res> {
+  factory $SessionStatusModelCopyWith(
+          SessionStatusModel value, $Res Function(SessionStatusModel) _then) =
+      _$SessionStatusModelCopyWithImpl;
+  @useResult
+  $Res call(
+      {int sessionId,
+      String instanceName,
+      int? resultId,
+      SQLExecuteState state,
+      Duration? executeTime,
+      BigInt? affectedRows,
+      String? query});
+}
+
+/// @nodoc
+class _$SessionStatusModelCopyWithImpl<$Res>
+    implements $SessionStatusModelCopyWith<$Res> {
+  _$SessionStatusModelCopyWithImpl(this._self, this._then);
+
+  final SessionStatusModel _self;
+  final $Res Function(SessionStatusModel) _then;
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sessionId = null,
+    Object? instanceName = null,
+    Object? resultId = freezed,
+    Object? state = null,
+    Object? executeTime = freezed,
+    Object? affectedRows = freezed,
+    Object? query = freezed,
+  }) {
+    return _then(_self.copyWith(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      instanceName: null == instanceName
+          ? _self.instanceName
+          : instanceName // ignore: cast_nullable_to_non_nullable
+              as String,
+      resultId: freezed == resultId
+          ? _self.resultId
+          : resultId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      state: null == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLExecuteState,
+      executeTime: freezed == executeTime
+          ? _self.executeTime
+          : executeTime // ignore: cast_nullable_to_non_nullable
+              as Duration?,
+      affectedRows: freezed == affectedRows
+          ? _self.affectedRows
+          : affectedRows // ignore: cast_nullable_to_non_nullable
+              as BigInt?,
+      query: freezed == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _SessionStatusModel
+    with DiagnosticableTreeMixin
+    implements SessionStatusModel {
+  const _SessionStatusModel(
+      {required this.sessionId,
+      required this.instanceName,
+      this.resultId,
+      required this.state,
+      this.executeTime,
+      this.affectedRows,
+      this.query});
+
+  @override
+  final int sessionId;
+  @override
+  final String instanceName;
+// sql result
+  @override
+  final int? resultId;
+  @override
+  final SQLExecuteState state;
+  @override
+  final Duration? executeTime;
+  @override
+  final BigInt? affectedRows;
+  @override
+  final String? query;
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SessionStatusModelCopyWith<_SessionStatusModel> get copyWith =>
+      __$SessionStatusModelCopyWithImpl<_SessionStatusModel>(this, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SessionStatusModel'))
+      ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('instanceName', instanceName))
+      ..add(DiagnosticsProperty('resultId', resultId))
+      ..add(DiagnosticsProperty('state', state))
+      ..add(DiagnosticsProperty('executeTime', executeTime))
+      ..add(DiagnosticsProperty('affectedRows', affectedRows))
+      ..add(DiagnosticsProperty('query', query));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SessionStatusModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.instanceName, instanceName) ||
+                other.instanceName == instanceName) &&
+            (identical(other.resultId, resultId) ||
+                other.resultId == resultId) &&
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.executeTime, executeTime) ||
+                other.executeTime == executeTime) &&
+            (identical(other.affectedRows, affectedRows) ||
+                other.affectedRows == affectedRows) &&
+            (identical(other.query, query) || other.query == query));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, sessionId, instanceName,
+      resultId, state, executeTime, affectedRows, query);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SessionStatusModelCopyWith<$Res>
+    implements $SessionStatusModelCopyWith<$Res> {
+  factory _$SessionStatusModelCopyWith(
+          _SessionStatusModel value, $Res Function(_SessionStatusModel) _then) =
+      __$SessionStatusModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int sessionId,
+      String instanceName,
+      int? resultId,
+      SQLExecuteState state,
+      Duration? executeTime,
+      BigInt? affectedRows,
+      String? query});
+}
+
+/// @nodoc
+class __$SessionStatusModelCopyWithImpl<$Res>
+    implements _$SessionStatusModelCopyWith<$Res> {
+  __$SessionStatusModelCopyWithImpl(this._self, this._then);
+
+  final _SessionStatusModel _self;
+  final $Res Function(_SessionStatusModel) _then;
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? sessionId = null,
+    Object? instanceName = null,
+    Object? resultId = freezed,
+    Object? state = null,
+    Object? executeTime = freezed,
+    Object? affectedRows = freezed,
+    Object? query = freezed,
+  }) {
+    return _then(_SessionStatusModel(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      instanceName: null == instanceName
+          ? _self.instanceName
+          : instanceName // ignore: cast_nullable_to_non_nullable
+              as String,
+      resultId: freezed == resultId
+          ? _self.resultId
+          : resultId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      state: null == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLExecuteState,
+      executeTime: freezed == executeTime
+          ? _self.executeTime
+          : executeTime // ignore: cast_nullable_to_non_nullable
+              as Duration?,
+      affectedRows: freezed == affectedRows
+          ? _self.affectedRows
+          : affectedRows // ignore: cast_nullable_to_non_nullable
+              as BigInt?,
+      query: freezed == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

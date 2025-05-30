@@ -4,7 +4,6 @@ import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:client/models/sessions.dart';
 
 class SessionDrawerBody extends ConsumerWidget {
   const SessionDrawerBody({Key? key}) : super(key: key);

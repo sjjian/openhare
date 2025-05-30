@@ -6,8 +6,8 @@ part of 'session_conn.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionConnControllerHash() =>
-    r'7801c5a2148c19e6a95b08f2da8b7c82cfbbf603';
+String _$sessionConnServicesHash() =>
+    r'c5aae9744ae81f52a88a5591962c92b18e96258b';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,7 +30,7 @@ class _SystemHash {
   }
 }
 
-abstract class _$SessionConnController
+abstract class _$SessionConnServices
     extends BuildlessNotifier<SessionConnModel> {
   late final int sessionId;
 
@@ -39,27 +39,27 @@ abstract class _$SessionConnController
   );
 }
 
-/// See also [SessionConnController].
-@ProviderFor(SessionConnController)
-const sessionConnControllerProvider = SessionConnControllerFamily();
+/// See also [SessionConnServices].
+@ProviderFor(SessionConnServices)
+const sessionConnServicesProvider = SessionConnServicesFamily();
 
-/// See also [SessionConnController].
-class SessionConnControllerFamily extends Family<SessionConnModel> {
-  /// See also [SessionConnController].
-  const SessionConnControllerFamily();
+/// See also [SessionConnServices].
+class SessionConnServicesFamily extends Family<SessionConnModel> {
+  /// See also [SessionConnServices].
+  const SessionConnServicesFamily();
 
-  /// See also [SessionConnController].
-  SessionConnControllerProvider call(
+  /// See also [SessionConnServices].
+  SessionConnServicesProvider call(
     int sessionId,
   ) {
-    return SessionConnControllerProvider(
+    return SessionConnServicesProvider(
       sessionId,
     );
   }
 
   @override
-  SessionConnControllerProvider getProviderOverride(
-    covariant SessionConnControllerProvider provider,
+  SessionConnServicesProvider getProviderOverride(
+    covariant SessionConnServicesProvider provider,
   ) {
     return call(
       provider.sessionId,
@@ -78,30 +78,30 @@ class SessionConnControllerFamily extends Family<SessionConnModel> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'sessionConnControllerProvider';
+  String? get name => r'sessionConnServicesProvider';
 }
 
-/// See also [SessionConnController].
-class SessionConnControllerProvider
-    extends NotifierProviderImpl<SessionConnController, SessionConnModel> {
-  /// See also [SessionConnController].
-  SessionConnControllerProvider(
+/// See also [SessionConnServices].
+class SessionConnServicesProvider
+    extends NotifierProviderImpl<SessionConnServices, SessionConnModel> {
+  /// See also [SessionConnServices].
+  SessionConnServicesProvider(
     int sessionId,
   ) : this._internal(
-          () => SessionConnController()..sessionId = sessionId,
-          from: sessionConnControllerProvider,
-          name: r'sessionConnControllerProvider',
+          () => SessionConnServices()..sessionId = sessionId,
+          from: sessionConnServicesProvider,
+          name: r'sessionConnServicesProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$sessionConnControllerHash,
-          dependencies: SessionConnControllerFamily._dependencies,
+                  : _$sessionConnServicesHash,
+          dependencies: SessionConnServicesFamily._dependencies,
           allTransitiveDependencies:
-              SessionConnControllerFamily._allTransitiveDependencies,
+              SessionConnServicesFamily._allTransitiveDependencies,
           sessionId: sessionId,
         );
 
-  SessionConnControllerProvider._internal(
+  SessionConnServicesProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -115,7 +115,7 @@ class SessionConnControllerProvider
 
   @override
   SessionConnModel runNotifierBuild(
-    covariant SessionConnController notifier,
+    covariant SessionConnServices notifier,
   ) {
     return notifier.build(
       sessionId,
@@ -123,10 +123,10 @@ class SessionConnControllerProvider
   }
 
   @override
-  Override overrideWith(SessionConnController Function() create) {
+  Override overrideWith(SessionConnServices Function() create) {
     return ProviderOverride(
       origin: this,
-      override: SessionConnControllerProvider._internal(
+      override: SessionConnServicesProvider._internal(
         () => create()..sessionId = sessionId,
         from: from,
         name: null,
@@ -139,15 +139,14 @@ class SessionConnControllerProvider
   }
 
   @override
-  NotifierProviderElement<SessionConnController, SessionConnModel>
+  NotifierProviderElement<SessionConnServices, SessionConnModel>
       createElement() {
-    return _SessionConnControllerProviderElement(this);
+    return _SessionConnServicesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SessionConnControllerProvider &&
-        other.sessionId == sessionId;
+    return other is SessionConnServicesProvider && other.sessionId == sessionId;
   }
 
   @override
@@ -161,22 +160,22 @@ class SessionConnControllerProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionConnControllerRef on NotifierProviderRef<SessionConnModel> {
+mixin SessionConnServicesRef on NotifierProviderRef<SessionConnModel> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
-class _SessionConnControllerProviderElement
-    extends NotifierProviderElement<SessionConnController, SessionConnModel>
-    with SessionConnControllerRef {
-  _SessionConnControllerProviderElement(super.provider);
+class _SessionConnServicesProviderElement
+    extends NotifierProviderElement<SessionConnServices, SessionConnModel>
+    with SessionConnServicesRef {
+  _SessionConnServicesProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SessionConnControllerProvider).sessionId;
+  int get sessionId => (origin as SessionConnServicesProvider).sessionId;
 }
 
 String _$selectedSessionConnControllerHash() =>
-    r'a22e0176f9f1baa3cf0f91c50192dcee0d58beb5';
+    r'1078863ee1ac90a2ea52c868ea34d54a2bf2d404';
 
 /// See also [SelectedSessionConnController].
 @ProviderFor(SelectedSessionConnController)

@@ -1,6 +1,6 @@
 import 'package:client/models/interface.dart';
 import 'package:client/providers/sessions.dart';
-import 'package:client/providers/session_conn.dart';
+import 'package:client/services/session_conn.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,7 +50,7 @@ class SQLEditor extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdControllerProvider)!;
     CurrentSessionMetadata sessionMeta = ref.watch(sessionMetadataControllerProvider);
-    SessionConnModel sessionConnModel = ref.watch(sessionConnControllerProvider(sessionIdModel.sessionId));
+    SessionConnModel sessionConnModel = ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
 
     MetaDataNode? metadata = sessionMeta.metadata;
     String? currentSchema = sessionConnModel.conn.currentSchema;

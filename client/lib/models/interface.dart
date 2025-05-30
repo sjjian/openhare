@@ -1,5 +1,4 @@
 import 'package:client/core/conn.dart';
-import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +11,13 @@ import 'package:client/widgets/data_tree.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 
 part 'interface.freezed.dart';
+
+enum SQLConnectState { pending, connecting, connected, failed }
+
+enum DrawerPage {
+  metadataTree,
+  sqlResult,
+}
 
 @freezed
 abstract class SessionConnModel with _$SessionConnModel {
@@ -58,7 +64,7 @@ abstract class CurrentSessionEditor with _$CurrentSessionEditor {
 abstract class SelectedSessionId with _$SelectedSessionId {
   const factory SelectedSessionId({
     required int sessionId,
-    int? instanceId,
+    required int instanceId,
   }) = _SelectedSessionId;
 }
 
@@ -83,4 +89,18 @@ abstract class SQLResultModel with _$SQLResultModel {
     required int sessionId,
     required SQLResult result,
   }) = _SQLResultModel;
+}
+
+@freezed
+abstract class SessionStatusModel with _$SessionStatusModel {
+  const factory SessionStatusModel({
+    required int sessionId,
+    required String instanceName,
+    // sql result
+    int? resultId,
+    required SQLExecuteState state,
+    Duration? executeTime,
+    BigInt? affectedRows,
+    String? query,
+  }) = _SessionStatusModel;
 }

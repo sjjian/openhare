@@ -1,4 +1,4 @@
-import 'package:client/providers/session_conn.dart';
+import 'package:client/services/session_conn.dart';
 import 'package:client/repositories/session_sql_result.dart';
 import 'package:client/models/interface.dart';
 import 'package:client/providers/sessions.dart';
@@ -6,6 +6,7 @@ import 'package:db_driver/db_driver.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:client/utils/reorder_list.dart';
+import 'package:excel/excel.dart';
 
 part 'session_sql_result.g.dart';
 
@@ -25,7 +26,7 @@ SQLResultModel? sqlResult(Ref ref, int sessionId, int resultId) {
 }
 
 @Riverpod(keepAlive: true)
-class SQLResultController extends _$SQLResultController {
+class SQLResultServices extends _$SQLResultServices {
   @override
   SQLResultModel? build(int sessionId, int resultId) {
     return ref.watch(sqlResultProvider(sessionId, resultId));
@@ -33,7 +34,7 @@ class SQLResultController extends _$SQLResultController {
 
   Future<void> loadFromQuery(String query) async {
     SessionConnModel sessionConnModel =
-        ref.read(sessionConnControllerProvider(state!.sessionId))!;
+        ref.read(sessionConnServicesProvider(state!.sessionId))!;
     state!.result.query = query;
     SQLResult result = state!.result;
     try {
@@ -45,15 +46,22 @@ class SQLResultController extends _$SQLResultController {
     } catch (e) {
       result.setError(e.toString());
     } finally {
-      state =state!.copyWith(
+      state = state!.copyWith(
         result: result,
       );
     }
   }
+
+  Excel toExcel() {
+    if (state == null) {
+      return Excel.createExcel();
+    }
+    return state!.result.toExcel();
+  }
 }
 
 @Riverpod(keepAlive: true)
-class SQLResultTabController extends _$SQLResultTabController {
+class SQLResultsServices extends _$SQLResultsServices {
   @override
   SQLResultsModel? build(int sessionId) {
     return ref.watch(sqlResultsProvider(sessionId));
@@ -65,8 +73,6 @@ class SQLResultTabController extends _$SQLResultTabController {
     }
     SQLResultRepo sqlResults = ref.read(sqlResultsRepoProvider);
     sqlResults.remove(state!.sessionId, index);
-    state = null; // Clear the state to avoid stale data
-    ref.invalidate(sqlResultsProvider(state!.sessionId));
     state = state!.copyWith(
       sqlResults: state!.sqlResults,
       sessionId: state!.sessionId,
@@ -79,7 +85,7 @@ class SQLResultTabController extends _$SQLResultTabController {
     }
     SQLResultRepo sqlResults = ref.read(sqlResultsRepoProvider);
     sqlResults.select(state!.sessionId, index);
-        state = state!.copyWith(
+    state = state!.copyWith(
       sqlResults: state!.sqlResults,
       sessionId: state!.sessionId,
     );
@@ -115,9 +121,12 @@ class SQLResultTabController extends _$SQLResultTabController {
 class SelectedSQLResultTabController extends _$SelectedSQLResultTabController {
   @override
   SQLResultsModel? build() {
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
-    return ref.watch(sQLResultTabControllerProvider(sessionIdModel.sessionId));
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
+    return ref.watch(sQLResultsServicesProvider(sessionIdModel.sessionId));
   }
 }
 
@@ -125,11 +134,15 @@ class SelectedSQLResultTabController extends _$SelectedSQLResultTabController {
 class SelectedSQLResultController extends _$SelectedSQLResultController {
   @override
   SQLResultModel? build() {
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
-    
-    int? resultId =
-        ref.watch(sQLResultTabControllerProvider(sessionIdModel.sessionId).select((model) {
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdControllerProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
+
+    int? resultId = ref.watch(
+        sQLResultsServicesProvider(sessionIdModel.sessionId)
+            .select((model) {
       if (model == null || model.sqlResults.isEmpty) {
         return null; // No results available
       }
@@ -138,6 +151,7 @@ class SelectedSQLResultController extends _$SelectedSQLResultController {
     if (resultId == null) {
       return null; // No selected result
     }
-    return ref.watch(sQLResultControllerProvider(sessionIdModel.sessionId, resultId));
+    return ref
+        .watch(sQLResultServicesProvider(sessionIdModel.sessionId, resultId));
   }
 }
