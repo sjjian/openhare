@@ -51,6 +51,8 @@ class SessionRepoImpl extends SessionRepo {
         ? SessionModel(
             sessionId: session.id,
             instanceId: session.instance.target?.id,
+            instanceName: session.instance.target?.name,
+            dbType: session.instance.target?.dbType,
           )
         : null;
   }
@@ -88,10 +90,16 @@ class SessionRepoImpl extends SessionRepo {
         return SessionModel(
           sessionId: s.id,
           instanceId: s.instance.target?.id,
+          instanceName: s.instance.target?.name,
+          dbType: s.instance.target?.dbType,
         );
       }).toList(),
       selectedSession: _sessions.isNotEmpty
-          ? SessionModel(sessionId: _sessions.first.id)
+          ? SessionModel(
+              sessionId: _sessions.selected()?.id ?? 0,
+              instanceId: _sessions.selected()?.instance.target?.id,
+              instanceName: _sessions.selected()?.instance.target?.name,
+              dbType: _sessions.selected()?.instance.target?.dbType)
           : null,
     );
   }
@@ -102,6 +110,7 @@ class SessionRepoImpl extends SessionRepo {
       _refreshSessionCache();
     }
   }
+
   @override
   void reorderSession(int oldIndex, int newIndex) {
     _sessions.reorder(oldIndex, newIndex);

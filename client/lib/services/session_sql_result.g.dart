@@ -303,7 +303,7 @@ class _SqlResultProviderElement extends ProviderElement<SQLResultModel?>
   int get resultId => (origin as SqlResultProvider).resultId;
 }
 
-String _$sQLResultServicesHash() => r'377e2397697893f603e272cde341dcdcc082726b';
+String _$sQLResultServicesHash() => r'c8060dbcd91654b7f8742cb7570cb2e0e68673e2';
 
 abstract class _$SQLResultServices extends BuildlessNotifier<SQLResultModel?> {
   late final int sessionId;
@@ -618,7 +618,7 @@ class _SQLResultsServicesProviderElement
 }
 
 String _$selectedSQLResultTabControllerHash() =>
-    r'bb3b6e28366a3b9b4ff7c5bba6e08a61a2f75b26';
+    r'5858a25f16e85cfb3e73a6d49a77ac488243ab63';
 
 /// See also [SelectedSQLResultTabController].
 @ProviderFor(SelectedSQLResultTabController)
@@ -635,7 +635,7 @@ final selectedSQLResultTabControllerProvider =
 
 typedef _$SelectedSQLResultTabController = Notifier<SQLResultsModel?>;
 String _$selectedSQLResultControllerHash() =>
-    r'caa5a96c575850e27d9b8173eee09d442cba258f';
+    r'a509f7489ea37664627fbba98b9f5bd6c629f345';
 
 /// See also [SelectedSQLResultController].
 @ProviderFor(SelectedSQLResultController)

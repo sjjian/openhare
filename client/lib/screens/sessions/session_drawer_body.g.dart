@@ -159,7 +159,7 @@ class _SessionDrawerStateProviderElement
 }
 
 String _$sessionDrawerControllerHash() =>
-    r'68905e8f14557e1cd1e4ef8670856af47fc89c2a';
+    r'25ee026284a11dc459e27be4648e86dde001fd17';
 
 /// See also [SessionDrawerController].
 @ProviderFor(SessionDrawerController)

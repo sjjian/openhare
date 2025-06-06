@@ -1,4 +1,4 @@
-import 'package:client/core/conn.dart';
+import 'package:client/repositories/session_conn.dart';
 import 'package:excel/excel.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/reorder_list.dart';

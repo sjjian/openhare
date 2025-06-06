@@ -1,3 +1,4 @@
+import 'package:client/models/sessions.dart';
 import 'package:client/services/session_conn.dart';
 import 'package:client/repositories/session_sql_result.dart';
 import 'package:client/models/interface.dart';
@@ -33,13 +34,11 @@ class SQLResultServices extends _$SQLResultServices {
   }
 
   Future<void> loadFromQuery(String query) async {
-    SessionConnModel sessionConnModel =
-        ref.read(sessionConnServicesProvider(state!.sessionId))!;
     state!.result.query = query;
     SQLResult result = state!.result;
     try {
       DateTime start = DateTime.now();
-      BaseQueryResult? queryResult = await sessionConnModel.conn.query(query);
+      BaseQueryResult? queryResult = await ref.read(sessionConnServicesProvider(sessionId).notifier).query( query);
       DateTime end = DateTime.now();
       SQLResult result = state!.result;
       result.setDone(queryResult!, end.difference(start));
@@ -121,7 +120,7 @@ class SQLResultsServices extends _$SQLResultsServices {
 class SelectedSQLResultTabController extends _$SelectedSQLResultTabController {
   @override
   SQLResultsModel? build() {
-    SelectedSessionId? sessionIdModel =
+    SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;
@@ -134,7 +133,7 @@ class SelectedSQLResultTabController extends _$SelectedSQLResultTabController {
 class SelectedSQLResultController extends _$SelectedSQLResultController {
   @override
   SQLResultModel? build() {
-    SelectedSessionId? sessionIdModel =
+    SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;

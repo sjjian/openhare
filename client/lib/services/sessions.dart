@@ -1,5 +1,4 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/models/interface.dart';
 import 'package:client/repositories/sessions.dart';
 import 'package:client/repositories/instances.dart';
 import 'package:client/repositories/repo.dart';
@@ -12,8 +11,7 @@ class SessionsServices extends _$SessionsServices {
   @override
   SessionListModel build() {
     print("SessionsServices build");
-    SessionListModel sessions =
-        ref.watch(sessionRepoProvider).getSessions();
+    SessionListModel sessions = ref.watch(sessionRepoProvider).getSessions();
     return sessions;
   }
 
@@ -34,8 +32,8 @@ class SessionsServices extends _$SessionsServices {
     // SessionRepo sessionRepo = ref.read(sessionRepoProvider);
     SessionModel selectedSession;
     if (state.selectedSession == null) {
-       selectedSession = await ref.read(sessionRepoProvider).newSession();
-    }else {
+      selectedSession = await ref.read(sessionRepoProvider).newSession();
+    } else {
       selectedSession = state.selectedSession!;
     }
 
@@ -46,7 +44,9 @@ class SessionsServices extends _$SessionsServices {
     if (schema != null) {
       ob.addInstanceActiveSchema(instance, schema);
     }
-    await ref.read(sessionRepoProvider).updateSession(selectedSession, instance, schema ?? '');
+    await ref
+        .read(sessionRepoProvider)
+        .updateSession(selectedSession, instance, schema ?? '');
     ref.invalidateSelf();
     // SessionStorage? session = state.sessions.selected();
     // if (session == null) {
@@ -78,11 +78,10 @@ class SessionsServices extends _$SessionsServices {
 @Riverpod(keepAlive: true)
 class SelectedSessionIdServices extends _$SelectedSessionIdServices {
   @override
-  SelectedSessionId? build() {
+  SessionModel? build() {
     int sessionId = ref.watch(sessionsServicesProvider.select((s) {
       print("notify sessionTabControllerProvider");
-      if (s.selectedSession== null ||
-          s.selectedSession!.instanceId == null) {
+      if (s.selectedSession == null || s.selectedSession!.instanceId == null) {
         return 0;
       }
       return s.selectedSession!.sessionId;
@@ -92,18 +91,6 @@ class SelectedSessionIdServices extends _$SelectedSessionIdServices {
       return null;
     }
     print("SelectedSessionIdController2 build: $sessionId");
-    SessionModel? session =
-        ref.read(sessionRepoProvider).getSession(sessionId);
-    
-    InstanceModel? instance =
-        ref.read(objectboxProvider).getInstanceById(session?.instanceId ?? 0);
-    if (instance == null) {
-      print("SelectedSessionIdController build 1: session is null or instance is null");
-      return null;
-    }
-    print("SelectedSessionIdController build 2: $sessionId");
-    return SelectedSessionId(
-        sessionId: sessionId, instanceId: instance.id);
+    return ref.read(sessionRepoProvider).getSession(sessionId);
   }
 }
-

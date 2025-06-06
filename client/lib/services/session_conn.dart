@@ -1,44 +1,67 @@
-import 'package:client/core/conn.dart';
-import 'package:client/models/interface.dart';
-import 'package:client/repositories/repo.dart';
+import 'package:client/models/session_conn.dart';
+import 'package:client/models/sessions.dart';
+import 'package:client/repositories/instances.dart';
+import 'package:client/repositories/session_conn.dart';
 import 'package:client/services/sessions.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_conn.g.dart';
 
 @Riverpod(keepAlive: true)
+class SessionConnsServices extends _$SessionConnsServices {
+  @override
+  int build() {
+    return 0;
+  }
+
+  Future<void> createConn(int sessionId, InstanceModel instance,
+      {String? currentSchema}) async {
+    ref
+        .read(sessionConnRepoProvider)
+        .createConn(sessionId, instance, currentSchema: currentSchema);
+  }
+
+  Future<void> removeConn(int sessionId) async {
+    ref.read(sessionConnRepoProvider).removeConn(sessionId);
+  }
+}
+
+@Riverpod(keepAlive: true)
 class SessionConnServices extends _$SessionConnServices {
   @override
   SessionConnModel build(int sessionId) {
-    SessionConn conn = ref.watch(sessionConnProvider(sessionId));
-    return SessionConnModel(conn: conn);
+    SessionConnModel conn =
+        ref.watch(sessionConnRepoProvider).getSessionConn(sessionId);
+    return conn;
   }
 
   Future<void> connect() async {
-    await state.conn.connect();
-    state = state.copyWith(conn: state.conn);
+    await ref.read(sessionConnRepoProvider).connect(sessionId);
+    ref.invalidateSelf();
   }
 
   Future<void> close() async {
-    await state.conn.close();
-    state = state.copyWith(conn: state.conn);
+    await ref.read(sessionConnRepoProvider).close(sessionId);
+    ref.invalidateSelf();
   }
 
   Future<void> onSchemaChanged(String schema) async {
-    ObjectBox ob = ref.read(objectboxProvider);
-    await ob.addInstanceActiveSchema(state.conn.model, schema);
-    state.conn.onSchemaChanged(schema);
-    state = state.copyWith(conn: state.conn);
+    await ref.read(sessionConnRepoProvider).onSchemaChanged(sessionId, schema);
+    ref.invalidateSelf();
   }
 
   Future<void> setCurrentSchema(String schema) async {
-    await state.conn.setCurrentSchema(schema);
-    state = state.copyWith(conn: state.conn);
+    await ref.read(sessionConnRepoProvider).setCurrentSchema(sessionId, schema);
+    ref.invalidateSelf();
   }
 
   Future<List<String>> getSchemas() async {
-    List<String> schemas = await state.conn.getSchemas();
-    return schemas;
+    return ref.read(sessionConnRepoProvider).getSchemas(sessionId);
+  }
+  
+  Future<BaseQueryResult?> query(String query) async {
+    return ref.read(sessionConnRepoProvider).query(sessionId, query);
   }
 }
 
@@ -46,11 +69,12 @@ class SessionConnServices extends _$SessionConnServices {
 class SelectedSessionConnController extends _$SelectedSessionConnController {
   @override
   SessionConnModel? build() {
-    SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }
-    SessionConnModel? model = ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
+    SessionConnModel? model =
+        ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
     return model;
   }
 }

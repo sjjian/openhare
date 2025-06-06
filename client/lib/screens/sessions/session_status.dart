@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:client/core/conn.dart';
 import 'package:client/models/interface.dart';
-import 'package:client/services/session_conn.dart';
+import 'package:client/models/sessions.dart';
+import 'package:client/repositories/session_conn.dart';
 import 'package:client/services/session_sql_result.dart';
 import 'package:client/services/sessions.dart';
 import 'package:file_picker/file_picker.dart';
@@ -13,24 +13,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_status.g.dart';
 
 @Riverpod(keepAlive: true)
-class SelectedSessionStatusNotifier
-    extends _$SelectedSessionStatusNotifier {
+class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
   @override
   SessionStatusModel? build() {
-    SelectedSessionId? sessionIdModel =
-        ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }
     SQLResultModel? sqlResultModel =
         ref.watch(selectedSQLResultControllerProvider);
 
-    SessionConnModel sessionConnModel =
-        ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
-
     return SessionStatusModel(
       sessionId: sessionIdModel.sessionId,
-      instanceName: sessionConnModel.conn.model.name,
+      instanceName: sessionIdModel.instanceName ?? "",
       resultId: sqlResultModel?.result.id,
       state: sqlResultModel?.result.state ?? SQLExecuteState.init,
       query: sqlResultModel?.result.query,
@@ -55,7 +50,7 @@ class SessionStatusTab extends ConsumerWidget {
     String affectedRowsDisplay = "${model.affectedRows ?? "-"}";
     String executeTimeDisplay = model.executeTime?.format() ?? "-";
     String shortQueryDisplay = model.query?.trimLeft().split("\n")[0] ?? "-";
-    
+
     return Container(
       padding: const EdgeInsets.only(left: 5),
       height: 30,

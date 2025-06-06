@@ -1,4 +1,5 @@
 import 'package:client/models/interface.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
@@ -20,7 +21,7 @@ CurrentSessionMetadata sessionMetadataState(Ref ref, int sessionId) {
 class SessionMetadataController extends _$SessionMetadataController {
   @override
   CurrentSessionMetadata build() {
-    SelectedSessionId? sessionIdModel =
+    SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionMetadataStateProvider(0));

@@ -1,4 +1,5 @@
 import 'package:client/models/interface.dart';
+import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/services/session_sql_result.dart';
@@ -17,7 +18,7 @@ part 'session_operation_bar.g.dart';
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
   SessionOpBarModel build() {
-    SelectedSessionId sessionIdModel =
+    SessionModel sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider)!;
     SessionConnModel sessionConnModel =
         ref.watch(selectedSessionConnControllerProvider)!;
@@ -26,8 +27,8 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
 
     return SessionOpBarModel(
       sessionId: sessionIdModel.sessionId,
-      canQuery: sessionConnModel.conn.canQuery(),
-      currentSchema: sessionConnModel.conn.currentSchema ?? "",
+      canQuery: sessionConnModel.canQuery,
+      currentSchema: sessionConnModel.currentSchema,
       isRightPageOpen: sessionDrawer.isRightPageOpen,
     );
   }

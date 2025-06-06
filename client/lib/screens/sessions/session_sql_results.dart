@@ -1,5 +1,6 @@
-import 'package:client/core/conn.dart';
 import 'package:client/models/interface.dart';
+import 'package:client/models/sessions.dart';
+import 'package:client/repositories/session_conn.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/services/session_sql_result.dart';
 import 'package:client/services/sessions.dart';
@@ -34,7 +35,7 @@ CurrentSessionEditor sessionEditor(Ref ref, int sessionId) {
 class SessionEditorController extends _$SessionEditorController {
   @override
   CurrentSessionEditor build() {
-    SelectedSessionId? sessionIdModel =
+    SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionEditorProvider(0));

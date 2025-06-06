@@ -161,7 +161,7 @@ class _SessionMetadataStateProviderElement
 }
 
 String _$sessionMetadataControllerHash() =>
-    r'40d88c33e11654ffde09122f31c3c25fbd79ad40';
+    r'ea687d28135f3a0f708d1747e7c1a3c74f8f12c2';
 
 /// See also [SessionMetadataController].
 @ProviderFor(SessionMetadataController)

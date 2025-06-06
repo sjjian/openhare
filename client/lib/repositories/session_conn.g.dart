@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'session_operation_bar.dart';
+part of 'session_conn.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionOpBarNotifierHash() =>
-    r'979d6cf66dd1554d600bef17c307cb4fe76c2603';
+String _$sessionConnRepoHash() => r'68c4a3afd00dc5fcedf306eb8cd1efe7493454fe';
 
-/// See also [SessionOpBarNotifier].
-@ProviderFor(SessionOpBarNotifier)
-final sessionOpBarNotifierProvider =
-    NotifierProvider<SessionOpBarNotifier, SessionOpBarModel>.internal(
-  SessionOpBarNotifier.new,
-  name: r'sessionOpBarNotifierProvider',
+/// See also [sessionConnRepo].
+@ProviderFor(sessionConnRepo)
+final sessionConnRepoProvider = Provider<SessionConnRepo>.internal(
+  sessionConnRepo,
+  name: r'sessionConnRepoProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$sessionOpBarNotifierHash,
+      : _$sessionConnRepoHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionOpBarNotifier = Notifier<SessionOpBarModel>;
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef SessionConnRepoRef = ProviderRef<SessionConnRepo>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,4 +1,5 @@
 import 'package:client/models/interface.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
@@ -24,7 +25,7 @@ CurrentSessionSplitView sessionSplitViewState(Ref ref, int sessionId) {
 class SessionSplitViewController extends _$SessionSplitViewController {
   @override
   CurrentSessionSplitView build() {
-    SelectedSessionId? sessionIdModel =
+    SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionSplitViewStateProvider(0));

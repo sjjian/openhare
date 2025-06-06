@@ -161,7 +161,7 @@ class _SessionSplitViewStateProviderElement
 }
 
 String _$sessionSplitViewControllerHash() =>
-    r'1157471642f90baaaf7ecaf79a2c12f3d29ccb4a';
+    r'8c3c6f28f1ec58a111445f1462b2883c959133e6';
 
 /// See also [SessionSplitViewController].
 @ProviderFor(SessionSplitViewController)

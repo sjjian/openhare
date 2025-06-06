@@ -6,8 +6,25 @@ part of 'session_conn.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$sessionConnsServicesHash() =>
+    r'8ac8138ef6b601f7b4d07779095cd3d3dd746bb6';
+
+/// See also [SessionConnsServices].
+@ProviderFor(SessionConnsServices)
+final sessionConnsServicesProvider =
+    NotifierProvider<SessionConnsServices, int>.internal(
+  SessionConnsServices.new,
+  name: r'sessionConnsServicesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionConnsServicesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SessionConnsServices = Notifier<int>;
 String _$sessionConnServicesHash() =>
-    r'88bb07ab1f834757f5eac0d13c7040ef36341f6e';
+    r'bf5cf773d5a72649bef2658bff752fc1912ab3c8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -175,7 +192,7 @@ class _SessionConnServicesProviderElement
 }
 
 String _$selectedSessionConnControllerHash() =>
-    r'1078863ee1ac90a2ea52c868ea34d54a2bf2d404';
+    r'8bbc06c81fcc4d1f2f6b1aa8dd3852933a502ec8';
 
 /// See also [SelectedSessionConnController].
 @ProviderFor(SelectedSessionConnController)

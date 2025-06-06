@@ -1,4 +1,4 @@
-import 'package:client/core/conn.dart';
+import 'package:client/repositories/session_conn.dart';
 import 'package:client/repositories/sessions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
@@ -19,12 +19,12 @@ enum DrawerPage {
   sqlResult,
 }
 
-@freezed
-abstract class SessionConnModel with _$SessionConnModel {
-  const factory SessionConnModel({
-    required SessionConn conn,
-  }) = _SessionConnModel;
-}
+// @freezed
+// abstract class SessionConnModel with _$SessionConnModel {
+//   const factory SessionConnModel({
+//     required SessionConn conn,
+//   }) = _SessionConnModel;
+// }
 
 @freezed
 abstract class CurrentSessionDrawer with _$CurrentSessionDrawer {

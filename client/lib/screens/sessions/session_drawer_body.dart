@@ -1,4 +1,5 @@
 import 'package:client/models/interface.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
 import 'package:client/services/sessions.dart';
@@ -23,7 +24,7 @@ CurrentSessionDrawer sessionDrawerState(Ref ref, int sessionId) {
 class SessionDrawerController extends _$SessionDrawerController {
   @override
   CurrentSessionDrawer build() {
-    SelectedSessionId? sessionIdModel =
+    SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionDrawerStateProvider(0));

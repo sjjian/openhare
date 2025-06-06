@@ -158,7 +158,7 @@ class _SessionEditorProviderElement
 }
 
 String _$sessionEditorControllerHash() =>
-    r'c7bd7423d35ed04e4029760170b594c6e9d1fee8';
+    r'b5ea0583f416c3698eac30b01c386a5d7e04d8f6';
 
 /// See also [SessionEditorController].
 @ProviderFor(SessionEditorController)

@@ -1,4 +1,6 @@
 import 'package:client/models/interface.dart';
+import 'package:client/models/session_conn.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/services/session_conn.dart';
 import 'package:client/services/sessions.dart';
@@ -49,12 +51,12 @@ class SQLEditor extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SelectedSessionId sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
+    SessionModel sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
     CurrentSessionMetadata sessionMeta = ref.watch(sessionMetadataControllerProvider);
     SessionConnModel sessionConnModel = ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
 
     MetaDataNode? metadata = sessionMeta.metadata;
-    String? currentSchema = sessionConnModel.conn.currentSchema;
+    String? currentSchema = sessionConnModel.currentSchema;
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords)
