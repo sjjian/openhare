@@ -1,8 +1,10 @@
+import 'package:client/models/sessions.dart';
 import 'package:client/repositories/instances.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:client/repositories/repo.dart';
+import 'package:client/utils/reorder_list.dart';
 
 part 'sessions.g.dart';
 
@@ -24,33 +26,91 @@ class SessionStorage {
   });
 }
 
-class SessionRepo {
+class SessionRepoImpl extends SessionRepo {
   final ObjectBox ob;
   final Box<SessionStorage> _sessionBox;
+  ReorderSelectedList<SessionStorage>? _sessionCache;
 
-  SessionRepo(this.ob) : _sessionBox = ob.store.box();
+  SessionRepoImpl(this.ob) : _sessionBox = ob.store.box();
 
-  SessionStorage? getSession(int id) {
-    return _sessionBox.get(id);
+  void _refreshSessionCache() {
+    _sessionCache = ReorderSelectedList(data: _sessionBox.getAll());
   }
 
-  Future<void> addSession(SessionStorage session) =>
-      _sessionBox.putAsync(session);
+  ReorderSelectedList<SessionStorage> get _sessions {
+    if (_sessionCache == null) {
+      _refreshSessionCache();
+    }
+    return _sessionCache!;
+  }
 
-  Future<void> updateSession(SessionStorage target) async {
+  @override
+  SessionModel? getSession(int id) {
+    final session = _sessionBox.get(id);
+    return session != null
+        ? SessionModel(
+            sessionId: session.id,
+            instanceId: session.instance.target?.id,
+          )
+        : null;
+  }
+
+  @override
+  Future<SessionModel> newSession() async {
+    final session = SessionStorage();
+    _sessions.add(session);
+    final id = await _sessionBox.putAsync(session);
+    return SessionModel(sessionId: id);
+  }
+
+  @override
+  Future<void> updateSession(
+      SessionModel model, InstanceModel instance, String currentSchema) async {
+    final target = await _sessionBox.getAsync(model.sessionId);
+    if (target == null) {
+      return;
+    }
+    target.instance.target = instance;
+    target.currentSchema = currentSchema;
     _sessionBox.putAsync(target);
   }
 
-  Future<void> deleteSession(SessionStorage session) =>
-      _sessionBox.removeAsync(session.id);
+  @override
+  Future<void> deleteSession(SessionModel model) async {
+    _sessionCache!.removeWhere((session) => session.id == model.sessionId);
+    _sessionBox.removeAsync(model.sessionId);
+  }
 
-  List<SessionStorage> getSessions() {
-    return _sessionBox.getAll();
+  @override
+  SessionListModel getSessions() {
+    return SessionListModel(
+      sessions: _sessions.map((s) {
+        return SessionModel(
+          sessionId: s.id,
+          instanceId: s.instance.target?.id,
+        );
+      }).toList(),
+      selectedSession: _sessions.isNotEmpty
+          ? SessionModel(sessionId: _sessions.first.id)
+          : null,
+    );
+  }
+
+  @override
+  void selectSessionByIndex(int index) {
+    if (_sessions.select(index)) {
+      _refreshSessionCache();
+    }
+  }
+  @override
+  void reorderSession(int oldIndex, int newIndex) {
+    _sessions.reorder(oldIndex, newIndex);
+    _refreshSessionCache();
   }
 }
 
 @Riverpod(keepAlive: true)
 SessionRepo sessionRepo(Ref ref) {
   ObjectBox ob = ref.watch(objectboxProvider);
-  return SessionRepo(ob);
+  return SessionRepoImpl(ob);
 }

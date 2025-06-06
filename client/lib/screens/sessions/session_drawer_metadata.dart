@@ -1,5 +1,5 @@
 import 'package:client/models/interface.dart';
-import 'package:client/providers/sessions.dart';
+import 'package:client/services/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:db_driver/db_driver.dart';
@@ -7,6 +7,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'session_drawer_metadata.g.dart';
+
+@Riverpod(keepAlive: true)
+CurrentSessionMetadata sessionMetadataState(Ref ref, int sessionId) {
+  return const CurrentSessionMetadata();
+}
+
+@Riverpod(keepAlive: true)
+class SessionMetadataController extends _$SessionMetadataController {
+  @override
+  CurrentSessionMetadata build() {
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionMetadataStateProvider(0));
+    }
+    return ref.watch(sessionMetadataStateProvider(sessionIdModel.sessionId));
+  }
+}
 
 class RootNode implements DataNode {
   final String name;

@@ -1,17 +1,28 @@
-import 'package:client/models/interface.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions.dart';
 import 'package:client/services/session_conn.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'session_tabs.g.dart';
+
+@Riverpod(keepAlive: true)
+class SessionsTabNotifier extends _$SessionsTabNotifier {
+  @override
+  SessionListModel build() {
+    return ref.watch(sessionsServicesProvider);
+  }
+}
 
 class SessionTabs extends ConsumerWidget {
   const SessionTabs({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionTab sessionTab = ref.watch(sessionsServicesProvider);
+    SessionListModel model = ref.watch(sessionsTabNotifierProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: CommonTabBar(
@@ -34,8 +45,8 @@ class SessionTabs extends ConsumerWidget {
                 .reorderSession(oldIndex, newIndex);
           },
           tabs: [
-            for (var i = 0; i < sessionTab.sessions.length; i++)
-              (sessionTab.sessions[i].instance.target == null)
+            for (var i = 0; i < model.sessions.length; i++)
+              (model.sessions[i].instanceId == null)
                   ? CommonTabWrap(
                       label: "new",
                       onTap: () {
@@ -48,21 +59,21 @@ class SessionTabs extends ConsumerWidget {
                             .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
-                      selected: sessionTab.sessions
-                          .isSelected(sessionTab.sessions[i]),
+                      selected: model.sessions[i] == model.selectedSession,
                     )
                   : CommonTabWrap(
-                      avatar: Image.asset(connectionMetaMap[
-                              sessionTab.sessions[i].instance.target!.dbType]!
-                          .logoAssertPath),
-                      label: sessionTab
-                          .sessions[i].instance.target!.connectValue.name,
+                      avatar: Image.asset(
+                          connectionMetaMap[model.sessions[i].dbType!]!
+                              .logoAssertPath),
+                      label: model.sessions[i].instanceName!,
                       items: <PopupMenuEntry>[
                         PopupMenuItem<String>(
                           height: 30,
                           onTap: () {
                             ref
-                                .read(sessionConnServicesProvider(sessionTab.sessions[i].id).notifier)
+                                .read(sessionConnServicesProvider(
+                                        model.sessions[i].sessionId)
+                                    .notifier)
                                 .connect();
                           },
                           child: const Text("连接"),
@@ -72,7 +83,9 @@ class SessionTabs extends ConsumerWidget {
                           height: 30,
                           onTap: () {
                             ref
-                                .read(sessionConnServicesProvider(sessionTab.sessions[i].id).notifier)
+                                .read(sessionConnServicesProvider(
+                                        model.sessions[i].sessionId)
+                                    .notifier)
                                 .close();
                           },
                           child: const Text("断开"),
@@ -98,8 +111,7 @@ class SessionTabs extends ConsumerWidget {
                             .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
-                      selected: sessionTab.sessions
-                          .isSelected(sessionTab.sessions[i]),
+                      selected: model.sessions[i] == model.selectedSession,
                     )
           ]),
     );

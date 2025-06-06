@@ -3,7 +3,7 @@ import 'package:client/core/conn.dart';
 import 'package:client/models/interface.dart';
 import 'package:client/services/session_conn.dart';
 import 'package:client/services/session_sql_result.dart';
-import 'package:client/providers/sessions.dart';
+import 'package:client/services/sessions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';
@@ -13,12 +13,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_status.g.dart';
 
 @Riverpod(keepAlive: true)
-class SelectedSessionStatusController
-    extends _$SelectedSessionStatusController {
+class SelectedSessionStatusNotifier
+    extends _$SelectedSessionStatusNotifier {
   @override
   SessionStatusModel? build() {
     SelectedSessionId? sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider);
+        ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }
@@ -30,7 +30,7 @@ class SelectedSessionStatusController
 
     return SessionStatusModel(
       sessionId: sessionIdModel.sessionId,
-      instanceName: sessionConnModel.conn.model.instance.target!.name,
+      instanceName: sessionConnModel.conn.model.name,
       resultId: sqlResultModel?.result.id,
       state: sqlResultModel?.result.state ?? SQLExecuteState.init,
       query: sqlResultModel?.result.query,
@@ -46,7 +46,7 @@ class SessionStatusTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionStatusModel? model =
-        ref.watch(selectedSessionStatusControllerProvider);
+        ref.watch(selectedSessionStatusNotifierProvider);
     if (model == null) {
       return Container(
         height: 30,

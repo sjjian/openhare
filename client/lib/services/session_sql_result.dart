@@ -1,7 +1,7 @@
 import 'package:client/services/session_conn.dart';
 import 'package:client/repositories/session_sql_result.dart';
 import 'package:client/models/interface.dart';
-import 'package:client/providers/sessions.dart';
+import 'package:client/services/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -122,7 +122,7 @@ class SelectedSQLResultTabController extends _$SelectedSQLResultTabController {
   @override
   SQLResultsModel? build() {
     SelectedSessionId? sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider);
+        ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }
@@ -135,7 +135,7 @@ class SelectedSQLResultController extends _$SelectedSQLResultController {
   @override
   SQLResultModel? build() {
     SelectedSessionId? sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider);
+        ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }

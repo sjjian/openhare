@@ -1,9 +1,77 @@
 import 'package:client/models/interface.dart';
-import 'package:client/providers/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
+import 'package:client/services/sessions.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'session_drawer_body.g.dart';
+
+@Riverpod(keepAlive: true)
+CurrentSessionDrawer sessionDrawerState(Ref ref, int sessionId) {
+  return const CurrentSessionDrawer(
+      drawerPage: DrawerPage.metadataTree,
+      sqlResult: null,
+      sqlColumn: null,
+      showRecord: false,
+      isRightPageOpen: true);
+}
+
+@Riverpod(keepAlive: true)
+class SessionDrawerController extends _$SessionDrawerController {
+  @override
+  CurrentSessionDrawer build() {
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionDrawerStateProvider(0));
+    }
+    return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
+  }
+
+  Future<void> loadMetadata() async {
+    // CurrentSessionDrawer? session = ref.read(currentSessionDrawerProvider);
+    // if (session == null || session is UnInitSession) {
+    //   return;
+    // }
+    // if ((session as Session).metadata != null) {
+    //   return;
+    // }
+
+    // if (session.connState != SQLConnectState.connected) {
+    //   return;
+    // }
+    // session.metadata = await session.conn2!.metadata();
+    // ref.invalidate(currentSessionDrawerProvider);
+    return;
+  }
+
+  void showRightPage() {
+    state = state.copyWith(isRightPageOpen: true);
+  }
+
+  void hideRightPage() {
+    state = state.copyWith(isRightPageOpen: false);
+  }
+
+  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
+    state = state.copyWith(
+      drawerPage: DrawerPage.sqlResult,
+      sqlColumn: column ?? state.sqlColumn,
+      sqlResult: result ?? state.sqlResult,
+    );
+  }
+
+  void goToTree() {
+    state = state.copyWith(
+      drawerPage: DrawerPage.metadataTree,
+      sqlColumn: null,
+      sqlResult: null,
+    );
+  }
+}
 
 class SessionDrawerBody extends ConsumerWidget {
   const SessionDrawerBody({Key? key}) : super(key: key);

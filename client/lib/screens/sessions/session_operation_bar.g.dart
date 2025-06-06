@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'session_status.dart';
+part of 'session_operation_bar.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$selectedSessionStatusNotifierHash() =>
-    r'aa99fc5a325b1d979807472f8386327463fd4333';
+String _$sessionOpBarNotifierHash() =>
+    r'6e8d88acd0315278307af93a0dc97593c0ee6734';
 
-/// See also [SelectedSessionStatusNotifier].
-@ProviderFor(SelectedSessionStatusNotifier)
-final selectedSessionStatusNotifierProvider = NotifierProvider<
-    SelectedSessionStatusNotifier, SessionStatusModel?>.internal(
-  SelectedSessionStatusNotifier.new,
-  name: r'selectedSessionStatusNotifierProvider',
+/// See also [SessionOpBarNotifier].
+@ProviderFor(SessionOpBarNotifier)
+final sessionOpBarNotifierProvider =
+    NotifierProvider<SessionOpBarNotifier, SessionOpBarModel>.internal(
+  SessionOpBarNotifier.new,
+  name: r'sessionOpBarNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$selectedSessionStatusNotifierHash,
+      : _$sessionOpBarNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SelectedSessionStatusNotifier = Notifier<SessionStatusModel?>;
+typedef _$SessionOpBarNotifier = Notifier<SessionOpBarModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

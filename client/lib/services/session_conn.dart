@@ -1,7 +1,7 @@
 import 'package:client/core/conn.dart';
 import 'package:client/models/interface.dart';
-import 'package:client/providers/sessions.dart';
 import 'package:client/repositories/repo.dart';
+import 'package:client/services/sessions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_conn.g.dart';
@@ -26,7 +26,7 @@ class SessionConnServices extends _$SessionConnServices {
 
   Future<void> onSchemaChanged(String schema) async {
     ObjectBox ob = ref.read(objectboxProvider);
-    await ob.addInstanceActiveSchema(state.conn.model.instance.target!, schema);
+    await ob.addInstanceActiveSchema(state.conn.model, schema);
     state.conn.onSchemaChanged(schema);
     state = state.copyWith(conn: state.conn);
   }
@@ -46,7 +46,7 @@ class SessionConnServices extends _$SessionConnServices {
 class SelectedSessionConnController extends _$SelectedSessionConnController {
   @override
   SessionConnModel? build() {
-    SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdControllerProvider);
+    SelectedSessionId? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }

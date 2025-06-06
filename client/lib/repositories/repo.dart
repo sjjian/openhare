@@ -59,6 +59,12 @@ class ObjectBox {
     return build.findFirst();
   }
 
+// todo: 替换 getInstance
+  InstanceModel? getInstanceById(int id) {
+    return _instanceBox.get(id);
+  }
+
+
 // todo: aync
   List<InstanceModel> searchInstances(String key,
       {int? pageNumber, int? pageSize}) {

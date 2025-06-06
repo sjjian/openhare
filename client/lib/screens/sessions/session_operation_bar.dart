@@ -1,12 +1,37 @@
 import 'package:client/models/interface.dart';
+import 'package:client/models/sessions.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/services/session_sql_result.dart';
-import 'package:client/providers/sessions.dart';
 import 'package:client/services/session_conn.dart';
+import 'package:client/services/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'session_operation_bar.g.dart';
+
+@Riverpod(keepAlive: true)
+class SessionOpBarNotifier extends _$SessionOpBarNotifier {
+  @override
+  SessionOpBarModel build() {
+    SelectedSessionId sessionIdModel =
+        ref.watch(selectedSessionIdServicesProvider)!;
+    SessionConnModel sessionConnModel =
+        ref.watch(selectedSessionConnControllerProvider)!;
+    CurrentSessionDrawer sessionDrawer =
+        ref.watch(sessionDrawerControllerProvider)!;
+
+    return SessionOpBarModel(
+      sessionId: sessionIdModel.sessionId,
+      canQuery: sessionConnModel.conn.canQuery(),
+      currentSchema: sessionConnModel.conn.currentSchema ?? "",
+      isRightPageOpen: sessionDrawer.isRightPageOpen,
+    );
+  }
+}
 
 class SessionOpBar extends ConsumerWidget {
   final CodeLineEditingController codeController;
@@ -41,14 +66,7 @@ class SessionOpBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
-    SessionConnModel sessionConnModel = ref.watch(selectedSessionConnControllerProvider)!;
-    CurrentSessionDrawer sessionDrawer =
-        ref.watch(sessionDrawerControllerProvider)!;
-
-    final canQuery = sessionConnModel.conn.canQuery();
-
+    SessionOpBarModel model = ref.watch(sessionOpBarNotifierProvider);
     return Container(
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
@@ -59,7 +77,7 @@ class SessionOpBar extends ConsumerWidget {
               iconSize: height,
               alignment: Alignment.center,
               padding: const EdgeInsets.all(2),
-              onPressed: canQuery
+              onPressed: model.canQuery
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
@@ -70,23 +88,22 @@ class SessionOpBar extends ConsumerWidget {
                     }
                   : null,
               icon: Icon(Icons.play_arrow_rounded,
-                  color: canQuery ? Colors.green : Colors.grey)),
+                  color: model.canQuery ? Colors.green : Colors.grey)),
           IconButton(
               iconSize: height,
               alignment: Alignment.center,
               padding: const EdgeInsets.all(2),
-              onPressed: canQuery
+              onPressed: model.canQuery
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
                         final result = ref
-                            .read(sQLResultsServicesProvider(
-                                    sessionIdModel.sessionId)
+                            .read(sQLResultsServicesProvider(model.sessionId)
                                 .notifier)
                             .addSQLResult();
                         ref
                             .read(sQLResultServicesProvider(
-                                    sessionIdModel.sessionId, result!.id)
+                                    model.sessionId, result!.id)
                                 .notifier)
                             .loadFromQuery(query);
                       }
@@ -94,7 +111,7 @@ class SessionOpBar extends ConsumerWidget {
                   : null,
               icon: Stack(alignment: Alignment.center, children: [
                 Icon(Icons.play_arrow_rounded,
-                    color: canQuery ? Colors.green : Colors.grey),
+                    color: model.canQuery ? Colors.green : Colors.grey),
                 const Icon(
                   Icons.add,
                   color: Colors.white,
@@ -105,18 +122,17 @@ class SessionOpBar extends ConsumerWidget {
               iconSize: height,
               padding: const EdgeInsets.all(2),
               alignment: Alignment.topLeft,
-              onPressed: canQuery
+              onPressed: model.canQuery
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
                         final result = ref
-                            .read(sQLResultsServicesProvider(
-                                    sessionIdModel.sessionId)
+                            .read(sQLResultsServicesProvider(model.sessionId)
                                 .notifier)
                             .addSQLResult();
                         ref
                             .read(sQLResultServicesProvider(
-                                    sessionIdModel.sessionId, result!.id)
+                                    model.sessionId, result!.id)
                                 .notifier)
                             .loadFromQuery("explain $query");
                       }
@@ -124,7 +140,7 @@ class SessionOpBar extends ConsumerWidget {
                   : null,
               icon: Icon(
                 Icons.e_mobiledata,
-                color: canQuery
+                color: model.canQuery
                     ? const Color.fromARGB(255, 241, 192, 84)
                     : Colors.grey,
               )),
@@ -134,10 +150,11 @@ class SessionOpBar extends ConsumerWidget {
             endIndent: 5,
           ),
           SchemaBar(
-              disable: canQuery ? false : true,
-              currentSchema: sessionConnModel.conn.model.currentSchema),
+              sessionId: model.sessionId,
+              disable: model.canQuery ? false : true,
+              currentSchema: model.currentSchema),
           const Spacer(),
-          if (sessionDrawer.isRightPageOpen == false)
+          if (model.isRightPageOpen == false)
             IconButton(
               onPressed: () {
                 ref
@@ -155,8 +172,10 @@ class SessionOpBar extends ConsumerWidget {
 class SchemaBar extends ConsumerStatefulWidget {
   final String? currentSchema;
   final bool disable;
+  final int sessionId;
   const SchemaBar({
     Key? key,
+    required this.sessionId,
     required this.disable,
     this.currentSchema,
   }) : super(key: key);
@@ -170,9 +189,6 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
 
   @override
   Widget build(BuildContext context) {
-    SessionConnModel sessionConnModel = ref.watch(selectedSessionConnControllerProvider)!;
-    SelectedSessionId sessionIdModel =
-        ref.watch(selectedSessionIdControllerProvider)!;
     return MouseRegion(
       onEnter: (_) {
         setState(() {
@@ -195,8 +211,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
           final overlayPos = overlay.localToGlobal(Offset.zero);
 
           List<String> schemas = await ref
-              .read(sessionConnServicesProvider(sessionIdModel.sessionId)
-                  .notifier)
+              .read(sessionConnServicesProvider(widget.sessionId).notifier)
               .getSchemas();
 
           // todo
@@ -213,8 +228,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     height: 30,
                     onTap: () {
                       ref
-                          .read(sessionConnServicesProvider(
-                                  sessionIdModel.sessionId)
+                          .read(sessionConnServicesProvider(widget.sessionId)
                               .notifier)
                           .setCurrentSchema(schema);
                     },
@@ -241,7 +255,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          sessionConnModel.conn.currentSchema ?? "",
+                          widget.currentSchema ?? "",
                           overflow: TextOverflow.ellipsis,
                         ))),
               ],

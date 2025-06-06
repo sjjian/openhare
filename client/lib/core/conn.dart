@@ -1,3 +1,6 @@
+import 'package:client/models/sessions.dart';
+import 'package:client/repositories/instances.dart';
+import 'package:client/repositories/repo.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/repositories/sessions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -115,7 +118,7 @@ class ConnManager {
     return conns[sessionId];
   }
 
-  SessionConn createConn(SessionStorage model, {String? currentSchema}) {
+  SessionConn createConn(InstanceModel model, {String? currentSchema}) {
     SessionConn conn = SessionConn(model: model, currentSchema: currentSchema);
     conns[model.id] = conn;
     return conn;
@@ -131,7 +134,7 @@ enum SQLConnectState { pending, connecting, connected, failed }
 enum SQLExecuteState { init, executing, done, error }
 
 class SessionConn {
-  final SessionStorage model;
+  final InstanceModel model;
   BaseConnection? conn2;
   SQLConnectState state = SQLConnectState.pending;
   SQLExecuteState queryState = SQLExecuteState.init;
@@ -145,9 +148,9 @@ class SessionConn {
   Future<void> connect() async {
     try {
       conn2 = await ConnectionFactory.open(
-        type: model.instance.target!.dbType,
-        meta: model.instance.target!.connectValue,
-        schema: model.currentSchema,
+        type: model.dbType,
+        meta: model.connectValue,
+        schema: currentSchema,
         // onCloseCallback: state.onConnClose,
         // onSchemaChangedCallback: state.onSchemaChanged,
       );
@@ -215,8 +218,14 @@ ConnManager connManager(Ref ref, int sessionId) {
 @Riverpod(keepAlive: true)
 SessionConn sessionConn(Ref ref, int sessionId) {
   ConnManager connManager = ref.watch(connManagerProvider(sessionId));
-  SessionStorage model = ref.watch(sessionRepoProvider).getSession(sessionId)!;
+  SessionModel model = ref.watch(sessionRepoProvider).getSession(sessionId)!;
+
   SessionConn? conn = connManager.getConn(sessionId);
-  conn ??= connManager.createConn(model);
+  InstanceModel? instance =
+        ref.read(objectboxProvider).getInstanceById(model.instanceId ?? 0);
+  if (instance == null) {
+    throw Exception("instance is null");
+  }
+  conn ??= connManager.createConn(instance);
   return conn;
 }

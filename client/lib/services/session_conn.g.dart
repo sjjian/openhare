@@ -7,7 +7,7 @@ part of 'session_conn.dart';
 // **************************************************************************
 
 String _$sessionConnServicesHash() =>
-    r'c5aae9744ae81f52a88a5591962c92b18e96258b';
+    r'88bb07ab1f834757f5eac0d13c7040ef36341f6e';
 
 /// Copied from Dart SDK
 class _SystemHash {

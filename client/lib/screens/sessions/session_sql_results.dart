@@ -1,13 +1,47 @@
 import 'package:client/core/conn.dart';
 import 'package:client/models/interface.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/services/session_sql_result.dart';
-import 'package:client/providers/sessions.dart';
+import 'package:client/services/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:sql_editor/re_editor.dart';
+import 'package:client/utils/sql_highlight.dart';
+import 'package:sql_parser/parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'session_sql_results.g.dart';
+
+@Riverpod(keepAlive: true)
+CurrentSessionEditor sessionEditor(Ref ref, int sessionId) {
+  return CurrentSessionEditor(code: CodeLineEditingController(
+      spanBuilder: ({required codeLines, required context, required style}) {
+    return TextSpan(
+        children: Lexer(codeLines.asString(TextLineBreak.lf))
+            .tokens()
+            .map<TextSpan>((tok) => TextSpan(
+                text: tok.content,
+                style: style.merge(getStyle(tok.id) ?? style)))
+            .toList());
+  }));
+}
+
+@Riverpod(keepAlive: true)
+class SessionEditorController extends _$SessionEditorController {
+  @override
+  CurrentSessionEditor build() {
+    SelectedSessionId? sessionIdModel =
+        ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionEditorProvider(0));
+    }
+    return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
+  }
+}
 
 class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);

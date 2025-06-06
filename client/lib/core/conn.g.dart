@@ -157,7 +157,7 @@ class _ConnManagerProviderElement extends ProviderElement<ConnManager>
   int get sessionId => (origin as ConnManagerProvider).sessionId;
 }
 
-String _$sessionConnHash() => r'925ab6c1a55e00299a4f2885203cdd7828770d74';
+String _$sessionConnHash() => r'56c8270475e694bb7f73eea0a290de1f8a532682';
 
 /// See also [sessionConn].
 @ProviderFor(sessionConn)
