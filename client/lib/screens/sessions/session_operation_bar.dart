@@ -18,10 +18,9 @@ part 'session_operation_bar.g.dart';
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
   SessionOpBarModel build() {
-    SessionModel sessionIdModel =
-        ref.watch(selectedSessionIdServicesProvider)!;
+    SessionModel sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
     SessionConnModel sessionConnModel =
-        ref.watch(selectedSessionConnControllerProvider)!;
+        ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
     CurrentSessionDrawer sessionDrawer =
         ref.watch(sessionDrawerControllerProvider)!;
 

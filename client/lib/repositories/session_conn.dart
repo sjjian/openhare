@@ -14,8 +14,8 @@ class SessionConnRepoImpl extends SessionConnRepo {
   SessionConnModel getSessionConn(int sessionId) {
     return SessionConnModel(
         sessionId: sessionId,
-        currentSchema: conns[sessionId]!.currentSchema ?? "",
-        canQuery: conns[sessionId]!.canQuery());
+        currentSchema: conns[sessionId]?.currentSchema ?? "",
+        canQuery: conns[sessionId]?.canQuery() ?? false);
   }
 
   @override

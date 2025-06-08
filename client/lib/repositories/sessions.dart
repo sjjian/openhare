@@ -59,27 +59,24 @@ class SessionRepoImpl extends SessionRepo {
 
   @override
   Future<SessionModel> newSession() async {
-    final session = SessionStorage();
+    final session = await _sessionBox.putAndGetAsync(SessionStorage());
     _sessions.add(session);
-    final id = await _sessionBox.putAsync(session);
-    return SessionModel(sessionId: id);
+    return SessionModel(sessionId: session.id);
   }
 
   @override
   Future<void> updateSession(
       SessionModel model, InstanceModel instance, String currentSchema) async {
-    final target = await _sessionBox.getAsync(model.sessionId);
-    if (target == null) {
-      return;
-    }
-    target.instance.target = instance;
-    target.currentSchema = currentSchema;
-    _sessionBox.putAsync(target);
+    final session = _sessions
+        .firstWhere((s) => s.id == model.sessionId); //todo: handler null
+    session.instance.target = instance;
+    session.currentSchema = currentSchema;
+    _sessionBox.putAsync(session);
   }
 
   @override
   Future<void> deleteSession(SessionModel model) async {
-    _sessionCache!.removeWhere((session) => session.id == model.sessionId);
+    _sessions.removeWhere((session) => session.id == model.sessionId);
     _sessionBox.removeAsync(model.sessionId);
   }
 
@@ -107,14 +104,14 @@ class SessionRepoImpl extends SessionRepo {
   @override
   void selectSessionByIndex(int index) {
     if (_sessions.select(index)) {
-      _refreshSessionCache();
+      // _refreshSessionCache();
     }
   }
 
   @override
   void reorderSession(int oldIndex, int newIndex) {
     _sessions.reorder(oldIndex, newIndex);
-    _refreshSessionCache();
+    // _refreshSessionCache();
   }
 }
 

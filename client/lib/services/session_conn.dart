@@ -73,7 +73,7 @@ class SelectedSessionConnController extends _$SelectedSessionConnController {
     if (sessionIdModel == null) {
       return null;
     }
-    SessionConnModel? model =
+    SessionConnModel model =
         ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
     return model;
   }

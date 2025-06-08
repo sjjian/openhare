@@ -12,6 +12,7 @@ class SessionsServices extends _$SessionsServices {
   SessionListModel build() {
     print("SessionsServices build");
     SessionListModel sessions = ref.watch(sessionRepoProvider).getSessions();
+    print("selectedSession: ${sessions.selectedSession}");
     return sessions;
   }
 
@@ -47,6 +48,8 @@ class SessionsServices extends _$SessionsServices {
     await ref
         .read(sessionRepoProvider)
         .updateSession(selectedSession, instance, schema ?? '');
+  
+    print("SessionsServices addSession: $selectedSession, $instance, $schema");
     ref.invalidateSelf();
     // SessionStorage? session = state.sessions.selected();
     // if (session == null) {
@@ -66,12 +69,9 @@ class SessionsServices extends _$SessionsServices {
     ref.invalidateSelf();
   }
 
-  void deleteSessionByIndex(int index) {
-    SessionRepo sessionRepo = ref.read(sessionRepoProvider);
-    final session = state.sessions.removeAt(index);
-    sessionRepo.deleteSession(session);
-    // refresh
-    state = state.copyWith(sessions: state.sessions);
+  Future<void> deleteSessionByIndex(int index) async {
+    await ref.read(sessionRepoProvider).deleteSession(state.sessions[index]);
+    ref.invalidateSelf();
   }
 }
 
