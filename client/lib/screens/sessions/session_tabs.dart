@@ -13,6 +13,7 @@ part 'session_tabs.g.dart';
 class SessionsTabNotifier extends _$SessionsTabNotifier {
   @override
   SessionListModel build() {
+    print("SessionsTabNotifier build");
     return ref.watch(sessionsServicesProvider);
   }
 }
@@ -70,6 +71,12 @@ class SessionTabs extends ConsumerWidget {
                         PopupMenuItem<String>(
                           height: 30,
                           onTap: () {
+                            ref
+                                .read(sessionConnsServicesProvider.notifier)
+                                .createConn(
+                                  model.sessions[i].sessionId,
+                                  model.sessions[i].instanceId!,
+                                );
                             ref
                                 .read(sessionConnServicesProvider(
                                         model.sessions[i].sessionId)

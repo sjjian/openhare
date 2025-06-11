@@ -7,7 +7,7 @@ part of 'session_tabs.dart';
 // **************************************************************************
 
 String _$sessionsTabNotifierHash() =>
-    r'd6bf2592d6a32b61fcf0f0b10a87f20b6b16c93d';
+    r'5131d4633d87ff3504b34216e3eeb1803be17a7e';
 
 /// See also [SessionsTabNotifier].
 @ProviderFor(SessionsTabNotifier)

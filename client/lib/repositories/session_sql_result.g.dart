@@ -6,7 +6,7 @@ part of 'session_sql_result.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sqlResultsRepoHash() => r'98b223107814f1362cba910e31bd2077f83ed984';
+String _$sqlResultsRepoHash() => r'9c25cb5933857678d0d543fa16d94d7489ef573e';
 
 /// See also [sqlResultsRepo].
 @ProviderFor(sqlResultsRepo)

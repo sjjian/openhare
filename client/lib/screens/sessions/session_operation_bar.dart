@@ -97,13 +97,13 @@ class SessionOpBar extends ConsumerWidget {
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
-                        final result = ref
+                        final resultModel = ref
                             .read(sQLResultsServicesProvider(model.sessionId)
                                 .notifier)
                             .addSQLResult();
                         ref
                             .read(sQLResultServicesProvider(
-                                    model.sessionId, result!.id)
+                                    model.sessionId, resultModel.result.id)
                                 .notifier)
                             .loadFromQuery(query);
                       }
@@ -126,13 +126,13 @@ class SessionOpBar extends ConsumerWidget {
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
-                        final result = ref
+                        final resultModel = ref
                             .read(sQLResultsServicesProvider(model.sessionId)
                                 .notifier)
                             .addSQLResult();
                         ref
                             .read(sQLResultServicesProvider(
-                                    model.sessionId, result!.id)
+                                    model.sessionId, resultModel.result.id)
                                 .notifier)
                             .loadFromQuery("explain $query");
                       }

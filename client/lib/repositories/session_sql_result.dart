@@ -1,3 +1,4 @@
+import 'package:client/models/session_sql_result.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:excel/excel.dart';
 import 'package:db_driver/db_driver.dart';
@@ -7,18 +8,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_sql_result.g.dart';
 
-class SQLResultRepo {
+class SQLResultRepoImpl extends SQLResultRepo {
   Map<int, ReorderSelectedList<SQLResult>> sqlResults = {};
-
-  int genSQLResultId(int sessionId) {
-    return sessionSqlResults(sessionId).isEmpty
-        ? 0
-        : sessionSqlResults(sessionId).fold(
-                0,
-                (previousId, element) =>
-                    previousId < element.id ? element.id : previousId) +
-            1;
-  }
 
   ReorderSelectedList<SQLResult> sessionSqlResults(int sessionId) {
     if (!sqlResults.containsKey(sessionId)) {
@@ -27,37 +18,92 @@ class SQLResultRepo {
     return sqlResults[sessionId]!;
   }
 
-  SQLResult getReuslt(int sessionId, int resultId) {
-    return sessionSqlResults(sessionId)
+  int genSQLResultId(int sessionId) {
+    return !sqlResults.containsKey(sessionId)
+        ? 0
+        : sqlResults[sessionId]!.fold(
+                0,
+                (previousId, element) =>
+                    previousId < element.id ? element.id : previousId) +
+            1;
+  }
+
+  @override
+  SQLResultListModel getSqlResults(int sessionId) {
+    if (!sqlResults.containsKey(sessionId)) {
+      sqlResults[sessionId] = ReorderSelectedList();
+    }
+    return SQLResultListModel(
+        sessionId: sessionId,
+        results: sqlResults[sessionId]!.map((m) {
+          return SQLResultModel(
+            sessionId: sessionId,
+            index: sqlResults[sessionId]!.indexOf(m),
+            result: m,
+          );
+        }).toList(),
+        selected: sqlResults[sessionId]!.selected() != null
+            ? SQLResultModel(
+                sessionId: sessionId,
+                index: sqlResults[sessionId]!
+                    .indexOf(sqlResults[sessionId]!.selected()!),
+                result: sqlResults[sessionId]!.selected()!)
+            : null);
+  }
+
+  @override
+  SQLResultModel getSQLReuslt(int sessionId, int resultId) {
+    final result = sessionSqlResults(sessionId)
         .where(
           (element) => element.id == resultId,
         )
         .first;
+
+    return SQLResultModel(
+        sessionId: sessionId,
+        index: sessionSqlResults(sessionId).indexOf(result),
+        result: result);
   }
 
-  void select(int sessionId, int index) {
+  @override
+  void selectSQLResult(int sessionId, int index) {
     sessionSqlResults(sessionId).select(index);
   }
 
-  void reorder(int sessionId, int oldIndex, int newIndex) {
+  @override
+  void reorderSQLResult(int sessionId, int oldIndex, int newIndex) {
     sessionSqlResults(sessionId).reorder(oldIndex, newIndex);
   }
 
-  SQLResult? selected(int sessionId) {
-    return sessionSqlResults(sessionId).selected();
+  @override
+  SQLResultModel? selectedSQLReuslt(int sessionId) {
+    final selectedResult = sessionSqlResults(sessionId).selected();
+    if (selectedResult != null) {
+      return SQLResultModel(
+          sessionId: sessionId,
+          index: sessionSqlResults(sessionId).indexOf(selectedResult),
+          result: selectedResult);
+    }
+    return null;
   }
 
-  void update(int sessionId, int index, SQLResult result) {
-    sessionSqlResults(sessionId)
-        .replace(sessionSqlResults(sessionId).selected()!, result);
+  @override
+  void updateSQLResult(int sessionId, int index, SQLResult result) {
+    sessionSqlResults(sessionId)[index] = result;
   }
 
-  void newSQLResult(int sessionId) {
+  @override
+  SQLResultModel addSQLResult(int sessionId) {
     SQLResult result = SQLResult(genSQLResultId(sessionId), sessionId);
     sessionSqlResults(sessionId).add(result);
+    return SQLResultModel(
+        sessionId: sessionId,
+        index: sessionSqlResults(sessionId).indexOf(result),
+        result: result);
   }
 
-  void remove(int sessionId, int index) {
+  @override
+  void deleteSQLResult(int sessionId, int index) {
     sessionSqlResults(sessionId).removeAt(index);
   }
 }
@@ -101,5 +147,5 @@ class SQLResult {
 
 @Riverpod(keepAlive: true)
 SQLResultRepo sqlResultsRepo(Ref ref) {
-  return SQLResultRepo();
+  return SQLResultRepoImpl();
 }

@@ -22,7 +22,7 @@ class SessionConnRepoImpl extends SessionConnRepo {
   SessionConnModel createConn(int sessionId, InstanceModel model,
       {String? currentSchema}) {
     SessionConn conn = SessionConn(model: model, currentSchema: currentSchema);
-    conns[model.id] = conn;
+    conns[sessionId] = conn;
     return SessionConnModel(
         sessionId: sessionId,
         currentSchema: currentSchema ?? "",

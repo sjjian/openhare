@@ -7,7 +7,7 @@ part of 'session_conn.dart';
 // **************************************************************************
 
 String _$sessionConnsServicesHash() =>
-    r'8ac8138ef6b601f7b4d07779095cd3d3dd746bb6';
+    r'11b297adf6d95afd6033a5117ad96835e9b61171';
 
 /// See also [SessionConnsServices].
 @ProviderFor(SessionConnsServices)
@@ -192,7 +192,7 @@ class _SessionConnServicesProviderElement
 }
 
 String _$selectedSessionConnControllerHash() =>
-    r'8bbc06c81fcc4d1f2f6b1aa8dd3852933a502ec8';
+    r'59d82636e29ed5d2c05e48095c730a4c22db1943';
 
 /// See also [SelectedSessionConnController].
 @ProviderFor(SelectedSessionConnController)

@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:client/models/interface.dart';
+import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/session_conn.dart';
+import 'package:client/screens/sessions/session_sql_results.dart';
 import 'package:client/services/session_sql_result.dart';
 import 'package:client/services/sessions.dart';
 import 'package:file_picker/file_picker.dart';
@@ -20,17 +22,17 @@ class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
     if (sessionIdModel == null) {
       return null;
     }
-    SQLResultModel? sqlResultModel =
-        ref.watch(selectedSQLResultControllerProvider);
+    SQLResultListModel? sqlResultModel =
+        ref.watch(selectedSQLResultTabNotifierProvider);
 
     return SessionStatusModel(
       sessionId: sessionIdModel.sessionId,
       instanceName: sessionIdModel.instanceName ?? "",
-      resultId: sqlResultModel?.result.id,
-      state: sqlResultModel?.result.state ?? SQLExecuteState.init,
-      query: sqlResultModel?.result.query,
-      executeTime: sqlResultModel?.result.executeTime,
-      affectedRows: sqlResultModel?.result.data?.affectedRows,
+      resultId: sqlResultModel?.selected?.result.id,
+      state: sqlResultModel?.selected?.result.state ?? SQLExecuteState.init,
+      query: sqlResultModel?.selected?.result.query,
+      executeTime: sqlResultModel?.selected?.result.executeTime,
+      affectedRows: sqlResultModel?.selected?.result.data?.affectedRows,
     );
   }
 }

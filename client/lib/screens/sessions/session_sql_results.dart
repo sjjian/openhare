@@ -1,4 +1,5 @@
 import 'package:client/models/interface.dart';
+import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
@@ -35,12 +36,43 @@ CurrentSessionEditor sessionEditor(Ref ref, int sessionId) {
 class SessionEditorController extends _$SessionEditorController {
   @override
   CurrentSessionEditor build() {
-    SessionModel? sessionIdModel =
-        ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionEditorProvider(0));
     }
     return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
+  @override
+  SQLResultListModel? build() {
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
+    return ref.watch(sQLResultsServicesProvider(sessionIdModel.sessionId));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
+  @override
+  SQLResultModel? build() {
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
+    int resultId = ref.watch(
+        sQLResultsServicesProvider(sessionIdModel.sessionId)
+            .select((m) => m.selected?.result.id ?? -1));
+    if (resultId == -1) {
+      return null;
+    }
+    print("selectedSQLResultNotifier: $resultId");
+    return ref
+        .watch(sQLResultServicesProvider(sessionIdModel.sessionId, resultId));
   }
 }
 
@@ -49,8 +81,7 @@ class SqlResultTables extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SQLResultsModel? sqlResultsModel =
-        ref.watch(selectedSQLResultTabControllerProvider);
+    SQLResultListModel? model = ref.watch(selectedSQLResultTabNotifierProvider);
 
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
@@ -66,7 +97,7 @@ class SqlResultTables extends ConsumerWidget {
     );
 
     Widget tab;
-    if (sqlResultsModel == null) {
+    if (model == null) {
       tab = const Spacer();
     } else {
       tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -86,30 +117,26 @@ class SqlResultTables extends ConsumerWidget {
                 tabStyle: style,
                 onReorder: (oldIndex, newIndex) {
                   ref
-                      .read(sQLResultsServicesProvider(
-                              sqlResultsModel.sessionId)
-                          .notifier)
+                      .read(
+                          sQLResultsServicesProvider(model.sessionId).notifier)
                       .reorderSQLResult(oldIndex, newIndex);
                 },
                 tabs: [
-              for (var i = 0; i < sqlResultsModel.sqlResults.length; i++)
+              for (var i = 0; i < model.results.length; i++)
                 CommonTabWrap(
-                  label: "${sqlResultsModel.sqlResults[i].id + 1}",
-                  selected: sqlResultsModel.sqlResults
-                      .isSelected(sqlResultsModel.sqlResults[i]),
+                  label: "${model.results[i].result.id}",
+                  selected: model.results[i] == model.selected,
                   onTap: () {
                     ref
-                        .read(sQLResultsServicesProvider(
-                                sqlResultsModel.sessionId)
+                        .read(sQLResultsServicesProvider(model.sessionId)
                             .notifier)
                         .selectSQLResultByIndex(i);
                   },
                   onDeleted: () {
                     ref
-                        .read(sQLResultsServicesProvider(
-                                sqlResultsModel.sessionId)
+                        .read(sQLResultsServicesProvider(model.sessionId)
                             .notifier)
-                        .deleteSQLResultByIndex(i);
+                        .deleteSQLResult(i);
                   },
                   avatar: const Icon(
                     Icons.grid_on,
@@ -180,23 +207,23 @@ class SqlResultTable extends ConsumerWidget {
         .colorScheme
         .surfaceContainerLow; // sql result body 的背景色
 
-    SQLResultModel? sqlResultModel =
-        ref.watch(selectedSQLResultControllerProvider);
-    if (sqlResultModel == null) {
+    final model = ref.read(selectedSQLResultNotifierProvider);
+    print("build sql result table: $model");
+    if (model == null) {
       return Container(
           alignment: Alignment.center,
           color: color,
           child: const Text('no data'));
     }
-    if (sqlResultModel.result.state == SQLExecuteState.done) {
+    if (model.result.state == SQLExecuteState.done) {
       return PlutoGrid(
-        key: ObjectKey(sqlResultModel.result),
+        key: ObjectKey(model.result),
         mode: PlutoGridMode.selectWithOneTap,
         onSelected: (event) {
           ref.read(sessionDrawerControllerProvider.notifier).showSQLResult(
-                result: sqlResultModel.result.data!.rows[event.rowIdx!]
+                result: model.result.data!.rows[event.rowIdx!]
                     .getValue(event.cell!.column.title),
-                column: sqlResultModel.result.data!.rows[event.rowIdx!]
+                column: model.result.data!.rows[event.rowIdx!]
                     .getColumn(event.cell!.column.title),
               );
         },
@@ -213,14 +240,14 @@ class SqlResultTable extends ConsumerWidget {
             gridBackgroundColor: color,
           ),
         ),
-        columns: buildColumns(sqlResultModel.result.data!.columns),
-        rows: buildRows(sqlResultModel.result.data!.rows),
+        columns: buildColumns(model.result.data!.columns),
+        rows: buildRows(model.result.data!.rows),
       );
-    } else if (sqlResultModel.result.state == SQLExecuteState.error) {
+    } else if (model.result.state == SQLExecuteState.error) {
       return Container(
           alignment: Alignment.topLeft,
           color: color,
-          child: Text('${sqlResultModel.result.error}'));
+          child: Text('${model.result.error}'));
     } else {
       return Container(
           alignment: Alignment.topLeft,

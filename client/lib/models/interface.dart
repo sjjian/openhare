@@ -75,21 +75,21 @@ abstract class SessionTab with _$SessionTab {
   }) = _SessionTab;
 }
 
-@freezed
-abstract class SQLResultsModel with _$SQLResultsModel {
-  const factory SQLResultsModel({
-    required int sessionId,
-    required ReorderSelectedList<SQLResult> sqlResults,
-  }) = _SQLResultsModel;
-}
+// @freezed
+// abstract class SQLResultsModel with _$SQLResultsModel {
+//   const factory SQLResultsModel({
+//     required int sessionId,
+//     required ReorderSelectedList<SQLResult> sqlResults,
+//   }) = _SQLResultsModel;
+// }
 
-@freezed
-abstract class SQLResultModel with _$SQLResultModel {
-  const factory SQLResultModel({
-    required int sessionId,
-    required SQLResult result,
-  }) = _SQLResultModel;
-}
+// @freezed
+// abstract class SQLResultModel with _$SQLResultModel {
+//   const factory SQLResultModel({
+//     required int sessionId,
+//     required SQLResult result,
+//   }) = _SQLResultModel;
+// }
 
 @freezed
 abstract class SessionStatusModel with _$SessionStatusModel {

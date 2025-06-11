@@ -174,5 +174,39 @@ final sessionEditorControllerProvider =
 );
 
 typedef _$SessionEditorController = Notifier<CurrentSessionEditor>;
+String _$selectedSQLResultTabNotifierHash() =>
+    r'7e11334458d840b9d80219985621a201d335f448';
+
+/// See also [SelectedSQLResultTabNotifier].
+@ProviderFor(SelectedSQLResultTabNotifier)
+final selectedSQLResultTabNotifierProvider = NotifierProvider<
+    SelectedSQLResultTabNotifier, SQLResultListModel?>.internal(
+  SelectedSQLResultTabNotifier.new,
+  name: r'selectedSQLResultTabNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedSQLResultTabNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedSQLResultTabNotifier = Notifier<SQLResultListModel?>;
+String _$selectedSQLResultNotifierHash() =>
+    r'c32608fecd2fdb242e2e81fad0f79ec9529a8981';
+
+/// See also [SelectedSQLResultNotifier].
+@ProviderFor(SelectedSQLResultNotifier)
+final selectedSQLResultNotifierProvider =
+    NotifierProvider<SelectedSQLResultNotifier, SQLResultModel?>.internal(
+  SelectedSQLResultNotifier.new,
+  name: r'selectedSQLResultNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedSQLResultNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedSQLResultNotifier = Notifier<SQLResultModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

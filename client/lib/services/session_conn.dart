@@ -1,6 +1,6 @@
 import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/instances.dart';
+import 'package:client/repositories/repo.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:client/services/sessions.dart';
 import 'package:db_driver/db_driver.dart';
@@ -15,11 +15,12 @@ class SessionConnsServices extends _$SessionConnsServices {
     return 0;
   }
 
-  Future<void> createConn(int sessionId, InstanceModel instance,
+  Future<void> createConn(int sessionId, int instanceId,
       {String? currentSchema}) async {
+    final instance = objectbox2.getInstanceById(instanceId);
     ref
         .read(sessionConnRepoProvider)
-        .createConn(sessionId, instance, currentSchema: currentSchema);
+        .createConn(sessionId, instance!, currentSchema: currentSchema);
   }
 
   Future<void> removeConn(int sessionId) async {
@@ -59,7 +60,7 @@ class SessionConnServices extends _$SessionConnServices {
   Future<List<String>> getSchemas() async {
     return ref.read(sessionConnRepoProvider).getSchemas(sessionId);
   }
-  
+
   Future<BaseQueryResult?> query(String query) async {
     return ref.read(sessionConnRepoProvider).query(sessionId, query);
   }
