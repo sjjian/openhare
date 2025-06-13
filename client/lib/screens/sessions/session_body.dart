@@ -1,4 +1,3 @@
-import 'package:client/models/interface.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';

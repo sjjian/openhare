@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:client/models/interface.dart';
 import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/session_conn.dart';

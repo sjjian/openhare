@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:client/models/interface.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:db_driver/db_driver.dart';

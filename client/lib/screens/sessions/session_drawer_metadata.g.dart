@@ -7,7 +7,7 @@ part of 'session_drawer_metadata.dart';
 // **************************************************************************
 
 String _$sessionMetadataStateHash() =>
-    r'1c6d6dd0214abf854c807d3227fb564145ffb104';
+    r'184e222c391343966dcb6371efb55b007daa90e3';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -35,7 +35,7 @@ class _SystemHash {
 const sessionMetadataStateProvider = SessionMetadataStateFamily();
 
 /// See also [sessionMetadataState].
-class SessionMetadataStateFamily extends Family<CurrentSessionMetadata> {
+class SessionMetadataStateFamily extends Family<InstanceMetadataModel> {
   /// See also [sessionMetadataState].
   const SessionMetadataStateFamily();
 
@@ -73,7 +73,7 @@ class SessionMetadataStateFamily extends Family<CurrentSessionMetadata> {
 }
 
 /// See also [sessionMetadataState].
-class SessionMetadataStateProvider extends Provider<CurrentSessionMetadata> {
+class SessionMetadataStateProvider extends Provider<InstanceMetadataModel> {
   /// See also [sessionMetadataState].
   SessionMetadataStateProvider(
     int sessionId,
@@ -108,7 +108,7 @@ class SessionMetadataStateProvider extends Provider<CurrentSessionMetadata> {
 
   @override
   Override overrideWith(
-    CurrentSessionMetadata Function(SessionMetadataStateRef provider) create,
+    InstanceMetadataModel Function(SessionMetadataStateRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -125,7 +125,7 @@ class SessionMetadataStateProvider extends Provider<CurrentSessionMetadata> {
   }
 
   @override
-  ProviderElement<CurrentSessionMetadata> createElement() {
+  ProviderElement<InstanceMetadataModel> createElement() {
     return _SessionMetadataStateProviderElement(this);
   }
 
@@ -146,13 +146,13 @@ class SessionMetadataStateProvider extends Provider<CurrentSessionMetadata> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionMetadataStateRef on ProviderRef<CurrentSessionMetadata> {
+mixin SessionMetadataStateRef on ProviderRef<InstanceMetadataModel> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
 class _SessionMetadataStateProviderElement
-    extends ProviderElement<CurrentSessionMetadata>
+    extends ProviderElement<InstanceMetadataModel>
     with SessionMetadataStateRef {
   _SessionMetadataStateProviderElement(super.provider);
 
@@ -161,12 +161,12 @@ class _SessionMetadataStateProviderElement
 }
 
 String _$sessionMetadataControllerHash() =>
-    r'ea687d28135f3a0f708d1747e7c1a3c74f8f12c2';
+    r'63e23f1c7a2559b77f08a7f07f688c6bdb944613';
 
 /// See also [SessionMetadataController].
 @ProviderFor(SessionMetadataController)
-final sessionMetadataControllerProvider = NotifierProvider<
-    SessionMetadataController, CurrentSessionMetadata>.internal(
+final sessionMetadataControllerProvider =
+    NotifierProvider<SessionMetadataController, InstanceMetadataModel>.internal(
   SessionMetadataController.new,
   name: r'sessionMetadataControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -176,6 +176,6 @@ final sessionMetadataControllerProvider = NotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionMetadataController = Notifier<CurrentSessionMetadata>;
+typedef _$SessionMetadataController = Notifier<InstanceMetadataModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,4 +1,4 @@
-import 'package:client/models/interface.dart';
+import 'package:client/models/instance_metadata.dart';
 import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
@@ -52,7 +52,7 @@ class SQLEditor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionModel sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
-    CurrentSessionMetadata sessionMeta = ref.watch(sessionMetadataControllerProvider);
+    InstanceMetadataModel sessionMeta = ref.watch(sessionMetadataControllerProvider);
     SessionConnModel sessionConnModel = ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
 
     MetaDataNode? metadata = sessionMeta.metadata;

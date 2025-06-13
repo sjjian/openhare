@@ -1,4 +1,4 @@
-import 'package:client/models/interface.dart';
+import 'package:client/models/instance_metadata.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
@@ -13,14 +13,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_drawer_metadata.g.dart';
 
 @Riverpod(keepAlive: true)
-CurrentSessionMetadata sessionMetadataState(Ref ref, int sessionId) {
-  return const CurrentSessionMetadata();
+InstanceMetadataModel sessionMetadataState(Ref ref, int sessionId) {
+  return const InstanceMetadataModel();
 }
 
 @Riverpod(keepAlive: true)
 class SessionMetadataController extends _$SessionMetadataController {
   @override
-  CurrentSessionMetadata build() {
+  InstanceMetadataModel build() {
     SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
@@ -151,7 +151,7 @@ class SessionDrawerMetadata extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSessionMetadata sessionMetadata = ref.watch(sessionMetadataControllerProvider)!;
+    final sessionMetadata = ref.watch(sessionMetadataControllerProvider);
 
     Widget body = const Align(
       alignment: Alignment.center,

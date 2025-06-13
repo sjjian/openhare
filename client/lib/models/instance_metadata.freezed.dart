@@ -4,7 +4,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'interface.dart';
+part of 'instance_metadata.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,22 +14,22 @@ part of 'interface.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$CurrentSessionMetadata implements DiagnosticableTreeMixin {
+mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
   MetaDataNode? get metadata;
   TreeController<DataNode>? get metadataController;
 
-  /// Create a copy of CurrentSessionMetadata
+  /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $CurrentSessionMetadataCopyWith<CurrentSessionMetadata> get copyWith =>
-      _$CurrentSessionMetadataCopyWithImpl<CurrentSessionMetadata>(
-          this as CurrentSessionMetadata, _$identity);
+  $InstanceMetadataModelCopyWith<InstanceMetadataModel> get copyWith =>
+      _$InstanceMetadataModelCopyWithImpl<InstanceMetadataModel>(
+          this as InstanceMetadataModel, _$identity);
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
-      ..add(DiagnosticsProperty('type', 'CurrentSessionMetadata'))
+      ..add(DiagnosticsProperty('type', 'InstanceMetadataModel'))
       ..add(DiagnosticsProperty('metadata', metadata))
       ..add(DiagnosticsProperty('metadataController', metadataController));
   }
@@ -38,7 +38,7 @@ mixin _$CurrentSessionMetadata implements DiagnosticableTreeMixin {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is CurrentSessionMetadata &&
+            other is InstanceMetadataModel &&
             (identical(other.metadata, metadata) ||
                 other.metadata == metadata) &&
             (identical(other.metadataController, metadataController) ||
@@ -50,29 +50,29 @@ mixin _$CurrentSessionMetadata implements DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CurrentSessionMetadata(metadata: $metadata, metadataController: $metadataController)';
+    return 'InstanceMetadataModel(metadata: $metadata, metadataController: $metadataController)';
   }
 }
 
 /// @nodoc
-abstract mixin class $CurrentSessionMetadataCopyWith<$Res> {
-  factory $CurrentSessionMetadataCopyWith(CurrentSessionMetadata value,
-          $Res Function(CurrentSessionMetadata) _then) =
-      _$CurrentSessionMetadataCopyWithImpl;
+abstract mixin class $InstanceMetadataModelCopyWith<$Res> {
+  factory $InstanceMetadataModelCopyWith(InstanceMetadataModel value,
+          $Res Function(InstanceMetadataModel) _then) =
+      _$InstanceMetadataModelCopyWithImpl;
   @useResult
   $Res call(
       {MetaDataNode? metadata, TreeController<DataNode>? metadataController});
 }
 
 /// @nodoc
-class _$CurrentSessionMetadataCopyWithImpl<$Res>
-    implements $CurrentSessionMetadataCopyWith<$Res> {
-  _$CurrentSessionMetadataCopyWithImpl(this._self, this._then);
+class _$InstanceMetadataModelCopyWithImpl<$Res>
+    implements $InstanceMetadataModelCopyWith<$Res> {
+  _$InstanceMetadataModelCopyWithImpl(this._self, this._then);
 
-  final CurrentSessionMetadata _self;
-  final $Res Function(CurrentSessionMetadata) _then;
+  final InstanceMetadataModel _self;
+  final $Res Function(InstanceMetadataModel) _then;
 
-  /// Create a copy of CurrentSessionMetadata
+  /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -95,29 +95,29 @@ class _$CurrentSessionMetadataCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _CurrentSessionMetadata
+class _InstanceMetadataModel
     with DiagnosticableTreeMixin
-    implements CurrentSessionMetadata {
-  const _CurrentSessionMetadata({this.metadata, this.metadataController});
+    implements InstanceMetadataModel {
+  const _InstanceMetadataModel({this.metadata, this.metadataController});
 
   @override
   final MetaDataNode? metadata;
   @override
   final TreeController<DataNode>? metadataController;
 
-  /// Create a copy of CurrentSessionMetadata
+  /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$CurrentSessionMetadataCopyWith<_CurrentSessionMetadata> get copyWith =>
-      __$CurrentSessionMetadataCopyWithImpl<_CurrentSessionMetadata>(
+  _$InstanceMetadataModelCopyWith<_InstanceMetadataModel> get copyWith =>
+      __$InstanceMetadataModelCopyWithImpl<_InstanceMetadataModel>(
           this, _$identity);
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
-      ..add(DiagnosticsProperty('type', 'CurrentSessionMetadata'))
+      ..add(DiagnosticsProperty('type', 'InstanceMetadataModel'))
       ..add(DiagnosticsProperty('metadata', metadata))
       ..add(DiagnosticsProperty('metadataController', metadataController));
   }
@@ -126,7 +126,7 @@ class _CurrentSessionMetadata
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _CurrentSessionMetadata &&
+            other is _InstanceMetadataModel &&
             (identical(other.metadata, metadata) ||
                 other.metadata == metadata) &&
             (identical(other.metadataController, metadataController) ||
@@ -138,16 +138,16 @@ class _CurrentSessionMetadata
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CurrentSessionMetadata(metadata: $metadata, metadataController: $metadataController)';
+    return 'InstanceMetadataModel(metadata: $metadata, metadataController: $metadataController)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$CurrentSessionMetadataCopyWith<$Res>
-    implements $CurrentSessionMetadataCopyWith<$Res> {
-  factory _$CurrentSessionMetadataCopyWith(_CurrentSessionMetadata value,
-          $Res Function(_CurrentSessionMetadata) _then) =
-      __$CurrentSessionMetadataCopyWithImpl;
+abstract mixin class _$InstanceMetadataModelCopyWith<$Res>
+    implements $InstanceMetadataModelCopyWith<$Res> {
+  factory _$InstanceMetadataModelCopyWith(_InstanceMetadataModel value,
+          $Res Function(_InstanceMetadataModel) _then) =
+      __$InstanceMetadataModelCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -155,14 +155,14 @@ abstract mixin class _$CurrentSessionMetadataCopyWith<$Res>
 }
 
 /// @nodoc
-class __$CurrentSessionMetadataCopyWithImpl<$Res>
-    implements _$CurrentSessionMetadataCopyWith<$Res> {
-  __$CurrentSessionMetadataCopyWithImpl(this._self, this._then);
+class __$InstanceMetadataModelCopyWithImpl<$Res>
+    implements _$InstanceMetadataModelCopyWith<$Res> {
+  __$InstanceMetadataModelCopyWithImpl(this._self, this._then);
 
-  final _CurrentSessionMetadata _self;
-  final $Res Function(_CurrentSessionMetadata) _then;
+  final _InstanceMetadataModel _self;
+  final $Res Function(_InstanceMetadataModel) _then;
 
-  /// Create a copy of CurrentSessionMetadata
+  /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -170,7 +170,7 @@ class __$CurrentSessionMetadataCopyWithImpl<$Res>
     Object? metadata = freezed,
     Object? metadataController = freezed,
   }) {
-    return _then(_CurrentSessionMetadata(
+    return _then(_InstanceMetadataModel(
       metadata: freezed == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
