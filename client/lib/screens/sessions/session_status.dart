@@ -21,17 +21,17 @@ class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
     if (sessionIdModel == null) {
       return null;
     }
-    SQLResultListModel? sqlResultModel =
-        ref.watch(selectedSQLResultTabNotifierProvider);
+    SQLResultModel? sqlResultModel =
+        ref.watch(selectedSQLResultNotifierProvider);
 
     return SessionStatusModel(
       sessionId: sessionIdModel.sessionId,
       instanceName: sessionIdModel.instanceName ?? "",
-      resultId: sqlResultModel?.selected?.result.id,
-      state: sqlResultModel?.selected?.result.state ?? SQLExecuteState.init,
-      query: sqlResultModel?.selected?.result.query,
-      executeTime: sqlResultModel?.selected?.result.executeTime,
-      affectedRows: sqlResultModel?.selected?.result.data?.affectedRows,
+      resultId: sqlResultModel?.resultId,
+      state: sqlResultModel?.state ?? SQLExecuteState.init,
+      query: sqlResultModel?.query,
+      executeTime: sqlResultModel?.executeTime,
+      affectedRows: sqlResultModel?.data?.affectedRows,
     );
   }
 }

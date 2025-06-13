@@ -1,6 +1,5 @@
 import 'package:client/models/session_sql_result.dart';
 import 'package:client/repositories/session_conn.dart';
-import 'package:excel/excel.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,8 +29,20 @@ class SQLResultRepoImpl extends SQLResultRepo {
 
   SQLResult _getSQLResult(int sessionId, int resultId) {
     return sessionSqlResults(sessionId).firstWhere(
-          (element) => element.id == resultId,
-        );
+      (element) => element.id == resultId,
+    );
+  }
+
+  SQLResultModel _toModel(int sessionId, SQLResult result) {
+    return SQLResultModel(
+      sessionId: sessionId,
+      resultId: result.id,
+      query: result.query,
+      state: result.state,
+      executeTime: result.executeTime,
+      error: result.error,
+      data: result.data,
+    );
   }
 
   @override
@@ -42,30 +53,24 @@ class SQLResultRepoImpl extends SQLResultRepo {
     return SQLResultListModel(
         sessionId: sessionId,
         results: sqlResults[sessionId]!.map((m) {
-          return SQLResultModel(
-            sessionId: sessionId,
-            result: m,
-          );
+          return _toModel(sessionId, m);
         }).toList(),
         selected: sqlResults[sessionId]!.selected() != null
-            ? SQLResultModel(
-                sessionId: sessionId,
-                result: sqlResults[sessionId]!.selected()!)
+            ? _toModel(sessionId, sqlResults[sessionId]!.selected()!)
             : null);
   }
 
   @override
   SQLResultModel getSQLReuslt(int sessionId, int resultId) {
-    final result =  _getSQLResult(sessionId, resultId);
-    return SQLResultModel(
-        sessionId: sessionId,
-        result: result);
+    final result = _getSQLResult(sessionId, resultId);
+    return _toModel(sessionId, result);
   }
 
   @override
   void selectSQLResult(int sessionId, int resultId) {
-    final result =  _getSQLResult(sessionId, resultId);
-    sessionSqlResults(sessionId).select(sessionSqlResults(sessionId).indexOf(result));
+    final result = _getSQLResult(sessionId, resultId);
+    sessionSqlResults(sessionId)
+        .select(sessionSqlResults(sessionId).indexOf(result));
   }
 
   @override
@@ -74,35 +79,36 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
-  SQLResultModel? selectedSQLReuslt(int sessionId) {
+  SQLResultModel? selectedSQLResult(int sessionId) {
     final selectedResult = sessionSqlResults(sessionId).selected();
     if (selectedResult != null) {
-      return SQLResultModel(
-          sessionId: sessionId,
-          result: selectedResult);
+      return _toModel(sessionId, selectedResult);
     }
     return null;
   }
 
   @override
-  void updateSQLResult(int sessionId, int resultId, SQLResult result) {
-    final orginResult =  _getSQLResult(sessionId, resultId);
-    sessionSqlResults(sessionId)[sessionSqlResults(sessionId).indexOf(orginResult)] = result;
+  void updateSQLResult(int sessionId, int resultId, SQLResultModel result) {
+    final orginResult = _getSQLResult(sessionId, resultId);
+    orginResult.query = result.query;
+    orginResult.data = result.data;
+    orginResult.error = result.error;
+    orginResult.executeTime = result.executeTime;
+    orginResult.state = result.state;
   }
 
   @override
   SQLResultModel addSQLResult(int sessionId) {
     SQLResult result = SQLResult(genSQLResultId(sessionId), sessionId);
     sessionSqlResults(sessionId).add(result);
-    return SQLResultModel(
-        sessionId: sessionId,
-        result: result);
+    return _toModel(sessionId, result);
   }
 
   @override
   void deleteSQLResult(int sessionId, int resultId) {
-    final result =  _getSQLResult(sessionId, resultId);
-    sessionSqlResults(sessionId).removeAt(sessionSqlResults(sessionId).indexOf(result));
+    final result = _getSQLResult(sessionId, resultId);
+    sessionSqlResults(sessionId)
+        .removeAt(sessionSqlResults(sessionId).indexOf(result));
   }
 }
 
@@ -117,6 +123,10 @@ class SQLResult {
 
   SQLResult(this.id, this.sessionId);
 
+  void setQuery(String query) {
+    this.query = query;
+  }
+
   void setDone(BaseQueryResult data, Duration executeTime) {
     this.data = data;
     this.executeTime = executeTime;
@@ -126,20 +136,6 @@ class SQLResult {
   void setError(String error) {
     state = SQLExecuteState.error;
     this.error = error;
-  }
-
-  Excel toExcel() {
-    Excel excel = Excel.createExcel();
-    Sheet sheet = excel["Sheet1"];
-    sheet.appendRow(data!.columns
-        .map<TextCellValue>((e) => TextCellValue(e.name))
-        .toList());
-    for (final row in data!.rows) {
-      sheet.appendRow(row.values
-          .map<TextCellValue>((e) => TextCellValue(e.getString() ?? ''))
-          .toList());
-    }
-    return excel;
   }
 }
 

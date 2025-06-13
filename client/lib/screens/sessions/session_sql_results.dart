@@ -65,7 +65,7 @@ class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
     }
     int resultId = ref
         .watch(sQLResultsServicesProvider(sessionIdModel.sessionId).select((m) {
-      return m.selected?.result.id ?? -1;
+      return m.selected?.resultId ?? -1;
     }));
     if (resultId == -1) {
       return null;
@@ -122,19 +122,19 @@ class SqlResultTables extends ConsumerWidget {
                 tabs: [
               for (var i = 0; i < model.results.length; i++)
                 CommonTabWrap(
-                  label: "${model.results[i].result.id}",
+                  label: "${model.results[i].resultId}",
                   selected: model.results[i] == model.selected,
                   onTap: () {
                     ref
                         .read(sQLResultsServicesProvider(model.sessionId)
                             .notifier)
-                        .selectSQLResult(model.results[i].result.id);
+                        .selectSQLResult(model.results[i].resultId);
                   },
                   onDeleted: () {
                     ref
                         .read(sQLResultsServicesProvider(model.sessionId)
                             .notifier)
-                        .deleteSQLResult(model.results[i].result.id);
+                        .deleteSQLResult(model.results[i].resultId);
                   },
                   avatar: const Icon(
                     Icons.grid_on,
@@ -212,15 +212,15 @@ class SqlResultTable extends ConsumerWidget {
           color: color,
           child: const Text('no data'));
     }
-    if (model.result.state == SQLExecuteState.done) {
+    if (model.state == SQLExecuteState.done) {
       return PlutoGrid(
-        key: ObjectKey(model.result),
+        key: ObjectKey(model),
         mode: PlutoGridMode.selectWithOneTap,
         onSelected: (event) {
           ref.read(sessionDrawerControllerProvider.notifier).showSQLResult(
-                result: model.result.data!.rows[event.rowIdx!]
+                result: model.data!.rows[event.rowIdx!]
                     .getValue(event.cell!.column.title),
-                column: model.result.data!.rows[event.rowIdx!]
+                column: model.data!.rows[event.rowIdx!]
                     .getColumn(event.cell!.column.title),
               );
         },
@@ -237,14 +237,14 @@ class SqlResultTable extends ConsumerWidget {
             gridBackgroundColor: color,
           ),
         ),
-        columns: buildColumns(model.result.data!.columns),
-        rows: buildRows(model.result.data!.rows),
+        columns: buildColumns(model.data!.columns),
+        rows: buildRows(model.data!.rows),
       );
-    } else if (model.result.state == SQLExecuteState.error) {
+    } else if (model.state == SQLExecuteState.error) {
       return Container(
           alignment: Alignment.topLeft,
           color: color,
-          child: Text('${model.result.error}'));
+          child: Text('${model.error}'));
     } else {
       return Container(
           alignment: Alignment.topLeft,

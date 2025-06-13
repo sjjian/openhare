@@ -1,4 +1,5 @@
 import 'package:client/models/session_sql_result.dart';
+import 'package:client/repositories/session_conn.dart';
 import 'package:client/services/session_conn.dart';
 import 'package:client/repositories/session_sql_result.dart';
 import 'package:db_driver/db_driver.dart';
@@ -15,26 +16,44 @@ class SQLResultServices extends _$SQLResultServices {
   }
 
   Future<void> loadFromQuery(String query) async {
-    SQLResult result = state.result;
+    final repo = ref.read(sqlResultsRepoProvider);
+
+    repo.updateSQLResult(sessionId, resultId, state.copyWith(query: query));
+    ref.invalidateSelf();
+
     try {
       DateTime start = DateTime.now();
       BaseQueryResult? queryResult = await ref
           .read(sessionConnServicesProvider(sessionId).notifier)
           .query(query);
       DateTime end = DateTime.now();
-      result.setDone(queryResult!, end.difference(start));
+      repo.updateSQLResult(
+          sessionId,
+          resultId,
+          state.copyWith(
+              data: queryResult,
+              executeTime: end.difference(start),
+              state: SQLExecuteState.done));
     } catch (e) {
-      result.setError(e.toString());
+      repo.updateSQLResult(sessionId, resultId,
+          state.copyWith(state: SQLExecuteState.error, error: e.toString()));
     } finally {
-      ref
-          .read(sqlResultsRepoProvider)
-          .updateSQLResult(sessionId, result.id, result);
       ref.invalidateSelf();
     }
   }
 
   Excel toExcel() {
-    return state.result.toExcel();
+    Excel excel = Excel.createExcel();
+    Sheet sheet = excel["Sheet1"];
+    sheet.appendRow(state.data!.columns
+        .map<TextCellValue>((e) => TextCellValue(e.name))
+        .toList());
+    for (final row in state.data!.rows) {
+      sheet.appendRow(row.values
+          .map<TextCellValue>((e) => TextCellValue(e.getString() ?? ''))
+          .toList());
+    }
+    return excel;
   }
 }
 
@@ -43,6 +62,11 @@ class SQLResultsServices extends _$SQLResultsServices {
   @override
   SQLResultListModel build(int sessionId) {
     return ref.watch(sqlResultsRepoProvider).getSqlResults(sessionId);
+  }
+
+  SQLResultModel? selectedSQLResult() {
+    SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
+    return repo.selectedSQLResult(state.sessionId);
   }
 
   void deleteSQLResult(int resultId) {

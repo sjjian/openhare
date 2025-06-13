@@ -1,4 +1,5 @@
 import 'package:client/models/session_conn.dart';
+import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/services/session_sql_result.dart';
@@ -79,11 +80,24 @@ class SessionOpBar extends ConsumerWidget {
               onPressed: model.canQuery
                   ? () {
                       String query = getQuery();
-                      if (query.isNotEmpty) {
-                        // ref
-                        //     .read(sQLResultControllerProvider.notifier)
-                        //     .loadFromQuery(query);
+
+                      SQLResultModel? resultModel = ref
+                          .read(sQLResultsServicesProvider(model.sessionId)
+                              .notifier)
+                          .selectedSQLResult();
+
+                      if (resultModel == null) {
+                        resultModel = ref
+                            .read(sQLResultsServicesProvider(model.sessionId)
+                                .notifier)
+                            .addSQLResult();
                       }
+
+                      ref
+                          .read(sQLResultServicesProvider(
+                                  model.sessionId, resultModel.resultId)
+                              .notifier)
+                          .loadFromQuery(query);
                     }
                   : null,
               icon: Icon(Icons.play_arrow_rounded,
@@ -102,7 +116,7 @@ class SessionOpBar extends ConsumerWidget {
                             .addSQLResult();
                         ref
                             .read(sQLResultServicesProvider(
-                                    model.sessionId, resultModel.result.id)
+                                    model.sessionId, resultModel.resultId)
                                 .notifier)
                             .loadFromQuery(query);
                       }
@@ -131,7 +145,7 @@ class SessionOpBar extends ConsumerWidget {
                             .addSQLResult();
                         ref
                             .read(sQLResultServicesProvider(
-                                    model.sessionId, resultModel.result.id)
+                                    model.sessionId, resultModel.resultId)
                                 .notifier)
                             .loadFromQuery("explain $query");
                       }
