@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:client/models/interface.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/file_type.dart';
@@ -13,7 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class SessionDrawerSqlResult extends ConsumerWidget {
   const SessionDrawerSqlResult({Key? key}) : super(key: key);
 
-  Widget buildDisplayField(BuildContext context, CurrentSessionDrawer sessionDrawer) {
+  Widget buildDisplayField(BuildContext context, SessionDrawerModel sessionDrawer) {
     BaseQueryValue? result = sessionDrawer.sqlResult;
     if (result == null) {
       return const ValueDisplayField(data: "");
@@ -47,7 +48,7 @@ class SessionDrawerSqlResult extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
     return Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,

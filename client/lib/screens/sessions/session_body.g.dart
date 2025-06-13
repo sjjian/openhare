@@ -7,7 +7,7 @@ part of 'session_body.dart';
 // **************************************************************************
 
 String _$sessionSplitViewStateHash() =>
-    r'78724f95d90323f72d5adb3c2508ada6ae45a8aa';
+    r'8446848065432962e94d19908dd20f4fd19f9721';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -35,7 +35,7 @@ class _SystemHash {
 const sessionSplitViewStateProvider = SessionSplitViewStateFamily();
 
 /// See also [sessionSplitViewState].
-class SessionSplitViewStateFamily extends Family<CurrentSessionSplitView> {
+class SessionSplitViewStateFamily extends Family<SessionSplitViewModel> {
   /// See also [sessionSplitViewState].
   const SessionSplitViewStateFamily();
 
@@ -73,7 +73,7 @@ class SessionSplitViewStateFamily extends Family<CurrentSessionSplitView> {
 }
 
 /// See also [sessionSplitViewState].
-class SessionSplitViewStateProvider extends Provider<CurrentSessionSplitView> {
+class SessionSplitViewStateProvider extends Provider<SessionSplitViewModel> {
   /// See also [sessionSplitViewState].
   SessionSplitViewStateProvider(
     int sessionId,
@@ -108,7 +108,7 @@ class SessionSplitViewStateProvider extends Provider<CurrentSessionSplitView> {
 
   @override
   Override overrideWith(
-    CurrentSessionSplitView Function(SessionSplitViewStateRef provider) create,
+    SessionSplitViewModel Function(SessionSplitViewStateRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -125,7 +125,7 @@ class SessionSplitViewStateProvider extends Provider<CurrentSessionSplitView> {
   }
 
   @override
-  ProviderElement<CurrentSessionSplitView> createElement() {
+  ProviderElement<SessionSplitViewModel> createElement() {
     return _SessionSplitViewStateProviderElement(this);
   }
 
@@ -146,13 +146,13 @@ class SessionSplitViewStateProvider extends Provider<CurrentSessionSplitView> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionSplitViewStateRef on ProviderRef<CurrentSessionSplitView> {
+mixin SessionSplitViewStateRef on ProviderRef<SessionSplitViewModel> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
 class _SessionSplitViewStateProviderElement
-    extends ProviderElement<CurrentSessionSplitView>
+    extends ProviderElement<SessionSplitViewModel>
     with SessionSplitViewStateRef {
   _SessionSplitViewStateProviderElement(super.provider);
 
@@ -161,12 +161,12 @@ class _SessionSplitViewStateProviderElement
 }
 
 String _$sessionSplitViewControllerHash() =>
-    r'8c3c6f28f1ec58a111445f1462b2883c959133e6';
+    r'555c00565fa10d91f46e380745d83f77d262aff5';
 
 /// See also [SessionSplitViewController].
 @ProviderFor(SessionSplitViewController)
 final sessionSplitViewControllerProvider = NotifierProvider<
-    SessionSplitViewController, CurrentSessionSplitView>.internal(
+    SessionSplitViewController, SessionSplitViewModel>.internal(
   SessionSplitViewController.new,
   name: r'sessionSplitViewControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -176,6 +176,6 @@ final sessionSplitViewControllerProvider = NotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionSplitViewController = Notifier<CurrentSessionSplitView>;
+typedef _$SessionSplitViewController = Notifier<SessionSplitViewModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

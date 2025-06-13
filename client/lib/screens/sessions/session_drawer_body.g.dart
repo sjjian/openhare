@@ -7,7 +7,7 @@ part of 'session_drawer_body.dart';
 // **************************************************************************
 
 String _$sessionDrawerStateHash() =>
-    r'253c562fbed2294539c4066cb1ed1458efdb5087';
+    r'19bfa943162037345b32a367a5b440bb6d5c3390';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -35,7 +35,7 @@ class _SystemHash {
 const sessionDrawerStateProvider = SessionDrawerStateFamily();
 
 /// See also [sessionDrawerState].
-class SessionDrawerStateFamily extends Family<CurrentSessionDrawer> {
+class SessionDrawerStateFamily extends Family<SessionDrawerModel> {
   /// See also [sessionDrawerState].
   const SessionDrawerStateFamily();
 
@@ -73,7 +73,7 @@ class SessionDrawerStateFamily extends Family<CurrentSessionDrawer> {
 }
 
 /// See also [sessionDrawerState].
-class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer> {
+class SessionDrawerStateProvider extends Provider<SessionDrawerModel> {
   /// See also [sessionDrawerState].
   SessionDrawerStateProvider(
     int sessionId,
@@ -108,7 +108,7 @@ class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer> {
 
   @override
   Override overrideWith(
-    CurrentSessionDrawer Function(SessionDrawerStateRef provider) create,
+    SessionDrawerModel Function(SessionDrawerStateRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -125,7 +125,7 @@ class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer> {
   }
 
   @override
-  ProviderElement<CurrentSessionDrawer> createElement() {
+  ProviderElement<SessionDrawerModel> createElement() {
     return _SessionDrawerStateProviderElement(this);
   }
 
@@ -145,13 +145,13 @@ class SessionDrawerStateProvider extends Provider<CurrentSessionDrawer> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionDrawerStateRef on ProviderRef<CurrentSessionDrawer> {
+mixin SessionDrawerStateRef on ProviderRef<SessionDrawerModel> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
 class _SessionDrawerStateProviderElement
-    extends ProviderElement<CurrentSessionDrawer> with SessionDrawerStateRef {
+    extends ProviderElement<SessionDrawerModel> with SessionDrawerStateRef {
   _SessionDrawerStateProviderElement(super.provider);
 
   @override
@@ -159,12 +159,12 @@ class _SessionDrawerStateProviderElement
 }
 
 String _$sessionDrawerControllerHash() =>
-    r'25ee026284a11dc459e27be4648e86dde001fd17';
+    r'ea10bb312b465fbff11c019e25e56ef614fc33d7';
 
 /// See also [SessionDrawerController].
 @ProviderFor(SessionDrawerController)
 final sessionDrawerControllerProvider =
-    NotifierProvider<SessionDrawerController, CurrentSessionDrawer>.internal(
+    NotifierProvider<SessionDrawerController, SessionDrawerModel>.internal(
   SessionDrawerController.new,
   name: r'sessionDrawerControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -174,6 +174,6 @@ final sessionDrawerControllerProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionDrawerController = Notifier<CurrentSessionDrawer>;
+typedef _$SessionDrawerController = Notifier<SessionDrawerModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

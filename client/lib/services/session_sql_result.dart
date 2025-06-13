@@ -28,7 +28,7 @@ class SQLResultServices extends _$SQLResultServices {
     } finally {
       ref
           .read(sqlResultsRepoProvider)
-          .updateSQLResult(sessionId, state.index, result);
+          .updateSQLResult(sessionId, result.id, result);
       ref.invalidateSelf();
     }
   }
@@ -45,15 +45,15 @@ class SQLResultsServices extends _$SQLResultsServices {
     return ref.watch(sqlResultsRepoProvider).getSqlResults(sessionId);
   }
 
-  void deleteSQLResult(int index) {
+  void deleteSQLResult(int resultId) {
     SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
-    repo.deleteSQLResult(state.sessionId, index);
+    repo.deleteSQLResult(state.sessionId, resultId);
     ref.invalidateSelf();
   }
 
-  void selectSQLResultByIndex(int index) {
+  void selectSQLResult(int resultId) {
     SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
-    repo.selectSQLResult(state.sessionId, index);
+    repo.selectSQLResult(state.sessionId, resultId);
     ref.invalidateSelf();
   }
 

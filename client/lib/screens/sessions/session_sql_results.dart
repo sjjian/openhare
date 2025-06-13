@@ -1,4 +1,3 @@
-import 'package:client/models/interface.dart';
 import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/session_conn.dart';
@@ -19,8 +18,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_sql_results.g.dart';
 
 @Riverpod(keepAlive: true)
-CurrentSessionEditor sessionEditor(Ref ref, int sessionId) {
-  return CurrentSessionEditor(code: CodeLineEditingController(
+SessionEditorModel sessionEditor(Ref ref, int sessionId) {
+  return SessionEditorModel(code: CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
     return TextSpan(
         children: Lexer(codeLines.asString(TextLineBreak.lf))
@@ -35,7 +34,7 @@ CurrentSessionEditor sessionEditor(Ref ref, int sessionId) {
 @Riverpod(keepAlive: true)
 class SessionEditorController extends _$SessionEditorController {
   @override
-  CurrentSessionEditor build() {
+  SessionEditorModel build() {
     SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionEditorProvider(0));
@@ -64,13 +63,13 @@ class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
     if (sessionIdModel == null) {
       return null;
     }
-    int resultId = ref.watch(
-        sQLResultsServicesProvider(sessionIdModel.sessionId)
-            .select((m) => m.selected?.result.id ?? -1));
+    int resultId = ref
+        .watch(sQLResultsServicesProvider(sessionIdModel.sessionId).select((m) {
+      return m.selected?.result.id ?? -1;
+    }));
     if (resultId == -1) {
       return null;
     }
-    print("selectedSQLResultNotifier: $resultId");
     return ref
         .watch(sQLResultServicesProvider(sessionIdModel.sessionId, resultId));
   }
@@ -82,7 +81,6 @@ class SqlResultTables extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SQLResultListModel? model = ref.watch(selectedSQLResultTabNotifierProvider);
-
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
       labelAlign: TextAlign.center,
@@ -130,13 +128,13 @@ class SqlResultTables extends ConsumerWidget {
                     ref
                         .read(sQLResultsServicesProvider(model.sessionId)
                             .notifier)
-                        .selectSQLResultByIndex(i);
+                        .selectSQLResult(model.results[i].result.id);
                   },
                   onDeleted: () {
                     ref
                         .read(sQLResultsServicesProvider(model.sessionId)
                             .notifier)
-                        .deleteSQLResult(i);
+                        .deleteSQLResult(model.results[i].result.id);
                   },
                   avatar: const Icon(
                     Icons.grid_on,
@@ -207,8 +205,7 @@ class SqlResultTable extends ConsumerWidget {
         .colorScheme
         .surfaceContainerLow; // sql result body 的背景色
 
-    final model = ref.read(selectedSQLResultNotifierProvider);
-    print("build sql result table: $model");
+    final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
       return Container(
           alignment: Alignment.center,

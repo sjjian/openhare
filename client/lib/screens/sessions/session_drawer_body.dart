@@ -11,8 +11,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_drawer_body.g.dart';
 
 @Riverpod(keepAlive: true)
-CurrentSessionDrawer sessionDrawerState(Ref ref, int sessionId) {
-  return const CurrentSessionDrawer(
+SessionDrawerModel sessionDrawerState(Ref ref, int sessionId) {
+  return const SessionDrawerModel(
       drawerPage: DrawerPage.metadataTree,
       sqlResult: null,
       sqlColumn: null,
@@ -23,7 +23,7 @@ CurrentSessionDrawer sessionDrawerState(Ref ref, int sessionId) {
 @Riverpod(keepAlive: true)
 class SessionDrawerController extends _$SessionDrawerController {
   @override
-  CurrentSessionDrawer build() {
+  SessionDrawerModel build() {
     SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
@@ -79,8 +79,7 @@ class SessionDrawerBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
-
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
     return Container(
       color: Theme.of(context)
           .colorScheme
@@ -109,7 +108,7 @@ class SessionDrawerBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider);
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
     return Container(
       color: Theme.of(context)
           .colorScheme

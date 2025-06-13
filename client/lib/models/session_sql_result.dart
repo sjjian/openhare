@@ -8,7 +8,6 @@ part 'session_sql_result.freezed.dart';
 abstract class SQLResultModel with _$SQLResultModel {
   const factory SQLResultModel({
     required int sessionId,
-    required int index,
     required SQLResult result,
   }) = _SQLResultModel;
 }
@@ -25,10 +24,10 @@ abstract class SQLResultListModel with _$SQLResultListModel {
 abstract class SQLResultRepo {
   SQLResultListModel getSqlResults(int sessionId);
   SQLResultModel getSQLReuslt(int sessionId, int resultId);
-  void selectSQLResult(int sessionId, int index);
+  void selectSQLResult(int sessionId, int resultId);
   SQLResultModel? selectedSQLReuslt(int sessionId);
   void reorderSQLResult(int sessionId, int oldIndex, int newIndex);
   SQLResultModel addSQLResult(int sessionId);
-  void deleteSQLResult(int sessionId, int index);
+  void deleteSQLResult(int sessionId, int resultId);
   void updateSQLResult(int sessionId, int resultId, SQLResult result);
 }

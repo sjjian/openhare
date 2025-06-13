@@ -14,8 +14,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_body.g.dart';
 
 @Riverpod(keepAlive: true)
-CurrentSessionSplitView sessionSplitViewState(Ref ref, int sessionId) {
-  return CurrentSessionSplitView(
+SessionSplitViewModel sessionSplitViewState(Ref ref, int sessionId) {
+  return SessionSplitViewModel(
       multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
       metaDataSplitViewCtrl:
           SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
@@ -24,7 +24,7 @@ CurrentSessionSplitView sessionSplitViewState(Ref ref, int sessionId) {
 @Riverpod(keepAlive: true)
 class SessionSplitViewController extends _$SessionSplitViewController {
   @override
-  CurrentSessionSplitView build() {
+  SessionSplitViewModel build() {
     SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
@@ -39,10 +39,9 @@ class SessionBodyPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print("SessionBodyPage build");
-    CurrentSessionEditor sessionEditor = ref.watch(sessionEditorControllerProvider);
-    CurrentSessionSplitView sessionSplitView = ref.watch(sessionSplitViewControllerProvider);
-    CurrentSessionDrawer sessionDrawer = ref.watch(sessionDrawerControllerProvider);
+    final sessionEditor = ref.watch(sessionEditorControllerProvider);
+    final sessionSplitView = ref.watch(sessionSplitViewControllerProvider);
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
 
     final Widget left = Column(
       children: [

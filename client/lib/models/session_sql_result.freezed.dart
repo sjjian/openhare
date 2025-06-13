@@ -16,7 +16,6 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SQLResultModel implements DiagnosticableTreeMixin {
   int get sessionId;
-  int get index;
   SQLResult get result;
 
   /// Create a copy of SQLResultModel
@@ -32,7 +31,6 @@ mixin _$SQLResultModel implements DiagnosticableTreeMixin {
     properties
       ..add(DiagnosticsProperty('type', 'SQLResultModel'))
       ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('index', index))
       ..add(DiagnosticsProperty('result', result));
   }
 
@@ -43,16 +41,15 @@ mixin _$SQLResultModel implements DiagnosticableTreeMixin {
             other is SQLResultModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
-            (identical(other.index, index) || other.index == index) &&
             (identical(other.result, result) || other.result == result));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, sessionId, index, result);
+  int get hashCode => Object.hash(runtimeType, sessionId, result);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SQLResultModel(sessionId: $sessionId, index: $index, result: $result)';
+    return 'SQLResultModel(sessionId: $sessionId, result: $result)';
   }
 }
 
@@ -62,7 +59,7 @@ abstract mixin class $SQLResultModelCopyWith<$Res> {
           SQLResultModel value, $Res Function(SQLResultModel) _then) =
       _$SQLResultModelCopyWithImpl;
   @useResult
-  $Res call({int sessionId, int index, SQLResult result});
+  $Res call({int sessionId, SQLResult result});
 }
 
 /// @nodoc
@@ -79,17 +76,12 @@ class _$SQLResultModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? sessionId = null,
-    Object? index = null,
     Object? result = null,
   }) {
     return _then(_self.copyWith(
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
-      index: null == index
-          ? _self.index
-          : index // ignore: cast_nullable_to_non_nullable
               as int,
       result: null == result
           ? _self.result
@@ -102,13 +94,10 @@ class _$SQLResultModelCopyWithImpl<$Res>
 /// @nodoc
 
 class _SQLResultModel with DiagnosticableTreeMixin implements SQLResultModel {
-  const _SQLResultModel(
-      {required this.sessionId, required this.index, required this.result});
+  const _SQLResultModel({required this.sessionId, required this.result});
 
   @override
   final int sessionId;
-  @override
-  final int index;
   @override
   final SQLResult result;
 
@@ -125,7 +114,6 @@ class _SQLResultModel with DiagnosticableTreeMixin implements SQLResultModel {
     properties
       ..add(DiagnosticsProperty('type', 'SQLResultModel'))
       ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('index', index))
       ..add(DiagnosticsProperty('result', result));
   }
 
@@ -136,16 +124,15 @@ class _SQLResultModel with DiagnosticableTreeMixin implements SQLResultModel {
             other is _SQLResultModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
-            (identical(other.index, index) || other.index == index) &&
             (identical(other.result, result) || other.result == result));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, sessionId, index, result);
+  int get hashCode => Object.hash(runtimeType, sessionId, result);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SQLResultModel(sessionId: $sessionId, index: $index, result: $result)';
+    return 'SQLResultModel(sessionId: $sessionId, result: $result)';
   }
 }
 
@@ -157,7 +144,7 @@ abstract mixin class _$SQLResultModelCopyWith<$Res>
       __$SQLResultModelCopyWithImpl;
   @override
   @useResult
-  $Res call({int sessionId, int index, SQLResult result});
+  $Res call({int sessionId, SQLResult result});
 }
 
 /// @nodoc
@@ -174,17 +161,12 @@ class __$SQLResultModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? sessionId = null,
-    Object? index = null,
     Object? result = null,
   }) {
     return _then(_SQLResultModel(
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
-      index: null == index
-          ? _self.index
-          : index // ignore: cast_nullable_to_non_nullable
               as int,
       result: null == result
           ? _self.result

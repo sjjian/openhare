@@ -1,4 +1,3 @@
-import 'package:client/models/interface.dart';
 import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
@@ -21,7 +20,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
     SessionModel sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
     SessionConnModel sessionConnModel =
         ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
-    CurrentSessionDrawer sessionDrawer =
+    SessionDrawerModel sessionDrawer =
         ref.watch(sessionDrawerControllerProvider)!;
 
     return SessionOpBarModel(

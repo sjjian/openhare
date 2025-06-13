@@ -6,7 +6,7 @@ part of 'session_sql_results.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionEditorHash() => r'75d1f688113bd1cd339190c83477842de7bebebb';
+String _$sessionEditorHash() => r'32a6237c3e8429e0d64e086c460900ca00d43227';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -34,7 +34,7 @@ class _SystemHash {
 const sessionEditorProvider = SessionEditorFamily();
 
 /// See also [sessionEditor].
-class SessionEditorFamily extends Family<CurrentSessionEditor> {
+class SessionEditorFamily extends Family<SessionEditorModel> {
   /// See also [sessionEditor].
   const SessionEditorFamily();
 
@@ -72,7 +72,7 @@ class SessionEditorFamily extends Family<CurrentSessionEditor> {
 }
 
 /// See also [sessionEditor].
-class SessionEditorProvider extends Provider<CurrentSessionEditor> {
+class SessionEditorProvider extends Provider<SessionEditorModel> {
   /// See also [sessionEditor].
   SessionEditorProvider(
     int sessionId,
@@ -107,7 +107,7 @@ class SessionEditorProvider extends Provider<CurrentSessionEditor> {
 
   @override
   Override overrideWith(
-    CurrentSessionEditor Function(SessionEditorRef provider) create,
+    SessionEditorModel Function(SessionEditorRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -124,7 +124,7 @@ class SessionEditorProvider extends Provider<CurrentSessionEditor> {
   }
 
   @override
-  ProviderElement<CurrentSessionEditor> createElement() {
+  ProviderElement<SessionEditorModel> createElement() {
     return _SessionEditorProviderElement(this);
   }
 
@@ -144,13 +144,13 @@ class SessionEditorProvider extends Provider<CurrentSessionEditor> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionEditorRef on ProviderRef<CurrentSessionEditor> {
+mixin SessionEditorRef on ProviderRef<SessionEditorModel> {
   /// The parameter `sessionId` of this provider.
   int get sessionId;
 }
 
-class _SessionEditorProviderElement
-    extends ProviderElement<CurrentSessionEditor> with SessionEditorRef {
+class _SessionEditorProviderElement extends ProviderElement<SessionEditorModel>
+    with SessionEditorRef {
   _SessionEditorProviderElement(super.provider);
 
   @override
@@ -158,12 +158,12 @@ class _SessionEditorProviderElement
 }
 
 String _$sessionEditorControllerHash() =>
-    r'b5ea0583f416c3698eac30b01c386a5d7e04d8f6';
+    r'92009187f5244d7707247520937d97fb78b410e4';
 
 /// See also [SessionEditorController].
 @ProviderFor(SessionEditorController)
 final sessionEditorControllerProvider =
-    NotifierProvider<SessionEditorController, CurrentSessionEditor>.internal(
+    NotifierProvider<SessionEditorController, SessionEditorModel>.internal(
   SessionEditorController.new,
   name: r'sessionEditorControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -173,7 +173,7 @@ final sessionEditorControllerProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionEditorController = Notifier<CurrentSessionEditor>;
+typedef _$SessionEditorController = Notifier<SessionEditorModel>;
 String _$selectedSQLResultTabNotifierHash() =>
     r'7e11334458d840b9d80219985621a201d335f448';
 
@@ -192,7 +192,7 @@ final selectedSQLResultTabNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSQLResultTabNotifier = Notifier<SQLResultListModel?>;
 String _$selectedSQLResultNotifierHash() =>
-    r'c32608fecd2fdb242e2e81fad0f79ec9529a8981';
+    r'caa0333d4df9f19d3b136e917f07d392975773a9';
 
 /// See also [SelectedSQLResultNotifier].
 @ProviderFor(SelectedSQLResultNotifier)

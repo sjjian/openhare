@@ -21,11 +21,17 @@ class SQLResultRepoImpl extends SQLResultRepo {
   int genSQLResultId(int sessionId) {
     return !sqlResults.containsKey(sessionId)
         ? 0
-        : sqlResults[sessionId]!.fold(
+        : sessionSqlResults(sessionId).fold(
                 0,
                 (previousId, element) =>
                     previousId < element.id ? element.id : previousId) +
             1;
+  }
+
+  SQLResult _getSQLResult(int sessionId, int resultId) {
+    return sessionSqlResults(sessionId).firstWhere(
+          (element) => element.id == resultId,
+        );
   }
 
   @override
@@ -38,36 +44,28 @@ class SQLResultRepoImpl extends SQLResultRepo {
         results: sqlResults[sessionId]!.map((m) {
           return SQLResultModel(
             sessionId: sessionId,
-            index: sqlResults[sessionId]!.indexOf(m),
             result: m,
           );
         }).toList(),
         selected: sqlResults[sessionId]!.selected() != null
             ? SQLResultModel(
                 sessionId: sessionId,
-                index: sqlResults[sessionId]!
-                    .indexOf(sqlResults[sessionId]!.selected()!),
                 result: sqlResults[sessionId]!.selected()!)
             : null);
   }
 
   @override
   SQLResultModel getSQLReuslt(int sessionId, int resultId) {
-    final result = sessionSqlResults(sessionId)
-        .where(
-          (element) => element.id == resultId,
-        )
-        .first;
-
+    final result =  _getSQLResult(sessionId, resultId);
     return SQLResultModel(
         sessionId: sessionId,
-        index: sessionSqlResults(sessionId).indexOf(result),
         result: result);
   }
 
   @override
-  void selectSQLResult(int sessionId, int index) {
-    sessionSqlResults(sessionId).select(index);
+  void selectSQLResult(int sessionId, int resultId) {
+    final result =  _getSQLResult(sessionId, resultId);
+    sessionSqlResults(sessionId).select(sessionSqlResults(sessionId).indexOf(result));
   }
 
   @override
@@ -81,15 +79,15 @@ class SQLResultRepoImpl extends SQLResultRepo {
     if (selectedResult != null) {
       return SQLResultModel(
           sessionId: sessionId,
-          index: sessionSqlResults(sessionId).indexOf(selectedResult),
           result: selectedResult);
     }
     return null;
   }
 
   @override
-  void updateSQLResult(int sessionId, int index, SQLResult result) {
-    sessionSqlResults(sessionId)[index] = result;
+  void updateSQLResult(int sessionId, int resultId, SQLResult result) {
+    final orginResult =  _getSQLResult(sessionId, resultId);
+    sessionSqlResults(sessionId)[sessionSqlResults(sessionId).indexOf(orginResult)] = result;
   }
 
   @override
@@ -98,13 +96,13 @@ class SQLResultRepoImpl extends SQLResultRepo {
     sessionSqlResults(sessionId).add(result);
     return SQLResultModel(
         sessionId: sessionId,
-        index: sessionSqlResults(sessionId).indexOf(result),
         result: result);
   }
 
   @override
-  void deleteSQLResult(int sessionId, int index) {
-    sessionSqlResults(sessionId).removeAt(index);
+  void deleteSQLResult(int sessionId, int resultId) {
+    final result =  _getSQLResult(sessionId, resultId);
+    sessionSqlResults(sessionId).removeAt(sessionSqlResults(sessionId).indexOf(result));
   }
 }
 

@@ -6,7 +6,7 @@ part of 'session_sql_result.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sQLResultServicesHash() => r'229f3828bcf849614efcaaf285a0335a612b0919';
+String _$sQLResultServicesHash() => r'4720496134dde3bebf150b585ff0091dbcc2c667';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -195,7 +195,7 @@ class _SQLResultServicesProviderElement
 }
 
 String _$sQLResultsServicesHash() =>
-    r'1df0b5f45af649c03ccc707580cbaa1d8aaf254d';
+    r'0eb67b97cfdf8c58f6632e0c51b358ce92f73fca';
 
 abstract class _$SQLResultsServices
     extends BuildlessNotifier<SQLResultListModel> {
