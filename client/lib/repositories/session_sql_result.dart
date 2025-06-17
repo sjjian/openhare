@@ -122,21 +122,6 @@ class SQLResult {
   Duration? executeTime;
 
   SQLResult(this.id, this.sessionId);
-
-  void setQuery(String query) {
-    this.query = query;
-  }
-
-  void setDone(BaseQueryResult data, Duration executeTime) {
-    this.data = data;
-    this.executeTime = executeTime;
-    state = SQLExecuteState.done;
-  }
-
-  void setError(String error) {
-    state = SQLExecuteState.error;
-    this.error = error;
-  }
 }
 
 @Riverpod(keepAlive: true)

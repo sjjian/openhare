@@ -15,8 +15,8 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
+  int get instanceId;
   MetaDataNode? get metadata;
-  TreeController<DataNode>? get metadataController;
 
   /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -30,8 +30,8 @@ mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
       ..add(DiagnosticsProperty('type', 'InstanceMetadataModel'))
-      ..add(DiagnosticsProperty('metadata', metadata))
-      ..add(DiagnosticsProperty('metadataController', metadataController));
+      ..add(DiagnosticsProperty('instanceId', instanceId))
+      ..add(DiagnosticsProperty('metadata', metadata));
   }
 
   @override
@@ -39,18 +39,18 @@ mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is InstanceMetadataModel &&
+            (identical(other.instanceId, instanceId) ||
+                other.instanceId == instanceId) &&
             (identical(other.metadata, metadata) ||
-                other.metadata == metadata) &&
-            (identical(other.metadataController, metadataController) ||
-                other.metadataController == metadataController));
+                other.metadata == metadata));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, metadata, metadataController);
+  int get hashCode => Object.hash(runtimeType, instanceId, metadata);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'InstanceMetadataModel(metadata: $metadata, metadataController: $metadataController)';
+    return 'InstanceMetadataModel(instanceId: $instanceId, metadata: $metadata)';
   }
 }
 
@@ -60,8 +60,7 @@ abstract mixin class $InstanceMetadataModelCopyWith<$Res> {
           $Res Function(InstanceMetadataModel) _then) =
       _$InstanceMetadataModelCopyWithImpl;
   @useResult
-  $Res call(
-      {MetaDataNode? metadata, TreeController<DataNode>? metadataController});
+  $Res call({int instanceId, MetaDataNode? metadata});
 }
 
 /// @nodoc
@@ -77,18 +76,18 @@ class _$InstanceMetadataModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? instanceId = null,
     Object? metadata = freezed,
-    Object? metadataController = freezed,
   }) {
     return _then(_self.copyWith(
+      instanceId: null == instanceId
+          ? _self.instanceId
+          : instanceId // ignore: cast_nullable_to_non_nullable
+              as int,
       metadata: freezed == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as MetaDataNode?,
-      metadataController: freezed == metadataController
-          ? _self.metadataController
-          : metadataController // ignore: cast_nullable_to_non_nullable
-              as TreeController<DataNode>?,
     ));
   }
 }
@@ -98,12 +97,12 @@ class _$InstanceMetadataModelCopyWithImpl<$Res>
 class _InstanceMetadataModel
     with DiagnosticableTreeMixin
     implements InstanceMetadataModel {
-  const _InstanceMetadataModel({this.metadata, this.metadataController});
+  const _InstanceMetadataModel({required this.instanceId, this.metadata});
 
   @override
-  final MetaDataNode? metadata;
+  final int instanceId;
   @override
-  final TreeController<DataNode>? metadataController;
+  final MetaDataNode? metadata;
 
   /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -118,8 +117,8 @@ class _InstanceMetadataModel
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
       ..add(DiagnosticsProperty('type', 'InstanceMetadataModel'))
-      ..add(DiagnosticsProperty('metadata', metadata))
-      ..add(DiagnosticsProperty('metadataController', metadataController));
+      ..add(DiagnosticsProperty('instanceId', instanceId))
+      ..add(DiagnosticsProperty('metadata', metadata));
   }
 
   @override
@@ -127,18 +126,18 @@ class _InstanceMetadataModel
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _InstanceMetadataModel &&
+            (identical(other.instanceId, instanceId) ||
+                other.instanceId == instanceId) &&
             (identical(other.metadata, metadata) ||
-                other.metadata == metadata) &&
-            (identical(other.metadataController, metadataController) ||
-                other.metadataController == metadataController));
+                other.metadata == metadata));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, metadata, metadataController);
+  int get hashCode => Object.hash(runtimeType, instanceId, metadata);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'InstanceMetadataModel(metadata: $metadata, metadataController: $metadataController)';
+    return 'InstanceMetadataModel(instanceId: $instanceId, metadata: $metadata)';
   }
 }
 
@@ -150,8 +149,7 @@ abstract mixin class _$InstanceMetadataModelCopyWith<$Res>
       __$InstanceMetadataModelCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {MetaDataNode? metadata, TreeController<DataNode>? metadataController});
+  $Res call({int instanceId, MetaDataNode? metadata});
 }
 
 /// @nodoc
@@ -167,18 +165,18 @@ class __$InstanceMetadataModelCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? instanceId = null,
     Object? metadata = freezed,
-    Object? metadataController = freezed,
   }) {
     return _then(_InstanceMetadataModel(
+      instanceId: null == instanceId
+          ? _self.instanceId
+          : instanceId // ignore: cast_nullable_to_non_nullable
+              as int,
       metadata: freezed == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as MetaDataNode?,
-      metadataController: freezed == metadataController
-          ? _self.metadataController
-          : metadataController // ignore: cast_nullable_to_non_nullable
-              as TreeController<DataNode>?,
     ));
   }
 }

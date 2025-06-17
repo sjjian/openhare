@@ -192,7 +192,7 @@ final selectedSQLResultTabNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSQLResultTabNotifier = Notifier<SQLResultListModel?>;
 String _$selectedSQLResultNotifierHash() =>
-    r'caa0333d4df9f19d3b136e917f07d392975773a9';
+    r'3a67457501d1569c8bf72a60519177f855524c15';
 
 /// See also [SelectedSQLResultNotifier].
 @ProviderFor(SelectedSQLResultNotifier)

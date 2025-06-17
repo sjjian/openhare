@@ -10,10 +10,12 @@ part 'sessions.g.dart';
 class SessionsServices extends _$SessionsServices {
   @override
   SessionListModel build() {
-    print("SessionsServices build");
     SessionListModel sessions = ref.watch(sessionRepoProvider).getSessions();
-    print("selectedSession: ${sessions.selectedSession}");
     return sessions;
+  }
+
+  SessionModel? getSession(int sessionId){
+    return ref.read(sessionRepoProvider).getSession(sessionId);
   }
 
   void selectSessionByIndex(int index) {
@@ -22,15 +24,11 @@ class SessionsServices extends _$SessionsServices {
   }
 
   void reorderSession(int oldIndex, int newIndex) {
-    // state.sessions.reorder(oldIndex, newIndex);
     ref.read(sessionRepoProvider).reorderSession(oldIndex, newIndex);
     ref.invalidateSelf();
-    // refresh
-    // state = state.copyWith(sessions: state.sessions);
   }
 
   Future<void> addSession(InstanceModel instance, {String? schema}) async {
-    // SessionRepo sessionRepo = ref.read(sessionRepoProvider);
     SessionModel selectedSession;
     if (state.selectedSession == null) {
       selectedSession = await ref.read(sessionRepoProvider).newSession();
@@ -48,20 +46,12 @@ class SessionsServices extends _$SessionsServices {
     await ref
         .read(sessionRepoProvider)
         .updateSession(selectedSession, instance, schema ?? '');
-  
-    print("SessionsServices addSession: $selectedSession, $instance, $schema");
     ref.invalidateSelf();
-    // SessionStorage? session = state.sessions.selected();
-    // if (session == null) {
-    //   session = SessionStorage();
-    //   state.sessions.add(session);
-    //   sessionRepo.addSession(session);
-    // }
-    // session.instance.target = instance;
-    // session.currentSchema = schema;
-    // sessionRepo.updateSession(session);
-    // refresh
-    // state = state.copyWith(sessions: state.sessions);
+  }
+
+  void setConnId(int sessionId, int connid) {
+    ref.read(sessionRepoProvider).setConnId(sessionId, connid);
+    ref.invalidateSelf();
   }
 
   Future<void> newSession() async {

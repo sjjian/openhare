@@ -1,5 +1,4 @@
 import 'package:client/repositories/session_conn.dart';
-import 'package:client/repositories/session_sql_result.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';

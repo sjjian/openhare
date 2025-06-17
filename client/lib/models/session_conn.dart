@@ -8,21 +8,22 @@ part 'session_conn.freezed.dart';
 @freezed
 abstract class SessionConnModel with _$SessionConnModel {
   const factory SessionConnModel({
-    required int sessionId,
+    required int connId,
     required String currentSchema,
     required bool canQuery,
   }) = _SessionConnModel;
 }
 
 abstract class SessionConnRepo {
-  SessionConnModel getSessionConn(int sessionId);
-  SessionConnModel createConn(int sessionId, InstanceModel model,
+  SessionConnModel getConn(int connId);
+  SessionConnModel createConn(InstanceModel model,
       {String? currentSchema});
-  void removeConn(int sessionId);
-  Future<void> connect(int sessionId);
-  Future<void> close(int sessionId);
-  Future<void> onSchemaChanged(int sessionId, String schema);
-  Future<void> setCurrentSchema(int sessionId, String schema);
-  Future<List<String>> getSchemas(int sessionId);
-  Future<BaseQueryResult?> query(int sessionId, String query);
+  void removeConn(int connId);
+  Future<void> connect(int connId);
+  Future<void> close(int connId);
+  Future<void> onSchemaChanged(int connId, String schema);
+  Future<void> setCurrentSchema(int connId, String schema);
+  Future<List<String>> getSchemas(int connId);
+  Future<MetaDataNode> getMetadata(int connId);
+  Future<BaseQueryResult?> query(int connId, String query);
 }

@@ -19,6 +19,7 @@ mixin _$SessionModel implements DiagnosticableTreeMixin {
   int? get instanceId;
   String? get instanceName;
   DatabaseType? get dbType;
+  int? get connId;
 
   /// Create a copy of SessionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -35,7 +36,8 @@ mixin _$SessionModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('sessionId', sessionId))
       ..add(DiagnosticsProperty('instanceId', instanceId))
       ..add(DiagnosticsProperty('instanceName', instanceName))
-      ..add(DiagnosticsProperty('dbType', dbType));
+      ..add(DiagnosticsProperty('dbType', dbType))
+      ..add(DiagnosticsProperty('connId', connId));
   }
 
   @override
@@ -49,16 +51,17 @@ mixin _$SessionModel implements DiagnosticableTreeMixin {
                 other.instanceId == instanceId) &&
             (identical(other.instanceName, instanceName) ||
                 other.instanceName == instanceName) &&
-            (identical(other.dbType, dbType) || other.dbType == dbType));
+            (identical(other.dbType, dbType) || other.dbType == dbType) &&
+            (identical(other.connId, connId) || other.connId == connId));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, sessionId, instanceId, instanceName, dbType);
+  int get hashCode => Object.hash(
+      runtimeType, sessionId, instanceId, instanceName, dbType, connId);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType)';
+    return 'SessionModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType, connId: $connId)';
   }
 }
 
@@ -72,7 +75,8 @@ abstract mixin class $SessionModelCopyWith<$Res> {
       {int sessionId,
       int? instanceId,
       String? instanceName,
-      DatabaseType? dbType});
+      DatabaseType? dbType,
+      int? connId});
 }
 
 /// @nodoc
@@ -91,6 +95,7 @@ class _$SessionModelCopyWithImpl<$Res> implements $SessionModelCopyWith<$Res> {
     Object? instanceId = freezed,
     Object? instanceName = freezed,
     Object? dbType = freezed,
+    Object? connId = freezed,
   }) {
     return _then(_self.copyWith(
       sessionId: null == sessionId
@@ -109,6 +114,10 @@ class _$SessionModelCopyWithImpl<$Res> implements $SessionModelCopyWith<$Res> {
           ? _self.dbType
           : dbType // ignore: cast_nullable_to_non_nullable
               as DatabaseType?,
+      connId: freezed == connId
+          ? _self.connId
+          : connId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -120,7 +129,8 @@ class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
       {required this.sessionId,
       this.instanceId,
       this.instanceName,
-      this.dbType});
+      this.dbType,
+      this.connId});
 
   @override
   final int sessionId;
@@ -130,6 +140,8 @@ class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
   final String? instanceName;
   @override
   final DatabaseType? dbType;
+  @override
+  final int? connId;
 
   /// Create a copy of SessionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -146,7 +158,8 @@ class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
       ..add(DiagnosticsProperty('sessionId', sessionId))
       ..add(DiagnosticsProperty('instanceId', instanceId))
       ..add(DiagnosticsProperty('instanceName', instanceName))
-      ..add(DiagnosticsProperty('dbType', dbType));
+      ..add(DiagnosticsProperty('dbType', dbType))
+      ..add(DiagnosticsProperty('connId', connId));
   }
 
   @override
@@ -160,16 +173,17 @@ class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
                 other.instanceId == instanceId) &&
             (identical(other.instanceName, instanceName) ||
                 other.instanceName == instanceName) &&
-            (identical(other.dbType, dbType) || other.dbType == dbType));
+            (identical(other.dbType, dbType) || other.dbType == dbType) &&
+            (identical(other.connId, connId) || other.connId == connId));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, sessionId, instanceId, instanceName, dbType);
+  int get hashCode => Object.hash(
+      runtimeType, sessionId, instanceId, instanceName, dbType, connId);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType)';
+    return 'SessionModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType, connId: $connId)';
   }
 }
 
@@ -185,7 +199,8 @@ abstract mixin class _$SessionModelCopyWith<$Res>
       {int sessionId,
       int? instanceId,
       String? instanceName,
-      DatabaseType? dbType});
+      DatabaseType? dbType,
+      int? connId});
 }
 
 /// @nodoc
@@ -205,6 +220,7 @@ class __$SessionModelCopyWithImpl<$Res>
     Object? instanceId = freezed,
     Object? instanceName = freezed,
     Object? dbType = freezed,
+    Object? connId = freezed,
   }) {
     return _then(_SessionModel(
       sessionId: null == sessionId
@@ -223,6 +239,10 @@ class __$SessionModelCopyWithImpl<$Res>
           ? _self.dbType
           : dbType // ignore: cast_nullable_to_non_nullable
               as DatabaseType?,
+      connId: freezed == connId
+          ? _self.connId
+          : connId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -438,6 +458,7 @@ class __$SessionListModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
   int get sessionId;
+  int get connId;
   bool get canQuery;
   String get currentSchema;
   bool get isRightPageOpen;
@@ -455,6 +476,7 @@ mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
     properties
       ..add(DiagnosticsProperty('type', 'SessionOpBarModel'))
       ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('connId', connId))
       ..add(DiagnosticsProperty('canQuery', canQuery))
       ..add(DiagnosticsProperty('currentSchema', currentSchema))
       ..add(DiagnosticsProperty('isRightPageOpen', isRightPageOpen));
@@ -467,6 +489,7 @@ mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
             other is SessionOpBarModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
+            (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.canQuery, canQuery) ||
                 other.canQuery == canQuery) &&
             (identical(other.currentSchema, currentSchema) ||
@@ -477,11 +500,11 @@ mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, sessionId, canQuery, currentSchema, isRightPageOpen);
+      runtimeType, sessionId, connId, canQuery, currentSchema, isRightPageOpen);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionOpBarModel(sessionId: $sessionId, canQuery: $canQuery, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
+    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, canQuery: $canQuery, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
   }
 }
 
@@ -493,6 +516,7 @@ abstract mixin class $SessionOpBarModelCopyWith<$Res> {
   @useResult
   $Res call(
       {int sessionId,
+      int connId,
       bool canQuery,
       String currentSchema,
       bool isRightPageOpen});
@@ -512,6 +536,7 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? sessionId = null,
+    Object? connId = null,
     Object? canQuery = null,
     Object? currentSchema = null,
     Object? isRightPageOpen = null,
@@ -520,6 +545,10 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      connId: null == connId
+          ? _self.connId
+          : connId // ignore: cast_nullable_to_non_nullable
               as int,
       canQuery: null == canQuery
           ? _self.canQuery
@@ -544,12 +573,15 @@ class _SessionOpBarModel
     implements SessionOpBarModel {
   const _SessionOpBarModel(
       {required this.sessionId,
+      required this.connId,
       required this.canQuery,
       required this.currentSchema,
       required this.isRightPageOpen});
 
   @override
   final int sessionId;
+  @override
+  final int connId;
   @override
   final bool canQuery;
   @override
@@ -570,6 +602,7 @@ class _SessionOpBarModel
     properties
       ..add(DiagnosticsProperty('type', 'SessionOpBarModel'))
       ..add(DiagnosticsProperty('sessionId', sessionId))
+      ..add(DiagnosticsProperty('connId', connId))
       ..add(DiagnosticsProperty('canQuery', canQuery))
       ..add(DiagnosticsProperty('currentSchema', currentSchema))
       ..add(DiagnosticsProperty('isRightPageOpen', isRightPageOpen));
@@ -582,6 +615,7 @@ class _SessionOpBarModel
             other is _SessionOpBarModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
+            (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.canQuery, canQuery) ||
                 other.canQuery == canQuery) &&
             (identical(other.currentSchema, currentSchema) ||
@@ -592,11 +626,11 @@ class _SessionOpBarModel
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, sessionId, canQuery, currentSchema, isRightPageOpen);
+      runtimeType, sessionId, connId, canQuery, currentSchema, isRightPageOpen);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionOpBarModel(sessionId: $sessionId, canQuery: $canQuery, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
+    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, canQuery: $canQuery, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
   }
 }
 
@@ -610,6 +644,7 @@ abstract mixin class _$SessionOpBarModelCopyWith<$Res>
   @useResult
   $Res call(
       {int sessionId,
+      int connId,
       bool canQuery,
       String currentSchema,
       bool isRightPageOpen});
@@ -629,6 +664,7 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? sessionId = null,
+    Object? connId = null,
     Object? canQuery = null,
     Object? currentSchema = null,
     Object? isRightPageOpen = null,
@@ -637,6 +673,10 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
+              as int,
+      connId: null == connId
+          ? _self.connId
+          : connId // ignore: cast_nullable_to_non_nullable
               as int,
       canQuery: null == canQuery
           ? _self.canQuery

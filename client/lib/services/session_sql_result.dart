@@ -2,6 +2,7 @@ import 'package:client/models/session_sql_result.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:client/services/session_conn.dart';
 import 'package:client/repositories/session_sql_result.dart';
+import 'package:client/services/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:excel/excel.dart';
@@ -21,10 +22,14 @@ class SQLResultServices extends _$SQLResultServices {
     repo.updateSQLResult(sessionId, resultId, state.copyWith(query: query));
     ref.invalidateSelf();
 
+    // todo
+    final sessionModel =
+        ref.read(sessionsServicesProvider.notifier).getSession(state.sessionId);
+
     try {
       DateTime start = DateTime.now();
       BaseQueryResult? queryResult = await ref
-          .read(sessionConnServicesProvider(sessionId).notifier)
+          .read(sessionConnServicesProvider(sessionModel!.connId ?? 0).notifier)
           .query(query);
       DateTime end = DateTime.now();
       repo.updateSQLResult(

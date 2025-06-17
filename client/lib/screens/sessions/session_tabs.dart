@@ -70,18 +70,22 @@ class SessionTabs extends ConsumerWidget {
                       items: <PopupMenuEntry>[
                         PopupMenuItem<String>(
                           height: 30,
-                          onTap: () {
-                            ref
+                          onTap: () async {
+                            final connModel = await ref
                                 .read(sessionConnsServicesProvider.notifier)
                                 .createConn(
-                                  model.sessions[i].sessionId,
                                   model.sessions[i].instanceId!,
                                 );
-                            ref
+                            await ref
                                 .read(sessionConnServicesProvider(
-                                        model.sessions[i].sessionId)
+                                        connModel.connId)
                                     .notifier)
                                 .connect();
+
+                            ref
+                                .read(sessionsServicesProvider.notifier)
+                                .setConnId(model.sessions[i].sessionId,
+                                    connModel.connId);
                           },
                           child: const Text("连接"),
                         ),
@@ -91,7 +95,7 @@ class SessionTabs extends ConsumerWidget {
                           onTap: () {
                             ref
                                 .read(sessionConnServicesProvider(
-                                        model.sessions[i].sessionId)
+                                        model.sessions[i].connId??0)
                                     .notifier)
                                 .close();
                           },

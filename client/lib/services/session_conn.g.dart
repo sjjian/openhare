@@ -7,7 +7,7 @@ part of 'session_conn.dart';
 // **************************************************************************
 
 String _$sessionConnsServicesHash() =>
-    r'11b297adf6d95afd6033a5117ad96835e9b61171';
+    r'fa9b60334a050ebd445ce4fd58a9d3b8b24a62bd';
 
 /// See also [SessionConnsServices].
 @ProviderFor(SessionConnsServices)
@@ -24,7 +24,7 @@ final sessionConnsServicesProvider =
 
 typedef _$SessionConnsServices = Notifier<int>;
 String _$sessionConnServicesHash() =>
-    r'bf5cf773d5a72649bef2658bff752fc1912ab3c8';
+    r'5174fbf4d170884b3bec486840c1567ee0c0d511';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -49,10 +49,10 @@ class _SystemHash {
 
 abstract class _$SessionConnServices
     extends BuildlessNotifier<SessionConnModel> {
-  late final int sessionId;
+  late final int connId;
 
   SessionConnModel build(
-    int sessionId,
+    int connId,
   );
 }
 
@@ -67,10 +67,10 @@ class SessionConnServicesFamily extends Family<SessionConnModel> {
 
   /// See also [SessionConnServices].
   SessionConnServicesProvider call(
-    int sessionId,
+    int connId,
   ) {
     return SessionConnServicesProvider(
-      sessionId,
+      connId,
     );
   }
 
@@ -79,7 +79,7 @@ class SessionConnServicesFamily extends Family<SessionConnModel> {
     covariant SessionConnServicesProvider provider,
   ) {
     return call(
-      provider.sessionId,
+      provider.connId,
     );
   }
 
@@ -103,9 +103,9 @@ class SessionConnServicesProvider
     extends NotifierProviderImpl<SessionConnServices, SessionConnModel> {
   /// See also [SessionConnServices].
   SessionConnServicesProvider(
-    int sessionId,
+    int connId,
   ) : this._internal(
-          () => SessionConnServices()..sessionId = sessionId,
+          () => SessionConnServices()..connId = connId,
           from: sessionConnServicesProvider,
           name: r'sessionConnServicesProvider',
           debugGetCreateSourceHash:
@@ -115,7 +115,7 @@ class SessionConnServicesProvider
           dependencies: SessionConnServicesFamily._dependencies,
           allTransitiveDependencies:
               SessionConnServicesFamily._allTransitiveDependencies,
-          sessionId: sessionId,
+          connId: connId,
         );
 
   SessionConnServicesProvider._internal(
@@ -125,17 +125,17 @@ class SessionConnServicesProvider
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.sessionId,
+    required this.connId,
   }) : super.internal();
 
-  final int sessionId;
+  final int connId;
 
   @override
   SessionConnModel runNotifierBuild(
     covariant SessionConnServices notifier,
   ) {
     return notifier.build(
-      sessionId,
+      connId,
     );
   }
 
@@ -144,13 +144,13 @@ class SessionConnServicesProvider
     return ProviderOverride(
       origin: this,
       override: SessionConnServicesProvider._internal(
-        () => create()..sessionId = sessionId,
+        () => create()..connId = connId,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        sessionId: sessionId,
+        connId: connId,
       ),
     );
   }
@@ -163,13 +163,13 @@ class SessionConnServicesProvider
 
   @override
   bool operator ==(Object other) {
-    return other is SessionConnServicesProvider && other.sessionId == sessionId;
+    return other is SessionConnServicesProvider && other.connId == connId;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, sessionId.hashCode);
+    hash = _SystemHash.combine(hash, connId.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -178,8 +178,8 @@ class SessionConnServicesProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin SessionConnServicesRef on NotifierProviderRef<SessionConnModel> {
-  /// The parameter `sessionId` of this provider.
-  int get sessionId;
+  /// The parameter `connId` of this provider.
+  int get connId;
 }
 
 class _SessionConnServicesProviderElement
@@ -188,25 +188,7 @@ class _SessionConnServicesProviderElement
   _SessionConnServicesProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SessionConnServicesProvider).sessionId;
+  int get connId => (origin as SessionConnServicesProvider).connId;
 }
-
-String _$selectedSessionConnControllerHash() =>
-    r'59d82636e29ed5d2c05e48095c730a4c22db1943';
-
-/// See also [SelectedSessionConnController].
-@ProviderFor(SelectedSessionConnController)
-final selectedSessionConnControllerProvider =
-    NotifierProvider<SelectedSessionConnController, SessionConnModel?>.internal(
-  SelectedSessionConnController.new,
-  name: r'selectedSessionConnControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$selectedSessionConnControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SelectedSessionConnController = Notifier<SessionConnModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

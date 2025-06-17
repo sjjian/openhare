@@ -52,10 +52,10 @@ class SQLEditor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionModel sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
-    InstanceMetadataModel sessionMeta = ref.watch(sessionMetadataControllerProvider);
+    InstanceMetadataModel? sessionMeta = ref.watch(sessionMetadataNotifierProvider);
     SessionConnModel sessionConnModel = ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
 
-    MetaDataNode? metadata = sessionMeta.metadata;
+    MetaDataNode? metadata = sessionMeta?.metadata;
     String? currentSchema = sessionConnModel.currentSchema;
 
     List<CodeKeywordPrompt> keywordPrompt = [

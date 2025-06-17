@@ -15,6 +15,7 @@ abstract class SessionModel with _$SessionModel {
     int? instanceId,
     String? instanceName,
     DatabaseType? dbType,
+    int? connId,
   }) = _SessionModel;
 }
 
@@ -30,6 +31,7 @@ abstract class SessionListModel with _$SessionListModel {
 abstract class SessionOpBarModel with _$SessionOpBarModel {
   const factory SessionOpBarModel({
     required int sessionId,
+    required int connId,
     required bool canQuery,
     required String currentSchema,
     required bool isRightPageOpen,
@@ -42,6 +44,7 @@ abstract class SessionRepo {
   Future<SessionModel> newSession();
   Future<void> updateSession(
       SessionModel model, InstanceModel instance, String currentSchema);
+  void setConnId(int sessionId, int connId);
   Future<void> deleteSession(SessionModel model);
   void selectSessionByIndex(int index);
   void reorderSession(int oldIndex, int newIndex);

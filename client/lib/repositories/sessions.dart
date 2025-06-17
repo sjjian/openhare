@@ -31,6 +31,8 @@ class SessionRepoImpl extends SessionRepo {
   final Box<SessionStorage> _sessionBox;
   ReorderSelectedList<SessionStorage>? _sessionCache;
 
+  final Map<int, int> _connIdMap = {};
+
   SessionRepoImpl(this.ob) : _sessionBox = ob.store.box();
 
   void _refreshSessionCache() {
@@ -53,6 +55,7 @@ class SessionRepoImpl extends SessionRepo {
             instanceId: session.instance.target?.id,
             instanceName: session.instance.target?.name,
             dbType: session.instance.target?.dbType,
+            connId: _connIdMap[session.id],
           )
         : null;
   }
@@ -75,6 +78,11 @@ class SessionRepoImpl extends SessionRepo {
   }
 
   @override
+  void setConnId(int sessionId, int connId) {
+    _connIdMap[sessionId] = connId;
+  }
+
+  @override
   Future<void> deleteSession(SessionModel model) async {
     _sessions.removeWhere((session) => session.id == model.sessionId);
     _sessionBox.removeAsync(model.sessionId);
@@ -89,6 +97,7 @@ class SessionRepoImpl extends SessionRepo {
           instanceId: s.instance.target?.id,
           instanceName: s.instance.target?.name,
           dbType: s.instance.target?.dbType,
+          connId: _connIdMap[s.id],
         );
       }).toList(),
       selectedSession: _sessions.isNotEmpty
@@ -96,7 +105,9 @@ class SessionRepoImpl extends SessionRepo {
               sessionId: _sessions.selected()?.id ?? 0,
               instanceId: _sessions.selected()?.instance.target?.id,
               instanceName: _sessions.selected()?.instance.target?.name,
-              dbType: _sessions.selected()?.instance.target?.dbType)
+              dbType: _sessions.selected()?.instance.target?.dbType,
+              connId: _connIdMap[_sessions.selected()?.id ?? 0],
+            )
           : null,
     );
   }

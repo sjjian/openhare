@@ -17,15 +17,22 @@ part 'session_operation_bar.g.dart';
 @Riverpod(keepAlive: true)
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
-  SessionOpBarModel build() {
-    SessionModel sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
+  SessionOpBarModel? build() {
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
     SessionConnModel sessionConnModel =
-        ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
-    SessionDrawerModel sessionDrawer =
-        ref.watch(sessionDrawerControllerProvider)!;
+        ref.watch(sessionConnServicesProvider(sessionIdModel.connId??0));
+    SessionDrawerModel? sessionDrawer =
+        ref.watch(sessionDrawerControllerProvider);
+    if (sessionDrawer == null) {
+      return null;
+    }    
 
     return SessionOpBarModel(
       sessionId: sessionIdModel.sessionId,
+      connId: sessionIdModel.connId??0,
       canQuery: sessionConnModel.canQuery,
       currentSchema: sessionConnModel.currentSchema,
       isRightPageOpen: sessionDrawer.isRightPageOpen,
@@ -66,7 +73,8 @@ class SessionOpBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionOpBarModel model = ref.watch(sessionOpBarNotifierProvider);
+    SessionOpBarModel? model = ref.watch(sessionOpBarNotifierProvider);
+    bool canQuery = model?.canQuery??false;
     return Container(
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
@@ -77,12 +85,12 @@ class SessionOpBar extends ConsumerWidget {
               iconSize: height,
               alignment: Alignment.center,
               padding: const EdgeInsets.all(2),
-              onPressed: model.canQuery
+              onPressed: canQuery
                   ? () {
                       String query = getQuery();
 
                       SQLResultModel? resultModel = ref
-                          .read(sQLResultsServicesProvider(model.sessionId)
+                          .read(sQLResultsServicesProvider(model!.sessionId)
                               .notifier)
                           .selectedSQLResult();
 
@@ -101,17 +109,17 @@ class SessionOpBar extends ConsumerWidget {
                     }
                   : null,
               icon: Icon(Icons.play_arrow_rounded,
-                  color: model.canQuery ? Colors.green : Colors.grey)),
+                  color: canQuery ? Colors.green : Colors.grey)),
           IconButton(
               iconSize: height,
               alignment: Alignment.center,
               padding: const EdgeInsets.all(2),
-              onPressed: model.canQuery
+              onPressed: canQuery
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
                         final resultModel = ref
-                            .read(sQLResultsServicesProvider(model.sessionId)
+                            .read(sQLResultsServicesProvider(model!.sessionId)
                                 .notifier)
                             .addSQLResult();
                         ref
@@ -124,7 +132,7 @@ class SessionOpBar extends ConsumerWidget {
                   : null,
               icon: Stack(alignment: Alignment.center, children: [
                 Icon(Icons.play_arrow_rounded,
-                    color: model.canQuery ? Colors.green : Colors.grey),
+                    color: canQuery ? Colors.green : Colors.grey),
                 const Icon(
                   Icons.add,
                   color: Colors.white,
@@ -135,17 +143,17 @@ class SessionOpBar extends ConsumerWidget {
               iconSize: height,
               padding: const EdgeInsets.all(2),
               alignment: Alignment.topLeft,
-              onPressed: model.canQuery
+              onPressed: canQuery
                   ? () {
                       String query = getQuery();
                       if (query.isNotEmpty) {
                         final resultModel = ref
-                            .read(sQLResultsServicesProvider(model.sessionId)
+                            .read(sQLResultsServicesProvider(model!.sessionId)
                                 .notifier)
                             .addSQLResult();
                         ref
                             .read(sQLResultServicesProvider(
-                                    model.sessionId, resultModel.resultId)
+                                    model!.sessionId, resultModel.resultId)
                                 .notifier)
                             .loadFromQuery("explain $query");
                       }
@@ -153,7 +161,7 @@ class SessionOpBar extends ConsumerWidget {
                   : null,
               icon: Icon(
                 Icons.e_mobiledata,
-                color: model.canQuery
+                color: canQuery
                     ? const Color.fromARGB(255, 241, 192, 84)
                     : Colors.grey,
               )),
@@ -163,7 +171,7 @@ class SessionOpBar extends ConsumerWidget {
             endIndent: 5,
           ),
           SchemaBar(
-              sessionId: model.sessionId,
+              connId: model!.connId,
               disable: model.canQuery ? false : true,
               currentSchema: model.currentSchema),
           const Spacer(),
@@ -185,10 +193,10 @@ class SessionOpBar extends ConsumerWidget {
 class SchemaBar extends ConsumerStatefulWidget {
   final String? currentSchema;
   final bool disable;
-  final int sessionId;
+  final int connId;
   const SchemaBar({
     Key? key,
-    required this.sessionId,
+    required this.connId,
     required this.disable,
     this.currentSchema,
   }) : super(key: key);
@@ -224,7 +232,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
           final overlayPos = overlay.localToGlobal(Offset.zero);
 
           List<String> schemas = await ref
-              .read(sessionConnServicesProvider(widget.sessionId).notifier)
+              .read(sessionConnServicesProvider(widget.connId).notifier)
               .getSchemas();
 
           // todo
@@ -241,7 +249,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     height: 30,
                     onTap: () {
                       ref
-                          .read(sessionConnServicesProvider(widget.sessionId)
+                          .read(sessionConnServicesProvider(widget.connId)
                               .notifier)
                           .setCurrentSchema(schema);
                     },

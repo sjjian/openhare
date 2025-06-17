@@ -7,61 +7,72 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 part 'session_conn.g.dart';
 
 class SessionConnRepoImpl extends SessionConnRepo {
+  static int connId = 0;
   Map<int, SessionConn> conns = {};
   SessionConnRepoImpl();
 
-  @override
-  SessionConnModel getSessionConn(int sessionId) {
-    return SessionConnModel(
-        sessionId: sessionId,
-        currentSchema: conns[sessionId]?.currentSchema ?? "",
-        canQuery: conns[sessionId]?.canQuery() ?? false);
+  static int getConnId() {
+    return connId++;
   }
 
   @override
-  SessionConnModel createConn(int sessionId, InstanceModel model,
+  SessionConnModel getConn(int connId) {
+    return SessionConnModel(
+        connId: connId,
+        currentSchema: conns[connId]?.currentSchema ?? "",
+        canQuery: conns[connId]?.canQuery() ?? false);
+  }
+
+  @override
+  SessionConnModel createConn(InstanceModel model,
       {String? currentSchema}) {
     SessionConn conn = SessionConn(model: model, currentSchema: currentSchema);
-    conns[sessionId] = conn;
+    final id = getConnId();
+    conns[id] = conn;
     return SessionConnModel(
-        sessionId: sessionId,
+        connId: id,
         currentSchema: currentSchema ?? "",
         canQuery: conn.canQuery());
   }
 
   @override
-  void removeConn(int sessionId) {
-    conns.remove(sessionId);
+  void removeConn(int connId) {
+    conns.remove(connId);
   }
 
   @override
-  Future<void> connect(int sessionId) {
-    return conns[sessionId]!.connect();
+  Future<void> connect(int connId) {
+    return conns[connId]!.connect();
   }
 
   @override
-  Future<void> close(int sessionId) {
-    return conns[sessionId]!.close();
+  Future<void> close(int connId) {
+    return conns[connId]!.close();
   }
 
   @override
-  Future<void> onSchemaChanged(int sessionId, String schema) {
-    return conns[sessionId]!.onSchemaChanged(schema);
+  Future<void> onSchemaChanged(int connId, String schema) {
+    return conns[connId]!.onSchemaChanged(schema);
   }
 
   @override
-  Future<void> setCurrentSchema(int sessionId, String schema) {
-    return conns[sessionId]!.setCurrentSchema(schema);
+  Future<void> setCurrentSchema(int connId, String schema) {
+    return conns[connId]!.setCurrentSchema(schema);
   }
 
   @override
-  Future<List<String>> getSchemas(int sessionId) {
-    return conns[sessionId]!.getSchemas();
+  Future<List<String>> getSchemas(int connId) {
+    return conns[connId]!.getSchemas();
   }
 
   @override
-  Future<BaseQueryResult?> query(int sessionId, String query) {
-    return conns[sessionId]!.query(query);
+  Future<MetaDataNode> getMetadata(int connId) {
+    return conns[connId]!.metadata();
+  }
+
+  @override
+  Future<BaseQueryResult?> query(int connId, String query) {
+    return conns[connId]!.query(query);
   }
 }
 
@@ -143,6 +154,10 @@ class SessionConn {
   Future<List<String>> getSchemas() async {
     List<String> schemas = await conn2!.schemas();
     return schemas;
+  }
+
+  Future<MetaDataNode> metadata() async {
+    return await conn2!.metadata();
   }
 }
 

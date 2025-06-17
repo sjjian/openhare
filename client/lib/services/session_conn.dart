@@ -1,8 +1,6 @@
 import 'package:client/models/session_conn.dart';
-import 'package:client/models/sessions.dart';
 import 'package:client/repositories/repo.dart';
 import 'package:client/repositories/session_conn.dart';
-import 'package:client/services/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,67 +13,71 @@ class SessionConnsServices extends _$SessionConnsServices {
     return 0;
   }
 
-  Future<void> createConn(int sessionId, int instanceId,
+  Future<SessionConnModel> createConn(int instanceId,
       {String? currentSchema}) async {
     final instance = objectbox2.getInstanceById(instanceId);
-    ref
+    return ref
         .read(sessionConnRepoProvider)
-        .createConn(sessionId, instance!, currentSchema: currentSchema);
+        .createConn(instance!, currentSchema: currentSchema);
   }
 
-  Future<void> removeConn(int sessionId) async {
-    ref.read(sessionConnRepoProvider).removeConn(sessionId);
+  Future<void> removeConn(int connId) async {
+    ref.read(sessionConnRepoProvider).removeConn(connId);
   }
 }
 
 @Riverpod(keepAlive: true)
 class SessionConnServices extends _$SessionConnServices {
   @override
-  SessionConnModel build(int sessionId) {
+  SessionConnModel build(int connId) {
     SessionConnModel conn =
-        ref.watch(sessionConnRepoProvider).getSessionConn(sessionId);
+        ref.watch(sessionConnRepoProvider).getConn(connId);
     return conn;
   }
 
   Future<void> connect() async {
-    await ref.read(sessionConnRepoProvider).connect(sessionId);
+    await ref.read(sessionConnRepoProvider).connect(connId);
     ref.invalidateSelf();
   }
 
   Future<void> close() async {
-    await ref.read(sessionConnRepoProvider).close(sessionId);
+    await ref.read(sessionConnRepoProvider).close(connId);
     ref.invalidateSelf();
   }
 
   Future<void> onSchemaChanged(String schema) async {
-    await ref.read(sessionConnRepoProvider).onSchemaChanged(sessionId, schema);
+    await ref.read(sessionConnRepoProvider).onSchemaChanged(connId, schema);
     ref.invalidateSelf();
   }
 
   Future<void> setCurrentSchema(String schema) async {
-    await ref.read(sessionConnRepoProvider).setCurrentSchema(sessionId, schema);
+    await ref.read(sessionConnRepoProvider).setCurrentSchema(connId, schema);
     ref.invalidateSelf();
   }
 
   Future<List<String>> getSchemas() async {
-    return ref.read(sessionConnRepoProvider).getSchemas(sessionId);
+    return ref.read(sessionConnRepoProvider).getSchemas(connId);
+  }
+
+  Future<MetaDataNode> getMetadata() async {
+    return ref.read(sessionConnRepoProvider).getMetadata(connId);
   }
 
   Future<BaseQueryResult?> query(String query) async {
-    return ref.read(sessionConnRepoProvider).query(sessionId, query);
+    return ref.read(sessionConnRepoProvider).query(connId, query);
   }
 }
 
-@Riverpod(keepAlive: true)
-class SelectedSessionConnController extends _$SelectedSessionConnController {
-  @override
-  SessionConnModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
-    if (sessionIdModel == null) {
-      return null;
-    }
-    SessionConnModel model =
-        ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
-    return model;
-  }
-}
+// @Riverpod(keepAlive: true)
+// class SelectedSessionConnController extends _$SelectedSessionConnController {
+//   @override
+//   SessionConnModel? build() {
+//     SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+//     if (sessionIdModel == null) {
+//       return null;
+//     }
+//     SessionConnModel model =
+//         ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
+//     return model;
+//   }
+// }
