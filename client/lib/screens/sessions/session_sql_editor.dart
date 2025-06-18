@@ -11,6 +11,34 @@ import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:sql_parser/parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'session_sql_editor.g.dart';
+
+@Riverpod(keepAlive: true)
+class SelectedSessionSQLEditorNotifier
+    extends _$SelectedSessionSQLEditorNotifier {
+  @override
+  SessionSQLEditorModel build() {
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return const SessionSQLEditorModel();
+    }
+    InstanceMetadataModel? sessionMeta =
+        ref.watch(sessionMetadataNotifierProvider);
+
+    String? currentSchema;
+    if (sessionIdModel.connId != null) {
+      SessionConnModel sessionConnModel =
+          ref.watch(sessionConnServicesProvider(sessionIdModel.connId!));
+      currentSchema = sessionConnModel.currentSchema;
+    }
+    return SessionSQLEditorModel(
+      currentSchema: currentSchema,
+      metadata: sessionMeta?.metadata,
+    );
+  }
+}
 
 class SQLEditor extends ConsumerWidget {
   final CodeLineEditingController codeController;
@@ -51,19 +79,15 @@ class SQLEditor extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionModel sessionIdModel = ref.watch(selectedSessionIdServicesProvider)!;
-    InstanceMetadataModel? sessionMeta = ref.watch(sessionMetadataNotifierProvider);
-    SessionConnModel sessionConnModel = ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
-
-    MetaDataNode? metadata = sessionMeta?.metadata;
-    String? currentSchema = sessionConnModel.currentSchema;
+    SessionSQLEditorModel model =
+        ref.watch(selectedSessionSQLEditorNotifierProvider);
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords)
         CodeCaseInsensitiveKeywordPrompt(word: keyword),
     ];
-    if (metadata != null) {
-      keywordPrompt.addAll(buildMetadataKeyword(metadata));
+    if (model.metadata != null) {
+      keywordPrompt.addAll(buildMetadataKeyword(model.metadata!));
     }
 
     return CodeAutocomplete(
@@ -75,8 +99,8 @@ class SQLEditor extends ConsumerWidget {
       },
       promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
         keywordPrompts: keywordPrompt,
-        relatedPrompts: (metadata != null)
-            ? buildRelatePrompts(metadata, currentSchema)
+        relatedPrompts: (model.metadata != null)
+            ? buildRelatePrompts(model.metadata!, model.currentSchema)
             : const {},
       ),
       child: CodeEditor(

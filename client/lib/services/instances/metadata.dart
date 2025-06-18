@@ -12,7 +12,7 @@ class InstanceMetadataServices extends _$InstanceMetadataServices {
     return ref.watch(instanceMetadataRepoProvider).getMetadata(instanceId);
   }
 
-  // todo: 这里传sessionId 稍微有点怪
+  // todo: 需要对conn 判空
   Future<void> refreshMetadata() async {
     final connModel = await ref.read(sessionConnsServicesProvider.notifier).createConn(instanceId);
     await ref.read(sessionConnServicesProvider(connModel.connId).notifier).connect();

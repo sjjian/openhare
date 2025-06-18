@@ -18,7 +18,7 @@ class SessionMetadataNotifier extends _$SessionMetadataNotifier {
   @override
   InstanceMetadataModel? build() {
     SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
-    if (sessionIdModel == null) {
+    if (sessionIdModel == null || sessionIdModel.instanceId == null) {
       return null;
     }
     return ref
@@ -147,8 +147,7 @@ class SessionDrawerMetadata extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final model = ref.watch(sessionMetadataNotifierProvider);
-
+    InstanceMetadataModel? model = ref.watch(sessionMetadataNotifierProvider);
     Widget body = const Align(
       alignment: Alignment.center,
       child: SizedBox(

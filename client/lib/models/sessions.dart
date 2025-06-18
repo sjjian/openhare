@@ -96,3 +96,11 @@ abstract class SessionStatusModel with _$SessionStatusModel {
     String? query,
   }) = _SessionStatusModel;
 }
+
+@freezed
+abstract class SessionSQLEditorModel with _$SessionSQLEditorModel {
+  const factory SessionSQLEditorModel({
+    String? currentSchema,
+    MetaDataNode? metadata,
+  }) = _SessionSQLEditorModel;
+}

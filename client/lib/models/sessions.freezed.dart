@@ -1540,4 +1540,172 @@ class __$SessionStatusModelCopyWithImpl<$Res>
   }
 }
 
+/// @nodoc
+mixin _$SessionSQLEditorModel implements DiagnosticableTreeMixin {
+  String? get currentSchema;
+  MetaDataNode? get metadata;
+
+  /// Create a copy of SessionSQLEditorModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SessionSQLEditorModelCopyWith<SessionSQLEditorModel> get copyWith =>
+      _$SessionSQLEditorModelCopyWithImpl<SessionSQLEditorModel>(
+          this as SessionSQLEditorModel, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SessionSQLEditorModel'))
+      ..add(DiagnosticsProperty('currentSchema', currentSchema))
+      ..add(DiagnosticsProperty('metadata', metadata));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SessionSQLEditorModel &&
+            (identical(other.currentSchema, currentSchema) ||
+                other.currentSchema == currentSchema) &&
+            (identical(other.metadata, metadata) ||
+                other.metadata == metadata));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, currentSchema, metadata);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SessionSQLEditorModel(currentSchema: $currentSchema, metadata: $metadata)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SessionSQLEditorModelCopyWith<$Res> {
+  factory $SessionSQLEditorModelCopyWith(SessionSQLEditorModel value,
+          $Res Function(SessionSQLEditorModel) _then) =
+      _$SessionSQLEditorModelCopyWithImpl;
+  @useResult
+  $Res call({String? currentSchema, MetaDataNode? metadata});
+}
+
+/// @nodoc
+class _$SessionSQLEditorModelCopyWithImpl<$Res>
+    implements $SessionSQLEditorModelCopyWith<$Res> {
+  _$SessionSQLEditorModelCopyWithImpl(this._self, this._then);
+
+  final SessionSQLEditorModel _self;
+  final $Res Function(SessionSQLEditorModel) _then;
+
+  /// Create a copy of SessionSQLEditorModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? currentSchema = freezed,
+    Object? metadata = freezed,
+  }) {
+    return _then(_self.copyWith(
+      currentSchema: freezed == currentSchema
+          ? _self.currentSchema
+          : currentSchema // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadata: freezed == metadata
+          ? _self.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as MetaDataNode?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _SessionSQLEditorModel
+    with DiagnosticableTreeMixin
+    implements SessionSQLEditorModel {
+  const _SessionSQLEditorModel({this.currentSchema, this.metadata});
+
+  @override
+  final String? currentSchema;
+  @override
+  final MetaDataNode? metadata;
+
+  /// Create a copy of SessionSQLEditorModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SessionSQLEditorModelCopyWith<_SessionSQLEditorModel> get copyWith =>
+      __$SessionSQLEditorModelCopyWithImpl<_SessionSQLEditorModel>(
+          this, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SessionSQLEditorModel'))
+      ..add(DiagnosticsProperty('currentSchema', currentSchema))
+      ..add(DiagnosticsProperty('metadata', metadata));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SessionSQLEditorModel &&
+            (identical(other.currentSchema, currentSchema) ||
+                other.currentSchema == currentSchema) &&
+            (identical(other.metadata, metadata) ||
+                other.metadata == metadata));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, currentSchema, metadata);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SessionSQLEditorModel(currentSchema: $currentSchema, metadata: $metadata)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SessionSQLEditorModelCopyWith<$Res>
+    implements $SessionSQLEditorModelCopyWith<$Res> {
+  factory _$SessionSQLEditorModelCopyWith(_SessionSQLEditorModel value,
+          $Res Function(_SessionSQLEditorModel) _then) =
+      __$SessionSQLEditorModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String? currentSchema, MetaDataNode? metadata});
+}
+
+/// @nodoc
+class __$SessionSQLEditorModelCopyWithImpl<$Res>
+    implements _$SessionSQLEditorModelCopyWith<$Res> {
+  __$SessionSQLEditorModelCopyWithImpl(this._self, this._then);
+
+  final _SessionSQLEditorModel _self;
+  final $Res Function(_SessionSQLEditorModel) _then;
+
+  /// Create a copy of SessionSQLEditorModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? currentSchema = freezed,
+    Object? metadata = freezed,
+  }) {
+    return _then(_SessionSQLEditorModel(
+      currentSchema: freezed == currentSchema
+          ? _self.currentSchema
+          : currentSchema // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadata: freezed == metadata
+          ? _self.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as MetaDataNode?,
+    ));
+  }
+}
+
 // dart format on

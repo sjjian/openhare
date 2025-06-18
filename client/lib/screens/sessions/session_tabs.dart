@@ -13,7 +13,6 @@ part 'session_tabs.g.dart';
 class SessionsTabNotifier extends _$SessionsTabNotifier {
   @override
   SessionListModel build() {
-    print("SessionsTabNotifier build");
     return ref.watch(sessionsServicesProvider);
   }
 }

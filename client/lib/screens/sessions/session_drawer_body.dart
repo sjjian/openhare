@@ -31,23 +31,6 @@ class SessionDrawerController extends _$SessionDrawerController {
     return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
   }
 
-  Future<void> loadMetadata() async {
-    // CurrentSessionDrawer? session = ref.read(currentSessionDrawerProvider);
-    // if (session == null || session is UnInitSession) {
-    //   return;
-    // }
-    // if ((session as Session).metadata != null) {
-    //   return;
-    // }
-
-    // if (session.connState != SQLConnectState.connected) {
-    //   return;
-    // }
-    // session.metadata = await session.conn2!.metadata();
-    // ref.invalidate(currentSessionDrawerProvider);
-    return;
-  }
-
   void showRightPage() {
     state = state.copyWith(isRightPageOpen: true);
   }
@@ -78,7 +61,7 @@ class SessionDrawerBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
     return Container(
       color: Theme.of(context)
           .colorScheme

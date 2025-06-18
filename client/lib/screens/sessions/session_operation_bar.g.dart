@@ -7,7 +7,7 @@ part of 'session_operation_bar.dart';
 // **************************************************************************
 
 String _$sessionOpBarNotifierHash() =>
-    r'4dbf6de92400f33b872243719acf1ac7f0947e7d';
+    r'69c4f62de619d93386136732780fa7c13f10b647';
 
 /// See also [SessionOpBarNotifier].
 @ProviderFor(SessionOpBarNotifier)

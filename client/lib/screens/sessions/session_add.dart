@@ -18,10 +18,6 @@ class AddSession extends HookConsumerWidget {
     instanceTableController.setCount(instancesProvider
         .instanceCount(instanceTableController.searchTextController.text));
 
-    final i1 = instancesProvider.activeInstances();
-    final i2 = instancesProvider.activeInstances();
-    print("i1 hashCode: ${i1.hashCode}; i2 hashCode: ${i2.hashCode}");
-
     return Container(
       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
       child: Row(
