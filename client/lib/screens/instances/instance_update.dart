@@ -1,13 +1,33 @@
-import 'package:client/providers/instances.dart';
+import 'package:client/models/instances.dart';
+import 'package:client/repositories/instances/instances.dart';
+import 'package:client/services/instances/instances.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:go_router/go_router.dart';
 
-class UpdateInstancePage extends StatelessWidget {
+class UpdateInstancePage extends StatefulWidget {
   const UpdateInstancePage({Key? key}) : super(key: key);
+
+  @override
+  State<UpdateInstancePage> createState() => _UpdateInstancePageState();
+}
+
+class _UpdateInstancePageState extends State<UpdateInstancePage> {
+  @override
+  void initState() {
+    super.initState();
+    updateInstanceController
+        .addListener(() => mounted ? setState(() {}) : null);
+  }
+
+  @override
+  void dispose() {
+    updateInstanceController.removeListener(() {});
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,30 +39,45 @@ class UpdateInstancePage extends StatelessWidget {
               icon: const Icon(Icons.arrow_back))
         ],
       ),
-      bottomBar: Consumer<UpdateInstanceProvider>(
-          builder: (context, updateInstanceProvider, _) {
-        return AddInstanceBottomBar(
-          isDatabasePingDoing: updateInstanceProvider.isDatabasePingDoing,
-          isDatabaseConnectable: updateInstanceProvider.isDatabaseConnectable,
-          databaseConnectError: updateInstanceProvider.databaseConnectError,
-        );
-      }),
+      bottomBar: AddInstanceBottomBar(
+        isDatabasePingDoing: updateInstanceController.isDatabasePingDoing,
+        isDatabaseConnectable: updateInstanceController.isDatabaseConnectable,
+        databaseConnectError: updateInstanceController.databaseConnectError,
+      ),
       child: const UpdateInstance(),
     );
   }
 }
 
-class UpdateInstance extends StatelessWidget {
+class UpdateInstance extends ConsumerStatefulWidget {
   const UpdateInstance({Key? key}) : super(key: key);
 
-  Color? selectedColor(UpdateInstanceProvider updateInstanceProvider) {
-    if (updateInstanceProvider.isDatabasePingDoing) {
+  @override
+  ConsumerState<UpdateInstance> createState() => _UpdateInstanceState();
+}
+
+class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
+  @override
+  void initState() {
+    super.initState();
+    updateInstanceController
+        .addListener(() => mounted ? setState(() {}) : null);
+  }
+
+  @override
+  void dispose() {
+    updateInstanceController.removeListener(() {});
+    super.dispose();
+  }
+
+  Color? selectedColor(AddInstanceController updateInstanceController) {
+    if (updateInstanceController.isDatabasePingDoing) {
       return null;
     }
-    if (updateInstanceProvider.isDatabaseConnectable == null) {
+    if (updateInstanceController.isDatabaseConnectable == null) {
       return null;
     }
-    if (updateInstanceProvider.isDatabaseConnectable == true) {
+    if (updateInstanceController.isDatabaseConnectable == true) {
       return Colors.green;
     } else {
       return Colors.red;
@@ -56,89 +91,93 @@ class UpdateInstance extends StatelessWidget {
         Expanded(
             child: Container(
           padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
-          child: Consumer<UpdateInstanceProvider>(
-            builder: (context, updateInstanceProvider, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                    decoration: BoxDecoration(
-                        border:
-                            Border(bottom: Divider.createBorderSide(context))),
-                    child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                decoration: BoxDecoration(
+                    border: Border(bottom: Divider.createBorderSide(context))),
+                child: Row(
+                  children: [
+                    Text(
+                      "更新数据源",
+                      style: Theme.of(context).textTheme.titleLarge,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    TextButton(
+                        onPressed: updateInstanceController.isDatabasePingDoing
+                            ? null
+                            : () {
+                                updateInstanceController.databasePing();
+                              },
+                        child: updateInstanceController.isDatabasePingDoing
+                            ? const Text("测试中")
+                            : const Text("测试连接")),
+                    TextButton(
+                        onPressed: () {
+                          if (updateInstanceController.validate()) {
+                            ref
+                                .read(instancesServicesProvider.notifier)
+                                .updateInstance(
+                                  InstanceStorage.one(
+                                    //todo: fix
+                                    id: updateInstanceController
+                                        .instance!.id.value,
+                                    dbType: updateInstanceController
+                                        .selectedDatabaseType,
+                                    connectValue: updateInstanceController
+                                        .getConnectValue(),
+                                  ).toModel(),
+                                );
+                            updateInstanceController.clear();
+                            GoRouter.of(context).go('/instances/list');
+                          }
+                        },
+                        child: const Text("更新")),
+                  ],
+                ),
+              ),
+              Expanded(
+                  child: SizedBox(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text(
-                          "更新数据源",
-                          style: Theme.of(context).textTheme.titleLarge,
-                          overflow: TextOverflow.ellipsis,
+                        DatabaseTypeCardList(
+                          connectionMetas: [
+                            connectionMetaMap[
+                                addInstanceController.selectedDatabaseType]!
+                          ],
+                          selectedColor: selectedColor(addInstanceController),
                         ),
-                        const Spacer(),
-                        TextButton(
-                            onPressed:
-                                updateInstanceProvider.isDatabasePingDoing
-                                    ? null
-                                    : () {
-                                        updateInstanceProvider.databasePing();
-                                      },
-                            child: updateInstanceProvider.isDatabasePingDoing
-                                ? const Text("测试中")
-                                : const Text("测试连接")),
-                        TextButton(
-                            onPressed: () {
-                              if (updateInstanceProvider.validate()) {
-                                updateInstanceProvider.onSubmit(context);
-                                updateInstanceProvider.clear();
-                                GoRouter.of(context).go('/instances/list');
-                              }
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: UpdateInstanceForm(
+                            infos: addInstanceController.dbInfos,
+                            selectedGroup: addInstanceController.selectedGroup,
+                            onValid: (info, isValid) {
+                              addInstanceController.updateValidState(
+                                  info, isValid);
                             },
-                            child: const Text("更新")),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                      child: SizedBox(
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            DatabaseTypeCardList(
-                              connectionMetas: [
-                                connectionMetaMap[updateInstanceProvider
-                                    .selectedDatabaseType]!
-                              ],
-                              selectedColor:
-                                  selectedColor(updateInstanceProvider),
-                            ),
-                            const SizedBox(height: 20),
-                            Expanded(
-                              child: UpdateInstanceForm(
-                                infos: updateInstanceProvider.dbInfos,
-                                selectedGroup:
-                                    updateInstanceProvider.selectedGroup,
-                                onValid: (info, isValid) {
-                                  updateInstanceProvider.updateValidState(
-                                      info, isValid);
-                                },
-                                onGroupChange: (group) {
-                                  updateInstanceProvider.onGroupChange(group);
-                                },
-                                codeController: updateInstanceProvider.code,
-                              ),
-                            )
-                          ]),
-                    ),
-                  )),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                    child: const Row(
-                      children: [],
-                    ),
-                  )
-                ],
-              );
-            },
+                            onGroupChange: (group) {
+                              addInstanceController.onGroupChange(group);
+                            },
+                            codeController: addInstanceController.code,
+                          ),
+                        )
+                      ]),
+                ),
+              )),
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: const Row(
+                  children: [],
+                ),
+              )
+            ],
           ),
         )),
       ],
@@ -176,3 +215,58 @@ class UpdateInstanceForm extends AddInstanceForm {
     );
   }
 }
+
+class UpdateInstanceController extends AddInstanceController {
+  InstanceModel? instance;
+
+  @override
+  DatabaseType get selectedDatabaseType =>
+      instance?.dbType ?? DatabaseType.mysql;
+
+  @override
+  void onDatabaseTypeChange(DatabaseType type) {
+    return;
+  }
+
+  UpdateInstanceController() : super();
+
+  void loadFromMeta(ConnectValue connectValue) {
+    for (final info in infos[selectedDatabaseType]!.values) {
+      if (info.dbType == selectedDatabaseType) {
+        switch (info.meta) {
+          case NameMeta():
+            info.ctrl.text = connectValue.name;
+          case AddressMeta():
+            info.ctrl.text = connectValue.host;
+          case PortMeta():
+            info.ctrl.text = connectValue.port.toString();
+          case UserMeta():
+            info.ctrl.text = connectValue.user;
+          case PasswordMeta():
+            info.ctrl.text = connectValue.password;
+          case DescMeta():
+            info.ctrl.text = connectValue.desc;
+          case CustomMeta():
+            info.ctrl.text = connectValue.getValue(info.meta.name);
+        }
+      }
+    }
+    code.text = connectValue.initQueryText();
+  }
+
+  void tryUpdateInstance(InstanceModel instance) {
+    this.instance = instance;
+    loadFromMeta(instance.connectValue);
+    notifyListeners();
+  }
+
+  // @override
+  // Future<void> onSubmit(BuildContext context) async {
+  //   context.read<InstancesProvider>().updateInstance(InstanceStorage.one(
+  //       id: instance!.id,
+  //       dbType: selectedDatabaseType,
+  //       connectValue: getConnectValue()));
+  // }
+}
+
+UpdateInstanceController updateInstanceController = UpdateInstanceController();

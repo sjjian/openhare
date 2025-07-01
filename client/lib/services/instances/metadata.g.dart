@@ -7,7 +7,7 @@ part of 'metadata.dart';
 // **************************************************************************
 
 String _$instanceMetadataServicesHash() =>
-    r'82461ef90ad38453ecc9336001459edb0ba5ee1e';
+    r'095dc93cda9e5af9b57123dc5834769417f41714';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -32,10 +32,10 @@ class _SystemHash {
 
 abstract class _$InstanceMetadataServices
     extends BuildlessNotifier<InstanceMetadataModel> {
-  late final int instanceId;
+  late final InstanceId instanceId;
 
   InstanceMetadataModel build(
-    int instanceId,
+    InstanceId instanceId,
   );
 }
 
@@ -50,7 +50,7 @@ class InstanceMetadataServicesFamily extends Family<InstanceMetadataModel> {
 
   /// See also [InstanceMetadataServices].
   InstanceMetadataServicesProvider call(
-    int instanceId,
+    InstanceId instanceId,
   ) {
     return InstanceMetadataServicesProvider(
       instanceId,
@@ -86,7 +86,7 @@ class InstanceMetadataServicesProvider extends NotifierProviderImpl<
     InstanceMetadataServices, InstanceMetadataModel> {
   /// See also [InstanceMetadataServices].
   InstanceMetadataServicesProvider(
-    int instanceId,
+    InstanceId instanceId,
   ) : this._internal(
           () => InstanceMetadataServices()..instanceId = instanceId,
           from: instanceMetadataServicesProvider,
@@ -111,7 +111,7 @@ class InstanceMetadataServicesProvider extends NotifierProviderImpl<
     required this.instanceId,
   }) : super.internal();
 
-  final int instanceId;
+  final InstanceId instanceId;
 
   @override
   InstanceMetadataModel runNotifierBuild(
@@ -164,7 +164,7 @@ class InstanceMetadataServicesProvider extends NotifierProviderImpl<
 mixin InstanceMetadataServicesRef
     on NotifierProviderRef<InstanceMetadataModel> {
   /// The parameter `instanceId` of this provider.
-  int get instanceId;
+  InstanceId get instanceId;
 }
 
 class _InstanceMetadataServicesProviderElement extends NotifierProviderElement<
@@ -173,7 +173,8 @@ class _InstanceMetadataServicesProviderElement extends NotifierProviderElement<
   _InstanceMetadataServicesProviderElement(super.provider);
 
   @override
-  int get instanceId => (origin as InstanceMetadataServicesProvider).instanceId;
+  InstanceId get instanceId =>
+      (origin as InstanceMetadataServicesProvider).instanceId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

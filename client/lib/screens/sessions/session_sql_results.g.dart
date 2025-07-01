@@ -6,7 +6,7 @@ part of 'session_sql_results.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionEditorHash() => r'32a6237c3e8429e0d64e086c460900ca00d43227';
+String _$sessionEditorHash() => r'25523e840883285f6d1dce3a71e7c5f5cf85ae46';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -40,7 +40,7 @@ class SessionEditorFamily extends Family<SessionEditorModel> {
 
   /// See also [sessionEditor].
   SessionEditorProvider call(
-    int sessionId,
+    SessionId sessionId,
   ) {
     return SessionEditorProvider(
       sessionId,
@@ -75,7 +75,7 @@ class SessionEditorFamily extends Family<SessionEditorModel> {
 class SessionEditorProvider extends Provider<SessionEditorModel> {
   /// See also [sessionEditor].
   SessionEditorProvider(
-    int sessionId,
+    SessionId sessionId,
   ) : this._internal(
           (ref) => sessionEditor(
             ref as SessionEditorRef,
@@ -103,7 +103,7 @@ class SessionEditorProvider extends Provider<SessionEditorModel> {
     required this.sessionId,
   }) : super.internal();
 
-  final int sessionId;
+  final SessionId sessionId;
 
   @override
   Override overrideWith(
@@ -146,7 +146,7 @@ class SessionEditorProvider extends Provider<SessionEditorModel> {
 // ignore: unused_element
 mixin SessionEditorRef on ProviderRef<SessionEditorModel> {
   /// The parameter `sessionId` of this provider.
-  int get sessionId;
+  SessionId get sessionId;
 }
 
 class _SessionEditorProviderElement extends ProviderElement<SessionEditorModel>
@@ -154,11 +154,11 @@ class _SessionEditorProviderElement extends ProviderElement<SessionEditorModel>
   _SessionEditorProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SessionEditorProvider).sessionId;
+  SessionId get sessionId => (origin as SessionEditorProvider).sessionId;
 }
 
 String _$sessionEditorControllerHash() =>
-    r'92009187f5244d7707247520937d97fb78b410e4';
+    r'e29fc0e0195205c135b9c62b26994fb9cbe60f18';
 
 /// See also [SessionEditorController].
 @ProviderFor(SessionEditorController)
@@ -192,7 +192,7 @@ final selectedSQLResultTabNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSQLResultTabNotifier = Notifier<SQLResultListModel?>;
 String _$selectedSQLResultNotifierHash() =>
-    r'3a67457501d1569c8bf72a60519177f855524c15';
+    r'9733dc390a9d5deb260ae4d7dcab550e05e493b7';
 
 /// See also [SelectedSQLResultNotifier].
 @ProviderFor(SelectedSQLResultNotifier)

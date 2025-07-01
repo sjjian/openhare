@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
-  int get instanceId;
+  InstanceId get instanceId;
   MetaDataNode? get metadata;
 
   /// Create a copy of InstanceMetadataModel
@@ -60,7 +60,9 @@ abstract mixin class $InstanceMetadataModelCopyWith<$Res> {
           $Res Function(InstanceMetadataModel) _then) =
       _$InstanceMetadataModelCopyWithImpl;
   @useResult
-  $Res call({int instanceId, MetaDataNode? metadata});
+  $Res call({InstanceId instanceId, MetaDataNode? metadata});
+
+  $InstanceIdCopyWith<$Res> get instanceId;
 }
 
 /// @nodoc
@@ -83,12 +85,22 @@ class _$InstanceMetadataModelCopyWithImpl<$Res>
       instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as InstanceId,
       metadata: freezed == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as MetaDataNode?,
     ));
+  }
+
+  /// Create a copy of InstanceMetadataModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $InstanceIdCopyWith<$Res> get instanceId {
+    return $InstanceIdCopyWith<$Res>(_self.instanceId, (value) {
+      return _then(_self.copyWith(instanceId: value));
+    });
   }
 }
 
@@ -100,7 +112,7 @@ class _InstanceMetadataModel
   const _InstanceMetadataModel({required this.instanceId, this.metadata});
 
   @override
-  final int instanceId;
+  final InstanceId instanceId;
   @override
   final MetaDataNode? metadata;
 
@@ -149,7 +161,10 @@ abstract mixin class _$InstanceMetadataModelCopyWith<$Res>
       __$InstanceMetadataModelCopyWithImpl;
   @override
   @useResult
-  $Res call({int instanceId, MetaDataNode? metadata});
+  $Res call({InstanceId instanceId, MetaDataNode? metadata});
+
+  @override
+  $InstanceIdCopyWith<$Res> get instanceId;
 }
 
 /// @nodoc
@@ -172,12 +187,22 @@ class __$InstanceMetadataModelCopyWithImpl<$Res>
       instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as InstanceId,
       metadata: freezed == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as MetaDataNode?,
     ));
+  }
+
+  /// Create a copy of InstanceMetadataModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $InstanceIdCopyWith<$Res> get instanceId {
+    return $InstanceIdCopyWith<$Res>(_self.instanceId, (value) {
+      return _then(_self.copyWith(instanceId: value));
+    });
   }
 }
 

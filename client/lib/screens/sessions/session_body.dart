@@ -13,7 +13,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_body.g.dart';
 
 @Riverpod(keepAlive: true)
-SessionSplitViewModel sessionSplitViewState(Ref ref, int sessionId) {
+SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
   return SessionSplitViewModel(
       multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
       metaDataSplitViewCtrl:
@@ -27,7 +27,7 @@ class SessionSplitViewController extends _$SessionSplitViewController {
     SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
-      return ref.watch(sessionSplitViewStateProvider(0));
+      return ref.watch(sessionSplitViewStateProvider(const SessionId(value: 0))); // todo: 空值处理
     }
     return ref.watch(sessionSplitViewStateProvider(sessionIdModel.sessionId));
   }

@@ -1,5 +1,6 @@
+import 'package:client/models/instances.dart';
 import 'package:client/models/session_conn.dart';
-import 'package:client/repositories/repo.dart';
+import 'package:client/repositories/instances/instances.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,15 +14,15 @@ class SessionConnsServices extends _$SessionConnsServices {
     return 0;
   }
 
-  Future<SessionConnModel> createConn(int instanceId,
+  Future<SessionConnModel> createConn(InstanceId instanceId,
       {String? currentSchema}) async {
-    final instance = objectbox2.getInstanceById(instanceId);
+    final instance = ref.read(instanceRepoProvider).getInstanceById(instanceId);
     return ref
         .read(sessionConnRepoProvider)
         .createConn(instance!, currentSchema: currentSchema);
   }
 
-  Future<void> removeConn(int connId) async {
+  Future<void> removeConn(ConnId connId) async {
     ref.read(sessionConnRepoProvider).removeConn(connId);
   }
 }
@@ -29,7 +30,7 @@ class SessionConnsServices extends _$SessionConnsServices {
 @Riverpod(keepAlive: true)
 class SessionConnServices extends _$SessionConnServices {
   @override
-  SessionConnModel build(int connId) {
+  SessionConnModel build(ConnId connId) {
     SessionConnModel conn =
         ref.watch(sessionConnRepoProvider).getConn(connId);
     return conn;
@@ -46,12 +47,16 @@ class SessionConnServices extends _$SessionConnServices {
   }
 
   Future<void> onSchemaChanged(String schema) async {
-    await ref.read(sessionConnRepoProvider).onSchemaChanged(connId, schema);
+    await ref
+        .read(sessionConnRepoProvider)
+        .onSchemaChanged(connId, schema);
     ref.invalidateSelf();
   }
 
   Future<void> setCurrentSchema(String schema) async {
-    await ref.read(sessionConnRepoProvider).setCurrentSchema(connId, schema);
+    await ref
+        .read(sessionConnRepoProvider)
+        .setCurrentSchema(connId, schema);
     ref.invalidateSelf();
   }
 
@@ -64,20 +69,8 @@ class SessionConnServices extends _$SessionConnServices {
   }
 
   Future<BaseQueryResult?> query(String query) async {
-    return ref.read(sessionConnRepoProvider).query(connId, query);
+    return ref
+        .read(sessionConnRepoProvider)
+        .query(connId, query);
   }
 }
-
-// @Riverpod(keepAlive: true)
-// class SelectedSessionConnController extends _$SelectedSessionConnController {
-//   @override
-//   SessionConnModel? build() {
-//     SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
-//     if (sessionIdModel == null) {
-//       return null;
-//     }
-//     SessionConnModel model =
-//         ref.watch(sessionConnServicesProvider(sessionIdModel.sessionId));
-//     return model;
-//   }
-// }

@@ -88,7 +88,7 @@ class SessionStatusTab extends ConsumerWidget {
                   File file = File(outputFile);
                   await file.writeAsBytes(ref
                       .read(sQLResultServicesProvider(
-                              model.sessionId, model.resultId!)
+                              model.resultId!)
                           .notifier)
                       .toExcel()
                       .save()!);

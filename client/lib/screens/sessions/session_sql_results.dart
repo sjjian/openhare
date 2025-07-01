@@ -18,7 +18,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_sql_results.g.dart';
 
 @Riverpod(keepAlive: true)
-SessionEditorModel sessionEditor(Ref ref, int sessionId) {
+SessionEditorModel sessionEditor(Ref ref, SessionId sessionId) {
   return SessionEditorModel(code: CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
     return TextSpan(
@@ -37,7 +37,7 @@ class SessionEditorController extends _$SessionEditorController {
   SessionEditorModel build() {
     SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
-      return ref.watch(sessionEditorProvider(0));
+      return ref.watch(sessionEditorProvider(const SessionId(value: 0)));
     }
     return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
   }
@@ -63,15 +63,15 @@ class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
     if (sessionIdModel == null) {
       return null;
     }
-    int resultId = ref
+    ResultId? resultId = ref
         .watch(sQLResultsServicesProvider(sessionIdModel.sessionId).select((m) {
-      return m.selected?.resultId ?? -1;
+      return m.selected?.resultId;
     }));
-    if (resultId == -1) {
+    if (resultId == null) {
       return null;
     }
     return ref
-        .watch(sQLResultServicesProvider(sessionIdModel.sessionId, resultId));
+        .watch(sQLResultServicesProvider(resultId));
   }
 }
 

@@ -7,7 +7,7 @@ part of 'session_conn.dart';
 // **************************************************************************
 
 String _$sessionConnsServicesHash() =>
-    r'fa9b60334a050ebd445ce4fd58a9d3b8b24a62bd';
+    r'e5ca84c44675f51135a6f11fe07e6ed44de12598';
 
 /// See also [SessionConnsServices].
 @ProviderFor(SessionConnsServices)
@@ -24,7 +24,7 @@ final sessionConnsServicesProvider =
 
 typedef _$SessionConnsServices = Notifier<int>;
 String _$sessionConnServicesHash() =>
-    r'5174fbf4d170884b3bec486840c1567ee0c0d511';
+    r'9c65e6e165733467f1a2d7b36af5155db6d2bae4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -49,10 +49,10 @@ class _SystemHash {
 
 abstract class _$SessionConnServices
     extends BuildlessNotifier<SessionConnModel> {
-  late final int connId;
+  late final ConnId connId;
 
   SessionConnModel build(
-    int connId,
+    ConnId connId,
   );
 }
 
@@ -67,7 +67,7 @@ class SessionConnServicesFamily extends Family<SessionConnModel> {
 
   /// See also [SessionConnServices].
   SessionConnServicesProvider call(
-    int connId,
+    ConnId connId,
   ) {
     return SessionConnServicesProvider(
       connId,
@@ -103,7 +103,7 @@ class SessionConnServicesProvider
     extends NotifierProviderImpl<SessionConnServices, SessionConnModel> {
   /// See also [SessionConnServices].
   SessionConnServicesProvider(
-    int connId,
+    ConnId connId,
   ) : this._internal(
           () => SessionConnServices()..connId = connId,
           from: sessionConnServicesProvider,
@@ -128,7 +128,7 @@ class SessionConnServicesProvider
     required this.connId,
   }) : super.internal();
 
-  final int connId;
+  final ConnId connId;
 
   @override
   SessionConnModel runNotifierBuild(
@@ -179,7 +179,7 @@ class SessionConnServicesProvider
 // ignore: unused_element
 mixin SessionConnServicesRef on NotifierProviderRef<SessionConnModel> {
   /// The parameter `connId` of this provider.
-  int get connId;
+  ConnId get connId;
 }
 
 class _SessionConnServicesProviderElement
@@ -188,7 +188,7 @@ class _SessionConnServicesProviderElement
   _SessionConnServicesProviderElement(super.provider);
 
   @override
-  int get connId => (origin as SessionConnServicesProvider).connId;
+  ConnId get connId => (origin as SessionConnServicesProvider).connId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

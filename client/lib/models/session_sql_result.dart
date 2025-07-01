@@ -1,3 +1,4 @@
+import 'package:client/models/sessions.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -6,10 +7,17 @@ import 'package:flutter/foundation.dart';
 part 'session_sql_result.freezed.dart';
 
 @freezed
+abstract class ResultId with _$ResultId {
+  const factory ResultId({
+    required SessionId sessionId,
+    required int value,
+  }) = _ResultId;
+}
+
+@freezed
 abstract class SQLResultModel with _$SQLResultModel {
   const factory SQLResultModel({
-    required int sessionId,
-    required int resultId,
+    required ResultId resultId,
     required SQLExecuteState state,
     String? query,
     Duration? executeTime,
@@ -21,19 +29,19 @@ abstract class SQLResultModel with _$SQLResultModel {
 @freezed
 abstract class SQLResultListModel with _$SQLResultListModel {
   const factory SQLResultListModel({
-    required int sessionId,
+    required SessionId sessionId,
     required List<SQLResultModel> results,
     SQLResultModel? selected,
   }) = _SQLResultListModel;
 }
 
 abstract class SQLResultRepo {
-  SQLResultListModel getSqlResults(int sessionId);
-  SQLResultModel getSQLReuslt(int sessionId, int resultId);
-  void selectSQLResult(int sessionId, int resultId);
-  SQLResultModel? selectedSQLResult(int sessionId);
-  void reorderSQLResult(int sessionId, int oldIndex, int newIndex);
-  SQLResultModel addSQLResult(int sessionId);
-  void deleteSQLResult(int sessionId, int resultId);
-  void updateSQLResult(int sessionId, int resultId, SQLResultModel result);
+  SQLResultListModel getSqlResults(SessionId sessionId);
+  SQLResultModel getSQLReuslt(ResultId resultId);
+  void selectSQLResult(ResultId resultId);
+  SQLResultModel? selectedSQLResult(SessionId sessionId);
+  void reorderSQLResult(SessionId sessionId, int oldIndex, int newIndex);
+  SQLResultModel addSQLResult(SessionId sessionId);
+  void deleteSQLResult(ResultId resultId);
+  void updateSQLResult(ResultId resultId, SQLResultModel result);
 }

@@ -7,7 +7,7 @@ part of 'session_body.dart';
 // **************************************************************************
 
 String _$sessionSplitViewStateHash() =>
-    r'8446848065432962e94d19908dd20f4fd19f9721';
+    r'1f3e904a48dd3977623cf68c07a8fcefddd5ca05';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -41,7 +41,7 @@ class SessionSplitViewStateFamily extends Family<SessionSplitViewModel> {
 
   /// See also [sessionSplitViewState].
   SessionSplitViewStateProvider call(
-    int sessionId,
+    SessionId sessionId,
   ) {
     return SessionSplitViewStateProvider(
       sessionId,
@@ -76,7 +76,7 @@ class SessionSplitViewStateFamily extends Family<SessionSplitViewModel> {
 class SessionSplitViewStateProvider extends Provider<SessionSplitViewModel> {
   /// See also [sessionSplitViewState].
   SessionSplitViewStateProvider(
-    int sessionId,
+    SessionId sessionId,
   ) : this._internal(
           (ref) => sessionSplitViewState(
             ref as SessionSplitViewStateRef,
@@ -104,7 +104,7 @@ class SessionSplitViewStateProvider extends Provider<SessionSplitViewModel> {
     required this.sessionId,
   }) : super.internal();
 
-  final int sessionId;
+  final SessionId sessionId;
 
   @override
   Override overrideWith(
@@ -148,7 +148,7 @@ class SessionSplitViewStateProvider extends Provider<SessionSplitViewModel> {
 // ignore: unused_element
 mixin SessionSplitViewStateRef on ProviderRef<SessionSplitViewModel> {
   /// The parameter `sessionId` of this provider.
-  int get sessionId;
+  SessionId get sessionId;
 }
 
 class _SessionSplitViewStateProviderElement
@@ -157,11 +157,12 @@ class _SessionSplitViewStateProviderElement
   _SessionSplitViewStateProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SessionSplitViewStateProvider).sessionId;
+  SessionId get sessionId =>
+      (origin as SessionSplitViewStateProvider).sessionId;
 }
 
 String _$sessionSplitViewControllerHash() =>
-    r'555c00565fa10d91f46e380745d83f77d262aff5';
+    r'7e4190af2eff74ea8c7c6729cd242fb474741ddc';
 
 /// See also [SessionSplitViewController].
 @ProviderFor(SessionSplitViewController)

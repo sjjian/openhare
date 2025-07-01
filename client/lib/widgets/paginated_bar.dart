@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
 class TablePaginatedBar extends StatefulWidget {
-  final TablePageController controller;
+  final int count;
+  final int pageSize;
+  final int pageNumber;
+  final void Function(int pageNumber) onChange;
 
-  const TablePaginatedBar({Key? key, required this.controller}) : super(key: key);
+  const TablePaginatedBar(
+      {Key? key,
+      required this.count,
+      required this.pageSize,
+      required this.pageNumber,
+      required this.onChange})
+      : super(key: key);
 
   @override
   State<TablePaginatedBar> createState() => _PaginatedBarState();
@@ -12,10 +21,9 @@ class TablePaginatedBar extends StatefulWidget {
 class _PaginatedBarState extends State<TablePaginatedBar> {
   @override
   Widget build(BuildContext context) {
-    int totalPageNumber =
-        (widget.controller.count / widget.controller.pageSize).ceil();
-    bool isFirstPage = (widget.controller.pageNumber <= 1);
-    bool isLastPage = (widget.controller.pageNumber == totalPageNumber);
+    int totalPageNumber = (widget.count / widget.pageSize).ceil();
+    bool isFirstPage = (widget.pageNumber <= 1);
+    bool isLastPage = (widget.pageNumber == totalPageNumber);
     return Container(
       padding: const EdgeInsets.only(top: 15, bottom: 15, right: 15),
       child: Row(
@@ -23,14 +31,14 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
         children: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
-            child: Text("${widget.controller.pageNumber}/$totalPageNumber"),
+            child: Text("${widget.pageNumber}/$totalPageNumber"),
           ),
           IconButton(
               onPressed: isFirstPage
                   ? null
                   : () {
                       setState(() {
-                        widget.controller.onChange(1);
+                        widget.onChange(1);
                       });
                     },
               icon: const Icon(Icons.first_page)),
@@ -39,8 +47,7 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
                   ? null
                   : () {
                       setState(() {
-                        widget.controller
-                            .onChange(widget.controller.pageNumber - 1);
+                        widget.onChange(widget.pageNumber - 1);
                       });
                     },
               icon: const Icon(Icons.keyboard_arrow_left)),
@@ -49,8 +56,7 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
                   ? null
                   : () {
                       setState(() {
-                        widget.controller
-                            .onChange(widget.controller.pageNumber + 1);
+                        widget.onChange(widget.pageNumber + 1);
                       });
                     },
               icon: const Icon(Icons.keyboard_arrow_right_outlined)),
@@ -59,7 +65,7 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
                   ? null
                   : () {
                       setState(() {
-                        widget.controller.onChange(totalPageNumber);
+                        widget.onChange(totalPageNumber);
                       });
                     },
               icon: const Icon(Icons.last_page)),
@@ -69,9 +75,9 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
   }
 }
 
-abstract class TablePageController {
-  void onChange(int pageNumber);
-  int get count;
-  int get pageSize;
-  int get pageNumber;
-}
+// abstract class TablePageController {
+//   void onChange(int pageNumber);
+//   int get count;
+//   int get pageSize;
+//   int get pageNumber;
+// }

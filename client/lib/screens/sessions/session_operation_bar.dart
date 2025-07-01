@@ -22,19 +22,22 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
     if (sessionIdModel == null) {
       return null;
     }
-    SessionConnModel sessionConnModel =
-        ref.watch(sessionConnServicesProvider(sessionIdModel.connId??0));
+    // todo: 未订阅到conn状态
+    SessionConnModel? sessionConnModel = sessionIdModel.connId != null
+        ? ref.watch(sessionConnServicesProvider(sessionIdModel.connId!))
+        : null;
+
     SessionDrawerModel? sessionDrawer =
         ref.watch(sessionDrawerControllerProvider);
     if (sessionDrawer == null) {
       return null;
-    }    
+    }
 
     return SessionOpBarModel(
       sessionId: sessionIdModel.sessionId,
-      connId: sessionIdModel.connId??0,
-      canQuery: sessionConnModel.canQuery,
-      currentSchema: sessionConnModel.currentSchema,
+      connId: sessionIdModel.connId,
+      canQuery: sessionConnModel?.canQuery ?? false,
+      currentSchema: sessionConnModel?.currentSchema ?? "",
       isRightPageOpen: sessionDrawer.isRightPageOpen,
     );
   }
@@ -74,7 +77,7 @@ class SessionOpBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionOpBarModel? model = ref.watch(sessionOpBarNotifierProvider);
-    bool canQuery = model?.canQuery??false;
+    bool canQuery = model?.canQuery ?? false;
     return Container(
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
@@ -102,8 +105,7 @@ class SessionOpBar extends ConsumerWidget {
                       }
 
                       ref
-                          .read(sQLResultServicesProvider(
-                                  model.sessionId, resultModel.resultId)
+                          .read(sQLResultServicesProvider(resultModel.resultId)
                               .notifier)
                           .loadFromQuery(query);
                     }
@@ -123,9 +125,9 @@ class SessionOpBar extends ConsumerWidget {
                                 .notifier)
                             .addSQLResult();
                         ref
-                            .read(sQLResultServicesProvider(
-                                    model.sessionId, resultModel.resultId)
-                                .notifier)
+                            .read(
+                                sQLResultServicesProvider(resultModel.resultId)
+                                    .notifier)
                             .loadFromQuery(query);
                       }
                     }
@@ -152,9 +154,9 @@ class SessionOpBar extends ConsumerWidget {
                                 .notifier)
                             .addSQLResult();
                         ref
-                            .read(sQLResultServicesProvider(
-                                    model!.sessionId, resultModel.resultId)
-                                .notifier)
+                            .read(
+                                sQLResultServicesProvider(resultModel.resultId)
+                                    .notifier)
                             .loadFromQuery("explain $query");
                       }
                     }
@@ -193,10 +195,10 @@ class SessionOpBar extends ConsumerWidget {
 class SchemaBar extends ConsumerStatefulWidget {
   final String? currentSchema;
   final bool disable;
-  final int connId;
+  final ConnId? connId;
   const SchemaBar({
     Key? key,
-    required this.connId,
+    this.connId,
     required this.disable,
     this.currentSchema,
   }) : super(key: key);
@@ -232,7 +234,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
           final overlayPos = overlay.localToGlobal(Offset.zero);
 
           List<String> schemas = await ref
-              .read(sessionConnServicesProvider(widget.connId).notifier)
+              .read(sessionConnServicesProvider(widget.connId!).notifier)
               .getSchemas();
 
           // todo
@@ -249,7 +251,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     height: 30,
                     onTap: () {
                       ref
-                          .read(sessionConnServicesProvider(widget.connId)
+                          .read(sessionConnServicesProvider(widget.connId!)
                               .notifier)
                           .setCurrentSchema(schema);
                     },

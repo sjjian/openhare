@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_drawer_body.g.dart';
 
 @Riverpod(keepAlive: true)
-SessionDrawerModel sessionDrawerState(Ref ref, int sessionId) {
+SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
   return const SessionDrawerModel(
       drawerPage: DrawerPage.metadataTree,
       sqlResult: null,
@@ -26,7 +26,7 @@ class SessionDrawerController extends _$SessionDrawerController {
     SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
     if (sessionIdModel == null) {
-      return ref.watch(sessionDrawerStateProvider(0));
+      return ref.watch(sessionDrawerStateProvider(const SessionId(value: 0)));
     }
     return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
   }

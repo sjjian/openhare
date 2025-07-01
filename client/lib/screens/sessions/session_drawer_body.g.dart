@@ -7,7 +7,7 @@ part of 'session_drawer_body.dart';
 // **************************************************************************
 
 String _$sessionDrawerStateHash() =>
-    r'19bfa943162037345b32a367a5b440bb6d5c3390';
+    r'e8954f01db2960aebb5987624ffdc25084b99e3d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -41,7 +41,7 @@ class SessionDrawerStateFamily extends Family<SessionDrawerModel> {
 
   /// See also [sessionDrawerState].
   SessionDrawerStateProvider call(
-    int sessionId,
+    SessionId sessionId,
   ) {
     return SessionDrawerStateProvider(
       sessionId,
@@ -76,7 +76,7 @@ class SessionDrawerStateFamily extends Family<SessionDrawerModel> {
 class SessionDrawerStateProvider extends Provider<SessionDrawerModel> {
   /// See also [sessionDrawerState].
   SessionDrawerStateProvider(
-    int sessionId,
+    SessionId sessionId,
   ) : this._internal(
           (ref) => sessionDrawerState(
             ref as SessionDrawerStateRef,
@@ -104,7 +104,7 @@ class SessionDrawerStateProvider extends Provider<SessionDrawerModel> {
     required this.sessionId,
   }) : super.internal();
 
-  final int sessionId;
+  final SessionId sessionId;
 
   @override
   Override overrideWith(
@@ -147,7 +147,7 @@ class SessionDrawerStateProvider extends Provider<SessionDrawerModel> {
 // ignore: unused_element
 mixin SessionDrawerStateRef on ProviderRef<SessionDrawerModel> {
   /// The parameter `sessionId` of this provider.
-  int get sessionId;
+  SessionId get sessionId;
 }
 
 class _SessionDrawerStateProviderElement
@@ -155,11 +155,11 @@ class _SessionDrawerStateProviderElement
   _SessionDrawerStateProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SessionDrawerStateProvider).sessionId;
+  SessionId get sessionId => (origin as SessionDrawerStateProvider).sessionId;
 }
 
 String _$sessionDrawerControllerHash() =>
-    r'ea10bb312b465fbff11c019e25e56ef614fc33d7';
+    r'01deafb1ca96e13b4d4a0bd9321ae7b6be6e5936';
 
 /// See also [SessionDrawerController].
 @ProviderFor(SessionDrawerController)

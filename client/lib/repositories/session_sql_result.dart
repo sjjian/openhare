@@ -1,4 +1,5 @@
 import 'package:client/models/session_sql_result.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/reorder_list.dart';
@@ -33,10 +34,10 @@ class SQLResultRepoImpl extends SQLResultRepo {
     );
   }
 
-  SQLResultModel _toModel(int sessionId, SQLResult result) {
+  SQLResultModel _toModel(SQLResult result) {
     return SQLResultModel(
-      sessionId: sessionId,
-      resultId: result.id,
+      resultId: ResultId(
+          sessionId: SessionId(value: result.sessionId), value: result.id),
       query: result.query,
       state: result.state,
       executeTime: result.executeTime,
@@ -46,50 +47,47 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
-  SQLResultListModel getSqlResults(int sessionId) {
-    if (!sqlResults.containsKey(sessionId)) {
-      sqlResults[sessionId] = ReorderSelectedList();
-    }
+  SQLResultListModel getSqlResults(SessionId sessionId) {
+    final results = sessionSqlResults(sessionId.value);
     return SQLResultListModel(
         sessionId: sessionId,
-        results: sqlResults[sessionId]!.map((m) {
-          return _toModel(sessionId, m);
+        results: results.map((m) {
+          return _toModel(m);
         }).toList(),
-        selected: sqlResults[sessionId]!.selected() != null
-            ? _toModel(sessionId, sqlResults[sessionId]!.selected()!)
-            : null);
+        selected:
+            results.selected() != null ? _toModel(results.selected()!) : null);
   }
 
   @override
-  SQLResultModel getSQLReuslt(int sessionId, int resultId) {
-    final result = _getSQLResult(sessionId, resultId);
-    return _toModel(sessionId, result);
+  SQLResultModel getSQLReuslt(ResultId resultId) {
+    final result = _getSQLResult(resultId.sessionId.value, resultId.value);
+    return _toModel(result);
   }
 
   @override
-  void selectSQLResult(int sessionId, int resultId) {
-    final result = _getSQLResult(sessionId, resultId);
-    sessionSqlResults(sessionId)
-        .select(sessionSqlResults(sessionId).indexOf(result));
+  void selectSQLResult(ResultId resultId) {
+    final result = _getSQLResult(resultId.sessionId.value, resultId.value);
+    sessionSqlResults(resultId.sessionId.value)
+        .select(sessionSqlResults(resultId.sessionId.value).indexOf(result));
   }
 
   @override
-  void reorderSQLResult(int sessionId, int oldIndex, int newIndex) {
-    sessionSqlResults(sessionId).reorder(oldIndex, newIndex);
+  void reorderSQLResult(SessionId sessionId, int oldIndex, int newIndex) {
+    sessionSqlResults(sessionId.value).reorder(oldIndex, newIndex);
   }
 
   @override
-  SQLResultModel? selectedSQLResult(int sessionId) {
-    final selectedResult = sessionSqlResults(sessionId).selected();
+  SQLResultModel? selectedSQLResult(SessionId sessionId) {
+    final selectedResult = sessionSqlResults(sessionId.value).selected();
     if (selectedResult != null) {
-      return _toModel(sessionId, selectedResult);
+      return _toModel(selectedResult);
     }
     return null;
   }
 
   @override
-  void updateSQLResult(int sessionId, int resultId, SQLResultModel result) {
-    final orginResult = _getSQLResult(sessionId, resultId);
+  void updateSQLResult(ResultId resultId, SQLResultModel result) {
+    final orginResult = _getSQLResult(resultId.sessionId.value, resultId.value);
     orginResult.query = result.query;
     orginResult.data = result.data;
     orginResult.error = result.error;
@@ -98,17 +96,18 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
-  SQLResultModel addSQLResult(int sessionId) {
-    SQLResult result = SQLResult(genSQLResultId(sessionId), sessionId);
-    sessionSqlResults(sessionId).add(result);
-    return _toModel(sessionId, result);
+  SQLResultModel addSQLResult(SessionId sessionId) {
+    SQLResult result =
+        SQLResult(genSQLResultId(sessionId.value), sessionId.value);
+    sessionSqlResults(sessionId.value).add(result);
+    return _toModel(result);
   }
 
   @override
-  void deleteSQLResult(int sessionId, int resultId) {
-    final result = _getSQLResult(sessionId, resultId);
-    sessionSqlResults(sessionId)
-        .removeAt(sessionSqlResults(sessionId).indexOf(result));
+  void deleteSQLResult(ResultId resultId) {
+    final result = _getSQLResult(resultId.sessionId.value, resultId.value);
+    sessionSqlResults(resultId.sessionId.value)
+        .removeAt(sessionSqlResults(resultId.sessionId.value).indexOf(result));
   }
 }
 

@@ -1,22 +1,19 @@
-import 'package:client/providers/instances.dart';
+import 'package:client/services/instances/instances.dart';
 import 'package:client/services/sessions.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' as provider;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+TextEditingController searchTextController = TextEditingController(text: "");
 
 class AddSession extends HookConsumerWidget {
   const AddSession({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    InstancesProvider instancesProvider =
-        provider.Provider.of<InstancesProvider>(context);
-
-    instanceTableController.setCount(instancesProvider
-        .instanceCount(instanceTableController.searchTextController.text));
+    final model = ref.watch(instancesNotifierProvider);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
@@ -47,7 +44,9 @@ class AddSession extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                for (var inst in instancesProvider.activeInstances())
+                for (var inst in ref
+                    .read(instancesServicesProvider.notifier)
+                    .activeInstances()) // todo
                   Row(
                     children: [
                       SizedBox(
@@ -61,8 +60,7 @@ class AddSession extends HookConsumerWidget {
                             TextButton(
                                 onPressed: () {
                                   ref
-                                      .read(
-                                          sessionsServicesProvider.notifier)
+                                      .read(sessionsServicesProvider.notifier)
                                       .addSession(inst);
                                 },
                                 child: Text(
@@ -106,10 +104,15 @@ class AddSession extends HookConsumerWidget {
                                       constraints: BoxConstraints(
                                           minHeight: 35, maxWidth: 200)),
                                   child: SearchBar(
-                                    controller: instanceTableController
-                                        .searchTextController,
+                                    controller: searchTextController,
                                     onChanged: (value) {
-                                      instanceTableController.onSearchChange();
+                                      print("=============$value");
+                                      ref
+                                          .read(instancesNotifierProvider
+                                              .notifier)
+                                          .changePage(value,
+                                              pageNumber: model.currentPage,
+                                              pageSize: model.pageSize);
                                     },
                                     trailing: const [Icon(Icons.search)],
                                   )),
@@ -136,10 +139,7 @@ class AddSession extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                for (var inst in instancesProvider.instances(
-                    instanceTableController.searchTextController.text,
-                    instanceTableController.pageSize,
-                    instanceTableController.pageNumber))
+                for (var inst in model.instances) //todo
                   Row(
                     children: [
                       SizedBox(
@@ -153,8 +153,7 @@ class AddSession extends HookConsumerWidget {
                             TextButton(
                                 onPressed: () {
                                   ref
-                                      .read(
-                                          sessionsServicesProvider.notifier)
+                                      .read(sessionsServicesProvider.notifier)
                                       .addSession(inst);
                                 },
                                 child: Text(inst.connectValue.name,
@@ -184,7 +183,16 @@ class AddSession extends HookConsumerWidget {
                       ),
                     ],
                   ),
-                TablePaginatedBar(controller: instanceTableController)
+                TablePaginatedBar(
+                    count: model.count,
+                    pageSize: model.pageSize,
+                    pageNumber: model.currentPage,
+                    onChange: (pageNumber) {
+                      ref.read(instancesNotifierProvider.notifier).changePage(
+                          "",
+                          pageNumber: pageNumber,
+                          pageSize: model.pageSize);
+                    }),
               ],
             ),
           ),
@@ -209,4 +217,4 @@ class AddSession extends HookConsumerWidget {
 
 // }
 
-InstanceTableController instanceTableController = InstanceTableController();
+// InstanceTableController instanceTableController = InstanceTableController();

@@ -1,4 +1,5 @@
 import 'package:client/models/session_sql_result.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/repositories/session_conn.dart';
 import 'package:client/services/session_conn.dart';
 import 'package:client/repositories/session_sql_result.dart';
@@ -12,35 +13,35 @@ part 'session_sql_result.g.dart';
 @Riverpod(keepAlive: true)
 class SQLResultServices extends _$SQLResultServices {
   @override
-  SQLResultModel build(int sessionId, int resultId) {
-    return ref.watch(sqlResultsRepoProvider).getSQLReuslt(sessionId, resultId);
+  SQLResultModel build(ResultId resultId) {
+    return ref.watch(sqlResultsRepoProvider).getSQLReuslt(resultId);
   }
 
   Future<void> loadFromQuery(String query) async {
     final repo = ref.read(sqlResultsRepoProvider);
 
-    repo.updateSQLResult(sessionId, resultId, state.copyWith(query: query));
+    repo.updateSQLResult(resultId, state.copyWith(query: query));
     ref.invalidateSelf();
 
     // todo
-    final sessionModel =
-        ref.read(sessionsServicesProvider.notifier).getSession(state.sessionId);
+    final sessionModel = ref
+        .read(sessionsServicesProvider.notifier)
+        .getSession(state.resultId.sessionId);
 
     try {
       DateTime start = DateTime.now();
       BaseQueryResult? queryResult = await ref
-          .read(sessionConnServicesProvider(sessionModel!.connId ?? 0).notifier)
+          .read(sessionConnServicesProvider(sessionModel!.connId!).notifier)
           .query(query);
       DateTime end = DateTime.now();
       repo.updateSQLResult(
-          sessionId,
           resultId,
           state.copyWith(
               data: queryResult,
               executeTime: end.difference(start),
               state: SQLExecuteState.done));
     } catch (e) {
-      repo.updateSQLResult(sessionId, resultId,
+      repo.updateSQLResult(resultId,
           state.copyWith(state: SQLExecuteState.error, error: e.toString()));
     } finally {
       ref.invalidateSelf();
@@ -65,7 +66,7 @@ class SQLResultServices extends _$SQLResultServices {
 @Riverpod(keepAlive: true)
 class SQLResultsServices extends _$SQLResultsServices {
   @override
-  SQLResultListModel build(int sessionId) {
+  SQLResultListModel build(SessionId sessionId) {
     return ref.watch(sqlResultsRepoProvider).getSqlResults(sessionId);
   }
 
@@ -74,15 +75,15 @@ class SQLResultsServices extends _$SQLResultsServices {
     return repo.selectedSQLResult(state.sessionId);
   }
 
-  void deleteSQLResult(int resultId) {
+  void deleteSQLResult(ResultId resultId) {
     SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
-    repo.deleteSQLResult(state.sessionId, resultId);
+    repo.deleteSQLResult(resultId);
     ref.invalidateSelf();
   }
 
-  void selectSQLResult(int resultId) {
+  void selectSQLResult(ResultId resultId) {
     SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
-    repo.selectSQLResult(state.sessionId, resultId);
+    repo.selectSQLResult(resultId);
     ref.invalidateSelf();
   }
 

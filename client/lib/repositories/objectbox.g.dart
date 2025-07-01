@@ -14,100 +14,12 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
-import '../repositories/instances.dart';
+import '../repositories/instances/instances.dart';
 import '../repositories/sessions.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
 final _entities = <obx_int.ModelEntity>[
-  obx_int.ModelEntity(
-    id: const obx_int.IdUid(1, 7771770525022327494),
-    name: 'InstanceModel',
-    lastPropertyId: const obx_int.IdUid(13, 9103170210888742968),
-    flags: 0,
-    properties: <obx_int.ModelProperty>[
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 4402971908614233426),
-        name: 'id',
-        type: 6,
-        flags: 1,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 2557526817954957013),
-        name: 'name',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 1533736204012627434),
-        name: 'host',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 8657086904403898878),
-        name: 'port',
-        type: 6,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 7449270155428902133),
-        name: 'user',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 7099609988433500239),
-        name: 'password',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(7, 8699536140751700883),
-        name: 'desc',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(8, 6180271050918009273),
-        name: 'initQuerys',
-        type: 30,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(9, 7938579034731173175),
-        name: 'createdAt',
-        type: 10,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(10, 5382849423225960488),
-        name: 'latestOpenAt',
-        type: 10,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 451105937567216074),
-        name: 'stDbType',
-        type: 6,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(12, 3794023625132426927),
-        name: 'stCustom',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(13, 9103170210888742968),
-        name: 'stActiveSchemas',
-        type: 30,
-        flags: 0,
-      ),
-    ],
-    relations: <obx_int.ModelRelation>[],
-    backlinks: <obx_int.ModelBacklink>[],
-  ),
   obx_int.ModelEntity(
     id: const obx_int.IdUid(3, 954363933915371259),
     name: 'SessionStorage',
@@ -126,7 +38,7 @@ final _entities = <obx_int.ModelEntity>[
         type: 11,
         flags: 520,
         indexId: const obx_int.IdUid(2, 3493315780447542151),
-        relationTarget: 'InstanceModel',
+        relationTarget: 'InstanceStorage',
       ),
       obx_int.ModelProperty(
         id: const obx_int.IdUid(3, 4040787782661306959),
@@ -138,6 +50,94 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(4, 2680331308371878199),
         name: 'currentSchema',
         type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(5, 9068295192823040783),
+    name: 'InstanceStorage',
+    lastPropertyId: const obx_int.IdUid(13, 8749264689524785390),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 6332533221694692916),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 7941998142696236769),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 224238240568187224),
+        name: 'host',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7469078253827869925),
+        name: 'port',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 1537637767970384375),
+        name: 'user',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 8389525849330073772),
+        name: 'password',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 2870873381397993482),
+        name: 'desc',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 8287743374826164088),
+        name: 'initQuerys',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 4690926171000995925),
+        name: 'createdAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 5475873554467602001),
+        name: 'latestOpenAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 7819267361613010979),
+        name: 'stDbType',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 4520754541798440120),
+        name: 'stCustom',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 8749264689524785390),
+        name: 'stActiveSchemas',
+        type: 30,
         flags: 0,
       ),
     ],
@@ -184,17 +184,47 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(3, 954363933915371259),
+    lastEntityId: const obx_int.IdUid(5, 9068295192823040783),
     lastIndexId: const obx_int.IdUid(2, 3493315780447542151),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
-    retiredEntityUids: const [4777369979113529251],
+    retiredEntityUids: const [
+      4777369979113529251,
+      7771770525022327494,
+      4128249689244104183,
+    ],
     retiredIndexUids: const [],
     retiredPropertyUids: const [
       6339393024853594017,
       2012876000864412152,
       3055836543278863247,
       2576353234273015585,
+      4402971908614233426,
+      2557526817954957013,
+      1533736204012627434,
+      8657086904403898878,
+      7449270155428902133,
+      7099609988433500239,
+      8699536140751700883,
+      6180271050918009273,
+      7938579034731173175,
+      5382849423225960488,
+      451105937567216074,
+      3794023625132426927,
+      9103170210888742968,
+      5811083849693601533,
+      8890379074780980911,
+      4167208944430226304,
+      984201060325373299,
+      152208878262239042,
+      5905217867648670601,
+      1629092070617964904,
+      4775537481234876128,
+      3321563170577621728,
+      7345410915938135096,
+      6439919288390320832,
+      6403594309000127769,
+      452695194295216491,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -203,15 +233,68 @@ obx_int.ModelDefinition getObjectBoxModel() {
   );
 
   final bindings = <Type, obx_int.EntityDefinition>{
-    InstanceModel: obx_int.EntityDefinition<InstanceModel>(
+    SessionStorage: obx_int.EntityDefinition<SessionStorage>(
       model: _entities[0],
-      toOneRelations: (InstanceModel object) => [],
-      toManyRelations: (InstanceModel object) => {},
-      getId: (InstanceModel object) => object.id,
-      setId: (InstanceModel object, int id) {
+      toOneRelations: (SessionStorage object) => [object.instance],
+      toManyRelations: (SessionStorage object) => {},
+      getId: (SessionStorage object) => object.id,
+      setId: (SessionStorage object, int id) {
         object.id = id;
       },
-      objectToFB: (InstanceModel object, fb.Builder fbb) {
+      objectToFB: (SessionStorage object, fb.Builder fbb) {
+        final textOffset =
+            object.text == null ? null : fbb.writeString(object.text!);
+        final currentSchemaOffset =
+            object.currentSchema == null
+                ? null
+                : fbb.writeString(object.currentSchema!);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.instance.targetId);
+        fbb.addOffset(2, textOffset);
+        fbb.addOffset(3, currentSchemaOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final textParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final currentSchemaParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 10);
+        final object = SessionStorage(
+          id: idParam,
+          text: textParam,
+          currentSchema: currentSchemaParam,
+        );
+        object.instance.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        object.instance.attach(store);
+        return object;
+      },
+    ),
+    InstanceStorage: obx_int.EntityDefinition<InstanceStorage>(
+      model: _entities[1],
+      toOneRelations: (InstanceStorage object) => [],
+      toManyRelations: (InstanceStorage object) => {},
+      getId: (InstanceStorage object) => object.id,
+      setId: (InstanceStorage object, int id) {
+        object.id = id;
+      },
+      objectToFB: (InstanceStorage object, fb.Builder fbb) {
         final nameOffset = fbb.writeString(object.name);
         final hostOffset = fbb.writeString(object.host);
         final userOffset = fbb.writeString(object.user);
@@ -295,7 +378,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
             latestOpenAtValue == null
                 ? null
                 : DateTime.fromMillisecondsSinceEpoch(latestOpenAtValue);
-        final object = InstanceModel(
+        final object = InstanceStorage(
             id: idParam,
             stDbType: stDbTypeParam,
             name: nameParam,
@@ -317,151 +400,99 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
-    SessionStorage: obx_int.EntityDefinition<SessionStorage>(
-      model: _entities[1],
-      toOneRelations: (SessionStorage object) => [object.instance],
-      toManyRelations: (SessionStorage object) => {},
-      getId: (SessionStorage object) => object.id,
-      setId: (SessionStorage object, int id) {
-        object.id = id;
-      },
-      objectToFB: (SessionStorage object, fb.Builder fbb) {
-        final textOffset =
-            object.text == null ? null : fbb.writeString(object.text!);
-        final currentSchemaOffset =
-            object.currentSchema == null
-                ? null
-                : fbb.writeString(object.currentSchema!);
-        fbb.startTable(5);
-        fbb.addInt64(0, object.id);
-        fbb.addInt64(1, object.instance.targetId);
-        fbb.addOffset(2, textOffset);
-        fbb.addOffset(3, currentSchemaOffset);
-        fbb.finish(fbb.endTable());
-        return object.id;
-      },
-      objectFromFB: (obx.Store store, ByteData fbData) {
-        final buffer = fb.BufferContext(fbData);
-        final rootOffset = buffer.derefObject(0);
-        final idParam = const fb.Int64Reader().vTableGet(
-          buffer,
-          rootOffset,
-          4,
-          0,
-        );
-        final textParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 8);
-        final currentSchemaParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 10);
-        final object = SessionStorage(
-          id: idParam,
-          text: textParam,
-          currentSchema: currentSchemaParam,
-        );
-        object.instance.targetId = const fb.Int64Reader().vTableGet(
-          buffer,
-          rootOffset,
-          6,
-          0,
-        );
-        object.instance.attach(store);
-        return object;
-      },
-    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
-}
-
-/// [InstanceModel] entity fields to define ObjectBox queries.
-class InstanceModel_ {
-  /// See [InstanceModel.id].
-  static final id = obx.QueryIntegerProperty<InstanceModel>(
-    _entities[0].properties[0],
-  );
-
-  /// See [InstanceModel.name].
-  static final name = obx.QueryStringProperty<InstanceModel>(
-    _entities[0].properties[1],
-  );
-
-  /// See [InstanceModel.host].
-  static final host = obx.QueryStringProperty<InstanceModel>(
-    _entities[0].properties[2],
-  );
-
-  /// See [InstanceModel.port].
-  static final port = obx.QueryIntegerProperty<InstanceModel>(
-    _entities[0].properties[3],
-  );
-
-  /// See [InstanceModel.user].
-  static final user = obx.QueryStringProperty<InstanceModel>(
-    _entities[0].properties[4],
-  );
-
-  /// See [InstanceModel.password].
-  static final password = obx.QueryStringProperty<InstanceModel>(
-    _entities[0].properties[5],
-  );
-
-  /// See [InstanceModel.desc].
-  static final desc = obx.QueryStringProperty<InstanceModel>(
-    _entities[0].properties[6],
-  );
-
-  /// See [InstanceModel.initQuerys].
-  static final initQuerys = obx.QueryStringVectorProperty<InstanceModel>(
-    _entities[0].properties[7],
-  );
-
-  /// See [InstanceModel.createdAt].
-  static final createdAt = obx.QueryDateProperty<InstanceModel>(
-    _entities[0].properties[8],
-  );
-
-  /// See [InstanceModel.latestOpenAt].
-  static final latestOpenAt = obx.QueryDateProperty<InstanceModel>(
-    _entities[0].properties[9],
-  );
-
-  /// See [InstanceModel.stDbType].
-  static final stDbType = obx.QueryIntegerProperty<InstanceModel>(
-    _entities[0].properties[10],
-  );
-
-  /// See [InstanceModel.stCustom].
-  static final stCustom = obx.QueryStringProperty<InstanceModel>(
-    _entities[0].properties[11],
-  );
-
-  /// See [InstanceModel.stActiveSchemas].
-  static final stActiveSchemas = obx.QueryStringVectorProperty<InstanceModel>(
-    _entities[0].properties[12],
-  );
 }
 
 /// [SessionStorage] entity fields to define ObjectBox queries.
 class SessionStorage_ {
   /// See [SessionStorage.id].
   static final id = obx.QueryIntegerProperty<SessionStorage>(
-    _entities[1].properties[0],
+    _entities[0].properties[0],
   );
 
   /// See [SessionStorage.instance].
-  static final instance = obx.QueryRelationToOne<SessionStorage, InstanceModel>(
-    _entities[1].properties[1],
-  );
+  static final instance =
+      obx.QueryRelationToOne<SessionStorage, InstanceStorage>(
+        _entities[0].properties[1],
+      );
 
   /// See [SessionStorage.text].
   static final text = obx.QueryStringProperty<SessionStorage>(
-    _entities[1].properties[2],
+    _entities[0].properties[2],
   );
 
   /// See [SessionStorage.currentSchema].
   static final currentSchema = obx.QueryStringProperty<SessionStorage>(
+    _entities[0].properties[3],
+  );
+}
+
+/// [InstanceStorage] entity fields to define ObjectBox queries.
+class InstanceStorage_ {
+  /// See [InstanceStorage.id].
+  static final id = obx.QueryIntegerProperty<InstanceStorage>(
+    _entities[1].properties[0],
+  );
+
+  /// See [InstanceStorage.name].
+  static final name = obx.QueryStringProperty<InstanceStorage>(
+    _entities[1].properties[1],
+  );
+
+  /// See [InstanceStorage.host].
+  static final host = obx.QueryStringProperty<InstanceStorage>(
+    _entities[1].properties[2],
+  );
+
+  /// See [InstanceStorage.port].
+  static final port = obx.QueryIntegerProperty<InstanceStorage>(
     _entities[1].properties[3],
+  );
+
+  /// See [InstanceStorage.user].
+  static final user = obx.QueryStringProperty<InstanceStorage>(
+    _entities[1].properties[4],
+  );
+
+  /// See [InstanceStorage.password].
+  static final password = obx.QueryStringProperty<InstanceStorage>(
+    _entities[1].properties[5],
+  );
+
+  /// See [InstanceStorage.desc].
+  static final desc = obx.QueryStringProperty<InstanceStorage>(
+    _entities[1].properties[6],
+  );
+
+  /// See [InstanceStorage.initQuerys].
+  static final initQuerys = obx.QueryStringVectorProperty<InstanceStorage>(
+    _entities[1].properties[7],
+  );
+
+  /// See [InstanceStorage.createdAt].
+  static final createdAt = obx.QueryDateProperty<InstanceStorage>(
+    _entities[1].properties[8],
+  );
+
+  /// See [InstanceStorage.latestOpenAt].
+  static final latestOpenAt = obx.QueryDateProperty<InstanceStorage>(
+    _entities[1].properties[9],
+  );
+
+  /// See [InstanceStorage.stDbType].
+  static final stDbType = obx.QueryIntegerProperty<InstanceStorage>(
+    _entities[1].properties[10],
+  );
+
+  /// See [InstanceStorage.stCustom].
+  static final stCustom = obx.QueryStringProperty<InstanceStorage>(
+    _entities[1].properties[11],
+  );
+
+  /// See [InstanceStorage.stActiveSchemas].
+  static final stActiveSchemas = obx.QueryStringVectorProperty<InstanceStorage>(
+    _entities[1].properties[12],
   );
 }

@@ -16,7 +16,6 @@ class SessionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     SessionModel? sessionIdModel =
         ref.watch(selectedSessionIdServicesProvider);
-    print("sessions page build: ${sessionIdModel?.sessionId}");
     return PageSkeleton(
         key: const Key("sessions"),
         topBar: const SessionTabs(),

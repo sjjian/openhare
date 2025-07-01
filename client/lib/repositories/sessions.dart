@@ -1,5 +1,7 @@
+import 'package:client/models/instances.dart';
+import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/instances.dart';
+import 'package:client/repositories/instances/instances.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,7 +15,7 @@ class SessionStorage {
   @Id()
   int id;
 
-  final instance = ToOne<InstanceModel>();
+  final instance = ToOne<InstanceStorage>();
 
   String? text;
 
@@ -31,7 +33,7 @@ class SessionRepoImpl extends SessionRepo {
   final Box<SessionStorage> _sessionBox;
   ReorderSelectedList<SessionStorage>? _sessionCache;
 
-  final Map<int, int> _connIdMap = {};
+  final Map<int, ConnId> _connIdMap = {};
 
   SessionRepoImpl(this.ob) : _sessionBox = ob.store.box();
 
@@ -46,83 +48,72 @@ class SessionRepoImpl extends SessionRepo {
     return _sessionCache!;
   }
 
+  SessionModel toModel(SessionStorage session) {
+    return SessionModel(
+      sessionId: SessionId(value: session.id),
+      instanceId: session.instance.target != null
+          ? InstanceId(value: session.instance.target!.id)
+          : null,
+      instanceName: session.instance.target?.name,
+      dbType: session.instance.target?.dbType,
+      connId: _connIdMap[session.id],
+    );
+  }
+
   @override
-  SessionModel? getSession(int id) {
-    final session = _sessionBox.get(id);
-    return session != null
-        ? SessionModel(
-            sessionId: session.id,
-            instanceId: session.instance.target?.id,
-            instanceName: session.instance.target?.name,
-            dbType: session.instance.target?.dbType,
-            connId: _connIdMap[session.id],
-          )
-        : null;
+  SessionModel? getSession(SessionId sessionId) {
+    final session = _sessionBox.get(sessionId.value);
+    return session != null ? toModel(session) : null;
   }
 
   @override
   Future<SessionModel> newSession() async {
     final session = await _sessionBox.putAndGetAsync(SessionStorage());
     _sessions.add(session);
-    return SessionModel(sessionId: session.id);
+    return SessionModel(sessionId: SessionId(value: session.id));
   }
 
   @override
   Future<void> updateSession(
-      SessionModel model, InstanceModel instance, String currentSchema) async {
+      SessionId sessionId, InstanceModel instance, String currentSchema) async {
     final session = _sessions
-        .firstWhere((s) => s.id == model.sessionId); //todo: handler null
-    session.instance.target = instance;
+        .firstWhere((s) => s.id == sessionId.value); //todo: handler null
+    session.instance.target = InstanceStorage.fromModel(instance);
     session.currentSchema = currentSchema;
     _sessionBox.putAsync(session);
   }
 
   @override
-  void setConnId(int sessionId, int connId) {
-    _connIdMap[sessionId] = connId;
+  void setConnId(SessionId sessionId, ConnId connId) {
+    _connIdMap[sessionId.value] = connId;
   }
 
   @override
-  Future<void> deleteSession(SessionModel model) async {
-    _sessions.removeWhere((session) => session.id == model.sessionId);
-    _sessionBox.removeAsync(model.sessionId);
+  Future<void> deleteSession(SessionId sessionId) async {
+    _sessions.removeWhere((session) => session.id == sessionId.value);
+    _sessionBox.removeAsync(sessionId.value);
   }
 
   @override
   SessionListModel getSessions() {
+    final selected = _sessions.selected();
     return SessionListModel(
       sessions: _sessions.map((s) {
-        return SessionModel(
-          sessionId: s.id,
-          instanceId: s.instance.target?.id,
-          instanceName: s.instance.target?.name,
-          dbType: s.instance.target?.dbType,
-          connId: _connIdMap[s.id],
-        );
+        return toModel(s);
       }).toList(),
-      selectedSession: _sessions.isNotEmpty
-          ? SessionModel(
-              sessionId: _sessions.selected()?.id ?? 0,
-              instanceId: _sessions.selected()?.instance.target?.id,
-              instanceName: _sessions.selected()?.instance.target?.name,
-              dbType: _sessions.selected()?.instance.target?.dbType,
-              connId: _connIdMap[_sessions.selected()?.id ?? 0],
-            )
-          : null,
+      selectedSession: selected != null ? toModel(selected) : null,
     );
   }
 
   @override
   void selectSessionByIndex(int index) {
     if (_sessions.select(index)) {
-      // _refreshSessionCache();
     }
   }
 
   @override
   void reorderSession(int oldIndex, int newIndex) {
     _sessions.reorder(oldIndex, newIndex);
-    // _refreshSessionCache();
   }
 }
 

@@ -14,12 +14,152 @@ part of 'sessions.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$SessionId implements DiagnosticableTreeMixin {
+  int get value;
+
+  /// Create a copy of SessionId
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<SessionId> get copyWith =>
+      _$SessionIdCopyWithImpl<SessionId>(this as SessionId, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SessionId'))
+      ..add(DiagnosticsProperty('value', value));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SessionId &&
+            (identical(other.value, value) || other.value == value));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, value);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SessionId(value: $value)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SessionIdCopyWith<$Res> {
+  factory $SessionIdCopyWith(SessionId value, $Res Function(SessionId) _then) =
+      _$SessionIdCopyWithImpl;
+  @useResult
+  $Res call({int value});
+}
+
+/// @nodoc
+class _$SessionIdCopyWithImpl<$Res> implements $SessionIdCopyWith<$Res> {
+  _$SessionIdCopyWithImpl(this._self, this._then);
+
+  final SessionId _self;
+  final $Res Function(SessionId) _then;
+
+  /// Create a copy of SessionId
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? value = null,
+  }) {
+    return _then(_self.copyWith(
+      value: null == value
+          ? _self.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _SessionId with DiagnosticableTreeMixin implements SessionId {
+  const _SessionId({required this.value});
+
+  @override
+  final int value;
+
+  /// Create a copy of SessionId
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SessionIdCopyWith<_SessionId> get copyWith =>
+      __$SessionIdCopyWithImpl<_SessionId>(this, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'SessionId'))
+      ..add(DiagnosticsProperty('value', value));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SessionId &&
+            (identical(other.value, value) || other.value == value));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, value);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'SessionId(value: $value)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SessionIdCopyWith<$Res>
+    implements $SessionIdCopyWith<$Res> {
+  factory _$SessionIdCopyWith(
+          _SessionId value, $Res Function(_SessionId) _then) =
+      __$SessionIdCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int value});
+}
+
+/// @nodoc
+class __$SessionIdCopyWithImpl<$Res> implements _$SessionIdCopyWith<$Res> {
+  __$SessionIdCopyWithImpl(this._self, this._then);
+
+  final _SessionId _self;
+  final $Res Function(_SessionId) _then;
+
+  /// Create a copy of SessionId
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? value = null,
+  }) {
+    return _then(_SessionId(
+      value: null == value
+          ? _self.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$SessionModel implements DiagnosticableTreeMixin {
-  int get sessionId;
-  int? get instanceId;
+  SessionId get sessionId;
+  InstanceId? get instanceId;
   String? get instanceName;
   DatabaseType? get dbType;
-  int? get connId;
+  ConnId? get connId;
 
   /// Create a copy of SessionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -72,11 +212,15 @@ abstract mixin class $SessionModelCopyWith<$Res> {
       _$SessionModelCopyWithImpl;
   @useResult
   $Res call(
-      {int sessionId,
-      int? instanceId,
+      {SessionId sessionId,
+      InstanceId? instanceId,
       String? instanceName,
       DatabaseType? dbType,
-      int? connId});
+      ConnId? connId});
+
+  $SessionIdCopyWith<$Res> get sessionId;
+  $InstanceIdCopyWith<$Res>? get instanceId;
+  $ConnIdCopyWith<$Res>? get connId;
 }
 
 /// @nodoc
@@ -101,11 +245,11 @@ class _$SessionModelCopyWithImpl<$Res> implements $SessionModelCopyWith<$Res> {
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as SessionId,
       instanceId: freezed == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as InstanceId?,
       instanceName: freezed == instanceName
           ? _self.instanceName
           : instanceName // ignore: cast_nullable_to_non_nullable
@@ -117,8 +261,46 @@ class _$SessionModelCopyWithImpl<$Res> implements $SessionModelCopyWith<$Res> {
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as ConnId?,
     ));
+  }
+
+  /// Create a copy of SessionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $InstanceIdCopyWith<$Res>? get instanceId {
+    if (_self.instanceId == null) {
+      return null;
+    }
+
+    return $InstanceIdCopyWith<$Res>(_self.instanceId!, (value) {
+      return _then(_self.copyWith(instanceId: value));
+    });
+  }
+
+  /// Create a copy of SessionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ConnIdCopyWith<$Res>? get connId {
+    if (_self.connId == null) {
+      return null;
+    }
+
+    return $ConnIdCopyWith<$Res>(_self.connId!, (value) {
+      return _then(_self.copyWith(connId: value));
+    });
   }
 }
 
@@ -133,15 +315,15 @@ class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
       this.connId});
 
   @override
-  final int sessionId;
+  final SessionId sessionId;
   @override
-  final int? instanceId;
+  final InstanceId? instanceId;
   @override
   final String? instanceName;
   @override
   final DatabaseType? dbType;
   @override
-  final int? connId;
+  final ConnId? connId;
 
   /// Create a copy of SessionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -196,11 +378,18 @@ abstract mixin class _$SessionModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int sessionId,
-      int? instanceId,
+      {SessionId sessionId,
+      InstanceId? instanceId,
       String? instanceName,
       DatabaseType? dbType,
-      int? connId});
+      ConnId? connId});
+
+  @override
+  $SessionIdCopyWith<$Res> get sessionId;
+  @override
+  $InstanceIdCopyWith<$Res>? get instanceId;
+  @override
+  $ConnIdCopyWith<$Res>? get connId;
 }
 
 /// @nodoc
@@ -226,11 +415,11 @@ class __$SessionModelCopyWithImpl<$Res>
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as SessionId,
       instanceId: freezed == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as InstanceId?,
       instanceName: freezed == instanceName
           ? _self.instanceName
           : instanceName // ignore: cast_nullable_to_non_nullable
@@ -242,8 +431,46 @@ class __$SessionModelCopyWithImpl<$Res>
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as ConnId?,
     ));
+  }
+
+  /// Create a copy of SessionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $InstanceIdCopyWith<$Res>? get instanceId {
+    if (_self.instanceId == null) {
+      return null;
+    }
+
+    return $InstanceIdCopyWith<$Res>(_self.instanceId!, (value) {
+      return _then(_self.copyWith(instanceId: value));
+    });
+  }
+
+  /// Create a copy of SessionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ConnIdCopyWith<$Res>? get connId {
+    if (_self.connId == null) {
+      return null;
+    }
+
+    return $ConnIdCopyWith<$Res>(_self.connId!, (value) {
+      return _then(_self.copyWith(connId: value));
+    });
   }
 }
 
@@ -457,8 +684,8 @@ class __$SessionListModelCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
-  int get sessionId;
-  int get connId;
+  SessionId get sessionId;
+  ConnId? get connId;
   bool get canQuery;
   String get currentSchema;
   bool get isRightPageOpen;
@@ -515,11 +742,14 @@ abstract mixin class $SessionOpBarModelCopyWith<$Res> {
       _$SessionOpBarModelCopyWithImpl;
   @useResult
   $Res call(
-      {int sessionId,
-      int connId,
+      {SessionId sessionId,
+      ConnId? connId,
       bool canQuery,
       String currentSchema,
       bool isRightPageOpen});
+
+  $SessionIdCopyWith<$Res> get sessionId;
+  $ConnIdCopyWith<$Res>? get connId;
 }
 
 /// @nodoc
@@ -536,7 +766,7 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? sessionId = null,
-    Object? connId = null,
+    Object? connId = freezed,
     Object? canQuery = null,
     Object? currentSchema = null,
     Object? isRightPageOpen = null,
@@ -545,11 +775,11 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
-      connId: null == connId
+              as SessionId,
+      connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as ConnId?,
       canQuery: null == canQuery
           ? _self.canQuery
           : canQuery // ignore: cast_nullable_to_non_nullable
@@ -563,6 +793,30 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
           : isRightPageOpen // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
+  }
+
+  /// Create a copy of SessionOpBarModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionOpBarModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ConnIdCopyWith<$Res>? get connId {
+    if (_self.connId == null) {
+      return null;
+    }
+
+    return $ConnIdCopyWith<$Res>(_self.connId!, (value) {
+      return _then(_self.copyWith(connId: value));
+    });
   }
 }
 
@@ -579,9 +833,9 @@ class _SessionOpBarModel
       required this.isRightPageOpen});
 
   @override
-  final int sessionId;
+  final SessionId sessionId;
   @override
-  final int connId;
+  final ConnId? connId;
   @override
   final bool canQuery;
   @override
@@ -643,11 +897,16 @@ abstract mixin class _$SessionOpBarModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int sessionId,
-      int connId,
+      {SessionId sessionId,
+      ConnId? connId,
       bool canQuery,
       String currentSchema,
       bool isRightPageOpen});
+
+  @override
+  $SessionIdCopyWith<$Res> get sessionId;
+  @override
+  $ConnIdCopyWith<$Res>? get connId;
 }
 
 /// @nodoc
@@ -664,7 +923,7 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? sessionId = null,
-    Object? connId = null,
+    Object? connId = freezed,
     Object? canQuery = null,
     Object? currentSchema = null,
     Object? isRightPageOpen = null,
@@ -673,11 +932,11 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
-      connId: null == connId
+              as SessionId,
+      connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as ConnId?,
       canQuery: null == canQuery
           ? _self.canQuery
           : canQuery // ignore: cast_nullable_to_non_nullable
@@ -691,6 +950,30 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
           : isRightPageOpen // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
+  }
+
+  /// Create a copy of SessionOpBarModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionOpBarModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ConnIdCopyWith<$Res>? get connId {
+    if (_self.connId == null) {
+      return null;
+    }
+
+    return $ConnIdCopyWith<$Res>(_self.connId!, (value) {
+      return _then(_self.copyWith(connId: value));
+    });
   }
 }
 
@@ -1260,9 +1543,9 @@ class __$SessionSplitViewModelCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$SessionStatusModel implements DiagnosticableTreeMixin {
-  int get sessionId;
+  SessionId get sessionId;
   String get instanceName; // sql result
-  int? get resultId;
+  ResultId? get resultId;
   SQLExecuteState get state;
   Duration? get executeTime;
   BigInt? get affectedRows;
@@ -1325,13 +1608,16 @@ abstract mixin class $SessionStatusModelCopyWith<$Res> {
       _$SessionStatusModelCopyWithImpl;
   @useResult
   $Res call(
-      {int sessionId,
+      {SessionId sessionId,
       String instanceName,
-      int? resultId,
+      ResultId? resultId,
       SQLExecuteState state,
       Duration? executeTime,
       BigInt? affectedRows,
       String? query});
+
+  $SessionIdCopyWith<$Res> get sessionId;
+  $ResultIdCopyWith<$Res>? get resultId;
 }
 
 /// @nodoc
@@ -1359,7 +1645,7 @@ class _$SessionStatusModelCopyWithImpl<$Res>
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as SessionId,
       instanceName: null == instanceName
           ? _self.instanceName
           : instanceName // ignore: cast_nullable_to_non_nullable
@@ -1367,7 +1653,7 @@ class _$SessionStatusModelCopyWithImpl<$Res>
       resultId: freezed == resultId
           ? _self.resultId
           : resultId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as ResultId?,
       state: null == state
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -1386,6 +1672,30 @@ class _$SessionStatusModelCopyWithImpl<$Res>
               as String?,
     ));
   }
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ResultIdCopyWith<$Res>? get resultId {
+    if (_self.resultId == null) {
+      return null;
+    }
+
+    return $ResultIdCopyWith<$Res>(_self.resultId!, (value) {
+      return _then(_self.copyWith(resultId: value));
+    });
+  }
 }
 
 /// @nodoc
@@ -1403,12 +1713,12 @@ class _SessionStatusModel
       this.query});
 
   @override
-  final int sessionId;
+  final SessionId sessionId;
   @override
   final String instanceName;
 // sql result
   @override
-  final int? resultId;
+  final ResultId? resultId;
   @override
   final SQLExecuteState state;
   @override
@@ -1477,13 +1787,18 @@ abstract mixin class _$SessionStatusModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int sessionId,
+      {SessionId sessionId,
       String instanceName,
-      int? resultId,
+      ResultId? resultId,
       SQLExecuteState state,
       Duration? executeTime,
       BigInt? affectedRows,
       String? query});
+
+  @override
+  $SessionIdCopyWith<$Res> get sessionId;
+  @override
+  $ResultIdCopyWith<$Res>? get resultId;
 }
 
 /// @nodoc
@@ -1511,7 +1826,7 @@ class __$SessionStatusModelCopyWithImpl<$Res>
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as SessionId,
       instanceName: null == instanceName
           ? _self.instanceName
           : instanceName // ignore: cast_nullable_to_non_nullable
@@ -1519,7 +1834,7 @@ class __$SessionStatusModelCopyWithImpl<$Res>
       resultId: freezed == resultId
           ? _self.resultId
           : resultId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as ResultId?,
       state: null == state
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -1537,6 +1852,30 @@ class __$SessionStatusModelCopyWithImpl<$Res>
           : query // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionStatusModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ResultIdCopyWith<$Res>? get resultId {
+    if (_self.resultId == null) {
+      return null;
+    }
+
+    return $ResultIdCopyWith<$Res>(_self.resultId!, (value) {
+      return _then(_self.copyWith(resultId: value));
+    });
   }
 }
 

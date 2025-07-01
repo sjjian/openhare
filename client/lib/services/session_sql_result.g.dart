@@ -6,7 +6,7 @@ part of 'session_sql_result.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sQLResultServicesHash() => r'7949ceb6ca2866206e5ac3e173c6d7e54575d1db';
+String _$sQLResultServicesHash() => r'9102bcadb5a993bd0fdb64864ee3cedab64ae584';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,12 +30,10 @@ class _SystemHash {
 }
 
 abstract class _$SQLResultServices extends BuildlessNotifier<SQLResultModel> {
-  late final int sessionId;
-  late final int resultId;
+  late final ResultId resultId;
 
   SQLResultModel build(
-    int sessionId,
-    int resultId,
+    ResultId resultId,
   );
 }
 
@@ -50,11 +48,9 @@ class SQLResultServicesFamily extends Family<SQLResultModel> {
 
   /// See also [SQLResultServices].
   SQLResultServicesProvider call(
-    int sessionId,
-    int resultId,
+    ResultId resultId,
   ) {
     return SQLResultServicesProvider(
-      sessionId,
       resultId,
     );
   }
@@ -64,7 +60,6 @@ class SQLResultServicesFamily extends Family<SQLResultModel> {
     covariant SQLResultServicesProvider provider,
   ) {
     return call(
-      provider.sessionId,
       provider.resultId,
     );
   }
@@ -89,12 +84,9 @@ class SQLResultServicesProvider
     extends NotifierProviderImpl<SQLResultServices, SQLResultModel> {
   /// See also [SQLResultServices].
   SQLResultServicesProvider(
-    int sessionId,
-    int resultId,
+    ResultId resultId,
   ) : this._internal(
-          () => SQLResultServices()
-            ..sessionId = sessionId
-            ..resultId = resultId,
+          () => SQLResultServices()..resultId = resultId,
           from: sQLResultServicesProvider,
           name: r'sQLResultServicesProvider',
           debugGetCreateSourceHash:
@@ -104,7 +96,6 @@ class SQLResultServicesProvider
           dependencies: SQLResultServicesFamily._dependencies,
           allTransitiveDependencies:
               SQLResultServicesFamily._allTransitiveDependencies,
-          sessionId: sessionId,
           resultId: resultId,
         );
 
@@ -115,19 +106,16 @@ class SQLResultServicesProvider
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.sessionId,
     required this.resultId,
   }) : super.internal();
 
-  final int sessionId;
-  final int resultId;
+  final ResultId resultId;
 
   @override
   SQLResultModel runNotifierBuild(
     covariant SQLResultServices notifier,
   ) {
     return notifier.build(
-      sessionId,
       resultId,
     );
   }
@@ -137,15 +125,12 @@ class SQLResultServicesProvider
     return ProviderOverride(
       origin: this,
       override: SQLResultServicesProvider._internal(
-        () => create()
-          ..sessionId = sessionId
-          ..resultId = resultId,
+        () => create()..resultId = resultId,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        sessionId: sessionId,
         resultId: resultId,
       ),
     );
@@ -158,15 +143,12 @@ class SQLResultServicesProvider
 
   @override
   bool operator ==(Object other) {
-    return other is SQLResultServicesProvider &&
-        other.sessionId == sessionId &&
-        other.resultId == resultId;
+    return other is SQLResultServicesProvider && other.resultId == resultId;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, sessionId.hashCode);
     hash = _SystemHash.combine(hash, resultId.hashCode);
 
     return _SystemHash.finish(hash);
@@ -176,11 +158,8 @@ class SQLResultServicesProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin SQLResultServicesRef on NotifierProviderRef<SQLResultModel> {
-  /// The parameter `sessionId` of this provider.
-  int get sessionId;
-
   /// The parameter `resultId` of this provider.
-  int get resultId;
+  ResultId get resultId;
 }
 
 class _SQLResultServicesProviderElement
@@ -189,20 +168,18 @@ class _SQLResultServicesProviderElement
   _SQLResultServicesProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SQLResultServicesProvider).sessionId;
-  @override
-  int get resultId => (origin as SQLResultServicesProvider).resultId;
+  ResultId get resultId => (origin as SQLResultServicesProvider).resultId;
 }
 
 String _$sQLResultsServicesHash() =>
-    r'f36dc817aaf3329831bc607aa30c6b49c326d514';
+    r'96f485c2c5d3a28fc9fde8bd2e4f714306333909';
 
 abstract class _$SQLResultsServices
     extends BuildlessNotifier<SQLResultListModel> {
-  late final int sessionId;
+  late final SessionId sessionId;
 
   SQLResultListModel build(
-    int sessionId,
+    SessionId sessionId,
   );
 }
 
@@ -217,7 +194,7 @@ class SQLResultsServicesFamily extends Family<SQLResultListModel> {
 
   /// See also [SQLResultsServices].
   SQLResultsServicesProvider call(
-    int sessionId,
+    SessionId sessionId,
   ) {
     return SQLResultsServicesProvider(
       sessionId,
@@ -253,7 +230,7 @@ class SQLResultsServicesProvider
     extends NotifierProviderImpl<SQLResultsServices, SQLResultListModel> {
   /// See also [SQLResultsServices].
   SQLResultsServicesProvider(
-    int sessionId,
+    SessionId sessionId,
   ) : this._internal(
           () => SQLResultsServices()..sessionId = sessionId,
           from: sQLResultsServicesProvider,
@@ -278,7 +255,7 @@ class SQLResultsServicesProvider
     required this.sessionId,
   }) : super.internal();
 
-  final int sessionId;
+  final SessionId sessionId;
 
   @override
   SQLResultListModel runNotifierBuild(
@@ -329,7 +306,7 @@ class SQLResultsServicesProvider
 // ignore: unused_element
 mixin SQLResultsServicesRef on NotifierProviderRef<SQLResultListModel> {
   /// The parameter `sessionId` of this provider.
-  int get sessionId;
+  SessionId get sessionId;
 }
 
 class _SQLResultsServicesProviderElement
@@ -338,7 +315,7 @@ class _SQLResultsServicesProviderElement
   _SQLResultsServicesProviderElement(super.provider);
 
   @override
-  int get sessionId => (origin as SQLResultsServicesProvider).sessionId;
+  SessionId get sessionId => (origin as SQLResultsServicesProvider).sessionId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

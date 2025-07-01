@@ -94,7 +94,7 @@ class SessionTabs extends ConsumerWidget {
                           onTap: () {
                             ref
                                 .read(sessionConnServicesProvider(
-                                        model.sessions[i].connId??0)
+                                        model.sessions[i].connId!)
                                     .notifier)
                                 .close();
                           },

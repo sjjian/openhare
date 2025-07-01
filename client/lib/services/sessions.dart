@@ -1,7 +1,8 @@
+import 'package:client/models/instances.dart';
+import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions.dart';
-import 'package:client/repositories/instances.dart';
-import 'package:client/repositories/repo.dart';
+import 'package:client/services/instances/instances.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sessions.g.dart';
@@ -14,7 +15,7 @@ class SessionsServices extends _$SessionsServices {
     return sessions;
   }
 
-  SessionModel? getSession(int sessionId){
+  SessionModel? getSession(SessionId sessionId){
     return ref.read(sessionRepoProvider).getSession(sessionId);
   }
 
@@ -36,20 +37,15 @@ class SessionsServices extends _$SessionsServices {
       selectedSession = state.selectedSession!;
     }
 
-    // todo: riverpod 改造
-    ObjectBox ob = ref.watch(objectboxProvider);
-    // 记录使用的数据源
-    ob.addActiveInstance(instance);
-    if (schema != null) {
-      ob.addInstanceActiveSchema(instance, schema);
-    }
+    ref.read(instancesServicesProvider.notifier).addActiveInstance(instance, schema: schema);
+    
     await ref
         .read(sessionRepoProvider)
-        .updateSession(selectedSession, instance, schema ?? '');
+        .updateSession(selectedSession.sessionId, instance, schema ?? '');
     ref.invalidateSelf();
   }
 
-  void setConnId(int sessionId, int connid) {
+  void setConnId(SessionId sessionId, ConnId connid) {
     ref.read(sessionRepoProvider).setConnId(sessionId, connid);
     ref.invalidateSelf();
   }
@@ -60,7 +56,7 @@ class SessionsServices extends _$SessionsServices {
   }
 
   Future<void> deleteSessionByIndex(int index) async {
-    await ref.read(sessionRepoProvider).deleteSession(state.sessions[index]);
+    await ref.read(sessionRepoProvider).deleteSession(state.sessions[index].sessionId);
     ref.invalidateSelf();
   }
 }
@@ -69,18 +65,15 @@ class SessionsServices extends _$SessionsServices {
 class SelectedSessionIdServices extends _$SelectedSessionIdServices {
   @override
   SessionModel? build() {
-    int sessionId = ref.watch(sessionsServicesProvider.select((s) {
-      print("notify sessionTabControllerProvider");
+    SessionId? sessionId = ref.watch(sessionsServicesProvider.select((s) {
       if (s.selectedSession == null || s.selectedSession!.instanceId == null) {
-        return 0;
+        return null;
       }
       return s.selectedSession!.sessionId;
     }));
-    print("SelectedSessionIdController1 build: $sessionId");
-    if (sessionId == 0) {
+    if (sessionId == null) {
       return null;
     }
-    print("SelectedSessionIdController2 build: $sessionId");
     return ref.read(sessionRepoProvider).getSession(sessionId);
   }
 }

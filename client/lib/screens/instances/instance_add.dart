@@ -1,15 +1,35 @@
-import 'package:client/providers/instances.dart';
+import 'package:client/services/instances/instances.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:client/repositories/instances/instances.dart';
+import 'package:sql_parser/parser.dart';
+import 'package:client/utils/sql_highlight.dart';
 
-class AddInstancePage extends StatelessWidget {
+class AddInstancePage extends StatefulWidget {
   const AddInstancePage({Key? key}) : super(key: key);
+
+  @override
+  State<AddInstancePage> createState() => _AddInstancePageState();
+}
+
+class _AddInstancePageState extends State<AddInstancePage> {
+  @override
+  void initState() {
+    super.initState();
+    addInstanceController.addListener(() => mounted ? setState(() {}) : null);
+  }
+
+  @override
+  void dispose() {
+    addInstanceController.removeListener(() {});
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,30 +41,44 @@ class AddInstancePage extends StatelessWidget {
               icon: const Icon(Icons.arrow_back))
         ],
       ),
-      bottomBar: Consumer<AddInstanceProvider>(
-          builder: (context, addInstanceProvider, _) {
-        return AddInstanceBottomBar(
-          isDatabasePingDoing: addInstanceProvider.isDatabasePingDoing,
-          isDatabaseConnectable: addInstanceProvider.isDatabaseConnectable,
-          databaseConnectError: addInstanceProvider.databaseConnectError,
-        );
-      }),
+      bottomBar: AddInstanceBottomBar(
+        isDatabasePingDoing: addInstanceController.isDatabasePingDoing,
+        isDatabaseConnectable: addInstanceController.isDatabaseConnectable,
+        databaseConnectError: addInstanceController.databaseConnectError,
+      ),
       child: const AddInstance(),
     );
   }
 }
 
-class AddInstance extends StatelessWidget {
+class AddInstance extends ConsumerStatefulWidget {
   const AddInstance({Key? key}) : super(key: key);
 
-  Color? selectedColor(AddInstanceProvider addInstanceProvider) {
-    if (addInstanceProvider.isDatabasePingDoing) {
+  @override
+  ConsumerState<AddInstance> createState() => _AddInstanceState();
+}
+
+class _AddInstanceState extends ConsumerState<AddInstance> {
+  @override
+  void initState() {
+    super.initState();
+    addInstanceController.addListener(() => mounted ? setState(() {}) : null);
+  }
+
+  @override
+  void dispose() {
+    addInstanceController.removeListener(() {});
+    super.dispose();
+  }
+
+  Color? selectedColor(AddInstanceController addInstanceController) {
+    if (addInstanceController.isDatabasePingDoing) {
       return null;
     }
-    if (addInstanceProvider.isDatabaseConnectable == null) {
+    if (addInstanceController.isDatabaseConnectable == null) {
       return null;
     }
-    if (addInstanceProvider.isDatabaseConnectable == true) {
+    if (addInstanceController.isDatabaseConnectable == true) {
       return Colors.green;
     } else {
       return Colors.red;
@@ -58,96 +92,106 @@ class AddInstance extends StatelessWidget {
         Expanded(
             child: Container(
           padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
-          child: Consumer<AddInstanceProvider>(
-            builder: (context, addInstanceProvider, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                    decoration: BoxDecoration(
-                        border:
-                            Border(bottom: Divider.createBorderSide(context))),
-                    child: Row(
-                      children: [
-                        Text(
-                          "添加数据源",
-                          style: Theme.of(context).textTheme.titleLarge,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Spacer(),
-                        TextButton(
-                            onPressed: addInstanceProvider.isDatabasePingDoing
-                                ? null
-                                : () {
-                                    addInstanceProvider.databasePing();
-                                    // showAddInstanceDialog(context);
-                                  },
-                            child: const Text("测试连接")),
-                        TextButton(
-                            onPressed: () async {
-                              if (addInstanceProvider.validate()) {
-                                await addInstanceProvider.onSubmit(context);
-                                addInstanceProvider.clear();
-                              }
-                            },
-                            child: const Text("提交并继续添加")),
-                        TextButton(
-                            onPressed: () async {
-                              if (addInstanceProvider.validate()) {
-                                await addInstanceProvider.onSubmit(context);
-                                addInstanceProvider.clear();
-                                GoRouter.of(context).go('/instances/list');
-                              }
-                            },
-                            child: const Text("提交")),
-                      ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                decoration: BoxDecoration(
+                    border: Border(bottom: Divider.createBorderSide(context))),
+                child: Row(
+                  children: [
+                    Text(
+                      "添加数据源",
+                      style: Theme.of(context).textTheme.titleLarge,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Expanded(
-                      child: SizedBox(
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            DatabaseTypeCardList(
-                              connectionMetas: connectionMetas,
-                              selectedDatabaseType:
-                                  addInstanceProvider.selectedDatabaseType,
-                              onDatabaseTypeChange: (type) {
-                                addInstanceProvider.onDatabaseTypeChange(type);
+                    const Spacer(),
+                    TextButton(
+                        onPressed: addInstanceController.isDatabasePingDoing
+                            ? null
+                            : () {
+                                addInstanceController.databasePing();
+                                // showAddInstanceDialog(context);
                               },
-                              selectedColor: selectedColor(addInstanceProvider),
-                            ),
-                            const SizedBox(height: 20),
-                            Expanded(
-                              child: AddInstanceForm(
-                                infos: addInstanceProvider.dbInfos,
-                                selectedGroup:
-                                    addInstanceProvider.selectedGroup,
-                                onValid: (info, isValid) {
-                                  addInstanceProvider.updateValidState(
-                                      info, isValid);
-                                },
-                                onGroupChange: (group) {
-                                  addInstanceProvider.onGroupChange(group);
-                                },
-                                codeController: addInstanceProvider.code,
-                              ),
-                            )
-                          ]),
-                    ),
-                  )),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                    child: const Row(
-                      children: [],
-                    ),
-                  )
-                ],
-              );
-            },
+                        child: const Text("测试连接")),
+                    TextButton(
+                        onPressed: () async {
+                          if (addInstanceController.validate()) {
+                            await ref
+                                .read(instancesServicesProvider.notifier)
+                                .addInstance(InstanceStorage.one(
+                                        //todo: fix
+                                        dbType: addInstanceController
+                                            .selectedDatabaseType,
+                                        connectValue: addInstanceController
+                                            .getConnectValue())
+                                    .toModel());
+                            addInstanceController.clear();
+                          }
+                        },
+                        child: const Text("提交并继续添加")),
+                    TextButton(
+                        onPressed: () async {
+                          if (addInstanceController.validate()) {
+                            await ref
+                                .read(instancesServicesProvider.notifier)
+                                .addInstance(InstanceStorage.one(
+                                        //todo: fix
+                                        dbType: addInstanceController
+                                            .selectedDatabaseType,
+                                        connectValue: addInstanceController
+                                            .getConnectValue())
+                                    .toModel());
+                            addInstanceController.clear();
+                            GoRouter.of(context).go('/instances/list');
+                          }
+                        },
+                        child: const Text("提交")),
+                  ],
+                ),
+              ),
+              Expanded(
+                  child: SizedBox(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        DatabaseTypeCardList(
+                          connectionMetas: connectionMetas,
+                          selectedDatabaseType:
+                              addInstanceController.selectedDatabaseType,
+                          onDatabaseTypeChange: (type) {
+                            addInstanceController.onDatabaseTypeChange(type);
+                          },
+                          selectedColor: selectedColor(addInstanceController),
+                        ),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: AddInstanceForm(
+                            infos: addInstanceController.dbInfos,
+                            selectedGroup: addInstanceController.selectedGroup,
+                            onValid: (info, isValid) {
+                              addInstanceController.updateValidState(
+                                  info, isValid);
+                            },
+                            onGroupChange: (group) {
+                              addInstanceController.onGroupChange(group);
+                            },
+                            codeController: addInstanceController.code,
+                          ),
+                        )
+                      ]),
+                ),
+              )),
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: const Row(
+                  children: [],
+                ),
+              )
+            ],
           ),
         )),
       ],
@@ -651,25 +695,23 @@ class AddInstanceBottomBar extends StatelessWidget {
 
     if (isDatabasePingDoing) {
       msg = const Text("连接测试中");
-      status = const CircularProgressIndicator(
-        strokeWidth: 2
-      );
+      status = const CircularProgressIndicator(strokeWidth: 2);
     } else if (isDatabaseConnectable == null) {
       msg = const Text("");
       status = const Spacer();
     } else if (isDatabaseConnectable == true) {
       msg = const Text("连接成功");
-      status = const Icon(Icons.check_circle,size: 20, color: Colors.green);
+      status = const Icon(Icons.check_circle, size: 20, color: Colors.green);
     } else {
       msg = Text(databaseConnectError ?? "", overflow: TextOverflow.ellipsis);
-      status = const Icon(Icons.error,size: 20, color: Colors.red);
+      status = const Icon(Icons.error, size: 20, color: Colors.red);
     }
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(10,0,10,0),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: SizedBox(
             height: 20,
             width: 20,
@@ -681,3 +723,230 @@ class AddInstanceBottomBar extends StatelessWidget {
     );
   }
 }
+
+class FormInfo {
+  DatabaseType dbType;
+  final SettingMeta meta;
+  TextEditingController ctrl;
+  GlobalKey<FormFieldState> state = GlobalKey<FormFieldState>();
+  bool isValid = true;
+
+  FormInfo(this.dbType, this.meta)
+      : ctrl = TextEditingController(text: meta.defaultValue);
+}
+
+class AddInstanceController extends ChangeNotifier {
+  final Map<DatabaseType, Map<String, FormInfo>> infos = {};
+
+  final CodeLineEditingController code = CodeLineEditingController(
+      spanBuilder: ({required codeLines, required context, required style}) {
+    return TextSpan(
+        children: Lexer(codeLines.asString(TextLineBreak.lf))
+            .tokens()
+            .map<TextSpan>((tok) => TextSpan(
+                text: tok.content,
+                style: style.merge(getStyle(tok.id) ?? style)))
+            .toList());
+  });
+
+  DatabaseType selectedDatabaseType = DatabaseType.mysql;
+  String? _selectedGroup;
+
+  bool? isDatabaseConnectable;
+  bool isDatabasePingDoing = false;
+  String? databaseConnectError;
+
+  AddInstanceController() {
+    for (var connMeta in connectionMetas) {
+      final dbInfos = infos.putIfAbsent(connMeta.type, () => {});
+      for (var meta in connMeta.connMeta) {
+        dbInfos[meta.name] = FormInfo(connMeta.type, meta);
+      }
+    }
+    code.text = connectionMetaMap[selectedDatabaseType]!.initQueryText();
+  }
+
+  void onDatabaseTypeChange(DatabaseType type) {
+    final isPortChanged =
+        (infos[selectedDatabaseType]![settingMetaNamePort]!.ctrl.text !=
+            defaultPort);
+    final name = infos[selectedDatabaseType]![settingMetaNameName]!.ctrl.text;
+    final desc = infos[selectedDatabaseType]![settingMetaNameDesc]!.ctrl.text;
+    final addr = infos[selectedDatabaseType]![settingMetaNameAddr]!.ctrl.text;
+    final user = infos[selectedDatabaseType]![settingMetaNameUser]!.ctrl.text;
+    final password =
+        infos[selectedDatabaseType]![settingMetaNamePassword]!.ctrl.text;
+
+    selectedDatabaseType = type;
+    _selectedGroup = null;
+
+    infos[type]![settingMetaNameName]!.ctrl.text = name;
+    infos[type]![settingMetaNameDesc]!.ctrl.text = desc;
+    infos[type]![settingMetaNameAddr]!.ctrl.text = addr;
+    infos[type]![settingMetaNameUser]!.ctrl.text = user;
+    infos[type]![settingMetaNamePassword]!.ctrl.text = password;
+    // 数据库切换则port 默认值要切换，除非用户自己编辑了特殊端口
+    if (!isPortChanged) {
+      port = defaultPort;
+    }
+    code.text = connectionMetaMap[selectedDatabaseType]!.initQueryText();
+    notifyListeners();
+  }
+
+  void clear() {
+    for (final dbInfos in infos.values) {
+      for (final info in dbInfos.values) {
+        info.ctrl.text = info.meta.defaultValue ?? "";
+      }
+    }
+  }
+
+  Map<String, FormInfo> get dbInfos {
+    return infos[selectedDatabaseType]!;
+  }
+
+  String get defaultPort {
+    return infos[selectedDatabaseType]![settingMetaNamePort]!
+            .meta
+            .defaultValue ??
+        "";
+  }
+
+  set port(String port) {
+    infos[selectedDatabaseType]![settingMetaNamePort]!.ctrl.text = port;
+  }
+
+  bool isGroupValid(String group) {
+    for (final info in infos[selectedDatabaseType]!.values) {
+      if (info.dbType == selectedDatabaseType && info.meta.group == group) {
+        if (!info.isValid) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  bool validate() {
+    var isValid = true;
+    for (final info in infos[selectedDatabaseType]!.values) {
+      if (info.dbType == selectedDatabaseType) {
+        if (!info.state.currentState!.validate()) {
+          isValid = false;
+        }
+      }
+    }
+    return isValid;
+  }
+
+  void updateValidState(FormInfo info, bool isValid) {
+    if (info.isValid == isValid) {
+      return;
+    }
+    info.isValid = isValid;
+    notifyListeners();
+  }
+
+  List<String> get customSettingGroup {
+    final connMeta = connectionMetaMap[selectedDatabaseType]?.connMeta;
+    if (connMeta == null) {
+      return [];
+    }
+    return connMeta
+        .groupFoldBy<String, List<String>>(
+          (meta) => meta.group,
+          (previous, meta) => (previous ?? [])..add(meta.group),
+        )
+        .keys
+        .whereNot((e) => e == settingMetaGroupBase)
+        .toList();
+  }
+
+  String? get selectedGroup {
+    return _selectedGroup;
+  }
+
+  void onGroupChange(String group) {
+    _selectedGroup = group;
+    notifyListeners();
+  }
+
+  List<SettingMeta> getSettingMeta(String group) {
+    final connMeta = connectionMetaMap[selectedDatabaseType]?.connMeta;
+    if (connMeta == null) {
+      return [];
+    }
+    return connMeta
+        .groupListsBy((meta) => meta.group)
+        .entries
+        .where((entry) => entry.key == group)
+        .expand((entry) => entry.value)
+        .toList();
+  }
+
+  ConnectValue getConnectValue() {
+    String name = "";
+    String addr = "";
+    int? port = 0;
+    String user = "";
+    String password = "";
+    String desc = "";
+    Map<String, String> custom = {};
+
+    for (final info in infos[selectedDatabaseType]!.values) {
+      switch (info.meta) {
+        case NameMeta():
+          name = info.ctrl.text;
+        case AddressMeta():
+          addr = info.ctrl.text;
+        case PortMeta():
+          port = int.tryParse(info.ctrl.text);
+        case UserMeta():
+          user = info.ctrl.text;
+        case PasswordMeta():
+          password = info.ctrl.text;
+        case DescMeta():
+          desc = info.ctrl.text;
+        case CustomMeta():
+          custom[(info.meta as CustomMeta).name] = info.ctrl.text;
+      }
+    }
+    List<String> querys = Splitter(code.text.trim(), ";")
+        .split()
+        .map((e) => e.content.trim())
+        .whereNot((e) => e.trim() == "")
+        .toList();
+    return ConnectValue(
+      name: name,
+      host: addr,
+      port: port,
+      user: user,
+      password: password,
+      desc: desc,
+      custom: custom,
+      initQuerys: querys,
+    );
+  }
+
+  Future<void> databasePing() async {
+    final connectValue = getConnectValue();
+    BaseConnection? conn;
+    try {
+      isDatabasePingDoing = true;
+      notifyListeners();
+      conn = await ConnectionFactory.open(
+          type: selectedDatabaseType, meta: connectValue);
+      isDatabaseConnectable = true;
+      databaseConnectError = null;
+      conn.close();
+    } catch (e) {
+      isDatabaseConnectable = false;
+      databaseConnectError = e.toString();
+    } finally {
+      isDatabasePingDoing = false;
+      notifyListeners();
+    }
+  }
+}
+
+AddInstanceController addInstanceController = AddInstanceController();

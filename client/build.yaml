@@ -10,5 +10,5 @@ targets:
           - "lib/screens/**.dart"
           - "lib/models/sessions.dart"
           - "lib/models/session_sql_result.dart"
-          - "lib/repositories/sessions.dart"
+          - "lib/repositories/**.dart"
           - "lib/core/**.dart"
