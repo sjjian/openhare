@@ -214,8 +214,10 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                   pageSize: model.pageSize,
                   pageNumber: model.currentPage,
                   onChange: (pageNumber) {
-                    ref.read(instancesNotifierProvider.notifier).changePage("",
-                        pageNumber: pageNumber, pageSize: model.pageSize);
+                    ref.read(instancesNotifierProvider.notifier).changePage(
+                        searchTextController.text,
+                        pageNumber: pageNumber,
+                        pageSize: model.pageSize);
                   }),
               const Spacer(),
               Container(

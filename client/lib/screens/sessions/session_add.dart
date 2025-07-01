@@ -6,8 +6,6 @@ import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-TextEditingController searchTextController = TextEditingController(text: "");
-
 class AddSession extends HookConsumerWidget {
   const AddSession({Key? key}) : super(key: key);
 
@@ -106,7 +104,6 @@ class AddSession extends HookConsumerWidget {
                                   child: SearchBar(
                                     controller: searchTextController,
                                     onChanged: (value) {
-                                      print("=============$value");
                                       ref
                                           .read(instancesNotifierProvider
                                               .notifier)
@@ -189,7 +186,7 @@ class AddSession extends HookConsumerWidget {
                     pageNumber: model.currentPage,
                     onChange: (pageNumber) {
                       ref.read(instancesNotifierProvider.notifier).changePage(
-                          "",
+                          searchTextController.text,
                           pageNumber: pageNumber,
                           pageSize: model.pageSize);
                     }),
