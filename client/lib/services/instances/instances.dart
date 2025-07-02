@@ -31,21 +31,28 @@ class InstancesServices extends _$InstancesServices {
     return repo.isInstanceExist(name);
   }
 
-  PaginationInstanceListModel instances(String key, {int? pageNumber, int? pageSize}) {
+  PaginationInstanceListModel instances(String key,
+      {int? pageNumber, int? pageSize}) {
     final repo = ref.read(instanceRepoProvider);
-    return repo.search(key,
-        pageNumber: pageNumber, pageSize: pageSize);
-  }
+    final instances =
+        repo.search(key, pageNumber: pageNumber, pageSize: pageSize);
+    final count = repo.count(key);
 
-  int instanceCount(String key) {
-    final repo = ref.read(instanceRepoProvider);
-    return repo.count(key);
+    return PaginationInstanceListModel(
+      count: count,
+      pageSize: pageSize ?? 10,
+      currentPage: pageNumber ?? 1,
+      instances: instances,
+      key: key,
+    );
   }
 
   void addActiveInstance(InstanceModel instance, {String? schema}) {
     ref.read(instanceRepoProvider).addActiveInstance(instance.id);
     if (schema != null) {
-      ref.read(instanceRepoProvider).addInstanceActiveSchema(instance.id, schema);
+      ref
+          .read(instanceRepoProvider)
+          .addInstanceActiveSchema(instance.id, schema);
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:client/models/instances.dart';
+import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
@@ -19,14 +20,17 @@ class InstancesNotifier extends _$InstancesNotifier {
         .instances("", pageNumber: 1, pageSize: 10);
   }
 
-  void changePage(String key, {int? pageNumber, int? pageSize}) {
+  void changePage(String key, {int? pageNumber = 1, int? pageSize = 10}) {
     state = ref
         .read(instancesServicesProvider.notifier)
         .instances(key, pageNumber: pageNumber, pageSize: pageSize);
   }
-}
 
-TextEditingController searchTextController = TextEditingController(text: "");
+  void refresh() {
+    state = ref.read(instancesServicesProvider.notifier).instances(state.key,
+        pageNumber: state.currentPage, pageSize: state.pageSize);
+  }
+}
 
 class InstancesPage extends StatelessWidget {
   const InstancesPage({Key? key}) : super(key: key);
@@ -48,70 +52,47 @@ class InstanceTable extends ConsumerStatefulWidget {
 }
 
 class _InstanceTableState extends ConsumerState<InstanceTable> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // instanceTableController.removeListener(() {});
-    super.dispose();
-  }
-
   DataRow buildDataRow(InstanceModel instance) {
-    return DataRow(
-        // selected: instanceTableController.selectedInstances.contains(instance),
-        // onSelectChanged: (state) {
-        //   setState(() {
-        //     if (state == null || !state) {
-        //       instanceTableController.selectedInstances.remove(instance);
-        //     } else {
-        //       instanceTableController.selectedInstances.add(instance);
-        //     }
-        //   });
-        // },
-        cells: [
-          DataCell(Row(
-            children: [
-              Image.asset(connectionMetaMap[instance.dbType]!.logoAssertPath),
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Text(instance.connectValue.name),
-              )
-            ],
-          )),
-          DataCell(Text(instance.connectValue.desc)),
-          DataCell(Text(instance.connectValue.host)),
-          DataCell(Text("${instance.connectValue.port}")),
-          DataCell(Text(instance.connectValue.user)),
-          DataCell(Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  // todo
-                  // context
-                  //     .read<UpdateInstanceProvider>()
-                  //     .tryUpdateInstance(instance);
-                  // GoRouter.of(context).go('/instances/update');
-                },
-                icon: const Icon(Icons.edit),
-              ),
-              IconButton(
-                onPressed: () {
-                  ref
-                      .read(instancesServicesProvider.notifier)
-                      .deleteInstance(instance.id);
-                },
-                icon: const Icon(Icons.delete),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.more_vert_outlined),
-              )
-            ],
-          ))
-        ]);
+    return DataRow(cells: [
+      DataCell(Row(
+        children: [
+          Image.asset(connectionMetaMap[instance.dbType]!.logoAssertPath),
+          Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: Text(instance.connectValue.name),
+          )
+        ],
+      )),
+      DataCell(Text(instance.connectValue.desc)),
+      DataCell(Text(instance.connectValue.host)),
+      DataCell(Text("${instance.connectValue.port}")),
+      DataCell(Text(instance.connectValue.user)),
+      DataCell(Row(
+        children: [
+          IconButton(
+            onPressed: () {
+              updateInstanceController.tryUpdateInstance(instance);
+              GoRouter.of(context).go('/instances/update');
+            },
+            icon: const Icon(Icons.edit),
+          ),
+          IconButton(
+            onPressed: () async {
+              await ref
+                  .read(instancesServicesProvider.notifier)
+                  .deleteInstance(instance.id);
+
+              ref.read(instancesNotifierProvider.notifier).refresh();
+            },
+            icon: const Icon(Icons.delete),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.more_vert_outlined),
+          )
+        ],
+      ))
+    ]);
   }
 
   @override
@@ -126,6 +107,8 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
     ];
 
     final model = ref.watch(instancesNotifierProvider);
+
+    final searchTextController = TextEditingController(text: model.key);
 
     return Row(
       children: [
@@ -186,27 +169,15 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: DataTable(
-                      checkboxHorizontalMargin: 0,
-                      showBottomBorder: true,
-                      columns: column,
-                      rows: model.instances.map((instance) {
-                        return buildDataRow(instance);
-                      }).toList(),
-                      sortAscending: false,
-                      showCheckboxColumn: true,
-                      onSelectAll: (state) async {
-                        // setState(() {
-                        //   if (state == null || !state) {
-                        //     instanceTableController.selectedInstances.clear();
-                        //   }
-                        // });
-                        // if (state != null && state) {
-                        //   setState(() {
-                        //     instanceTableController.selectedInstances
-                        //         .addAll(model.instances);
-                        //   });
-                        // }
-                      }),
+                    checkboxHorizontalMargin: 0,
+                    showBottomBorder: true,
+                    columns: column,
+                    rows: model.instances.map((instance) {
+                      return buildDataRow(instance);
+                    }).toList(),
+                    sortAscending: false,
+                    showCheckboxColumn: true,
+                  ),
                 ),
               ),
               TablePaginatedBar(
@@ -233,36 +204,3 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
     );
   }
 }
-
-// class InstanceTableController extends ChangeNotifier
-//     implements TablePageController {
-//   Set<InstanceModel> selectedInstances = {};
-//   TextEditingController searchTextController = TextEditingController(text: "");
-//   int currentPage = 1;
-//   int _count = 0;
-
-//   InstanceTableController();
-
-//   @override
-//   void onChange(int pageNumber) {
-//     currentPage = pageNumber;
-//     notifyListeners();
-//   }
-
-//   void onSearchChange() {
-//     notifyListeners();
-//   }
-
-//   void setCount(int count) => _count = count;
-
-//   @override
-//   int get count => _count;
-
-//   @override
-//   int get pageSize => 10;
-
-//   @override
-//   int get pageNumber => currentPage;
-// }
-
-// InstanceTableController instanceTableController = InstanceTableController();

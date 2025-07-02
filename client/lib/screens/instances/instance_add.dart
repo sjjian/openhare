@@ -1,4 +1,7 @@
+import 'package:client/models/instances.dart';
+import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/utils/active_set.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -112,7 +115,6 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                             ? null
                             : () {
                                 addInstanceController.databasePing();
-                                // showAddInstanceDialog(context);
                               },
                         child: const Text("测试连接")),
                     TextButton(
@@ -120,14 +122,14 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                           if (addInstanceController.validate()) {
                             await ref
                                 .read(instancesServicesProvider.notifier)
-                                .addInstance(InstanceStorage.one(
-                                        //todo: fix
-                                        dbType: addInstanceController
-                                            .selectedDatabaseType,
-                                        connectValue: addInstanceController
-                                            .getConnectValue())
-                                    .toModel());
+                                .addInstance(
+                                    addInstanceController.getInstanceModel());
+                            
                             addInstanceController.clear();
+
+                            ref
+                                .read(instancesNotifierProvider.notifier)
+                                .changePage("");
                           }
                         },
                         child: const Text("提交并继续添加")),
@@ -136,14 +138,15 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                           if (addInstanceController.validate()) {
                             await ref
                                 .read(instancesServicesProvider.notifier)
-                                .addInstance(InstanceStorage.one(
-                                        //todo: fix
-                                        dbType: addInstanceController
-                                            .selectedDatabaseType,
-                                        connectValue: addInstanceController
-                                            .getConnectValue())
-                                    .toModel());
+                                .addInstance(
+                                    addInstanceController.getInstanceModel());
+
                             addInstanceController.clear();
+
+                            ref
+                                .read(instancesNotifierProvider.notifier)
+                                .changePage("");
+                            
                             GoRouter.of(context).go('/instances/list');
                           }
                         },
@@ -946,6 +949,25 @@ class AddInstanceController extends ChangeNotifier {
       isDatabasePingDoing = false;
       notifyListeners();
     }
+  }
+
+  InstanceModel getInstanceModel() {
+    final connectValue = getConnectValue();
+    return InstanceModel(
+      id: const InstanceId(value: 0),
+      dbType: selectedDatabaseType,
+      name: connectValue.name,
+      host: connectValue.host,
+      port: connectValue.port,
+      user: connectValue.user,
+      password: connectValue.password,
+      desc: connectValue.desc,
+      custom: connectValue.custom,
+      initQuerys: connectValue.initQuerys,
+      activeSchemas: [],
+      createdAt: DateTime.now(),
+      latestOpenAt: DateTime.now(),
+    );
   }
 }
 

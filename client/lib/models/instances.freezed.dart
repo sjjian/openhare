@@ -632,6 +632,7 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
   int get currentPage;
   int get pageSize;
   int get count;
+  String get key;
 
   /// Create a copy of PaginationInstanceListModel
   /// with the given fields replaced by the non-null parameter values.
@@ -649,7 +650,8 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('instances', instances))
       ..add(DiagnosticsProperty('currentPage', currentPage))
       ..add(DiagnosticsProperty('pageSize', pageSize))
-      ..add(DiagnosticsProperty('count', count));
+      ..add(DiagnosticsProperty('count', count))
+      ..add(DiagnosticsProperty('key', key));
   }
 
   @override
@@ -662,7 +664,8 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
                 other.currentPage == currentPage) &&
             (identical(other.pageSize, pageSize) ||
                 other.pageSize == pageSize) &&
-            (identical(other.count, count) || other.count == count));
+            (identical(other.count, count) || other.count == count) &&
+            (identical(other.key, key) || other.key == key));
   }
 
   @override
@@ -671,11 +674,12 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(instances),
       currentPage,
       pageSize,
-      count);
+      count,
+      key);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count)';
+    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count, key: $key)';
   }
 }
 
@@ -690,7 +694,8 @@ abstract mixin class $PaginationInstanceListModelCopyWith<$Res> {
       {List<InstanceModel> instances,
       int currentPage,
       int pageSize,
-      int count});
+      int count,
+      String key});
 }
 
 /// @nodoc
@@ -710,6 +715,7 @@ class _$PaginationInstanceListModelCopyWithImpl<$Res>
     Object? currentPage = null,
     Object? pageSize = null,
     Object? count = null,
+    Object? key = null,
   }) {
     return _then(_self.copyWith(
       instances: null == instances
@@ -728,6 +734,10 @@ class _$PaginationInstanceListModelCopyWithImpl<$Res>
           ? _self.count
           : count // ignore: cast_nullable_to_non_nullable
               as int,
+      key: null == key
+          ? _self.key
+          : key // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -741,7 +751,8 @@ class _PaginationInstanceListModel
       {required final List<InstanceModel> instances,
       required this.currentPage,
       required this.pageSize,
-      required this.count})
+      required this.count,
+      required this.key})
       : _instances = instances;
 
   final List<InstanceModel> _instances;
@@ -758,6 +769,8 @@ class _PaginationInstanceListModel
   final int pageSize;
   @override
   final int count;
+  @override
+  final String key;
 
   /// Create a copy of PaginationInstanceListModel
   /// with the given fields replaced by the non-null parameter values.
@@ -775,7 +788,8 @@ class _PaginationInstanceListModel
       ..add(DiagnosticsProperty('instances', instances))
       ..add(DiagnosticsProperty('currentPage', currentPage))
       ..add(DiagnosticsProperty('pageSize', pageSize))
-      ..add(DiagnosticsProperty('count', count));
+      ..add(DiagnosticsProperty('count', count))
+      ..add(DiagnosticsProperty('key', key));
   }
 
   @override
@@ -789,7 +803,8 @@ class _PaginationInstanceListModel
                 other.currentPage == currentPage) &&
             (identical(other.pageSize, pageSize) ||
                 other.pageSize == pageSize) &&
-            (identical(other.count, count) || other.count == count));
+            (identical(other.count, count) || other.count == count) &&
+            (identical(other.key, key) || other.key == key));
   }
 
   @override
@@ -798,11 +813,12 @@ class _PaginationInstanceListModel
       const DeepCollectionEquality().hash(_instances),
       currentPage,
       pageSize,
-      count);
+      count,
+      key);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count)';
+    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count, key: $key)';
   }
 }
 
@@ -819,7 +835,8 @@ abstract mixin class _$PaginationInstanceListModelCopyWith<$Res>
       {List<InstanceModel> instances,
       int currentPage,
       int pageSize,
-      int count});
+      int count,
+      String key});
 }
 
 /// @nodoc
@@ -839,6 +856,7 @@ class __$PaginationInstanceListModelCopyWithImpl<$Res>
     Object? currentPage = null,
     Object? pageSize = null,
     Object? count = null,
+    Object? key = null,
   }) {
     return _then(_PaginationInstanceListModel(
       instances: null == instances
@@ -857,6 +875,10 @@ class __$PaginationInstanceListModelCopyWithImpl<$Res>
           ? _self.count
           : count // ignore: cast_nullable_to_non_nullable
               as int,
+      key: null == key
+          ? _self.key
+          : key // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }

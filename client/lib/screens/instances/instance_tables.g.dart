@@ -6,7 +6,7 @@ part of 'instance_tables.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$instancesNotifierHash() => r'bb17227e6853feac6c6beacae23f93f0a75a26bc';
+String _$instancesNotifierHash() => r'12ab90480e0b545c3311397a399bfa9b04879b29';
 
 /// See also [InstancesNotifier].
 @ProviderFor(InstancesNotifier)

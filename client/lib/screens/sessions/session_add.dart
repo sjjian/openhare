@@ -12,6 +12,7 @@ class AddSession extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final model = ref.watch(instancesNotifierProvider);
+    final searchTextController = TextEditingController(text: model.key);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
@@ -198,20 +199,3 @@ class AddSession extends HookConsumerWidget {
     );
   }
 }
-
-// class _AddSessionState extends State<AddSession> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     instanceTableController.addListener(() => mounted ? setState(() {}) : null);
-//   }
-
-//   @override
-//   void dispose() {
-//     instanceTableController.removeListener(() {});
-//     super.dispose();
-//   }
-
-// }
-
-// InstanceTableController instanceTableController = InstanceTableController();

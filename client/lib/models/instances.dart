@@ -49,7 +49,7 @@ abstract class InstanceRepo {
   bool isInstanceExist(String name);
   InstanceModel? getInstanceByName(String name);
   InstanceModel? getInstanceById(InstanceId id);
-  PaginationInstanceListModel search(String key, {int? pageNumber, int? pageSize});
+  List<InstanceModel> search(String key, {int? pageNumber, int? pageSize});
   int count(String key);
   List<InstanceModel> getActiveInstances(int top);
   Future<void> addActiveInstance(InstanceId id);
@@ -63,5 +63,6 @@ abstract class PaginationInstanceListModel with _$PaginationInstanceListModel {
     required  int currentPage,
     required int pageSize,
     required  int count,
+    required String key,
   }) = _PaginationInstanceListModel;
 }

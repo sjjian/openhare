@@ -1,5 +1,6 @@
 import 'package:client/models/instances.dart';
 import 'package:client/repositories/instances/instances.dart';
+import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -116,22 +117,20 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
                             ? const Text("测试中")
                             : const Text("测试连接")),
                     TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (updateInstanceController.validate()) {
-                            ref
+                            await ref
                                 .read(instancesServicesProvider.notifier)
                                 .updateInstance(
-                                  InstanceStorage.one(
-                                    //todo: fix
-                                    id: updateInstanceController
-                                        .instance!.id.value,
-                                    dbType: updateInstanceController
-                                        .selectedDatabaseType,
-                                    connectValue: updateInstanceController
-                                        .getConnectValue(),
-                                  ).toModel(),
+                                  updateInstanceController.getInstanceModel(),
                                 );
+
                             updateInstanceController.clear();
+
+                            ref
+                                .read(instancesNotifierProvider.notifier)
+                                .refresh();
+
                             GoRouter.of(context).go('/instances/list');
                           }
                         },
@@ -149,23 +148,25 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
                         DatabaseTypeCardList(
                           connectionMetas: [
                             connectionMetaMap[
-                                addInstanceController.selectedDatabaseType]!
+                                updateInstanceController.selectedDatabaseType]!
                           ],
-                          selectedColor: selectedColor(addInstanceController),
+                          selectedColor:
+                              selectedColor(updateInstanceController),
                         ),
                         const SizedBox(height: 20),
                         Expanded(
                           child: UpdateInstanceForm(
-                            infos: addInstanceController.dbInfos,
-                            selectedGroup: addInstanceController.selectedGroup,
+                            infos: updateInstanceController.dbInfos,
+                            selectedGroup:
+                                updateInstanceController.selectedGroup,
                             onValid: (info, isValid) {
-                              addInstanceController.updateValidState(
+                              updateInstanceController.updateValidState(
                                   info, isValid);
                             },
                             onGroupChange: (group) {
-                              addInstanceController.onGroupChange(group);
+                              updateInstanceController.onGroupChange(group);
                             },
-                            codeController: addInstanceController.code,
+                            codeController: updateInstanceController.code,
                           ),
                         )
                       ]),
@@ -260,13 +261,25 @@ class UpdateInstanceController extends AddInstanceController {
     notifyListeners();
   }
 
-  // @override
-  // Future<void> onSubmit(BuildContext context) async {
-  //   context.read<InstancesProvider>().updateInstance(InstanceStorage.one(
-  //       id: instance!.id,
-  //       dbType: selectedDatabaseType,
-  //       connectValue: getConnectValue()));
-  // }
+  @override
+  InstanceModel getInstanceModel() {
+    final connectValue = getConnectValue();
+    return InstanceModel(
+      id: instance!.id,
+      dbType: selectedDatabaseType,
+      name: connectValue.name,
+      host: connectValue.host,
+      port: connectValue.port,
+      user: connectValue.user,
+      password: connectValue.password,
+      desc: connectValue.desc,
+      custom: connectValue.custom,
+      initQuerys: connectValue.initQuerys,
+      activeSchemas: instance!.activeSchemas,
+      createdAt: instance!.createdAt,
+      latestOpenAt: instance!.latestOpenAt,
+    );
+  }
 }
 
 UpdateInstanceController updateInstanceController = UpdateInstanceController();

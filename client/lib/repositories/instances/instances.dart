@@ -86,22 +86,6 @@ class InstanceStorage {
         dbType = DatabaseType.values[stDbType],
         createdAt = createdAt ?? DateTime.now();
 
-  InstanceStorage.one({
-    this.id = 0,
-    required this.dbType,
-    required ConnectValue connectValue,
-    ActiveSet<String>? activeSchemas,
-  })  : name = connectValue.name,
-        host = connectValue.host,
-        port = connectValue.port,
-        user = connectValue.user,
-        password = connectValue.password,
-        desc = connectValue.desc,
-        custom = connectValue.custom,
-        initQuerys = connectValue.initQuerys,
-        activeSchemas = activeSchemas ?? ActiveSet<String>(List.empty()),
-        createdAt = DateTime.now();
-
   InstanceStorage.fromModel(InstanceModel model)
       : id = model.id.value,
         dbType = model.dbType,
@@ -147,7 +131,7 @@ class InstanceRepoImpl extends InstanceRepo {
 
   @override
   Future<void> update(InstanceModel instance) async {
-    _instanceBox.putAsync(InstanceStorage.fromModel(instance));
+    await _instanceBox.putAsync(InstanceStorage.fromModel(instance));
   }
 
   @override
@@ -176,19 +160,16 @@ class InstanceRepoImpl extends InstanceRepo {
 
   @override
 // todo: aync
-  PaginationInstanceListModel search(String key, {int? pageNumber, int? pageSize}) {
-    final build =
-        _instanceBox.query(InstanceStorage_.name.contains(key)).build();
+  List<InstanceModel> search(String key, {int? pageNumber, int? pageSize}) {
+    final build = _instanceBox
+        .query(InstanceStorage_.name.contains(key))
+        .order(InstanceStorage_.createdAt, flags: Order.descending)
+        .build();
     build.limit = (pageSize ?? 10);
     build.offset = ((pageNumber ?? 1) - 1) * (pageSize ?? 10);
     final instances = build.find();
-    
-    return PaginationInstanceListModel(
-      count: count(key),
-      pageSize: pageSize ?? 10,
-      currentPage: pageNumber ?? 1,
-      instances: instances.map((e) => e.toModel()).toList(),
-    );
+
+    return instances.map((e) => e.toModel()).toList();
   }
 
   @override
@@ -212,16 +193,22 @@ class InstanceRepoImpl extends InstanceRepo {
   @override
   Future<void> addActiveInstance(InstanceId id) async {
     final instance = _instanceBox.get(id.value);
-    instance?.latestOpenAt = DateTime.now();
-    await _instanceBox.putAsync(instance!);
+    if (instance == null) {
+      return;
+    }
+    instance.latestOpenAt = DateTime.now();
+    await _instanceBox.putAsync(instance);
     return;
   }
 
   @override
   Future<void> addInstanceActiveSchema(InstanceId id, String schema) async {
     final instance = _instanceBox.get(id.value);
-    instance?.activeSchemas.add(schema);
-    await _instanceBox.putAsync(instance!);
+    if (instance == null) {
+      return;
+    }
+    instance.activeSchemas.add(schema);
+    await _instanceBox.putAsync(instance);
     return;
   }
 }
