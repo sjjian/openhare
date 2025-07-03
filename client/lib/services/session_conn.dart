@@ -31,9 +31,7 @@ class SessionConnsServices extends _$SessionConnsServices {
 class SessionConnServices extends _$SessionConnServices {
   @override
   SessionConnModel build(ConnId connId) {
-    SessionConnModel conn =
-        ref.watch(sessionConnRepoProvider).getConn(connId);
-    return conn;
+    return ref.watch(sessionConnRepoProvider).getConn(connId);
   }
 
   Future<void> connect() async {

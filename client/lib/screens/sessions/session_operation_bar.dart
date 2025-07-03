@@ -22,7 +22,6 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
     if (sessionIdModel == null) {
       return null;
     }
-    // todo: 未订阅到conn状态
     SessionConnModel? sessionConnModel = sessionIdModel.connId != null
         ? ref.watch(sessionConnServicesProvider(sessionIdModel.connId!))
         : null;

@@ -23,7 +23,7 @@ final sessionsServicesProvider =
 
 typedef _$SessionsServices = Notifier<SessionListModel>;
 String _$selectedSessionIdServicesHash() =>
-    r'f37187eaa0aaabf331db7961991dd5dfa3cc95eb';
+    r'df1a1be61e110d3eb4f103bcf8f66ed5ec26ae59';
 
 /// See also [SelectedSessionIdServices].
 @ProviderFor(SelectedSessionIdServices)

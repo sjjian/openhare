@@ -65,15 +65,15 @@ class SessionsServices extends _$SessionsServices {
 class SelectedSessionIdServices extends _$SelectedSessionIdServices {
   @override
   SessionModel? build() {
-    SessionId? sessionId = ref.watch(sessionsServicesProvider.select((s) {
+    SessionModel? session = ref.watch(sessionsServicesProvider.select((s) {
       if (s.selectedSession == null || s.selectedSession!.instanceId == null) {
         return null;
       }
-      return s.selectedSession!.sessionId;
+      return s.selectedSession;
     }));
-    if (sessionId == null) {
+    if (session == null) {
       return null;
     }
-    return ref.read(sessionRepoProvider).getSession(sessionId);
+    return session;
   }
 }
