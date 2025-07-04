@@ -1,0 +1,159 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "3:954363933915371259",
+      "lastPropertyId": "4:2680331308371878199",
+      "name": "SessionStorage",
+      "properties": [
+        {
+          "id": "1:517178709276681653",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4854003834765344230",
+          "name": "instanceId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "2:3493315780447542151",
+          "relationTarget": "InstanceStorage"
+        },
+        {
+          "id": "3:4040787782661306959",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "4:2680331308371878199",
+          "name": "currentSchema",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:9068295192823040783",
+      "lastPropertyId": "13:8749264689524785390",
+      "name": "InstanceStorage",
+      "properties": [
+        {
+          "id": "1:6332533221694692916",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7941998142696236769",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:224238240568187224",
+          "name": "host",
+          "type": 9
+        },
+        {
+          "id": "4:7469078253827869925",
+          "name": "port",
+          "type": 6
+        },
+        {
+          "id": "5:1537637767970384375",
+          "name": "user",
+          "type": 9
+        },
+        {
+          "id": "6:8389525849330073772",
+          "name": "password",
+          "type": 9
+        },
+        {
+          "id": "7:2870873381397993482",
+          "name": "desc",
+          "type": 9
+        },
+        {
+          "id": "8:8287743374826164088",
+          "name": "initQuerys",
+          "type": 30
+        },
+        {
+          "id": "9:4690926171000995925",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "10:5475873554467602001",
+          "name": "latestOpenAt",
+          "type": 10
+        },
+        {
+          "id": "11:7819267361613010979",
+          "name": "stDbType",
+          "type": 6
+        },
+        {
+          "id": "12:4520754541798440120",
+          "name": "stCustom",
+          "type": 9
+        },
+        {
+          "id": "13:8749264689524785390",
+          "name": "stActiveSchemas",
+          "type": 30
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "5:9068295192823040783",
+  "lastIndexId": "2:3493315780447542151",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    4777369979113529251,
+    7771770525022327494,
+    4128249689244104183
+  ],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    6339393024853594017,
+    2012876000864412152,
+    3055836543278863247,
+    2576353234273015585,
+    4402971908614233426,
+    2557526817954957013,
+    1533736204012627434,
+    8657086904403898878,
+    7449270155428902133,
+    7099609988433500239,
+    8699536140751700883,
+    6180271050918009273,
+    7938579034731173175,
+    5382849423225960488,
+    451105937567216074,
+    3794023625132426927,
+    9103170210888742968,
+    5811083849693601533,
+    8890379074780980911,
+    4167208944430226304,
+    984201060325373299,
+    152208878262239042,
+    5905217867648670601,
+    1629092070617964904,
+    4775537481234876128,
+    3321563170577621728,
+    7345410915938135096,
+    6439919288390320832,
+    6403594309000127769,
+    452695194295216491
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

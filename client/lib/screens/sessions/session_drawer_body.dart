@@ -1,100 +1,141 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
+import 'package:client/services/sessions.dart';
+import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
-import 'package:client/providers/sessions.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class SessionDrawerBody extends StatefulWidget {
-  const SessionDrawerBody({Key? key}) : super(key: key);
+part 'session_drawer_body.g.dart';
 
-  @override
-  State<SessionDrawerBody> createState() => _SessionDrawerBodyState();
+@Riverpod(keepAlive: true)
+SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
+  return const SessionDrawerModel(
+      drawerPage: DrawerPage.metadataTree,
+      sqlResult: null,
+      sqlColumn: null,
+      showRecord: false,
+      isRightPageOpen: true);
 }
 
-class _SessionDrawerBodyState extends State<SessionDrawerBody> {
+@Riverpod(keepAlive: true)
+class SessionDrawerController extends _$SessionDrawerController {
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerLow, // session drawer 背景色
-      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        return Column(
-          children: [
-            const SessionDrawerBar(),
-            Expanded(
-              child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  child: switch (sessionProvider.session!.drawerPage) {
-                    DrawerPage.sqlResult => const SessionDrawerSqlResult(),
-                    _ => const SessionDrawerMetadata(),
-                  }),
-            ),
-          ],
-        );
-      }),
+  SessionDrawerModel build() {
+    SessionModel? sessionIdModel =
+        ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionDrawerStateProvider(const SessionId(value: 0)));
+    }
+    return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
+  }
+
+  void showRightPage() {
+    state = state.copyWith(isRightPageOpen: true);
+  }
+
+  void hideRightPage() {
+    state = state.copyWith(isRightPageOpen: false);
+  }
+
+  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
+    state = state.copyWith(
+      drawerPage: DrawerPage.sqlResult,
+      sqlColumn: column ?? state.sqlColumn,
+      sqlResult: result ?? state.sqlResult,
+    );
+  }
+
+  void goToTree() {
+    state = state.copyWith(
+      drawerPage: DrawerPage.metadataTree,
+      sqlColumn: null,
+      sqlResult: null,
     );
   }
 }
 
-class SessionDrawerBar extends StatelessWidget {
+class SessionDrawerBody extends ConsumerWidget {
+  const SessionDrawerBody({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
+    return Container(
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerLow, // session drawer 背景色
+      child: Column(
+        children: [
+          const SessionDrawerBar(),
+          Expanded(
+            child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: switch (sessionDrawer.drawerPage) {
+                  DrawerPage.sqlResult => const SessionDrawerSqlResult(),
+                  _ => const SessionDrawerMetadata(),
+                }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SessionDrawerBar extends ConsumerWidget {
   final double height;
 
   const SessionDrawerBar({Key? key, this.height = 36}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
     return Container(
       color: Theme.of(context)
           .colorScheme
           .surfaceContainer, // session drawer bar 背景色
       constraints: BoxConstraints(maxHeight: height),
-      child: Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton(
-                onPressed: () {
-                  sessionProvider.goToTree();
-                },
-                icon: (sessionProvider.session!.drawerPage ==
-                        DrawerPage.metadataTree)
-                    ? Icon(
-                        Icons.account_tree_rounded,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary, // metadata 按钮色
-                      )
-                    : const Icon(Icons.account_tree_outlined)),
-            IconButton(
-                onPressed: () {
-                  sessionProvider.showSQLResult();
-                },
-                icon: (sessionProvider.session!.drawerPage ==
-                        DrawerPage.sqlResult)
-                    ? Icon(
-                        Icons.article_rounded,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary, // sql result 按钮色
-                      )
-                    : const Icon(Icons.article_outlined)),
-            const Spacer(),
-            IconButton(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconButton(
               onPressed: () {
-                sessionProvider.isRightPageOpen()
-                    ? sessionProvider.hideRightPage()
-                    : sessionProvider.showRightPage();
+                ref.read(sessionDrawerControllerProvider.notifier).goToTree();
               },
-              icon: sessionProvider.isRightPageOpen()
-                  ? const Icon(Icons.format_indent_increase)
-                  : const Icon(Icons.format_indent_decrease),
-            )
-          ],
-        );
-      }),
+              icon: (sessionDrawer.drawerPage == DrawerPage.metadataTree)
+                  ? Icon(
+                      Icons.account_tree_rounded,
+                      color:
+                          Theme.of(context).colorScheme.primary, // metadata 按钮色
+                    )
+                  : const Icon(Icons.account_tree_outlined)),
+          IconButton(
+              onPressed: () {
+                ref.read(sessionDrawerControllerProvider.notifier).showSQLResult();
+              },
+              icon: (sessionDrawer.drawerPage == DrawerPage.sqlResult)
+                  ? Icon(
+                      Icons.article_rounded,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary, // sql result 按钮色
+                    )
+                  : const Icon(Icons.article_outlined)),
+          const Spacer(),
+          IconButton(
+            onPressed: () {
+              sessionDrawer.isRightPageOpen
+                  ? ref.read(sessionDrawerControllerProvider.notifier).hideRightPage()
+                  : ref.read(sessionDrawerControllerProvider.notifier).showRightPage();
+            },
+            icon: sessionDrawer.isRightPageOpen
+                ? const Icon(Icons.format_indent_increase)
+                : const Icon(Icons.format_indent_decrease),
+          )
+        ],
+      ),
     );
   }
 }

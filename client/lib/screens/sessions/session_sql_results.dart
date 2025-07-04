@@ -1,22 +1,86 @@
+import 'package:client/models/session_sql_result.dart';
+import 'package:client/models/sessions.dart';
+import 'package:client/repositories/session_conn.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
+import 'package:client/services/session_sql_result.dart';
+import 'package:client/services/sessions.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:client/providers/sessions.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:client/widgets/tab_widget.dart';
-import 'package:client/models/sql_result.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:sql_editor/re_editor.dart';
+import 'package:client/utils/sql_highlight.dart';
+import 'package:sql_parser/parser.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class SqlResultTables extends StatefulWidget {
+part 'session_sql_results.g.dart';
+
+@Riverpod(keepAlive: true)
+SessionEditorModel sessionEditor(Ref ref, SessionId sessionId) {
+  return SessionEditorModel(code: CodeLineEditingController(
+      spanBuilder: ({required codeLines, required context, required style}) {
+    return TextSpan(
+        children: Lexer(codeLines.asString(TextLineBreak.lf))
+            .tokens()
+            .map<TextSpan>((tok) => TextSpan(
+                text: tok.content,
+                style: style.merge(getStyle(tok.id) ?? style)))
+            .toList());
+  }));
+}
+
+@Riverpod(keepAlive: true)
+class SessionEditorController extends _$SessionEditorController {
+  @override
+  SessionEditorModel build() {
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return ref.watch(sessionEditorProvider(const SessionId(value: 0)));
+    }
+    return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
+  @override
+  SQLResultListModel? build() {
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
+    return ref.watch(sQLResultsServicesProvider(sessionIdModel.sessionId));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
+  @override
+  SQLResultModel? build() {
+    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    if (sessionIdModel == null) {
+      return null;
+    }
+    ResultId? resultId = ref
+        .watch(sQLResultsServicesProvider(sessionIdModel.sessionId).select((m) {
+      return m.selected?.resultId;
+    }));
+    if (resultId == null) {
+      return null;
+    }
+    return ref
+        .watch(sQLResultServicesProvider(resultId));
+  }
+}
+
+class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);
 
   @override
-  State<SqlResultTables> createState() => _SqlResultTablesState();
-}
-
-class _SqlResultTablesState extends State<SqlResultTables> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    SQLResultListModel? model = ref.watch(selectedSQLResultTabNotifierProvider);
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
       labelAlign: TextAlign.center,
@@ -29,6 +93,57 @@ class _SqlResultTablesState extends State<SqlResultTables> {
           .colorScheme
           .surfaceContainer, // sql result tab 的鼠标移入色
     );
+
+    Widget tab;
+    if (model == null) {
+      tab = const Spacer();
+    } else {
+      tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        CommonTab(
+          label: "执行记录",
+          selected: false, // todo
+          width: 100,
+          style: style,
+          onTap: () {
+            // session.selectToRecord();
+          },
+        ),
+        Expanded(
+            child: CommonTabBar(
+                height: 35,
+                color: Theme.of(context).colorScheme.surfaceContainer,
+                tabStyle: style,
+                onReorder: (oldIndex, newIndex) {
+                  ref
+                      .read(
+                          sQLResultsServicesProvider(model.sessionId).notifier)
+                      .reorderSQLResult(oldIndex, newIndex);
+                },
+                tabs: [
+              for (var i = 0; i < model.results.length; i++)
+                CommonTabWrap(
+                  label: "${model.results[i].resultId.value}",
+                  selected: model.results[i] == model.selected,
+                  onTap: () {
+                    ref
+                        .read(sQLResultsServicesProvider(model.sessionId)
+                            .notifier)
+                        .selectSQLResult(model.results[i].resultId);
+                  },
+                  onDeleted: () {
+                    ref
+                        .read(sQLResultsServicesProvider(model.sessionId)
+                            .notifier)
+                        .deleteSQLResult(model.results[i].resultId);
+                  },
+                  avatar: const Icon(
+                    Icons.grid_on,
+                  ),
+                )
+            ]))
+      ]);
+    }
+
     return Row(
       children: [
         Expanded(
@@ -37,57 +152,7 @@ class _SqlResultTablesState extends State<SqlResultTables> {
               Container(
                 alignment: Alignment.centerLeft,
                 constraints: const BoxConstraints(maxHeight: 35),
-                child: Consumer<SessionProvider>(
-                  builder: (context, sessionProvider, _) {
-                    final results = sessionProvider.getAllSQLResult();
-                    final currentResult = sessionProvider.getCurrentSQLResult();
-                    final showRecord = sessionProvider.session!.showRecord;
-                    if (results == null) {
-                      return const Spacer();
-                    }
-                    return Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          CommonTab(
-                            label: "执行记录",
-                            selected: showRecord,
-                            width: 100,
-                            style: style,
-                            onTap: () {
-                              sessionProvider.selectToRecord();
-                            },
-                          ),
-                          Expanded(
-                              child: CommonTabBar(
-                                  height: 35,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceContainer,
-                                  tabStyle: style,
-                                  onReorder: (oldIndex, newIndex) {
-                                    sessionProvider.reorderSQLResult(
-                                        oldIndex, newIndex);
-                                  },
-                                  tabs: [
-                                for (var i = 0; i < results.length; i++)
-                                  CommonTabWrap(
-                                    label: "${results[i].id + 1}",
-                                    selected: !showRecord &&
-                                        results[i] == currentResult,
-                                    onTap: () {
-                                      sessionProvider.selectSQLResultByIndex(i);
-                                    },
-                                    onDeleted: () {
-                                      sessionProvider.deleteSQLResultByIndex(i);
-                                    },
-                                    avatar: const Icon(
-                                      Icons.grid_on,
-                                    ),
-                                  )
-                              ]))
-                        ]);
-                  },
-                ),
+                child: tab,
               ),
               const Expanded(child: SqlResultTable())
             ],
@@ -98,18 +163,8 @@ class _SqlResultTablesState extends State<SqlResultTables> {
   }
 }
 
-class SqlResultTable extends StatefulWidget {
+class SqlResultTable extends ConsumerWidget {
   const SqlResultTable({super.key});
-
-  @override
-  State<SqlResultTable> createState() => _SqlResultTableState();
-}
-
-class _SqlResultTableState extends State<SqlResultTable> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   List<PlutoColumn> buildColumns(List<BaseQueryColumn> columns) {
     return columns
@@ -145,69 +200,62 @@ class _SqlResultTableState extends State<SqlResultTable> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<SessionProvider>(builder: (context, sessionProvider, _) {
-      final color = Theme.of(context)
-          .colorScheme
-          .surfaceContainerLow; // sql result body 的背景色
-      final result = sessionProvider.getCurrentSQLResult();
-      if (sessionProvider.session!.showRecord) {
-        return Container(
-            alignment: Alignment.center,
-            color: color,
-            child: const Text('执行记录'));
-      }
-      if (result == null) {
-        return Container(
-            alignment: Alignment.center,
-            color: color,
-            child: const Text('no data'));
-      }
-      if (result.state == SQLExecuteState.done) {
-        return PlutoGrid(
-          key: ObjectKey(result),
-          mode: PlutoGridMode.selectWithOneTap,
-          onSelected: (event) {
-            sessionProvider.showSQLResult(
-              result: result.rows![event.rowIdx!]
-                  .getValue(event.cell!.column.title),
-              column: result.rows![event.rowIdx!]
-                  .getColumn(event.cell!.column.title), 
-            );
-          },
-          configuration: PlutoGridConfiguration(
-            localeText: const PlutoGridLocaleText.china(),
-            style: PlutoGridStyleConfig(
-              rowHeight: 30,
-              columnHeight: 36,
-              gridBorderColor: color,
-              rowColor: color,
-              activatedColor: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainer, // sql result table 行选中的颜色
-              gridBackgroundColor: color,
-            ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final color = Theme.of(context)
+        .colorScheme
+        .surfaceContainerLow; // sql result body 的背景色
+
+    final model = ref.watch(selectedSQLResultNotifierProvider);
+    if (model == null) {
+      return Container(
+          alignment: Alignment.center,
+          color: color,
+          child: const Text('no data'));
+    }
+    if (model.state == SQLExecuteState.done) {
+      return PlutoGrid(
+        key: ObjectKey(model),
+        mode: PlutoGridMode.selectWithOneTap,
+        onSelected: (event) {
+          ref.read(sessionDrawerControllerProvider.notifier).showSQLResult(
+                result: model.data!.rows[event.rowIdx!]
+                    .getValue(event.cell!.column.title),
+                column: model.data!.rows[event.rowIdx!]
+                    .getColumn(event.cell!.column.title),
+              );
+        },
+        configuration: PlutoGridConfiguration(
+          localeText: const PlutoGridLocaleText.china(),
+          style: PlutoGridStyleConfig(
+            rowHeight: 30,
+            columnHeight: 36,
+            gridBorderColor: color,
+            rowColor: color,
+            activatedColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainer, // sql result table 行选中的颜色
+            gridBackgroundColor: color,
           ),
-          columns: buildColumns(result.columns!),
-          rows: buildRows(result.rows!),
-        );
-      } else if (result.state == SQLExecuteState.error) {
-        return Container(
-            alignment: Alignment.topLeft,
-            color: color,
-            child: Text('${result.error}'));
-      } else {
-        return Container(
-            alignment: Alignment.topLeft,
-            color: color,
-            child: const Center(
-              child: SizedBox(
-                height: 40,
-                width: 40,
-                child: CircularProgressIndicator(),
-              ),
-            ));
-      }
-    });
+        ),
+        columns: buildColumns(model.data!.columns),
+        rows: buildRows(model.data!.rows),
+      );
+    } else if (model.state == SQLExecuteState.error) {
+      return Container(
+          alignment: Alignment.topLeft,
+          color: color,
+          child: Text('${model.error}'));
+    } else {
+      return Container(
+          alignment: Alignment.topLeft,
+          color: color,
+          child: const Center(
+            child: SizedBox(
+              height: 40,
+              width: 40,
+              child: CircularProgressIndicator(),
+            ),
+          ));
+    }
   }
 }

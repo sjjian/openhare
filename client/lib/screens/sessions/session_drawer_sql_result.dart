@@ -1,25 +1,24 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:client/providers/sessions.dart';
+import 'package:client/models/sessions.dart';
+import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/file_type.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/atom-one-light.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SessionDrawerSqlResult extends StatelessWidget {
+class SessionDrawerSqlResult extends ConsumerWidget {
   const SessionDrawerSqlResult({Key? key}) : super(key: key);
 
-  Widget buildDisplayField(BuildContext context) {
-    SessionProvider sessionProvider =
-        Provider.of<SessionProvider>(context, listen: false);
-    BaseQueryValue? result = sessionProvider.session!.sqlResult;
+  Widget buildDisplayField(BuildContext context, SessionDrawerModel sessionDrawer) {
+    BaseQueryValue? result = sessionDrawer.sqlResult;
     if (result == null) {
       return const ValueDisplayField(data: "");
     }
-    BaseQueryColumn? column = sessionProvider.session!.sqlColumn;
+    BaseQueryColumn? column = sessionDrawer.sqlColumn;
     if (column == null) {
       return ValueDisplayField(data: result.getString() ?? "");
     }
@@ -47,7 +46,8 @@ class SessionDrawerSqlResult extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
     return Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,10 +57,7 @@ class SessionDrawerSqlResult extends StatelessWidget {
           //   endIndent: 10,
           // ),
           Expanded(
-            child: Consumer<SessionProvider>(
-                builder: (context, sessionProvider, _) {
-              return buildDisplayField(context);
-            }),
+            child: buildDisplayField(context, sessionDrawer),
             // child: buildDisplayField(context),
           ),
         ]);

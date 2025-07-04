@@ -1,6 +1,3 @@
-import 'package:client/models/sessions.dart';
-import 'package:client/providers/instances.dart';
-import 'package:client/providers/sessions.dart';
 import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/screens/instances/instance_update.dart';
@@ -9,7 +6,6 @@ import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -26,8 +22,6 @@ class App extends StatefulWidget {
 String lastInstancePage = "/instances/list";
 
 class _AppState extends State<App> {
-
-
   final GoRouter _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: '/sessions',
@@ -50,9 +44,12 @@ class _AppState extends State<App> {
               return NoTransitionPage<void>(child: child);
             },
             routes: [
-              GoRoute(path: "/instances", redirect: (context, state) {
-                return lastInstancePage;
-              },),
+              GoRoute(
+                path: "/instances",
+                redirect: (context, state) {
+                  return lastInstancePage;
+                },
+              ),
               GoRoute(
                 path: '/instances/list',
                 pageBuilder: (context, state) {
@@ -71,7 +68,8 @@ class _AppState extends State<App> {
                 path: '/instances/update',
                 pageBuilder: (context, state) {
                   lastInstancePage = '/instances/update';
-                  return const NoTransitionPage<void>(child: UpdateInstancePage());
+                  return const NoTransitionPage<void>(
+                      child: UpdateInstancePage());
                 },
               ),
             ]),
@@ -79,32 +77,15 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final instancesProvider = InstancesProvider();
-    instancesProvider.loadInstance();
-    final sessions = SessionsModel();
-    final sessionProvider = SessionProvider(sessions.data.selected());
-    final sessionListProvider = SessionListProvider(sessionProvider, sessions);
-    final addInstanceProvider = AddInstanceProvider();
-    final updateInstanceProvider = UpdateInstanceProvider();
-
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: sessionProvider),
-        ChangeNotifierProvider.value(value: sessionListProvider),
-        ChangeNotifierProvider.value(value: instancesProvider),
-        ChangeNotifierProvider.value(value: addInstanceProvider),
-        ChangeNotifierProvider.value(value: updateInstanceProvider),
-      ],
-      child: MaterialApp.router(
-        title: 'Natuo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-          // brightness: Brightness.dark
-        ),
-        routerConfig: _router,
-        debugShowCheckedModeBanner: false,
+    return MaterialApp.router(
+      title: 'Natuo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+        // brightness: Brightness.dark
       ),
+      routerConfig: _router,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

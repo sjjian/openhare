@@ -1,10 +1,16 @@
 import 'package:quiver/collection.dart';
 
 class ReorderSelectedList<E> extends DelegatingList<E> {
-  final List<E> _data = [];
+  final List<E> _data;
   E? _selected;
 
-  ReorderSelectedList();
+  ReorderSelectedList({List<E>? data, E? selected})
+      : _data = (data ?? <E>[]).toList(growable: true),
+        _selected = selected ?? (data != null && data.isNotEmpty ? data[0] : null);
+
+  ReorderSelectedList.copyWith(ReorderSelectedList<E> origin)
+      : _data = List<E>.from(origin._data),
+        _selected = origin._selected;
 
   @override
   List<E> get delegate => _data;
@@ -49,6 +55,9 @@ class ReorderSelectedList<E> extends DelegatingList<E> {
   }
 
   E? selected() {
+    if (_selected == null && _data.isNotEmpty) {
+      _selected = _data[0];
+    }
     return _selected;
   }
 

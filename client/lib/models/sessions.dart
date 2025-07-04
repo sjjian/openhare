@@ -1,18 +1,69 @@
-import 'package:client/models/sql_result.dart';
-import 'package:client/utils/reorder_list.dart';
-import 'package:client/utils/sql_highlight.dart';
-import 'package:client/widgets/split_view.dart';
-import 'package:flutter/material.dart';
-import 'package:client/widgets/data_tree.dart';
-import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
-import 'package:multi_split_view/multi_split_view.dart';
-import 'package:sql_editor/re_editor.dart';
-import 'package:sql_parser/parser.dart';
-import 'package:db_driver/db_driver.dart';
 import 'package:client/models/instances.dart';
+import 'package:client/models/session_conn.dart';
+import 'package:client/models/session_sql_result.dart';
+import 'package:db_driver/db_driver.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sql_editor/re_editor.dart';
+import 'package:client/widgets/split_view.dart';
+import 'package:client/repositories/session_conn.dart';
 
-class SessionsModel {
-  ReorderSelectedList<SessionModel> data = ReorderSelectedList();
+part 'sessions.freezed.dart';
+
+@freezed
+abstract class SessionId with _$SessionId {
+  const factory SessionId({
+    required int value,
+  }) = _SessionId;
+}
+
+@freezed
+abstract class SessionModel with _$SessionModel {
+  const factory SessionModel({
+    required SessionId sessionId,
+    InstanceId? instanceId,
+    String? instanceName,
+    DatabaseType? dbType,
+    ConnId? connId,
+  }) = _SessionModel;
+}
+
+@freezed
+abstract class SessionListModel with _$SessionListModel {
+  const factory SessionListModel({
+    required List<SessionModel> sessions,
+    SessionModel? selectedSession,
+  }) = _SessionListModel;
+}
+
+@freezed
+abstract class SessionOpBarModel with _$SessionOpBarModel {
+  const factory SessionOpBarModel({
+    required SessionId sessionId,
+    required ConnId? connId,
+    required bool canQuery,
+    required String currentSchema,
+    required bool isRightPageOpen,
+  }) = _SessionOpBarModel;
+}
+
+abstract class SessionRepo {
+  Future<SessionModel> newSession();
+  SessionListModel getSessions();
+  SessionModel? getSession(SessionId sessionId);
+  Future<void> updateSession(
+      SessionId sessionId, InstanceModel instance, String currentSchema);
+  void setConnId(SessionId sessionId, ConnId connId);
+  Future<void> deleteSession(SessionId sessionId);
+  void selectSessionByIndex(int index);
+  void reorderSession(int oldIndex, int newIndex);
+}
+
+@freezed
+abstract class SessionEditorModel with _$SessionEditorModel {
+  const factory SessionEditorModel({
+    required CodeLineEditingController code,
+  }) = _SessionEditorModel;
 }
 
 enum SQLConnectState { pending, connecting, connected, failed }
@@ -22,107 +73,43 @@ enum DrawerPage {
   sqlResult,
 }
 
-class SessionModel {
-  InstanceModel? instance;
-  BaseConnection? conn2;
-  SQLConnectState connState = SQLConnectState.pending;
-  void Function()? _onClose;
-  void Function(String)? _onSchemaChanged;
-  String? currentSchema;
+@freezed
+abstract class SessionDrawerModel with _$SessionDrawerModel {
+  const factory SessionDrawerModel({
+    required DrawerPage drawerPage,
+    required BaseQueryValue? sqlResult,
+    required BaseQueryColumn? sqlColumn,
+    required bool showRecord,
+    required bool isRightPageOpen,
+  }) = _SessionDrawerModel;
+}
 
-  SQLExecuteState? queryState;
+@freezed
+abstract class SessionSplitViewModel with _$SessionSplitViewModel {
+  const factory SessionSplitViewModel({
+    required SplitViewController multiSplitViewCtrl,
+    required SplitViewController metaDataSplitViewCtrl,
+  }) = _SessionSplitViewModel;
+}
 
-  MetaDataNode? metadata;
+@freezed
+abstract class SessionStatusModel with _$SessionStatusModel {
+  const factory SessionStatusModel({
+    required SessionId sessionId,
+    required String instanceName,
+    // sql result
+    ResultId? resultId,
+    required SQLExecuteState state,
+    Duration? executeTime,
+    BigInt? affectedRows,
+    String? query,
+  }) = _SessionStatusModel;
+}
 
-  TreeController<DataNode>? metadataController;
-
-  ReorderSelectedList<SQLResultModel> sqlResults = ReorderSelectedList();
-
-  final SplitViewController multiSplitViewCtrl =
-      SplitViewController(Area(), Area(min: 35, size: 500));
-
-  final SplitViewController metaDataSplitViewCtrl =
-      SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3));
-
-  CodeLineEditingController code = CodeLineEditingController(
-      spanBuilder: ({required codeLines, required context, required style}) {
-    return TextSpan(
-        children: Lexer(codeLines.asString(TextLineBreak.lf))
-            .tokens()
-            .map<TextSpan>((tok) => TextSpan(
-                text: tok.content,
-                style: style.merge(getStyle(tok.id) ?? style)))
-            .toList());
-  });
-
-  // session drawer
-  DrawerPage drawerPage = DrawerPage.metadataTree;
-
-  BaseQueryValue? sqlResult;
-  BaseQueryColumn? sqlColumn;
-
-  //
-  bool showRecord = true;
-  bool isRightPageOpen = true;
-
-  SessionModel();
-
-  int genSQLResultId() {
-    return sqlResults.isEmpty
-        ? 0
-        : sqlResults.fold(
-                0,
-                (previousId, element) =>
-                    previousId < element.id ? element.id : previousId) +
-            1;
-  }
-
-  Future<void> connect() async {
-    try {
-      conn2 = await ConnectionFactory.open(
-          type: instance!.dbType,
-          meta: instance!.connectValue,
-          schema: currentSchema,
-          onCloseCallback: onConnClose,
-          onSchemaChangedCallback: onSchemaChanged);
-      connState = SQLConnectState.connected;
-    } catch (e, s) {
-      print("conn error: ${e}; ${s}");
-      connState = SQLConnectState.failed;
-    }
-  }
-
-  Future<void> close() async {
-    if (conn2 == null || connState != SQLConnectState.connected) {
-      return;
-    }
-    try {
-      conn2!.close();
-      connState = SQLConnectState.pending;
-      conn2 = null;
-    } catch (e) {
-      // todo: handler error;
-    }
-  }
-
-  void onConnClose() {
-    connState = SQLConnectState.pending;
-    _onClose?.call();
-  }
-
-  void onSchemaChanged(String schema) {
-    currentSchema = schema;
-    _onSchemaChanged?.call(schema);
-  }
-
-  void listenCallBack(
-      void Function() onClose, void Function(String) onSchemaChanged) {
-    _onClose = onClose;
-    _onSchemaChanged = onSchemaChanged;
-  }
-
-  void unListenCallBack() {
-    _onClose = null;
-    _onSchemaChanged = null;
-  }
+@freezed
+abstract class SessionSQLEditorModel with _$SessionSQLEditorModel {
+  const factory SessionSQLEditorModel({
+    String? currentSchema,
+    MetaDataNode? metadata,
+  }) = _SessionSQLEditorModel;
 }
