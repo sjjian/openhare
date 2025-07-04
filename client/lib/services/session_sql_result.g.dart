@@ -6,7 +6,7 @@ part of 'session_sql_result.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sQLResultServicesHash() => r'9102bcadb5a993bd0fdb64864ee3cedab64ae584';
+String _$sQLResultServicesHash() => r'5bc4ac2bf3bcbbb105644b847bdf208e85c3d782';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,7 +29,8 @@ class _SystemHash {
   }
 }
 
-abstract class _$SQLResultServices extends BuildlessNotifier<SQLResultModel> {
+abstract class _$SQLResultServices
+    extends BuildlessAutoDisposeNotifier<SQLResultModel> {
   late final ResultId resultId;
 
   SQLResultModel build(
@@ -81,7 +82,7 @@ class SQLResultServicesFamily extends Family<SQLResultModel> {
 
 /// See also [SQLResultServices].
 class SQLResultServicesProvider
-    extends NotifierProviderImpl<SQLResultServices, SQLResultModel> {
+    extends AutoDisposeNotifierProviderImpl<SQLResultServices, SQLResultModel> {
   /// See also [SQLResultServices].
   SQLResultServicesProvider(
     ResultId resultId,
@@ -137,7 +138,8 @@ class SQLResultServicesProvider
   }
 
   @override
-  NotifierProviderElement<SQLResultServices, SQLResultModel> createElement() {
+  AutoDisposeNotifierProviderElement<SQLResultServices, SQLResultModel>
+      createElement() {
     return _SQLResultServicesProviderElement(this);
   }
 
@@ -157,14 +159,14 @@ class SQLResultServicesProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SQLResultServicesRef on NotifierProviderRef<SQLResultModel> {
+mixin SQLResultServicesRef on AutoDisposeNotifierProviderRef<SQLResultModel> {
   /// The parameter `resultId` of this provider.
   ResultId get resultId;
 }
 
 class _SQLResultServicesProviderElement
-    extends NotifierProviderElement<SQLResultServices, SQLResultModel>
-    with SQLResultServicesRef {
+    extends AutoDisposeNotifierProviderElement<SQLResultServices,
+        SQLResultModel> with SQLResultServicesRef {
   _SQLResultServicesProviderElement(super.provider);
 
   @override
@@ -172,10 +174,10 @@ class _SQLResultServicesProviderElement
 }
 
 String _$sQLResultsServicesHash() =>
-    r'96f485c2c5d3a28fc9fde8bd2e4f714306333909';
+    r'5dbe293f44efc4b92f4cfc03f4f7414db0e8e1f2';
 
 abstract class _$SQLResultsServices
-    extends BuildlessNotifier<SQLResultListModel> {
+    extends BuildlessAutoDisposeNotifier<SQLResultListModel> {
   late final SessionId sessionId;
 
   SQLResultListModel build(
@@ -226,8 +228,8 @@ class SQLResultsServicesFamily extends Family<SQLResultListModel> {
 }
 
 /// See also [SQLResultsServices].
-class SQLResultsServicesProvider
-    extends NotifierProviderImpl<SQLResultsServices, SQLResultListModel> {
+class SQLResultsServicesProvider extends AutoDisposeNotifierProviderImpl<
+    SQLResultsServices, SQLResultListModel> {
   /// See also [SQLResultsServices].
   SQLResultsServicesProvider(
     SessionId sessionId,
@@ -283,7 +285,7 @@ class SQLResultsServicesProvider
   }
 
   @override
-  NotifierProviderElement<SQLResultsServices, SQLResultListModel>
+  AutoDisposeNotifierProviderElement<SQLResultsServices, SQLResultListModel>
       createElement() {
     return _SQLResultsServicesProviderElement(this);
   }
@@ -304,14 +306,15 @@ class SQLResultsServicesProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SQLResultsServicesRef on NotifierProviderRef<SQLResultListModel> {
+mixin SQLResultsServicesRef
+    on AutoDisposeNotifierProviderRef<SQLResultListModel> {
   /// The parameter `sessionId` of this provider.
   SessionId get sessionId;
 }
 
 class _SQLResultsServicesProviderElement
-    extends NotifierProviderElement<SQLResultsServices, SQLResultListModel>
-    with SQLResultsServicesRef {
+    extends AutoDisposeNotifierProviderElement<SQLResultsServices,
+        SQLResultListModel> with SQLResultsServicesRef {
   _SQLResultsServicesProviderElement(super.provider);
 
   @override

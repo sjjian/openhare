@@ -37,6 +37,7 @@ abstract class SQLResultListModel with _$SQLResultListModel {
 
 abstract class SQLResultRepo {
   SQLResultListModel getSqlResults(SessionId sessionId);
+  void deleteSQLResults(SessionId sessionId);
   SQLResultModel getSQLReuslt(ResultId resultId);
   void selectSQLResult(ResultId resultId);
   SQLResultModel? selectedSQLResult(SessionId sessionId);

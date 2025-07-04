@@ -36,7 +36,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
       sessionId: sessionIdModel.sessionId,
       connId: sessionIdModel.connId,
       canQuery: sessionConnModel?.canQuery ?? false,
-      currentSchema: sessionConnModel?.currentSchema ?? "",
+      currentSchema: sessionConnModel?.currentSchema ?? "", //todo: 没有订阅到变化
       isRightPageOpen: sessionDrawer.isRightPageOpen,
     );
   }

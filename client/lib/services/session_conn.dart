@@ -2,12 +2,13 @@ import 'package:client/models/instances.dart';
 import 'package:client/models/session_conn.dart';
 import 'package:client/repositories/instances/instances.dart';
 import 'package:client/repositories/session_conn.dart';
+import 'package:client/services/instances/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_conn.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 class SessionConnsServices extends _$SessionConnsServices {
   @override
   int build() {
@@ -27,27 +28,26 @@ class SessionConnsServices extends _$SessionConnsServices {
   }
 }
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 class SessionConnServices extends _$SessionConnServices {
   @override
   SessionConnModel build(ConnId connId) {
-    return ref.watch(sessionConnRepoProvider).getConn(connId);
+    final model =ref.watch(sessionConnRepoProvider).getConn(connId);
+    print("SessionConnServices build: ${model}");
+    return model;
   }
 
   Future<void> connect() async {
-    await ref.read(sessionConnRepoProvider).connect(connId);
+    await ref.read(sessionConnRepoProvider).connect(connId,
+        onSchemaChangedCallback: (schema){
+          ref.read(instancesServicesProvider.notifier).addActiveInstance(state.instanceId, schema: schema);
+          ref.invalidateSelf();
+        });
     ref.invalidateSelf();
   }
 
   Future<void> close() async {
     await ref.read(sessionConnRepoProvider).close(connId);
-    ref.invalidateSelf();
-  }
-
-  Future<void> onSchemaChanged(String schema) async {
-    await ref
-        .read(sessionConnRepoProvider)
-        .onSchemaChanged(connId, schema);
     ref.invalidateSelf();
   }
 

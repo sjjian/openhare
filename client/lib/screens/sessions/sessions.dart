@@ -22,7 +22,7 @@ class SessionsPage extends ConsumerWidget {
         bottomBar: const SessionStatusTab(),
         child: Container(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: (sessionIdModel == null)
+          child: (sessionIdModel == null || sessionIdModel.instanceId == null)
               ? const AddSession()
               : const SessionBodyPage(),
         ));

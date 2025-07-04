@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 class InstanceMetadataServices extends _$InstanceMetadataServices {
   @override
   InstanceMetadataModel build(InstanceId instanceId) {

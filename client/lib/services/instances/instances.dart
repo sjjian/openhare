@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'instances.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 class InstancesServices extends _$InstancesServices {
   @override
   int build() {
@@ -47,12 +47,12 @@ class InstancesServices extends _$InstancesServices {
     );
   }
 
-  void addActiveInstance(InstanceModel instance, {String? schema}) {
-    ref.read(instanceRepoProvider).addActiveInstance(instance.id);
+  void addActiveInstance(InstanceId instanceId, {String? schema}) {
+    ref.read(instanceRepoProvider).addActiveInstance(instanceId);
     if (schema != null) {
       ref
           .read(instanceRepoProvider)
-          .addInstanceActiveSchema(instance.id, schema);
+          .addInstanceActiveSchema(instanceId, schema);
     }
   }
 

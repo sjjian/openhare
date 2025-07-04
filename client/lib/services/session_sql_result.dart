@@ -10,7 +10,7 @@ import 'package:excel/excel.dart';
 
 part 'session_sql_result.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 class SQLResultServices extends _$SQLResultServices {
   @override
   SQLResultModel build(ResultId resultId) {
@@ -63,7 +63,7 @@ class SQLResultServices extends _$SQLResultServices {
   }
 }
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 class SQLResultsServices extends _$SQLResultsServices {
   @override
   SQLResultListModel build(SessionId sessionId) {

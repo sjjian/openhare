@@ -122,7 +122,7 @@ class SqlResultTables extends ConsumerWidget {
                 tabs: [
               for (var i = 0; i < model.results.length; i++)
                 CommonTabWrap(
-                  label: "${model.results[i].resultId}",
+                  label: "${model.results[i].resultId.value}",
                   selected: model.results[i] == model.selected,
                   onTap: () {
                     ref

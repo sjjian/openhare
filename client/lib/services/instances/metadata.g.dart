@@ -7,7 +7,7 @@ part of 'metadata.dart';
 // **************************************************************************
 
 String _$instanceMetadataServicesHash() =>
-    r'095dc93cda9e5af9b57123dc5834769417f41714';
+    r'795b9174e2f236e08ff34466eaf2ad6beaf3b7ba';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,7 +31,7 @@ class _SystemHash {
 }
 
 abstract class _$InstanceMetadataServices
-    extends BuildlessNotifier<InstanceMetadataModel> {
+    extends BuildlessAutoDisposeNotifier<InstanceMetadataModel> {
   late final InstanceId instanceId;
 
   InstanceMetadataModel build(
@@ -82,7 +82,7 @@ class InstanceMetadataServicesFamily extends Family<InstanceMetadataModel> {
 }
 
 /// See also [InstanceMetadataServices].
-class InstanceMetadataServicesProvider extends NotifierProviderImpl<
+class InstanceMetadataServicesProvider extends AutoDisposeNotifierProviderImpl<
     InstanceMetadataServices, InstanceMetadataModel> {
   /// See also [InstanceMetadataServices].
   InstanceMetadataServicesProvider(
@@ -139,8 +139,8 @@ class InstanceMetadataServicesProvider extends NotifierProviderImpl<
   }
 
   @override
-  NotifierProviderElement<InstanceMetadataServices, InstanceMetadataModel>
-      createElement() {
+  AutoDisposeNotifierProviderElement<InstanceMetadataServices,
+      InstanceMetadataModel> createElement() {
     return _InstanceMetadataServicesProviderElement(this);
   }
 
@@ -162,14 +162,14 @@ class InstanceMetadataServicesProvider extends NotifierProviderImpl<
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin InstanceMetadataServicesRef
-    on NotifierProviderRef<InstanceMetadataModel> {
+    on AutoDisposeNotifierProviderRef<InstanceMetadataModel> {
   /// The parameter `instanceId` of this provider.
   InstanceId get instanceId;
 }
 
-class _InstanceMetadataServicesProviderElement extends NotifierProviderElement<
-    InstanceMetadataServices,
-    InstanceMetadataModel> with InstanceMetadataServicesRef {
+class _InstanceMetadataServicesProviderElement
+    extends AutoDisposeNotifierProviderElement<InstanceMetadataServices,
+        InstanceMetadataModel> with InstanceMetadataServicesRef {
   _InstanceMetadataServicesProviderElement(super.provider);
 
   @override

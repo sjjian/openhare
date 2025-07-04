@@ -59,6 +59,11 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
+  void deleteSQLResults(SessionId sessionId) {
+    sqlResults.remove(sessionId.value);
+  }
+
+  @override
   SQLResultModel getSQLReuslt(ResultId resultId) {
     final result = _getSQLResult(resultId.sessionId.value, resultId.value);
     return _toModel(result);

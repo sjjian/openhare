@@ -19,18 +19,19 @@ class SessionConnRepoImpl extends SessionConnRepo {
   SessionConnModel getConn(ConnId connId) {
     return SessionConnModel(
         connId: connId,
+        instanceId: conns[connId.value]?.model.id ?? const InstanceId(value: 0),
         currentSchema: conns[connId.value]?.currentSchema ?? "",
         canQuery: conns[connId.value]?.canQuery() ?? false);
   }
 
   @override
-  SessionConnModel createConn(InstanceModel model,
-      {String? currentSchema}) {
+  SessionConnModel createConn(InstanceModel model, {String? currentSchema}) {
     SessionConn conn = SessionConn(model: model, currentSchema: currentSchema);
     final id = getConnId();
     conns[id] = conn;
     return SessionConnModel(
         connId: ConnId(value: id),
+        instanceId: model.id,
         currentSchema: currentSchema ?? "",
         canQuery: conn.canQuery());
   }
@@ -41,18 +42,20 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
-  Future<void> connect(ConnId connId) {
-    return conns[connId.value]!.connect();
+  Future<void> connect(
+    ConnId connId, {
+    Function()? onCloseCallback,
+    Function(String)? onSchemaChangedCallback,
+  }) {
+    return conns[connId.value]!.connect(
+      onCloseCallback: onCloseCallback,
+      onSchemaChangedCallback: onSchemaChangedCallback,
+    );
   }
 
   @override
   Future<void> close(ConnId connId) {
     return conns[connId.value]!.close();
-  }
-
-  @override
-  Future<void> onSchemaChanged(ConnId connId, String schema) {
-    return conns[connId.value]!.onSchemaChanged(schema);
   }
 
   @override
@@ -92,21 +95,27 @@ class SessionConn {
     this.currentSchema,
   });
 
-  Future<void> connect() async {
+  Future<void> connect(
+      {Function()? onCloseCallback,
+      Function(String)? onSchemaChangedCallback}) async {
     try {
       conn2 = await ConnectionFactory.open(
         type: model.dbType,
         meta: model.connectValue,
         schema: currentSchema,
-        // onCloseCallback: state.onConnClose,
-        // onSchemaChangedCallback: state.onSchemaChanged,
+        onCloseCallback: () {
+          state = SQLConnectState.pending;
+          onCloseCallback?.call();
+        },
+        onSchemaChangedCallback: (schema) {
+          currentSchema = schema;
+          onSchemaChangedCallback?.call(schema);
+        },
       );
       state = SQLConnectState.connected;
-      //  = state.copyWith(conn2: conn, state: SQLConnectState.connected);
     } catch (e, s) {
       print("conn error: ${e}; ${s}");
       state = SQLConnectState.failed;
-      // state = state.copyWith(conn2: null, state: SQLConnectState.failed);
     }
   }
 
@@ -137,13 +146,6 @@ class SessionConn {
     } finally {
       queryState = SQLExecuteState.init;
     }
-  }
-
-  Future<void> onSchemaChanged(String schema) async {
-    // ObjectBox ob = ref.read(objectboxProvider);
-    // await ob.addInstanceActiveSchema(state.model.instance.target!, schema);
-    // state = state.copyWith(currentSchema: schema);
-    currentSchema = schema;
   }
 
   Future<void> setCurrentSchema(String schema) async {

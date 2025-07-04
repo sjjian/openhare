@@ -80,7 +80,7 @@ class SessionRepoImpl extends SessionRepo {
         .firstWhere((s) => s.id == sessionId.value); //todo: handler null
     session.instance.target = InstanceStorage.fromModel(instance);
     session.currentSchema = currentSchema;
-    _sessionBox.putAsync(session);
+    await _sessionBox.putAsync(session);
   }
 
   @override
@@ -90,8 +90,8 @@ class SessionRepoImpl extends SessionRepo {
 
   @override
   Future<void> deleteSession(SessionId sessionId) async {
-    _sessions.removeWhere((session) => session.id == sessionId.value);
-    _sessionBox.removeAsync(sessionId.value);
+    _sessions.removeAt(_sessions.indexWhere((session) => session.id == sessionId.value));
+    await _sessionBox.removeAsync(sessionId.value);
   }
 
   @override

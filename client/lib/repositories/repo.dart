@@ -23,7 +23,7 @@ class ObjectBox {
   static Future<ObjectBox> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
-    print("load stor from: ${docsDir.path}/objectbox");
+    print("load store from: ${docsDir.path}/objectbox");
     final store = await openStore(
         directory: p.join(docsDir.path, "objectbox"),
         macosApplicationGroup: "objectbox.store");
