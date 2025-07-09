@@ -5,6 +5,7 @@ import 'package:client/repositories/session_sql_result.dart';
 import 'package:client/repositories/sessions.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/session_conn.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sessions.g.dart';
@@ -17,7 +18,7 @@ class SessionsServices extends _$SessionsServices {
     return sessions;
   }
 
-  SessionModel? getSession(SessionId sessionId){
+  SessionModel? getSession(SessionId sessionId) {
     return ref.read(sessionRepoProvider).getSession(sessionId);
   }
 
@@ -39,8 +40,10 @@ class SessionsServices extends _$SessionsServices {
       selectedSession = state.selectedSession!;
     }
 
-    ref.read(instancesServicesProvider.notifier).addActiveInstance(instance.id, schema: schema);
-    
+    ref
+        .read(instancesServicesProvider.notifier)
+        .addActiveInstance(instance.id, schema: schema);
+
     await ref
         .read(sessionRepoProvider)
         .updateSession(selectedSession.sessionId, instance, schema ?? '');
@@ -59,12 +62,18 @@ class SessionsServices extends _$SessionsServices {
 
   Future<void> deleteSessionByIndex(int index) async {
     // 1. delete session
-    await ref.read(sessionRepoProvider).deleteSession(state.sessions[index].sessionId);
+    await ref
+        .read(sessionRepoProvider)
+        .deleteSession(state.sessions[index].sessionId);
     // 2. close conn
     final session = state.sessions[index];
     if (session.connId != null) {
-      await ref.read(sessionConnServicesProvider(session.connId!).notifier).close();
-      await ref.read(sessionConnsServicesProvider.notifier).removeConn(session.connId!);
+      await ref
+          .read(sessionConnServicesProvider(session.connId!).notifier)
+          .close();
+      await ref
+          .read(sessionConnsServicesProvider.notifier)
+          .removeConn(session.connId!);
     }
     // 3. delete result
     ref.read(sqlResultsRepoProvider).deleteSQLResults(session.sessionId);

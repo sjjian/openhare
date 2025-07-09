@@ -6,190 +6,150 @@ part of 'session_conn.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(SessionConnsServices)
+const sessionConnsServicesProvider = SessionConnsServicesProvider._();
+
+final class SessionConnsServicesProvider
+    extends $NotifierProvider<SessionConnsServices, int> {
+  const SessionConnsServicesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'sessionConnsServicesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$sessionConnsServicesHash();
+
+  @$internal
+  @override
+  SessionConnsServices create() => SessionConnsServices();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
 String _$sessionConnsServicesHash() =>
     r'3770fe1a1a765806d8e9e490c6af5088766d1e43';
 
-/// See also [SessionConnsServices].
-@ProviderFor(SessionConnsServices)
-final sessionConnsServicesProvider =
-    AutoDisposeNotifierProvider<SessionConnsServices, int>.internal(
-  SessionConnsServices.new,
-  name: r'sessionConnsServicesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sessionConnsServicesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SessionConnsServices = AutoDisposeNotifier<int>;
-String _$sessionConnServicesHash() =>
-    r'd20148982e0b1d8b37f6ff66b191bdb5a393de38';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+abstract class _$SessionConnsServices extends $Notifier<int> {
+  int build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<int, int>;
+    final element = ref.element
+        as $ClassProviderElement<AnyNotifier<int, int>, int, Object?, Object?>;
+    element.handleValue(ref, created);
   }
 }
 
-abstract class _$SessionConnServices
-    extends BuildlessAutoDisposeNotifier<SessionConnModel> {
-  late final ConnId connId;
-
-  SessionConnModel build(
-    ConnId connId,
-  );
-}
-
-/// See also [SessionConnServices].
 @ProviderFor(SessionConnServices)
-const sessionConnServicesProvider = SessionConnServicesFamily();
+const sessionConnServicesProvider = SessionConnServicesFamily._();
 
-/// See also [SessionConnServices].
-class SessionConnServicesFamily extends Family<SessionConnModel> {
-  /// See also [SessionConnServices].
-  const SessionConnServicesFamily();
-
-  /// See also [SessionConnServices].
-  SessionConnServicesProvider call(
-    ConnId connId,
-  ) {
-    return SessionConnServicesProvider(
-      connId,
-    );
-  }
-
-  @override
-  SessionConnServicesProvider getProviderOverride(
-    covariant SessionConnServicesProvider provider,
-  ) {
-    return call(
-      provider.connId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'sessionConnServicesProvider';
-}
-
-/// See also [SessionConnServices].
-class SessionConnServicesProvider extends AutoDisposeNotifierProviderImpl<
-    SessionConnServices, SessionConnModel> {
-  /// See also [SessionConnServices].
-  SessionConnServicesProvider(
-    ConnId connId,
-  ) : this._internal(
-          () => SessionConnServices()..connId = connId,
-          from: sessionConnServicesProvider,
+final class SessionConnServicesProvider
+    extends $NotifierProvider<SessionConnServices, SessionConnModel?> {
+  const SessionConnServicesProvider._(
+      {required SessionConnServicesFamily super.from,
+      required ConnId super.argument})
+      : super(
+          retry: null,
           name: r'sessionConnServicesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$sessionConnServicesHash,
-          dependencies: SessionConnServicesFamily._dependencies,
-          allTransitiveDependencies:
-              SessionConnServicesFamily._allTransitiveDependencies,
-          connId: connId,
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  SessionConnServicesProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.connId,
-  }) : super.internal();
-
-  final ConnId connId;
+  @override
+  String debugGetCreateSourceHash() => _$sessionConnServicesHash();
 
   @override
-  SessionConnModel runNotifierBuild(
-    covariant SessionConnServices notifier,
-  ) {
-    return notifier.build(
-      connId,
-    );
+  String toString() {
+    return r'sessionConnServicesProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  Override overrideWith(SessionConnServices Function() create) {
-    return ProviderOverride(
+  SessionConnServices create() => SessionConnServices();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SessionConnModel? value) {
+    return $ProviderOverride(
       origin: this,
-      override: SessionConnServicesProvider._internal(
-        () => create()..connId = connId,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        connId: connId,
-      ),
+      providerOverride: $SyncValueProvider<SessionConnModel?>(value),
     );
-  }
-
-  @override
-  AutoDisposeNotifierProviderElement<SessionConnServices, SessionConnModel>
-      createElement() {
-    return _SessionConnServicesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SessionConnServicesProvider && other.connId == connId;
+    return other is SessionConnServicesProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, connId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin SessionConnServicesRef
-    on AutoDisposeNotifierProviderRef<SessionConnModel> {
-  /// The parameter `connId` of this provider.
-  ConnId get connId;
-}
+String _$sessionConnServicesHash() =>
+    r'5bbd7d9715d905dd315b04a0aaf7e30ae0a3a8fb';
 
-class _SessionConnServicesProviderElement
-    extends AutoDisposeNotifierProviderElement<SessionConnServices,
-        SessionConnModel> with SessionConnServicesRef {
-  _SessionConnServicesProviderElement(super.provider);
+final class SessionConnServicesFamily extends $Family
+    with
+        $ClassFamilyOverride<SessionConnServices, SessionConnModel?,
+            SessionConnModel?, SessionConnModel?, ConnId> {
+  const SessionConnServicesFamily._()
+      : super(
+          retry: null,
+          name: r'sessionConnServicesProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: false,
+        );
+
+  SessionConnServicesProvider call(
+    ConnId connId,
+  ) =>
+      SessionConnServicesProvider._(argument: connId, from: this);
 
   @override
-  ConnId get connId => (origin as SessionConnServicesProvider).connId;
+  String toString() => r'sessionConnServicesProvider';
 }
+
+abstract class _$SessionConnServices extends $Notifier<SessionConnModel?> {
+  late final _$args = ref.$arg as ConnId;
+  ConnId get connId => _$args;
+
+  SessionConnModel? build(
+    ConnId connId,
+  );
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref = this.ref as $Ref<SessionConnModel?, SessionConnModel?>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<SessionConnModel?, SessionConnModel?>,
+        SessionConnModel?,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

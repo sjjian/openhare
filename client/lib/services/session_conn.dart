@@ -28,21 +28,28 @@ class SessionConnsServices extends _$SessionConnsServices {
   }
 }
 
-@Riverpod()
+@Riverpod(keepAlive: true)
 class SessionConnServices extends _$SessionConnServices {
   @override
-  SessionConnModel build(ConnId connId) {
-    final model =ref.watch(sessionConnRepoProvider).getConn(connId);
-    print("SessionConnServices build: ${model}");
+  SessionConnModel? build(ConnId connId) {
+    if (connId.value == 0) {
+      return null;
+    }
+    final model = ref.watch(sessionConnRepoProvider).getConn(connId);
     return model;
   }
 
   Future<void> connect() async {
-    await ref.read(sessionConnRepoProvider).connect(connId,
-        onSchemaChangedCallback: (schema){
-          ref.read(instancesServicesProvider.notifier).addActiveInstance(state.instanceId, schema: schema);
-          ref.invalidateSelf();
-        });
+    await ref.read(sessionConnRepoProvider).connect(
+      connId,
+      onSchemaChangedCallback: (schema) {
+        ref
+            .read(instancesServicesProvider.notifier)
+            .addActiveInstance(state!.instanceId, schema: schema);
+        ref.invalidateSelf();
+      },
+    );
+    if (!ref.mounted) return;
     ref.invalidateSelf();
   }
 
@@ -52,9 +59,7 @@ class SessionConnServices extends _$SessionConnServices {
   }
 
   Future<void> setCurrentSchema(String schema) async {
-    await ref
-        .read(sessionConnRepoProvider)
-        .setCurrentSchema(connId, schema);
+    await ref.read(sessionConnRepoProvider).setCurrentSchema(connId, schema);
     ref.invalidateSelf();
   }
 
@@ -67,8 +72,6 @@ class SessionConnServices extends _$SessionConnServices {
   }
 
   Future<BaseQueryResult?> query(String query) async {
-    return ref
-        .read(sessionConnRepoProvider)
-        .query(connId, query);
+    return ref.read(sessionConnRepoProvider).query(connId, query);
   }
 }
