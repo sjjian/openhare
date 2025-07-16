@@ -39,7 +39,7 @@ final class SessionOpBarNotifierProvider
 }
 
 String _$sessionOpBarNotifierHash() =>
-    r'363fbd9baf4e404ada3aeeb5fe1b5c5b210c4af5';
+    r'cac5c60d6d2581d226cd55e2f1abba6ee2b2385c';
 
 abstract class _$SessionOpBarNotifier extends $Notifier<SessionOpBarModel?> {
   SessionOpBarModel? build();

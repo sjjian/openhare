@@ -1,7 +1,6 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
-import 'package:client/utils/active_set.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -10,7 +9,6 @@ import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:client/repositories/instances/instances.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:client/utils/sql_highlight.dart';
 

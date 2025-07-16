@@ -6,22 +6,17 @@ import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'shell');
 
-class App extends StatefulWidget {
-  const App({super.key});
+class App extends ConsumerWidget {
+  App({super.key});
 
-  @override
-  State<App> createState() => _AppState();
-}
-
-String lastInstancePage = "/instances/list";
-
-class _AppState extends State<App> {
   final GoRouter _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: '/sessions',
@@ -76,19 +71,30 @@ class _AppState extends State<App> {
       ]);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final model = ref.watch(settingNotifierProvider);
+
     return MaterialApp.router(
       title: 'Natuo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness:
+              model.theme == "dark" ? Brightness.dark : Brightness.light,
+        ),
         useMaterial3: true,
-        // brightness: Brightness.dark
       ),
+      themeMode: (model.theme == "dark") ? ThemeMode.dark : ThemeMode.light,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: Locale(model.language),
     );
   }
 }
+
+String lastInstancePage = "/instances/list";
 
 class ScaffoldWithNavRail extends StatefulWidget {
   final Widget child;
@@ -107,6 +113,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
     return Row(
       children: <Widget>[
         NavigationRail(
+          minWidth: 70,
           backgroundColor:
               Theme.of(context).colorScheme.surfaceDim, // navigation color
           useIndicator: true,
@@ -161,15 +168,15 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               ),
             )
           ],
-          trailing: const Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
-                child: FlutterLogo(),
-              ),
-            ),
-          ),
+          // trailing: const Expanded(
+          //   child: Align(
+          //     alignment: Alignment.bottomCenter,
+          //     child: Padding(
+          //       padding: EdgeInsets.only(bottom: 20),
+          //       child: FlutterLogo(),
+          //     ),
+          //   ),
+          // ),
         ),
         Expanded(child: widget.child)
       ],

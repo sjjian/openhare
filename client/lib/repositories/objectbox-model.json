@@ -108,9 +108,33 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "6:7763174657391623643",
+      "lastPropertyId": "3:5314647270738127679",
+      "name": "SettingsStorage",
+      "properties": [
+        {
+          "id": "1:390357101932384688",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5521178418702823783",
+          "name": "theme",
+          "type": 9
+        },
+        {
+          "id": "3:5314647270738127679",
+          "name": "language",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "5:9068295192823040783",
+  "lastEntityId": "6:7763174657391623643",
   "lastIndexId": "2:3493315780447542151",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
