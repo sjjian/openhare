@@ -14,6 +14,7 @@ import 'package:client/utils/sql_highlight.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'session_sql_results.g.dart';
 
@@ -70,8 +71,7 @@ class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
     if (resultId == null) {
       return null;
     }
-    return ref
-        .watch(sQLResultServicesProvider(resultId));
+    return ref.watch(sQLResultServicesProvider(resultId));
   }
 }
 
@@ -99,15 +99,15 @@ class SqlResultTables extends ConsumerWidget {
       tab = const Spacer();
     } else {
       tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        CommonTab(
-          label: "执行记录",
-          selected: false, // todo
-          width: 100,
-          style: style,
-          onTap: () {
-            // session.selectToRecord();
-          },
-        ),
+        // CommonTab(
+        //   label: "执行记录",
+        //   selected: false, // todo
+        //   width: 100,
+        //   style: style,
+        //   onTap: () {
+        //     // session.selectToRecord();
+        //   },
+        // ),
         Expanded(
             child: CommonTabBar(
                 height: 35,
@@ -210,7 +210,7 @@ class SqlResultTable extends ConsumerWidget {
       return Container(
           alignment: Alignment.center,
           color: color,
-          child: const Text('no data'));
+          child: Text(AppLocalizations.of(context)!.display_msg_no_data));
     }
     if (model.state == SQLExecuteState.done) {
       return PlutoGrid(

@@ -59,7 +59,7 @@ class SettingsPage extends ConsumerWidget {
                           children: [
                             const Icon(Icons.language),
                             const SizedBox(width: 8),
-                            const Text("语言"),
+                            Text(AppLocalizations.of(context)!.language),
                             const SizedBox(
                               width: 16,
                             ),
@@ -106,14 +106,15 @@ class SettingsPage extends ConsumerWidget {
                           children: [
                             const Icon(Icons.language),
                             const SizedBox(width: 8),
-                            const Text("主题"),
+                            Text(AppLocalizations.of(context)!.theme),
                             const SizedBox(
                               width: 16,
                             ),
                             SizedBox(
                               width: 140,
                               child: RadioListTile<String>(
-                                title: const Text("浅色"),
+                                title: Text(
+                                    AppLocalizations.of(context)!.theme_light),
                                 value: "light",
                                 groupValue: model.theme,
                                 onChanged: (value) {
@@ -130,7 +131,8 @@ class SettingsPage extends ConsumerWidget {
                             SizedBox(
                               width: 140,
                               child: RadioListTile<String>(
-                                title: const Text("深色"),
+                                title: Text(
+                                    AppLocalizations.of(context)!.theme_dark),
                                 value: "dark",
                                 groupValue: model.theme,
                                 onChanged: (value) {

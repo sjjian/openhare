@@ -6,6 +6,7 @@ import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'session_tabs.g.dart';
 
@@ -48,7 +49,7 @@ class SessionTabs extends ConsumerWidget {
             for (var i = 0; i < model.sessions.length; i++)
               (model.sessions[i].instanceId == null)
                   ? CommonTabWrap(
-                      label: "new",
+                      label: AppLocalizations.of(context)!.new_tab,
                       onTap: () {
                         ref
                             .read(sessionsServicesProvider.notifier)
@@ -86,7 +87,7 @@ class SessionTabs extends ConsumerWidget {
                                 .setConnId(model.sessions[i].sessionId,
                                     connModel.connId);
                           },
-                          child: const Text("连接"),
+                          child: Text(AppLocalizations.of(context)!.connect),
                         ),
                         const PopupMenuDivider(height: 0.1),
                         PopupMenuItem<String>(
@@ -98,7 +99,7 @@ class SessionTabs extends ConsumerWidget {
                                     .notifier)
                                 .close();
                           },
-                          child: const Text("断开"),
+                          child: Text(AppLocalizations.of(context)!.disconnect),
                         ),
                         const PopupMenuDivider(height: 0.1),
                         PopupMenuItem<String>(
@@ -108,7 +109,7 @@ class SessionTabs extends ConsumerWidget {
                                 .read(sessionsServicesProvider.notifier)
                                 .deleteSessionByIndex(i);
                           },
-                          child: const Text("关闭"),
+                          child: Text(AppLocalizations.of(context)!.close),
                         ),
                       ],
                       onTap: () {

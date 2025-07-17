@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'session_status.g.dart';
 
@@ -58,18 +59,24 @@ class SessionStatusTab extends ConsumerWidget {
       child: Row(
         children: [
           Tooltip(
-              message: 'effect rows: $affectedRowsDisplay',
-              child: Text('effect rows: $affectedRowsDisplay')),
+              message:
+                  '${AppLocalizations.of(context)!.effect_rows}: $affectedRowsDisplay',
+              child: Text(
+                  '${AppLocalizations.of(context)!.effect_rows}: $affectedRowsDisplay')),
           const Text("  |  "),
           Tooltip(
-              message: 'duration: $executeTimeDisplay',
-              child: Text('duration: $executeTimeDisplay')),
+              message:
+                  '${AppLocalizations.of(context)!.duration}: $executeTimeDisplay',
+              child: Text(
+                  '${AppLocalizations.of(context)!.duration}: $executeTimeDisplay')),
           const Text("  |  "),
           Tooltip(
-            message: model.query ?? "No query executed",
+            message:
+                model.query ?? AppLocalizations.of(context)!.no_query_executed,
             child: SizedBox(
                 width: 200,
-                child: Text("query: $shortQueryDisplay",
+                child: Text(
+                    "${AppLocalizations.of(context)!.query}: $shortQueryDisplay",
                     overflow: TextOverflow.ellipsis)),
           ),
           const Text("  |  "),
@@ -78,7 +85,8 @@ class SessionStatusTab extends ConsumerWidget {
                 onPressed: () async {
                   //todo: 下载失效了，需要测试。
                   String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle: 'Please select an output file:',
+                    dialogTitle:
+                        AppLocalizations.of(context)!.display_msg_downlaod,
                     fileName:
                         '${model.instanceName}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
                   );
@@ -87,9 +95,7 @@ class SessionStatusTab extends ConsumerWidget {
                   }
                   File file = File(outputFile);
                   await file.writeAsBytes(ref
-                      .read(sQLResultServicesProvider(
-                              model.resultId!)
-                          .notifier)
+                      .read(sQLResultServicesProvider(model.resultId!).notifier)
                       .toExcel()
                       .save()!);
                 },
