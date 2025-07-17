@@ -13,7 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class SessionDrawerSqlResult extends ConsumerWidget {
   const SessionDrawerSqlResult({Key? key}) : super(key: key);
 
-  Widget buildDisplayField(BuildContext context, SessionDrawerModel sessionDrawer) {
+  Widget buildDisplayField(
+      BuildContext context, SessionDrawerModel sessionDrawer) {
     BaseQueryValue? result = sessionDrawer.sqlResult;
     if (result == null) {
       return const ValueDisplayField(data: "");
@@ -47,7 +48,7 @@ class SessionDrawerSqlResult extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionDrawer = ref.watch(sessionDrawerControllerProvider)!;
+    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
     return Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -8,6 +8,7 @@ import 'package:client/screens/page_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'instance_tables.g.dart';
 
@@ -97,13 +98,13 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
 
   @override
   Widget build(BuildContext context) {
-    const column = [
-      DataColumn(label: Text("名称")),
-      DataColumn(label: Text("描述")),
-      DataColumn(label: Text("地址")),
-      DataColumn(label: Text("端口")),
-      DataColumn(label: Text("用户名")),
-      DataColumn(label: Text("操作"))
+    final column = [
+      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_name)),
+      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_desc)),
+      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_host)),
+      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_port)),
+      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_user)),
+      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_op))
     ];
 
     final model = ref.watch(instancesNotifierProvider);
@@ -125,7 +126,7 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                 child: Row(
                   children: [
                     Text(
-                      "数据源列表",
+                      AppLocalizations.of(context)!.db_instance,
                       style: Theme.of(context).textTheme.titleLarge,
                       overflow: TextOverflow.ellipsis,
                     ),

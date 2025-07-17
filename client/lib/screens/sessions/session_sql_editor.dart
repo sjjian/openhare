@@ -27,14 +27,11 @@ class SelectedSessionSQLEditorNotifier
     InstanceMetadataModel? sessionMeta =
         ref.watch(sessionMetadataNotifierProvider);
 
-    String? currentSchema;
-    if (sessionIdModel.connId != null) {
-      SessionConnModel sessionConnModel =
-          ref.watch(sessionConnServicesProvider(sessionIdModel.connId!));
-      currentSchema = sessionConnModel.currentSchema;
-    }
+    SessionConnModel? sessionConnModel = ref.watch(sessionConnServicesProvider(
+        sessionIdModel.connId ?? const ConnId(value: 0)));
+
     return SessionSQLEditorModel(
-      currentSchema: currentSchema,
+      currentSchema: sessionConnModel?.currentSchema,
       metadata: sessionMeta?.metadata,
     );
   }

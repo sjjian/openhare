@@ -14,7 +14,7 @@ void main() async {
 
   await ConnectionFactory.init();
 
-  runApp(const ProviderScope(child: App()));
+  runApp(ProviderScope(child: App()));
 
   doWhenWindowReady(() {
     const initialSize = Size(1400, 1000);

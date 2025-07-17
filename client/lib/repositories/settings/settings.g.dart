@@ -1,51 +1,51 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'instances.dart';
+part of 'settings.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-@ProviderFor(instanceRepo)
-const instanceRepoProvider = InstanceRepoProvider._();
+@ProviderFor(settingsRepo)
+const settingsRepoProvider = SettingsRepoProvider._();
 
-final class InstanceRepoProvider
-    extends $FunctionalProvider<InstanceRepo, InstanceRepo, InstanceRepo>
-    with $Provider<InstanceRepo> {
-  const InstanceRepoProvider._()
+final class SettingsRepoProvider
+    extends $FunctionalProvider<SettingsRepo, SettingsRepo, SettingsRepo>
+    with $Provider<SettingsRepo> {
+  const SettingsRepoProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'instanceRepoProvider',
+          name: r'settingsRepoProvider',
           isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$instanceRepoHash();
+  String debugGetCreateSourceHash() => _$settingsRepoHash();
 
   @$internal
   @override
-  $ProviderElement<InstanceRepo> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<SettingsRepo> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  InstanceRepo create(Ref ref) {
-    return instanceRepo(ref);
+  SettingsRepo create(Ref ref) {
+    return settingsRepo(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(InstanceRepo value) {
+  Override overrideWithValue(SettingsRepo value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<InstanceRepo>(value),
+      providerOverride: $SyncValueProvider<SettingsRepo>(value),
     );
   }
 }
 
-String _$instanceRepoHash() => r'e34eb7dc6f7ef4eda56ab23e4b330d875ac804de';
+String _$settingsRepoHash() => r'f49caaf5239aee4643cb4377d2aa31952e3a6039';
 
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

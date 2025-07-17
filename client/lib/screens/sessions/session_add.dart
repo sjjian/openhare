@@ -5,6 +5,7 @@ import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddSession extends HookConsumerWidget {
   const AddSession({Key? key}) : super(key: key);
@@ -27,7 +28,7 @@ class AddSession extends HookConsumerWidget {
                 Container(
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Text(
-                    "最近使用",
+                    AppLocalizations.of(context)!.recently_used_db_instance,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -36,10 +37,14 @@ class AddSession extends HookConsumerWidget {
                   padding: const EdgeInsets.only(top: 5, bottom: 5),
                   child: Row(
                     children: [
-                      const SizedBox(width: 200, child: Text("数据源")),
+                      SizedBox(
+                          width: 200,
+                          child: Text(
+                              AppLocalizations.of(context)!.db_instance_name)),
                       Container(
                           padding: const EdgeInsets.only(left: 15),
-                          child: const Text("最近打开的数据库"))
+                          child: Text(AppLocalizations.of(context)!
+                              .recently_used_schema))
                     ],
                   ),
                 ),
@@ -88,7 +93,7 @@ class AddSession extends HookConsumerWidget {
                   child: Row(
                     children: [
                       Text(
-                        "完整列表",
+                        AppLocalizations.of(context)!.db_instance,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Expanded(
@@ -126,14 +131,19 @@ class AddSession extends HookConsumerWidget {
                   padding: const EdgeInsets.only(top: 5, bottom: 5),
                   child: Row(
                     children: [
-                      const SizedBox(width: 200, child: Text("数据源")),
+                      SizedBox(
+                          width: 200,
+                          child: Text(
+                              AppLocalizations.of(context)!.db_instance_name)),
                       Container(
                           width: 200,
                           padding: const EdgeInsets.only(left: 15),
-                          child: const Text("地址")),
+                          child: Text(
+                              AppLocalizations.of(context)!.db_instance_host)),
                       Container(
                           padding: const EdgeInsets.only(left: 15),
-                          child: const Text("描述")),
+                          child: Text(
+                              AppLocalizations.of(context)!.db_instance_desc)),
                     ],
                   ),
                 ),

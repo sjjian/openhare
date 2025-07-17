@@ -1,7 +1,6 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
-import 'package:client/utils/active_set.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -10,9 +9,9 @@ import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:client/repositories/instances/instances.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:client/utils/sql_highlight.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddInstancePage extends StatefulWidget {
   const AddInstancePage({Key? key}) : super(key: key);
@@ -105,7 +104,7 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                 child: Row(
                   children: [
                     Text(
-                      "添加数据源",
+                      AppLocalizations.of(context)!.add_db_instance,
                       style: Theme.of(context).textTheme.titleLarge,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -116,7 +115,8 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                             : () {
                                 addInstanceController.databasePing();
                               },
-                        child: const Text("测试连接")),
+                        child: Text(
+                            AppLocalizations.of(context)!.db_instance_test)),
                     TextButton(
                         onPressed: () async {
                           if (addInstanceController.validate()) {
@@ -124,7 +124,7 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                                 .read(instancesServicesProvider.notifier)
                                 .addInstance(
                                     addInstanceController.getInstanceModel());
-                            
+
                             addInstanceController.clear();
 
                             ref
@@ -132,7 +132,8 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                                 .changePage("");
                           }
                         },
-                        child: const Text("提交并继续添加")),
+                        child: Text(
+                            AppLocalizations.of(context)!.submit_and_continue)),
                     TextButton(
                         onPressed: () async {
                           if (addInstanceController.validate()) {
@@ -146,11 +147,11 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
                             ref
                                 .read(instancesNotifierProvider.notifier)
                                 .changePage("");
-                            
+
                             GoRouter.of(context).go('/instances/list');
                           }
                         },
-                        child: const Text("提交")),
+                        child: Text(AppLocalizations.of(context)!.submit)),
                   ],
                 ),
               ),
@@ -372,7 +373,7 @@ class DescFormField extends StatelessWidget {
         maxLines: 4,
         decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-            labelText: "描述",
+            labelText: AppLocalizations.of(context)!.db_instance_desc,
             contentPadding: const EdgeInsets.all(10)),
       ),
     );
@@ -411,7 +412,7 @@ class AddInstanceForm extends StatelessWidget {
   FormFieldValidator validatorName(BuildContext context) {
     return (value) {
       if (value == null || value.isEmpty) {
-        return "名称不能为空";
+        return AppLocalizations.of(context)!.field_val_msg_value_reqiured;
       }
       // final exist = context.read<InstancesProvider>().isInstanceExist(value);
       // if (exist is Future<bool>) {
@@ -428,7 +429,7 @@ class AddInstanceForm extends StatelessWidget {
   FormFieldValidator validatorValueRequired(BuildContext context) {
     return (value) {
       if (value == null || value.isEmpty) {
-        return "值不能为空";
+        return AppLocalizations.of(context)!.field_val_msg_value_reqiured;
       }
       return null;
     };
@@ -455,7 +456,7 @@ class AddInstanceForm extends StatelessWidget {
     FormInfo name = infos[settingMetaNameName]!;
     return CommonFormField(
       state: name.state,
-      label: "名称",
+      label: AppLocalizations.of(context)!.db_instance_name,
       controller: name.ctrl,
       validator: validatorFn(context, name, validatorName(context)),
     );
@@ -471,7 +472,7 @@ class AddInstanceForm extends StatelessWidget {
         children: [
           Expanded(
             child: CommonFormField(
-              label: "地址",
+              label: AppLocalizations.of(context)!.db_instance_host,
               controller: addr.ctrl,
               state: addr.state,
               validator:
@@ -484,7 +485,7 @@ class AddInstanceForm extends StatelessWidget {
           Container(
             constraints: const BoxConstraints(maxWidth: 120),
             child: CommonFormField(
-              label: "端口",
+              label: AppLocalizations.of(context)!.db_instance_port,
               controller: port.ctrl,
               state: port.state,
               validator:
@@ -499,7 +500,7 @@ class AddInstanceForm extends StatelessWidget {
   Widget buildUserField(BuildContext context) {
     FormInfo user = infos[settingMetaNameUser]!;
     return CommonFormField(
-      label: "账号",
+      label: AppLocalizations.of(context)!.db_instance_user,
       controller: user.ctrl,
       state: user.state,
       validator: validatorFn(context, user, validatorValueRequired(context)),
@@ -509,7 +510,7 @@ class AddInstanceForm extends StatelessWidget {
   Widget buildPasswordField(BuildContext context) {
     FormInfo password = infos[settingMetaNamePassword]!;
     return CommonFormField(
-      label: "密码",
+      label: AppLocalizations.of(context)!.db_instance_password,
       controller: password.ctrl,
       state: password.state,
       obscureText: true,
@@ -609,7 +610,7 @@ class AddInstanceForm extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    "基础配置",
+                    AppLocalizations.of(context)!.db_base_config,
                     textAlign: TextAlign.left,
                     style: Theme.of(context).textTheme.titleMedium,
                   )
@@ -697,13 +698,13 @@ class AddInstanceBottomBar extends StatelessWidget {
     Widget status;
 
     if (isDatabasePingDoing) {
-      msg = const Text("连接测试中");
+      msg = Text(AppLocalizations.of(context)!.testing);
       status = const CircularProgressIndicator(strokeWidth: 2);
     } else if (isDatabaseConnectable == null) {
       msg = const Text("");
       status = const Spacer();
     } else if (isDatabaseConnectable == true) {
-      msg = const Text("连接成功");
+      msg = Text(AppLocalizations.of(context)!.test_success);
       status = const Icon(Icons.check_circle, size: 20, color: Colors.green);
     } else {
       msg = Text(databaseConnectError ?? "", overflow: TextOverflow.ellipsis);

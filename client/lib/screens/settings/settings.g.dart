@@ -1,56 +1,55 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'session_tabs.dart';
+part of 'settings.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-@ProviderFor(SessionsTabNotifier)
-const sessionsTabNotifierProvider = SessionsTabNotifierProvider._();
+@ProviderFor(SettingNotifier)
+const settingNotifierProvider = SettingNotifierProvider._();
 
-final class SessionsTabNotifierProvider
-    extends $NotifierProvider<SessionsTabNotifier, SessionListModel> {
-  const SessionsTabNotifierProvider._()
+final class SettingNotifierProvider
+    extends $NotifierProvider<SettingNotifier, SettingModel> {
+  const SettingNotifierProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'sessionsTabNotifierProvider',
+          name: r'settingNotifierProvider',
           isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$sessionsTabNotifierHash();
+  String debugGetCreateSourceHash() => _$settingNotifierHash();
 
   @$internal
   @override
-  SessionsTabNotifier create() => SessionsTabNotifier();
+  SettingNotifier create() => SettingNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(SessionListModel value) {
+  Override overrideWithValue(SettingModel value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<SessionListModel>(value),
+      providerOverride: $SyncValueProvider<SettingModel>(value),
     );
   }
 }
 
-String _$sessionsTabNotifierHash() =>
-    r'd6bf2592d6a32b61fcf0f0b10a87f20b6b16c93d';
+String _$settingNotifierHash() => r'ce3c6dd798beb52da17621f5db27fc84931eb172';
 
-abstract class _$SessionsTabNotifier extends $Notifier<SessionListModel> {
-  SessionListModel build();
+abstract class _$SettingNotifier extends $Notifier<SettingModel> {
+  SettingModel build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<SessionListModel, SessionListModel>;
+    final ref = this.ref as $Ref<SettingModel, SettingModel>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<SessionListModel, SessionListModel>,
-        SessionListModel,
+        AnyNotifier<SettingModel, SettingModel>,
+        SettingModel,
         Object?,
         Object?>;
     element.handleValue(ref, created);

@@ -14,7 +14,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_operation_bar.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
   SessionOpBarModel? build() {
@@ -22,9 +22,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
     if (sessionIdModel == null) {
       return null;
     }
-    SessionConnModel? sessionConnModel = sessionIdModel.connId != null
-        ? ref.watch(sessionConnServicesProvider(sessionIdModel.connId!))
-        : null;
+    SessionConnModel? sessionConnModel = ref.watch(sessionConnServicesProvider(sessionIdModel.connId?? const ConnId(value: 0)));
 
     SessionDrawerModel? sessionDrawer =
         ref.watch(sessionDrawerControllerProvider);
@@ -248,8 +246,8 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
               items: schemas.map((schema) {
                 return PopupMenuItem<String>(
                     height: 30,
-                    onTap: () {
-                      ref
+                    onTap: () async {
+                      await ref
                           .read(sessionConnServicesProvider(widget.connId!)
                               .notifier)
                           .setCurrentSchema(schema);

@@ -59,8 +59,8 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
-  Future<void> setCurrentSchema(ConnId connId, String schema) {
-    return conns[connId.value]!.setCurrentSchema(schema);
+  Future<void> setCurrentSchema(ConnId connId, String schema) async {
+    await conns[connId.value]!.setCurrentSchema(schema);
   }
 
   @override

@@ -1,5 +1,4 @@
 import 'package:client/models/instances.dart';
-import 'package:client/repositories/instances/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UpdateInstancePage extends StatefulWidget {
   const UpdateInstancePage({Key? key}) : super(key: key);
@@ -102,7 +102,7 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
                 child: Row(
                   children: [
                     Text(
-                      "更新数据源",
+                      AppLocalizations.of(context)!.update_db_instance,
                       style: Theme.of(context).textTheme.titleLarge,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -113,9 +113,8 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
                             : () {
                                 updateInstanceController.databasePing();
                               },
-                        child: updateInstanceController.isDatabasePingDoing
-                            ? const Text("测试中")
-                            : const Text("测试连接")),
+                        child: Text(
+                            AppLocalizations.of(context)!.db_instance_test)),
                     TextButton(
                         onPressed: () async {
                           if (updateInstanceController.validate()) {
@@ -134,7 +133,7 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
                             GoRouter.of(context).go('/instances/list');
                           }
                         },
-                        child: const Text("更新")),
+                        child: Text(AppLocalizations.of(context)!.submit)),
                   ],
                 ),
               ),
@@ -198,7 +197,7 @@ class UpdateInstanceForm extends AddInstanceForm {
   FormFieldValidator validatorName(BuildContext context) {
     return (value) {
       if (value == null || value.isEmpty) {
-        return "名称不能为空";
+        return AppLocalizations.of(context)!.field_val_msg_value_reqiured;
       }
       return null;
     };
@@ -210,7 +209,7 @@ class UpdateInstanceForm extends AddInstanceForm {
     return CommonFormField(
       readOnly: true,
       state: name.state,
-      label: "名称",
+      label: AppLocalizations.of(context)!.db_instance_name,
       controller: name.ctrl,
       validator: validatorFn(context, name, validatorName(context)),
     );

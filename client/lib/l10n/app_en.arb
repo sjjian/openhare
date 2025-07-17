@@ -1,0 +1,146 @@
+{
+  "sys_settings": "System settings",
+  "@sys_settings": {
+    "description": "System settings"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme"
+  },
+  "theme_dark": "Dark",
+  "@theme_dark": {
+    "description": "Dark theme"
+  },
+  "theme_light": "Light",
+  "@theme_light": {
+    "description": "Light theme"
+  },
+  "db_instance": "DB instances",
+  "@db_instance": {
+    "description": "DB instances"
+  },
+  "recently_used_db_instance": "Recently used",
+  "@recently_used_db_instance": {
+    "description": "Recently used DB instances"
+  },
+  "recently_used_schema": "Recently used schema",
+  "@recently_used_schema": {
+    "description": "Recently used schema"
+  },
+  "add_db_instance": "Add DB instance",
+  "@add_db_instance": {
+    "description": "Add DB instance"
+  },
+  "update_db_instance": "Update DB instance",
+  "@update_db_instance": {
+    "description": "Update DB instance"
+  },
+  "db_instance_name": "Name",
+  "@db_instance_name": {
+    "description": "DB instance Name"
+  },
+  "db_instance_type": "Type",
+  "@db_instance_type": {
+    "description": "DB instance Type"
+  },
+  "db_instance_host": "Host",
+  "@db_instance_host": {
+    "description": "DB instance Host"
+  },
+  "db_instance_port": "Port",
+  "@db_instance_port": {
+    "description": "DB instance Port"
+  },
+  "db_instance_user": "User",
+  "@db_instance_user": {
+    "description": "DB instance User"
+  },
+  "db_instance_password": "Password",
+  "@db_instance_password": {
+    "description": "DB Instance Password"
+  },
+  "db_instance_desc": "Description",
+  "@db_instance_desc": {
+    "description": "DB instance Description"
+  },
+  "db_instance_op": "Operation",
+  "@db_instance_op": {
+    "description": "DB instance Operation"
+  },
+  "db_instance_test": "Test connection",
+  "@db_instance_test": {
+    "description": "DB instance test connection"
+  },
+  "testing": "Testing",
+  "@testing": {
+    "description": "Testing"
+  },
+  "test_success": "Test success",
+  "@test_success": {
+    "description": "Test success"
+  },
+  "test_failed": "Test failed",
+  "@test_failed": {
+    "description": "Test failed"
+  },
+  "submit": "Submit",
+  "@submit": {
+    "description": "Submit"
+  },
+  "submit_and_continue": "Submit and Continue",
+  "@submit_and_continue": {
+    "description": "Submit and Continue"
+  },
+  "db_base_config": "Base config",
+  "@db_base_config": {
+    "description": "DB base config"
+  },
+  "field_val_msg_value_reqiured": "Value is required",
+  "@field_val_msg_value_reqiured": {
+    "description": "Field value required"
+  },
+  "display_msg_no_data": "No data",
+  "@display_msg_no_data": {
+    "description": "No data"
+  },
+  "effect_rows": "Effect rows",
+  "@effect_rows": {
+    "description": "Effect rows"
+  },
+  "duration": "Duration",
+  "@duration": {
+    "description": "Duration"
+  },
+  "query": "Query",
+  "@query": {
+    "description": "Query"
+  },
+  "no_query_executed": "No query executed",
+  "@no_query_executed": {
+    "description": "No query executed"
+  },
+  "display_msg_downlaod": "Please select an output file",
+  "@display_msg_downlaod": {
+    "description": "tips when download sql query data"
+  },
+  "connect": "Connect",
+  "@connect": {
+    "description": "Connect"
+  },
+  "disconnect": "Disconnect",
+  "@disconnect": {
+    "description": "Disconnect"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close"
+  },
+  "new_tab": "New tab",
+  "@new_tab": {
+    "description": "New tab"
+  }
+}
