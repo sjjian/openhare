@@ -2,6 +2,7 @@ import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/screens/settings/settings.dart';
+import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -31,6 +32,12 @@ class App extends ConsumerWidget {
           path: '/settings',
           pageBuilder: (context, state) =>
               const NoTransitionPage<void>(child: SettingsPage()),
+        ),
+        // About 页面
+        GoRoute(
+          path: '/about',
+          pageBuilder: (context, state) =>
+              const NoTransitionPage<void>(child: AboutPage()),
         ),
         ShellRoute(
             navigatorKey: _shellNavigatorKey,
@@ -166,7 +173,17 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                   style: TextStyle(fontSize: 16),
                 ),
               ),
-            )
+            ),
+            // About 页面
+            const NavigationRailDestination(
+              icon: Icon(Icons.info_outline),
+              label: Center(
+                child: Text(
+                  "关于",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
           ],
           // trailing: const Expanded(
           //   child: Align(
@@ -194,6 +211,9 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
     if (location.startsWith('/settings')) {
       return 2;
     }
+    if (location.startsWith('/about')) {
+      return 3;
+    }
     return 0;
   }
 
@@ -208,6 +228,8 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
         GoRouter.of(context).go('/instances');
       case 2:
         GoRouter.of(context).go('/settings');
+      case 3:
+        GoRouter.of(context).go('/about');
     }
   }
 }
