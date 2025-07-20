@@ -82,7 +82,7 @@ class App extends ConsumerWidget {
     final model = ref.watch(settingNotifierProvider);
 
     return MaterialApp.router(
-      title: 'Natuo',
+      title: 'snowhare',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,

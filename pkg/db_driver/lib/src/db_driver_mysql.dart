@@ -167,7 +167,7 @@ class MySQLConnection extends BaseConnection {
 
   Future<BaseQueryResult> _query(String sql) async {
     // 加入注释. todo: 通用方法处理
-    sql = "/* call by natuo */ $sql";
+    sql = "/* call by snowhare */ $sql";
     final qs = await _conn.query(query: sql);
     final columns =
         qs.columns.map<BaseQueryColumn>((qs) => MysqlQueryColumn(qs)).toList();
