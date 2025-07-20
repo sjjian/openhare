@@ -142,5 +142,9 @@
   "new_tab": "New tab",
   "@new_tab": {
     "description": "New tab"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About"
   }
 }

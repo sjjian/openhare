@@ -34,5 +34,6 @@
     "connect": "连接",
     "disconnect": "断开",
     "close": "关闭",
-    "new_tab": "新标签"
+    "new_tab": "新标签",
+    "about": "关于"
 }
