@@ -96,7 +96,7 @@ class AboutPage extends ConsumerWidget {
                     ),
                     child: InkWell(
                       onTap: () => _launchUrl(
-                        Uri.parse('https://github.com/sjjian/natuo'),
+                        Uri.parse('https://github.com/sjjian/snowhare'),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +107,7 @@ class AboutPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'https://github.com/sjjian/natuo',
+                            'https://github.com/sjjian/snowhare',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               decoration: TextDecoration.underline,
