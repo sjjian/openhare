@@ -185,15 +185,19 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               ),
             ),
           ],
-          // trailing: const Expanded(
-          //   child: Align(
-          //     alignment: Alignment.bottomCenter,
-          //     child: Padding(
-          //       padding: EdgeInsets.only(bottom: 20),
-          //       child: FlutterLogo(),
-          //     ),
-          //   ),
-          // ),
+          trailing: Expanded(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Image.asset(
+                  "assets/icons/logo.png",
+                  height: 36,
+                  width: 36,
+                ),
+              ),
+            ),
+          ),
         ),
         Expanded(child: widget.child)
       ],

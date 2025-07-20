@@ -83,6 +83,7 @@ dev_dependencies:
   objectbox_generator: any
   riverpod_generator: ^3.0.0-dev.16
   freezed: ^3.0.6
+  flutter_launcher_icons: "^0.14.4"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -129,3 +130,13 @@ flutter:
 
 objectbox:
   output_dir: repositories
+
+flutter_launcher_icons:
+  image_path: "assets\\icons\\logo.png"
+  windows:
+    generate: true
+    image_path: "assets\\icons\\logo.png"
+    icon_size: 256 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets\\icons\\logo.png"
