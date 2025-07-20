@@ -1,11 +1,25 @@
 import 'package:client/screens/page_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
-class AboutPage extends ConsumerWidget {
+class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
+
+  @override
+  State<AboutPage> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
+  String _version = '';
+
+  @override
+  void initState() {
+    super.initState();
+    initVersion();
+  }
 
   Future<void> _launchUrl(Uri url) async {
     if (!await launchUrl(url)) {
@@ -13,8 +27,16 @@ class AboutPage extends ConsumerWidget {
     }
   }
 
+  Future<void> initVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = packageInfo.version;
+    setState(() {
+      _version = version;
+    });
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return PageSkeleton(
       key: const Key("about"),
       child: Row(
@@ -53,13 +75,13 @@ class AboutPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Icons.info_outline,
-                          size: 24,
+                        HugeIcon(
+                          icon: HugeIcons.strokeRoundedInformationCircle,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          '本产品是一个功能强大且易于使用的 SQL 客户端，支持多种主流数据库。它提供直观的界面，帮助开发者高效地进行数据库管理、查询编写和数据可视化，显著提升开发效率。',
+                          AppLocalizations.of(context)!.app_desc,
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ],
@@ -75,13 +97,13 @@ class AboutPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Icons.code,
-                          size: 24,
+                        HugeIcon(
+                          icon: HugeIcons.strokeRoundedWorkflowCircle06,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          '版本: 1.0.0',
+                          '${AppLocalizations.of(context)!.version}: $_version',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ],
@@ -101,8 +123,9 @@ class AboutPage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
-                            Icons.open_in_new,
+                          HugeIcon(
+                            icon: HugeIcons.strokeRoundedGithub,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 24,
                           ),
                           const SizedBox(height: 12),

@@ -146,5 +146,13 @@
   "about": "About",
   "@about": {
     "description": "About"
+  },
+  "app_desc": "This product is a powerful and user-friendly SQL client that supports multiple mainstream databases. It provides an intuitive interface to help developers efficiently manage databases, write queries, and visualize data, significantly improving development productivity.",
+  "@app_desc": {
+    "description": "App desc"
+  },
+  "version" : "Version",
+  "@version": {
+    "description": "App version"
   }
 }
