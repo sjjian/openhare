@@ -154,5 +154,9 @@
   "version" : "Version",
   "@version": {
     "description": "App version"
+  },
+  "sessions": "SQL editor",
+  "@sessions": {
+    "description": "SQL editor"
   }
 }
