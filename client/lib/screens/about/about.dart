@@ -67,79 +67,60 @@ class _AboutPageState extends State<AboutPage> {
                   ),
                   const SizedBox(height: 20),
                   // 产品描述部分
-                  Container(
-                    // padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HugeIcon(
-                          icon: HugeIcons.strokeRoundedInformationCircle,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          AppLocalizations.of(context)!.app_desc,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      HugeIcon(
+                        icon: HugeIcons.strokeRoundedInformationCircle,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        AppLocalizations.of(context)!.app_desc,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   // 版本信息部分
-                  Container(
-                    // padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HugeIcon(
-                          icon: HugeIcons.strokeRoundedWorkflowCircle06,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          '${AppLocalizations.of(context)!.version}: $_version',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      HugeIcon(
+                        icon: HugeIcons.strokeRoundedWorkflowCircle06,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '${AppLocalizations.of(context)!.version}: $_version',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   // GitHub 地址部分
-                  Container(
-                    // padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: InkWell(
-                      onTap: () => _launchUrl(
-                        Uri.parse('https://github.com/sjjian/snowhare'),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      HugeIcon(
+                        icon: HugeIcons.strokeRoundedGithub,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 24,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          HugeIcon(
-                            icon: HugeIcons.strokeRoundedGithub,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            size: 24,
+                      const SizedBox(height: 12),
+                      InkWell(
+                        onTap: () => _launchUrl(
+                          Uri.parse('https://github.com/sjjian/snowhare'),
+                        ),
+                        child: Text(
+                          'https://github.com/sjjian/snowhare',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 16,
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'https://github.com/sjjian/snowhare',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              decoration: TextDecoration.underline,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
