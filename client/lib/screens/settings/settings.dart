@@ -52,16 +52,19 @@ class SettingsPage extends ConsumerWidget {
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 添加选项：设置语言, 使用Icon(Icons.language)图标，使用水平的单选，支持中英。样式要好看一点.
                       Container(
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
                         child: Row(
                           children: [
-                            const Icon(Icons.language),
-                            const SizedBox(width: 8),
-                            Text(AppLocalizations.of(context)!.language),
-                            const SizedBox(
-                              width: 16,
+                            SizedBox(
+                              width: 140,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.language),
+                                  const SizedBox(width: 8),
+                                  Text(AppLocalizations.of(context)!.language)
+                                ],
+                              ),
                             ),
                             SizedBox(
                               width: 140,
@@ -104,11 +107,15 @@ class SettingsPage extends ConsumerWidget {
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
                         child: Row(
                           children: [
-                            const Icon(Icons.language),
-                            const SizedBox(width: 8),
-                            Text(AppLocalizations.of(context)!.theme),
-                            const SizedBox(
-                              width: 16,
+                            SizedBox(
+                              width: 140,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.language),
+                                  const SizedBox(width: 8),
+                                  Text(AppLocalizations.of(context)!.language)
+                                ],
+                              ),
                             ),
                             SizedBox(
                               width: 140,
