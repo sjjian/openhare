@@ -6,143 +6,177 @@ part of 'session_body.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-@ProviderFor(sessionSplitViewState)
-const sessionSplitViewStateProvider = SessionSplitViewStateFamily._();
+String _$sessionSplitViewStateHash() =>
+    r'1f3e904a48dd3977623cf68c07a8fcefddd5ca05';
 
-final class SessionSplitViewStateProvider extends $FunctionalProvider<
-    SessionSplitViewModel,
-    SessionSplitViewModel,
-    SessionSplitViewModel> with $Provider<SessionSplitViewModel> {
-  const SessionSplitViewStateProvider._(
-      {required SessionSplitViewStateFamily super.from,
-      required SessionId super.argument})
-      : super(
-          retry: null,
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// See also [sessionSplitViewState].
+@ProviderFor(sessionSplitViewState)
+const sessionSplitViewStateProvider = SessionSplitViewStateFamily();
+
+/// See also [sessionSplitViewState].
+class SessionSplitViewStateFamily extends Family<SessionSplitViewModel> {
+  /// See also [sessionSplitViewState].
+  const SessionSplitViewStateFamily();
+
+  /// See also [sessionSplitViewState].
+  SessionSplitViewStateProvider call(
+    SessionId sessionId,
+  ) {
+    return SessionSplitViewStateProvider(
+      sessionId,
+    );
+  }
+
+  @override
+  SessionSplitViewStateProvider getProviderOverride(
+    covariant SessionSplitViewStateProvider provider,
+  ) {
+    return call(
+      provider.sessionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'sessionSplitViewStateProvider';
+}
+
+/// See also [sessionSplitViewState].
+class SessionSplitViewStateProvider extends Provider<SessionSplitViewModel> {
+  /// See also [sessionSplitViewState].
+  SessionSplitViewStateProvider(
+    SessionId sessionId,
+  ) : this._internal(
+          (ref) => sessionSplitViewState(
+            ref as SessionSplitViewStateRef,
+            sessionId,
+          ),
+          from: sessionSplitViewStateProvider,
           name: r'sessionSplitViewStateProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sessionSplitViewStateHash,
+          dependencies: SessionSplitViewStateFamily._dependencies,
+          allTransitiveDependencies:
+              SessionSplitViewStateFamily._allTransitiveDependencies,
+          sessionId: sessionId,
         );
 
-  @override
-  String debugGetCreateSourceHash() => _$sessionSplitViewStateHash();
+  SessionSplitViewStateProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.sessionId,
+  }) : super.internal();
+
+  final SessionId sessionId;
 
   @override
-  String toString() {
-    return r'sessionSplitViewStateProvider'
-        ''
-        '($argument)';
-  }
-
-  @$internal
-  @override
-  $ProviderElement<SessionSplitViewModel> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  SessionSplitViewModel create(Ref ref) {
-    final argument = this.argument as SessionId;
-    return sessionSplitViewState(
-      ref,
-      argument,
-    );
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(SessionSplitViewModel value) {
-    return $ProviderOverride(
+  Override overrideWith(
+    SessionSplitViewModel Function(SessionSplitViewStateRef provider) create,
+  ) {
+    return ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<SessionSplitViewModel>(value),
+      override: SessionSplitViewStateProvider._internal(
+        (ref) => create(ref as SessionSplitViewStateRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        sessionId: sessionId,
+      ),
     );
+  }
+
+  @override
+  ProviderElement<SessionSplitViewModel> createElement() {
+    return _SessionSplitViewStateProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SessionSplitViewStateProvider && other.argument == argument;
+    return other is SessionSplitViewStateProvider &&
+        other.sessionId == sessionId;
   }
 
   @override
   int get hashCode {
-    return argument.hashCode;
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, sessionId.hashCode);
+
+    return _SystemHash.finish(hash);
   }
 }
 
-String _$sessionSplitViewStateHash() =>
-    r'1f3e904a48dd3977623cf68c07a8fcefddd5ca05';
-
-final class SessionSplitViewStateFamily extends $Family
-    with $FunctionalFamilyOverride<SessionSplitViewModel, SessionId> {
-  const SessionSplitViewStateFamily._()
-      : super(
-          retry: null,
-          name: r'sessionSplitViewStateProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: false,
-        );
-
-  SessionSplitViewStateProvider call(
-    SessionId sessionId,
-  ) =>
-      SessionSplitViewStateProvider._(argument: sessionId, from: this);
-
-  @override
-  String toString() => r'sessionSplitViewStateProvider';
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SessionSplitViewStateRef on ProviderRef<SessionSplitViewModel> {
+  /// The parameter `sessionId` of this provider.
+  SessionId get sessionId;
 }
 
-@ProviderFor(SessionSplitViewController)
-const sessionSplitViewControllerProvider =
-    SessionSplitViewControllerProvider._();
-
-final class SessionSplitViewControllerProvider extends $NotifierProvider<
-    SessionSplitViewController, SessionSplitViewModel> {
-  const SessionSplitViewControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'sessionSplitViewControllerProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+class _SessionSplitViewStateProviderElement
+    extends ProviderElement<SessionSplitViewModel>
+    with SessionSplitViewStateRef {
+  _SessionSplitViewStateProviderElement(super.provider);
 
   @override
-  String debugGetCreateSourceHash() => _$sessionSplitViewControllerHash();
-
-  @$internal
-  @override
-  SessionSplitViewController create() => SessionSplitViewController();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(SessionSplitViewModel value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<SessionSplitViewModel>(value),
-    );
-  }
+  SessionId get sessionId =>
+      (origin as SessionSplitViewStateProvider).sessionId;
 }
 
 String _$sessionSplitViewControllerHash() =>
     r'7e4190af2eff74ea8c7c6729cd242fb474741ddc';
 
-abstract class _$SessionSplitViewController
-    extends $Notifier<SessionSplitViewModel> {
-  SessionSplitViewModel build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final created = build();
-    final ref = this.ref as $Ref<SessionSplitViewModel, SessionSplitViewModel>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<SessionSplitViewModel, SessionSplitViewModel>,
-        SessionSplitViewModel,
-        Object?,
-        Object?>;
-    element.handleValue(ref, created);
-  }
-}
+/// See also [SessionSplitViewController].
+@ProviderFor(SessionSplitViewController)
+final sessionSplitViewControllerProvider = NotifierProvider<
+    SessionSplitViewController, SessionSplitViewModel>.internal(
+  SessionSplitViewController.new,
+  name: r'sessionSplitViewControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionSplitViewControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
+typedef _$SessionSplitViewController = Notifier<SessionSplitViewModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
