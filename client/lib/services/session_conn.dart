@@ -49,7 +49,6 @@ class SessionConnServices extends _$SessionConnServices {
         ref.invalidateSelf();
       },
     );
-    if (!ref.mounted) return;
     ref.invalidateSelf();
   }
 
