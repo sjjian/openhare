@@ -161,22 +161,22 @@ class _SessionSplitViewStateProviderElement
       (origin as SessionSplitViewStateProvider).sessionId;
 }
 
-String _$sessionSplitViewControllerHash() =>
-    r'7e4190af2eff74ea8c7c6729cd242fb474741ddc';
+String _$sessionSplitViewNotifierHash() =>
+    r'73541b7a2440869576d70c9debf90175c5f69c50';
 
-/// See also [SessionSplitViewController].
-@ProviderFor(SessionSplitViewController)
-final sessionSplitViewControllerProvider = NotifierProvider<
-    SessionSplitViewController, SessionSplitViewModel>.internal(
-  SessionSplitViewController.new,
-  name: r'sessionSplitViewControllerProvider',
+/// See also [SessionSplitViewNotifier].
+@ProviderFor(SessionSplitViewNotifier)
+final sessionSplitViewNotifierProvider =
+    NotifierProvider<SessionSplitViewNotifier, SessionSplitViewModel>.internal(
+  SessionSplitViewNotifier.new,
+  name: r'sessionSplitViewNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$sessionSplitViewControllerHash,
+      : _$sessionSplitViewNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionSplitViewController = Notifier<SessionSplitViewModel>;
+typedef _$SessionSplitViewNotifier = Notifier<SessionSplitViewModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

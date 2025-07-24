@@ -157,25 +157,25 @@ class _SessionEditorProviderElement extends ProviderElement<SessionEditorModel>
   SessionId get sessionId => (origin as SessionEditorProvider).sessionId;
 }
 
-String _$sessionEditorControllerHash() =>
-    r'e29fc0e0195205c135b9c62b26994fb9cbe60f18';
+String _$sessionEditorNotifierHash() =>
+    r'4727045e22d114d841834eaf1512163a30a6962f';
 
-/// See also [SessionEditorController].
-@ProviderFor(SessionEditorController)
-final sessionEditorControllerProvider =
-    NotifierProvider<SessionEditorController, SessionEditorModel>.internal(
-  SessionEditorController.new,
-  name: r'sessionEditorControllerProvider',
+/// See also [SessionEditorNotifier].
+@ProviderFor(SessionEditorNotifier)
+final sessionEditorNotifierProvider =
+    NotifierProvider<SessionEditorNotifier, SessionEditorModel>.internal(
+  SessionEditorNotifier.new,
+  name: r'sessionEditorNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$sessionEditorControllerHash,
+      : _$sessionEditorNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionEditorController = Notifier<SessionEditorModel>;
+typedef _$SessionEditorNotifier = Notifier<SessionEditorModel>;
 String _$selectedSQLResultTabNotifierHash() =>
-    r'7e11334458d840b9d80219985621a201d335f448';
+    r'12e5ca69992c6eb0fea425949fd0204deda72ef7';
 
 /// See also [SelectedSQLResultTabNotifier].
 @ProviderFor(SelectedSQLResultTabNotifier)
@@ -192,7 +192,7 @@ final selectedSQLResultTabNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSQLResultTabNotifier = Notifier<SQLResultListModel?>;
 String _$selectedSQLResultNotifierHash() =>
-    r'9733dc390a9d5deb260ae4d7dcab550e05e493b7';
+    r'a666d6d6933f47f59a47e8d9a9e80ed6eba5da4e';
 
 /// See also [SelectedSQLResultNotifier].
 @ProviderFor(SelectedSQLResultNotifier)

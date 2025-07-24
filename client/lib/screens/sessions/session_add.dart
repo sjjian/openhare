@@ -1,5 +1,5 @@
 import 'package:client/services/instances/instances.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';

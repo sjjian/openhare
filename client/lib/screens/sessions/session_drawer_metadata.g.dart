@@ -7,7 +7,7 @@ part of 'session_drawer_metadata.dart';
 // **************************************************************************
 
 String _$sessionMetadataNotifierHash() =>
-    r'5e8bc8ba060d65672bc4cbb098d0c4942dda6358';
+    r'827c5c81807cd37ea09d752cdaeb46219476037b';
 
 /// See also [SessionMetadataNotifier].
 @ProviderFor(SessionMetadataNotifier)

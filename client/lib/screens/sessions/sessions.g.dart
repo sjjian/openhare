@@ -7,7 +7,7 @@ part of 'sessions.dart';
 // **************************************************************************
 
 String _$sessionsPageNotifierHash() =>
-    r'cfd9f63a6c081ef6d4c99d885fa34593ede897ec';
+    r'5425729012ed34841e38df5cc53c5dbcf67f0604';
 
 /// See also [SessionsPageNotifier].
 @ProviderFor(SessionsPageNotifier)

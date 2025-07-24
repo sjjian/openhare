@@ -7,7 +7,7 @@ part of 'session_sql_editor.dart';
 // **************************************************************************
 
 String _$selectedSessionSQLEditorNotifierHash() =>
-    r'2550b087d9f5c70b04f1d478cebaeef57965ae19';
+    r'519503af9e93df2780dee0d17d903984b78c17e5';
 
 /// See also [SelectedSessionSQLEditorNotifier].
 @ProviderFor(SelectedSessionSQLEditorNotifier)

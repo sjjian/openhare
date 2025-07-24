@@ -22,22 +22,22 @@ final sessionsServicesProvider =
 );
 
 typedef _$SessionsServices = Notifier<SessionListModel>;
-String _$selectedSessionIdServicesHash() =>
-    r'10b45714e42cff1acac0702a0f305baf42aed5ad';
+String _$selectedSessionServicesHash() =>
+    r'ddcdc99de0ec7d2043e3824e3d75e67f72260154';
 
-/// See also [SelectedSessionIdServices].
-@ProviderFor(SelectedSessionIdServices)
-final selectedSessionIdServicesProvider =
-    NotifierProvider<SelectedSessionIdServices, SessionModel?>.internal(
-  SelectedSessionIdServices.new,
-  name: r'selectedSessionIdServicesProvider',
+/// See also [SelectedSessionServices].
+@ProviderFor(SelectedSessionServices)
+final selectedSessionServicesProvider =
+    NotifierProvider<SelectedSessionServices, SessionModel?>.internal(
+  SelectedSessionServices.new,
+  name: r'selectedSessionServicesProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$selectedSessionIdServicesHash,
+      : _$selectedSessionServicesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SelectedSessionIdServices = Notifier<SessionModel?>;
+typedef _$SelectedSessionServices = Notifier<SessionModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

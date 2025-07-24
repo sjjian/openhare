@@ -1,10 +1,8 @@
-import 'package:client/models/session_conn.dart';
-import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
-import 'package:client/services/session_sql_result.dart';
-import 'package:client/services/session_conn.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/session_sql_result.dart';
+import 'package:client/services/sessions/session_conn.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -18,14 +16,14 @@ part 'session_operation_bar.g.dart';
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
   SessionOpBarModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }
     SessionConnModel? sessionConnModel = ref.watch(sessionConnServicesProvider(sessionIdModel.connId?? const ConnId(value: 0)));
 
     SessionDrawerModel? sessionDrawer =
-        ref.watch(sessionDrawerControllerProvider);
+        ref.watch(sessionDrawerNotifierProvider);
     if (sessionDrawer == null) {
       return null;
     }
@@ -34,7 +32,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
       sessionId: sessionIdModel.sessionId,
       connId: sessionIdModel.connId,
       canQuery: sessionConnModel?.canQuery ?? false,
-      currentSchema: sessionConnModel?.currentSchema ?? "", //todo: 没有订阅到变化
+      currentSchema: sessionConnModel?.currentSchema ?? (sessionIdModel.currentSchema ?? ""), //todo: 没有订阅到变化
       isRightPageOpen: sessionDrawer.isRightPageOpen,
     );
   }
@@ -178,7 +176,7 @@ class SessionOpBar extends ConsumerWidget {
             IconButton(
               onPressed: () {
                 ref
-                    .read(sessionDrawerControllerProvider.notifier)
+                    .read(sessionDrawerNotifierProvider.notifier)
                     .showRightPage();
               },
               icon: const Icon(Icons.format_indent_decrease),

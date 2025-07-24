@@ -4,7 +4,7 @@ import 'package:client/screens/sessions/session_add.dart';
 import 'package:client/screens/sessions/session_body.dart';
 import 'package:client/screens/sessions/session_status.dart';
 import 'package:client/screens/sessions/session_tabs.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,7 +15,7 @@ part 'sessions.g.dart';
 class SessionsPageNotifier extends _$SessionsPageNotifier {
   @override
   SessionModel? build() {
-    return ref.watch(selectedSessionIdServicesProvider);
+    return ref.watch(selectedSessionServicesProvider);
   }
 }
 

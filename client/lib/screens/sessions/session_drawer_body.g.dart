@@ -158,22 +158,22 @@ class _SessionDrawerStateProviderElement
   SessionId get sessionId => (origin as SessionDrawerStateProvider).sessionId;
 }
 
-String _$sessionDrawerControllerHash() =>
-    r'01deafb1ca96e13b4d4a0bd9321ae7b6be6e5936';
+String _$sessionDrawerNotifierHash() =>
+    r'a83e2d2145985bc65c6e66ea4679e82b578b0c3e';
 
-/// See also [SessionDrawerController].
-@ProviderFor(SessionDrawerController)
-final sessionDrawerControllerProvider =
-    NotifierProvider<SessionDrawerController, SessionDrawerModel>.internal(
-  SessionDrawerController.new,
-  name: r'sessionDrawerControllerProvider',
+/// See also [SessionDrawerNotifier].
+@ProviderFor(SessionDrawerNotifier)
+final sessionDrawerNotifierProvider =
+    NotifierProvider<SessionDrawerNotifier, SessionDrawerModel>.internal(
+  SessionDrawerNotifier.new,
+  name: r'sessionDrawerNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$sessionDrawerControllerHash,
+      : _$sessionDrawerNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionDrawerController = Notifier<SessionDrawerModel>;
+typedef _$SessionDrawerNotifier = Notifier<SessionDrawerModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

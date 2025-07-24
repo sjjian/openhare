@@ -1,10 +1,9 @@
 import 'dart:io';
-import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/session_conn.dart';
+import 'package:client/repositories/sessions/session_conn.dart';
 import 'package:client/screens/sessions/session_sql_results.dart';
-import 'package:client/services/session_sql_result.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/session_sql_result.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';
@@ -18,7 +17,7 @@ part 'session_status.g.dart';
 class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
   @override
   SessionStatusModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }

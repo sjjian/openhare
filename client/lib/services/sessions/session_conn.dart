@@ -1,7 +1,7 @@
 import 'package:client/models/instances.dart';
-import 'package:client/models/session_conn.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/repositories/instances/instances.dart';
-import 'package:client/repositories/session_conn.dart';
+import 'package:client/repositories/sessions/session_conn.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

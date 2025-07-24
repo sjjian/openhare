@@ -1,7 +1,7 @@
-import 'package:client/models/instance_metadata.dart';
+import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/services/instances/metadata.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:db_driver/db_driver.dart';
@@ -17,7 +17,7 @@ part 'session_drawer_metadata.g.dart';
 class SessionMetadataNotifier extends _$SessionMetadataNotifier {
   @override
   InstanceMetadataModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null || sessionIdModel.instanceId == null) {
       return null;
     }

@@ -1,11 +1,9 @@
 import 'package:client/models/instances.dart';
-import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/session_sql_result.dart';
-import 'package:client/repositories/sessions.dart';
+import 'package:client/repositories/sessions/session_sql_result.dart';
+import 'package:client/repositories/sessions/sessions.dart';
 import 'package:client/services/instances/instances.dart';
-import 'package:client/services/session_conn.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/services/sessions/session_conn.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sessions.g.dart';
@@ -83,7 +81,7 @@ class SessionsServices extends _$SessionsServices {
 }
 
 @Riverpod(keepAlive: true)
-class SelectedSessionIdServices extends _$SelectedSessionIdServices {
+class SelectedSessionServices extends _$SelectedSessionServices {
   @override
   SessionModel? build() {
     return ref.watch(sessionsServicesProvider.select((s) {

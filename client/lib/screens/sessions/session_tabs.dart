@@ -1,6 +1,6 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/services/sessions.dart';
-import 'package:client/services/session_conn.dart';
+import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -75,6 +75,7 @@ class SessionTabs extends ConsumerWidget {
                                 .read(sessionConnsServicesProvider.notifier)
                                 .createConn(
                                   model.sessions[i].instanceId!,
+                                  currentSchema: model.sessions[i].currentSchema,
                                 );
                             await ref
                                 .read(sessionConnServicesProvider(

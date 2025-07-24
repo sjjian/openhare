@@ -1,14 +1,55 @@
 import 'package:client/models/instances.dart';
-import 'package:client/models/session_conn.dart';
-import 'package:client/models/session_sql_result.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:client/widgets/split_view.dart';
-import 'package:client/repositories/session_conn.dart';
+import 'package:client/repositories/sessions/session_conn.dart';
 
 part 'sessions.freezed.dart';
+
+abstract class SessionRepo {
+  Future<SessionModel> newSession();
+  SessionListModel getSessions();
+  SessionModel? getSession(SessionId sessionId);
+  Future<void> updateSession(
+      SessionId sessionId, InstanceModel instance, String currentSchema);
+  void setConnId(SessionId sessionId, ConnId connId);
+  Future<void> deleteSession(SessionId sessionId);
+  void selectSessionByIndex(int index);
+  void reorderSession(int oldIndex, int newIndex);
+}
+
+abstract class SessionConnRepo {
+  SessionConnModel getConn(ConnId connId);
+  SessionConnModel createConn(InstanceModel model, {String? currentSchema});
+  void removeConn(ConnId connId);
+
+  Future<void> connect(
+    ConnId connId, {
+    Function()? onCloseCallback,
+    Function(String)? onSchemaChangedCallback,
+  });
+  Future<void> close(ConnId connId);
+  Future<void> setCurrentSchema(ConnId connId, String schema);
+  Future<List<String>> getSchemas(ConnId connId);
+  Future<MetaDataNode> getMetadata(ConnId connId);
+  Future<BaseQueryResult?> query(ConnId connId, String query);
+}
+
+abstract class SQLResultRepo {
+  SQLResultListModel getSqlResults(SessionId sessionId);
+  void deleteSQLResults(SessionId sessionId);
+  SQLResultModel getSQLReuslt(ResultId resultId);
+  void selectSQLResult(ResultId resultId);
+  SQLResultModel? selectedSQLResult(SessionId sessionId);
+  void reorderSQLResult(SessionId sessionId, int oldIndex, int newIndex);
+  SQLResultModel addSQLResult(SessionId sessionId);
+  void deleteSQLResult(ResultId resultId);
+  void updateSQLResult(ResultId resultId, SQLResultModel result);
+}
+
+// sessions model
 
 @freezed
 abstract class SessionId with _$SessionId {
@@ -23,6 +64,7 @@ abstract class SessionModel with _$SessionModel {
     required SessionId sessionId,
     InstanceId? instanceId,
     String? instanceName,
+    String? currentSchema,
     DatabaseType? dbType,
     ConnId? connId,
   }) = _SessionModel;
@@ -45,18 +87,6 @@ abstract class SessionOpBarModel with _$SessionOpBarModel {
     required String currentSchema,
     required bool isRightPageOpen,
   }) = _SessionOpBarModel;
-}
-
-abstract class SessionRepo {
-  Future<SessionModel> newSession();
-  SessionListModel getSessions();
-  SessionModel? getSession(SessionId sessionId);
-  Future<void> updateSession(
-      SessionId sessionId, InstanceModel instance, String currentSchema);
-  void setConnId(SessionId sessionId, ConnId connId);
-  Future<void> deleteSession(SessionId sessionId);
-  void selectSessionByIndex(int index);
-  void reorderSession(int oldIndex, int newIndex);
 }
 
 @freezed
@@ -112,4 +142,54 @@ abstract class SessionSQLEditorModel with _$SessionSQLEditorModel {
     String? currentSchema,
     MetaDataNode? metadata,
   }) = _SessionSQLEditorModel;
+}
+
+// sessions conn model
+
+@freezed
+abstract class ConnId with _$ConnId {
+  const factory ConnId({
+    required int value,
+  }) = _ConnId;
+}
+
+@freezed
+abstract class SessionConnModel with _$SessionConnModel {
+  const factory SessionConnModel({
+    required ConnId connId,
+    required InstanceId instanceId,
+    required String currentSchema,
+    required bool canQuery,
+  }) = _SessionConnModel;
+}
+
+// sessions sql result model
+
+@freezed
+abstract class ResultId with _$ResultId {
+  const factory ResultId({
+    required SessionId sessionId,
+    required int value,
+  }) = _ResultId;
+}
+
+@freezed
+abstract class SQLResultModel with _$SQLResultModel {
+  const factory SQLResultModel({
+    required ResultId resultId,
+    required SQLExecuteState state,
+    String? query,
+    Duration? executeTime,
+    String? error,
+    BaseQueryResult? data,
+  }) = _SQLResultModel;
+}
+
+@freezed
+abstract class SQLResultListModel with _$SQLResultListModel {
+  const factory SQLResultListModel({
+    required SessionId sessionId,
+    required List<SQLResultModel> results,
+    SQLResultModel? selected,
+  }) = _SQLResultListModel;
 }

@@ -1,4 +1,3 @@
-import 'package:client/models/instance_metadata.dart';
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

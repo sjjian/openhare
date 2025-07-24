@@ -7,7 +7,7 @@ part of 'session_status.dart';
 // **************************************************************************
 
 String _$selectedSessionStatusNotifierHash() =>
-    r'8184048987ad66051cf7ecc6e79af499240c132c';
+    r'f1717a283ccb0a1d1b4030145b02189528816417';
 
 /// See also [SelectedSessionStatusNotifier].
 @ProviderFor(SelectedSessionStatusNotifier)

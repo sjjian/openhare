@@ -1,7 +1,6 @@
-import 'package:client/models/instance_metadata.dart';
 import 'package:client/models/instances.dart';
 import 'package:client/repositories/instances/metadata.dart';
-import 'package:client/services/session_conn.dart';
+import 'package:client/services/sessions/session_conn.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata.g.dart';

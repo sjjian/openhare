@@ -1,5 +1,4 @@
 import 'package:client/models/instances.dart';
-import 'package:client/models/session_conn.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/instances/instances.dart';
 import 'package:objectbox/objectbox.dart';
@@ -55,6 +54,7 @@ class SessionRepoImpl extends SessionRepo {
           ? InstanceId(value: session.instance.target!.id)
           : null,
       instanceName: session.instance.target?.name,
+      currentSchema: session.currentSchema,
       dbType: session.instance.target?.dbType,
       connId: _connIdMap[session.id],
     );

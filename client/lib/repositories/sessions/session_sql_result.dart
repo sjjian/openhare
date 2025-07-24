@@ -1,6 +1,5 @@
-import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/session_conn.dart';
+import 'package:client/repositories/sessions/session_conn.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
