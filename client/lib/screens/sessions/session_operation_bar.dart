@@ -83,12 +83,12 @@ class SessionOpBar extends ConsumerWidget {
             .read(sessionsServicesProvider.notifier)
             .disconnectSession(sessionId);
       },
-      icon: Icon(Icons.link_off_rounded, color: Theme.of(context).colorScheme.error),
+      icon: Icon(Icons.link_off_rounded,
+          color: Theme.of(context).colorScheme.error),
     );
   }
 
-    void connectDialog(
-      BuildContext context, WidgetRef ref, SessionId sessionId) {
+  void connectDialog(BuildContext context, WidgetRef ref, SessionId sessionId) {
     return doActionDialog(
       context,
       AppLocalizations.of(context)!.tip_connect,
@@ -98,7 +98,8 @@ class SessionOpBar extends ConsumerWidget {
             .read(sessionsServicesProvider.notifier)
             .connectSession(sessionId);
       },
-      icon: Icon(Icons.link_rounded, color: Theme.of(context).colorScheme.primary),
+      icon: Icon(Icons.link_rounded,
+          color: Theme.of(context).colorScheme.primary),
     );
   }
 
@@ -112,6 +113,7 @@ class SessionOpBar extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          const SizedBox(width: 5),
           // connect
           !canQuery
               ? IconButton(
@@ -132,8 +134,19 @@ class SessionOpBar extends ConsumerWidget {
                       color: Theme.of(context).primaryColor)),
 
           const VerticalDivider(
-            indent: 5,
-            endIndent: 5,
+            width: 5,
+            indent: 10,
+            endIndent: 10,
+          ),
+          // schema list
+          SchemaBar(
+              connId: model!.connId,
+              disable: model.canQuery ? false : true,
+              currentSchema: model.currentSchema),
+          const VerticalDivider(
+            width: 5,
+            indent: 10,
+            endIndent: 10,
           ),
           IconButton(
               iconSize: height,
@@ -222,15 +235,7 @@ class SessionOpBar extends ConsumerWidget {
                     ? const Color.fromARGB(255, 241, 192, 84)
                     : Colors.grey,
               )),
-          // schema list
-          const VerticalDivider(
-            indent: 5,
-            endIndent: 5,
-          ),
-          SchemaBar(
-              connId: model!.connId,
-              disable: model.canQuery ? false : true,
-              currentSchema: model.currentSchema),
+
           const Spacer(),
           if (model.isRightPageOpen == false)
             IconButton(
@@ -314,7 +319,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
               }).toList());
         },
         child: Container(
-            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
             color: (isEnter && !widget.disable)
                 ? Theme.of(context)
                     .colorScheme
@@ -328,8 +333,8 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                   size: 20,
                 ),
                 Container(
-                    padding: const EdgeInsets.only(left: 5),
-                    width: 160,
+                    padding: const EdgeInsets.only(left: 2),
+                    width: 120,
                     child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
