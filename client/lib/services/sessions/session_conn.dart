@@ -39,16 +39,11 @@ class SessionConnServices extends _$SessionConnServices {
     return model;
   }
 
-  Future<void> connect() async {
+  Future<void> connect({Function(String)? onSchemaChangedCallback}) async {
     await ref.read(sessionConnRepoProvider).connect(
-      connId,
-      onSchemaChangedCallback: (schema) {
-        ref
-            .read(instancesServicesProvider.notifier)
-            .addActiveInstance(state!.instanceId, schema: schema);
-        ref.invalidateSelf();
-      },
-    );
+          connId,
+          onSchemaChangedCallback: onSchemaChangedCallback,
+        );
     ref.invalidateSelf();
   }
 

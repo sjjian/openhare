@@ -38,5 +38,11 @@
     "about": "关于",
     "app_desc": "本产品是一个功能强大且易于使用的 SQL 客户端，支持多种主流数据库。它提供直观的界面，帮助开发者高效地进行数据库管理、查询编写和数据可视化，显著提升开发效率。",
     "version": "版本",
-    "sessions": "SQL窗口"
+    "sessions": "SQL窗口",
+    "cancel": "取消",
+    "confirm": "确认",
+    "tip_disconnect": "断开连接",
+    "tip_disconnect_desc": "确定断开连接吗?",
+    "tip_connect": "连接",
+    "tip_connect_desc": "未连接数据库，请先连接数据库。"
 }

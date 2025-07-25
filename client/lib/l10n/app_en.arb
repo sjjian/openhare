@@ -151,12 +151,36 @@
   "@app_desc": {
     "description": "App desc"
   },
-  "version" : "Version",
+  "version": "Version",
   "@version": {
     "description": "App version"
   },
   "sessions": "SQL editor",
   "@sessions": {
     "description": "SQL editor"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm"
+  },
+  "tip_disconnect": "Disconnect",
+  "@tip_disconnect": {
+    "description": "tips when disconnect session"
+  },
+  "tip_disconnect_desc": "Are you sure you want to disconnect? You will not be able to execute queries until you reconnect.",
+  "@tip_disconnect_desc": {
+    "description": "tips when disconnect session desc"
+  },
+  "tip_connect": "Connect",
+  "@tip_connect": {
+    "description": "tips when connect session"
+  },
+  "tip_connect_desc": "You are not connected. Please connect to execute queries.",
+  "@tip_connect_desc": {
+    "description": "tips when connect session desc"
   }
 }

@@ -13,8 +13,9 @@ abstract class SessionRepo {
   SessionListModel getSessions();
   SessionModel? getSession(SessionId sessionId);
   Future<void> updateSession(
-      SessionId sessionId, InstanceModel instance, String currentSchema);
+      SessionId sessionId, {InstanceModel? instance, String? currentSchema});
   void setConnId(SessionId sessionId, ConnId connId);
+  void unsetConnId(SessionId sessionId);
   Future<void> deleteSession(SessionId sessionId);
   void selectSessionByIndex(int index);
   void reorderSession(int oldIndex, int newIndex);
@@ -158,7 +159,6 @@ abstract class SessionConnModel with _$SessionConnModel {
   const factory SessionConnModel({
     required ConnId connId,
     required InstanceId instanceId,
-    required String currentSchema,
     required bool canQuery,
   }) = _SessionConnModel;
 }

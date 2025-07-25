@@ -1,6 +1,5 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
-import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -71,34 +70,19 @@ class SessionTabs extends ConsumerWidget {
                         PopupMenuItem<String>(
                           height: 30,
                           onTap: () async {
-                            final connModel = await ref
-                                .read(sessionConnsServicesProvider.notifier)
-                                .createConn(
-                                  model.sessions[i].instanceId!,
-                                  currentSchema: model.sessions[i].currentSchema,
-                                );
                             await ref
-                                .read(sessionConnServicesProvider(
-                                        connModel.connId)
-                                    .notifier)
-                                .connect();
-
-                            ref
                                 .read(sessionsServicesProvider.notifier)
-                                .setConnId(model.sessions[i].sessionId,
-                                    connModel.connId);
+                                .connectSession(model.sessions[i].sessionId);
                           },
                           child: Text(AppLocalizations.of(context)!.connect),
                         ),
                         const PopupMenuDivider(height: 0.1),
                         PopupMenuItem<String>(
                           height: 30,
-                          onTap: () {
-                            ref
-                                .read(sessionConnServicesProvider(
-                                        model.sessions[i].connId!)
-                                    .notifier)
-                                .close();
+                          onTap: () async {
+                            await ref
+                                .read(sessionsServicesProvider.notifier)
+                                .disconnectSession(model.sessions[i].sessionId);
                           },
                           child: Text(AppLocalizations.of(context)!.disconnect),
                         ),

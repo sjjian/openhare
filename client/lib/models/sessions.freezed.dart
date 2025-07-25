@@ -2211,7 +2211,6 @@ class __$ConnIdCopyWithImpl<$Res> implements _$ConnIdCopyWith<$Res> {
 mixin _$SessionConnModel implements DiagnosticableTreeMixin {
   ConnId get connId;
   InstanceId get instanceId;
-  String get currentSchema;
   bool get canQuery;
 
   /// Create a copy of SessionConnModel
@@ -2228,7 +2227,6 @@ mixin _$SessionConnModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('type', 'SessionConnModel'))
       ..add(DiagnosticsProperty('connId', connId))
       ..add(DiagnosticsProperty('instanceId', instanceId))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
       ..add(DiagnosticsProperty('canQuery', canQuery));
   }
 
@@ -2240,19 +2238,16 @@ mixin _$SessionConnModel implements DiagnosticableTreeMixin {
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.instanceId, instanceId) ||
                 other.instanceId == instanceId) &&
-            (identical(other.currentSchema, currentSchema) ||
-                other.currentSchema == currentSchema) &&
             (identical(other.canQuery, canQuery) ||
                 other.canQuery == canQuery));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, connId, instanceId, currentSchema, canQuery);
+  int get hashCode => Object.hash(runtimeType, connId, instanceId, canQuery);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, currentSchema: $currentSchema, canQuery: $canQuery)';
+    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, canQuery: $canQuery)';
   }
 }
 
@@ -2262,11 +2257,7 @@ abstract mixin class $SessionConnModelCopyWith<$Res> {
           SessionConnModel value, $Res Function(SessionConnModel) _then) =
       _$SessionConnModelCopyWithImpl;
   @useResult
-  $Res call(
-      {ConnId connId,
-      InstanceId instanceId,
-      String currentSchema,
-      bool canQuery});
+  $Res call({ConnId connId, InstanceId instanceId, bool canQuery});
 
   $ConnIdCopyWith<$Res> get connId;
   $InstanceIdCopyWith<$Res> get instanceId;
@@ -2287,7 +2278,6 @@ class _$SessionConnModelCopyWithImpl<$Res>
   $Res call({
     Object? connId = null,
     Object? instanceId = null,
-    Object? currentSchema = null,
     Object? canQuery = null,
   }) {
     return _then(_self.copyWith(
@@ -2299,10 +2289,6 @@ class _$SessionConnModelCopyWithImpl<$Res>
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      currentSchema: null == currentSchema
-          ? _self.currentSchema
-          : currentSchema // ignore: cast_nullable_to_non_nullable
-              as String,
       canQuery: null == canQuery
           ? _self.canQuery
           : canQuery // ignore: cast_nullable_to_non_nullable
@@ -2337,17 +2323,12 @@ class _SessionConnModel
     with DiagnosticableTreeMixin
     implements SessionConnModel {
   const _SessionConnModel(
-      {required this.connId,
-      required this.instanceId,
-      required this.currentSchema,
-      required this.canQuery});
+      {required this.connId, required this.instanceId, required this.canQuery});
 
   @override
   final ConnId connId;
   @override
   final InstanceId instanceId;
-  @override
-  final String currentSchema;
   @override
   final bool canQuery;
 
@@ -2365,7 +2346,6 @@ class _SessionConnModel
       ..add(DiagnosticsProperty('type', 'SessionConnModel'))
       ..add(DiagnosticsProperty('connId', connId))
       ..add(DiagnosticsProperty('instanceId', instanceId))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
       ..add(DiagnosticsProperty('canQuery', canQuery));
   }
 
@@ -2377,19 +2357,16 @@ class _SessionConnModel
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.instanceId, instanceId) ||
                 other.instanceId == instanceId) &&
-            (identical(other.currentSchema, currentSchema) ||
-                other.currentSchema == currentSchema) &&
             (identical(other.canQuery, canQuery) ||
                 other.canQuery == canQuery));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, connId, instanceId, currentSchema, canQuery);
+  int get hashCode => Object.hash(runtimeType, connId, instanceId, canQuery);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, currentSchema: $currentSchema, canQuery: $canQuery)';
+    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, canQuery: $canQuery)';
   }
 }
 
@@ -2401,11 +2378,7 @@ abstract mixin class _$SessionConnModelCopyWith<$Res>
       __$SessionConnModelCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {ConnId connId,
-      InstanceId instanceId,
-      String currentSchema,
-      bool canQuery});
+  $Res call({ConnId connId, InstanceId instanceId, bool canQuery});
 
   @override
   $ConnIdCopyWith<$Res> get connId;
@@ -2428,7 +2401,6 @@ class __$SessionConnModelCopyWithImpl<$Res>
   $Res call({
     Object? connId = null,
     Object? instanceId = null,
-    Object? currentSchema = null,
     Object? canQuery = null,
   }) {
     return _then(_SessionConnModel(
@@ -2440,10 +2412,6 @@ class __$SessionConnModelCopyWithImpl<$Res>
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      currentSchema: null == currentSchema
-          ? _self.currentSchema
-          : currentSchema // ignore: cast_nullable_to_non_nullable
-              as String,
       canQuery: null == canQuery
           ? _self.canQuery
           : canQuery // ignore: cast_nullable_to_non_nullable

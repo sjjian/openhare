@@ -74,12 +74,17 @@ class SessionRepoImpl extends SessionRepo {
   }
 
   @override
-  Future<void> updateSession(
-      SessionId sessionId, InstanceModel instance, String currentSchema) async {
+  Future<void> updateSession(SessionId sessionId,
+      {InstanceModel? instance, String? currentSchema}) async {
     final session = _sessions
         .firstWhere((s) => s.id == sessionId.value); //todo: handler null
-    session.instance.target = InstanceStorage.fromModel(instance);
-    session.currentSchema = currentSchema;
+
+    if (instance != null) {
+      session.instance.target = InstanceStorage.fromModel(instance);
+    }
+    if (currentSchema != null) {
+      session.currentSchema = currentSchema;
+    }
     await _sessionBox.putAsync(session);
   }
 
@@ -89,8 +94,14 @@ class SessionRepoImpl extends SessionRepo {
   }
 
   @override
+  void unsetConnId(SessionId sessionId) {
+    _connIdMap.remove(sessionId.value);
+  }
+
+  @override
   Future<void> deleteSession(SessionId sessionId) async {
-    _sessions.removeAt(_sessions.indexWhere((session) => session.id == sessionId.value));
+    _sessions.removeAt(
+        _sessions.indexWhere((session) => session.id == sessionId.value));
     await _sessionBox.removeAsync(sessionId.value);
   }
 
@@ -107,8 +118,7 @@ class SessionRepoImpl extends SessionRepo {
 
   @override
   void selectSessionByIndex(int index) {
-    if (_sessions.select(index)) {
-    }
+    if (_sessions.select(index)) {}
   }
 
   @override

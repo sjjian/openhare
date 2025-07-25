@@ -24,7 +24,7 @@ final sessionConnsServicesProvider =
 
 typedef _$SessionConnsServices = AutoDisposeNotifier<int>;
 String _$sessionConnServicesHash() =>
-    r'419786b508427fab6ec30c220dcefc38e8be9fa0';
+    r'24259c6e78c48b2a01dd9c76df6df837800275b0';
 
 /// Copied from Dart SDK
 class _SystemHash {
