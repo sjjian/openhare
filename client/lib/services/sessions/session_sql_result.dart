@@ -1,5 +1,4 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
@@ -13,13 +12,14 @@ part 'session_sql_result.g.dart';
 class SQLResultServices extends _$SQLResultServices {
   @override
   SQLResultModel build(ResultId resultId) {
-    return ref.watch(sqlResultsRepoProvider).getSQLReuslt(resultId);
+    return ref.watch(sqlResultsRepoProvider).getSQLResult(resultId);
   }
 
   Future<void> loadFromQuery(String query) async {
     final repo = ref.read(sqlResultsRepoProvider);
 
-    repo.updateSQLResult(resultId, state.copyWith(query: query));
+    repo.updateSQLResult(
+        resultId, state.copyWith(query: query, state: SQLExecuteState.init));
     ref.invalidateSelf();
 
     // todo

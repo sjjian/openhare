@@ -16,7 +16,8 @@ class MysqlQueryValue extends BaseQueryValue {
   @override
   String? getString() {
     return _value.when<String?>(
-      bytes: (field0) => utf8.decode(field0, allowMalformed: true), // todo: support gbk, latin1?
+      bytes: (field0) => utf8.decode(field0,
+          allowMalformed: true), // todo: support gbk, latin1?
       int: (field0) => field0.toString(),
       uInt: (field0) => field0.toString(),
       float: (field0) => field0.toString(),
@@ -144,6 +145,11 @@ class MySQLConnection extends BaseConnection {
   Future<void> close() async {
     await _conn.close();
     _conn.dispose();
+  }
+
+  @override
+  Future<void> ping() async {
+    await _query("SELECT 1");
   }
 
   @override

@@ -101,7 +101,7 @@ class SessionsServices extends _$SessionsServices {
       await ref
           .read(sessionRepoProvider)
           .updateSession(sessionId, currentSchema: schema);
-      
+
       ref
           .read(instancesServicesProvider.notifier)
           .addActiveInstance(session.instanceId!, schema: schema);

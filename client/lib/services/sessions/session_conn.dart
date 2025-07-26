@@ -2,7 +2,6 @@ import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/instances/instances.dart';
 import 'package:client/repositories/sessions/session_conn.dart';
-import 'package:client/services/instances/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -39,11 +38,16 @@ class SessionConnServices extends _$SessionConnServices {
     return model;
   }
 
-  Future<void> connect({Function(String)? onSchemaChangedCallback}) async {
+  Future<void> connect({
+    Function(String)? onSchemaChangedCallback,
+  }) async {
     await ref.read(sessionConnRepoProvider).connect(
-          connId,
-          onSchemaChangedCallback: onSchemaChangedCallback,
-        );
+      connId,
+      onStateChangedCallback: () {
+        ref.invalidateSelf();
+      },
+      onSchemaChangedCallback: onSchemaChangedCallback,
+    );
     ref.invalidateSelf();
   }
 

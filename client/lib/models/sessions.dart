@@ -4,7 +4,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:client/widgets/split_view.dart';
-import 'package:client/repositories/sessions/session_conn.dart';
 
 part 'sessions.freezed.dart';
 
@@ -12,8 +11,8 @@ abstract class SessionRepo {
   Future<SessionModel> newSession();
   SessionListModel getSessions();
   SessionModel? getSession(SessionId sessionId);
-  Future<void> updateSession(
-      SessionId sessionId, {InstanceModel? instance, String? currentSchema});
+  Future<void> updateSession(SessionId sessionId,
+      {InstanceModel? instance, String? currentSchema});
   void setConnId(SessionId sessionId, ConnId connId);
   void unsetConnId(SessionId sessionId);
   Future<void> deleteSession(SessionId sessionId);
@@ -28,7 +27,7 @@ abstract class SessionConnRepo {
 
   Future<void> connect(
     ConnId connId, {
-    Function()? onCloseCallback,
+    Function()? onStateChangedCallback,
     Function(String)? onSchemaChangedCallback,
   });
   Future<void> close(ConnId connId);
@@ -41,7 +40,7 @@ abstract class SessionConnRepo {
 abstract class SQLResultRepo {
   SQLResultListModel getSqlResults(SessionId sessionId);
   void deleteSQLResults(SessionId sessionId);
-  SQLResultModel getSQLReuslt(ResultId resultId);
+  SQLResultModel getSQLResult(ResultId resultId);
   void selectSQLResult(ResultId resultId);
   SQLResultModel? selectedSQLResult(SessionId sessionId);
   void reorderSQLResult(SessionId sessionId, int oldIndex, int newIndex);
@@ -97,7 +96,16 @@ abstract class SessionEditorModel with _$SessionEditorModel {
   }) = _SessionEditorModel;
 }
 
-enum SQLConnectState { pending, connecting, connected, failed }
+enum SQLConnectState {
+  disconnected,
+  connecting,
+  connected,
+  executing,
+  unHealth,
+  failed
+}
+
+enum SQLExecuteState { init, executing, done, error }
 
 enum DrawerPage {
   metadataTree,

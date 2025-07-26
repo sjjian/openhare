@@ -63,7 +63,7 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
-  SQLResultModel getSQLReuslt(ResultId resultId) {
+  SQLResultModel getSQLResult(ResultId resultId) {
     final result = _getSQLResult(resultId.sessionId.value, resultId.value);
     return _toModel(result);
   }
