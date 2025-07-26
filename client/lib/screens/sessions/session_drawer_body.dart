@@ -1,7 +1,7 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,11 +20,11 @@ SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
 }
 
 @Riverpod(keepAlive: true)
-class SessionDrawerController extends _$SessionDrawerController {
+class SessionDrawerNotifier extends _$SessionDrawerNotifier {
   @override
   SessionDrawerModel build() {
     SessionModel? sessionIdModel =
-        ref.watch(selectedSessionIdServicesProvider);
+        ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionDrawerStateProvider(const SessionId(value: 0)));
     }
@@ -61,7 +61,7 @@ class SessionDrawerBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
+    final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     return Container(
       color: Theme.of(context)
           .colorScheme
@@ -90,7 +90,7 @@ class SessionDrawerBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
+    final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     return Container(
       color: Theme.of(context)
           .colorScheme
@@ -102,7 +102,7 @@ class SessionDrawerBar extends ConsumerWidget {
         children: [
           IconButton(
               onPressed: () {
-                ref.read(sessionDrawerControllerProvider.notifier).goToTree();
+                ref.read(sessionDrawerNotifierProvider.notifier).goToTree();
               },
               icon: (sessionDrawer.drawerPage == DrawerPage.metadataTree)
                   ? Icon(
@@ -113,7 +113,7 @@ class SessionDrawerBar extends ConsumerWidget {
                   : const Icon(Icons.account_tree_outlined)),
           IconButton(
               onPressed: () {
-                ref.read(sessionDrawerControllerProvider.notifier).showSQLResult();
+                ref.read(sessionDrawerNotifierProvider.notifier).showSQLResult();
               },
               icon: (sessionDrawer.drawerPage == DrawerPage.sqlResult)
                   ? Icon(
@@ -127,8 +127,8 @@ class SessionDrawerBar extends ConsumerWidget {
           IconButton(
             onPressed: () {
               sessionDrawer.isRightPageOpen
-                  ? ref.read(sessionDrawerControllerProvider.notifier).hideRightPage()
-                  : ref.read(sessionDrawerControllerProvider.notifier).showRightPage();
+                  ? ref.read(sessionDrawerNotifierProvider.notifier).hideRightPage()
+                  : ref.read(sessionDrawerNotifierProvider.notifier).showRightPage();
             },
             icon: sessionDrawer.isRightPageOpen
                 ? const Icon(Icons.format_indent_increase)

@@ -1,5 +1,5 @@
 import 'package:client/models/instances.dart';
-import 'package:client/models/session_conn.dart';
+import 'package:client/models/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +20,6 @@ class SessionConnRepoImpl extends SessionConnRepo {
     return SessionConnModel(
         connId: connId,
         instanceId: conns[connId.value]?.model.id ?? const InstanceId(value: 0),
-        currentSchema: conns[connId.value]?.currentSchema ?? "",
         canQuery: conns[connId.value]?.canQuery() ?? false);
   }
 
@@ -32,7 +31,6 @@ class SessionConnRepoImpl extends SessionConnRepo {
     return SessionConnModel(
         connId: ConnId(value: id),
         instanceId: model.id,
-        currentSchema: currentSchema ?? "",
         canQuery: conn.canQuery());
   }
 

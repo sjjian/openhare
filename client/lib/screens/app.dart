@@ -146,11 +146,11 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
             ],
           ),
           destinations: [
-            const NavigationRailDestination(
-              icon: Icon(Icons.personal_video),
+            NavigationRailDestination(
+              icon: const Icon(Icons.personal_video),
               label: Text(
-                "工作台",
-                style: TextStyle(fontSize: 16),
+                AppLocalizations.of(context)!.sessions,
+                style: const TextStyle(fontSize: 16),
               ),
             ),
             NavigationRailDestination(
@@ -158,29 +158,29 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                 icon: HugeIcons.strokeRoundedDatabase,
                 color: Theme.of(context).iconTheme.color ?? Colors.black87,
               ),
-              label: const Center(
+              label: Center(
                 child: Text(
-                  "数据源",
-                  style: TextStyle(fontSize: 16),
+                  AppLocalizations.of(context)!.db_instance,
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),
-            const NavigationRailDestination(
-              icon: Icon(Icons.settings),
+            NavigationRailDestination(
+              icon: const Icon(Icons.settings),
               label: Center(
                 child: Text(
-                  "设置",
-                  style: TextStyle(fontSize: 16),
+                  AppLocalizations.of(context)!.sys_settings,
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),
             // About 页面
-            const NavigationRailDestination(
-              icon: Icon(Icons.info_outline),
+            NavigationRailDestination(
+              icon: const Icon(Icons.info_outline),
               label: Center(
                 child: Text(
-                  "关于",
-                  style: TextStyle(fontSize: 16),
+                  AppLocalizations.of(context)!.about,
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),

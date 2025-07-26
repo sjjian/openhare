@@ -1,9 +1,8 @@
-import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/session_conn.dart';
-import 'package:client/services/session_conn.dart';
-import 'package:client/repositories/session_sql_result.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/repositories/sessions/session_conn.dart';
+import 'package:client/services/sessions/session_conn.dart';
+import 'package:client/repositories/sessions/session_sql_result.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:excel/excel.dart';

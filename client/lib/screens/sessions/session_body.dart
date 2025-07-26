@@ -3,7 +3,7 @@ import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_sql_results.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:multi_split_view/multi_split_view.dart';
@@ -21,11 +21,11 @@ SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
 }
 
 @Riverpod(keepAlive: true)
-class SessionSplitViewController extends _$SessionSplitViewController {
+class SessionSplitViewNotifier extends _$SessionSplitViewNotifier {
   @override
   SessionSplitViewModel build() {
     SessionModel? sessionIdModel =
-        ref.watch(selectedSessionIdServicesProvider);
+        ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionSplitViewStateProvider(const SessionId(value: 0))); // todo: 空值处理
     }
@@ -38,9 +38,9 @@ class SessionBodyPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionEditor = ref.watch(sessionEditorControllerProvider);
-    final sessionSplitView = ref.watch(sessionSplitViewControllerProvider);
-    final sessionDrawer = ref.watch(sessionDrawerControllerProvider);
+    final sessionEditor = ref.watch(sessionEditorNotifierProvider);
+    final sessionSplitView = ref.watch(sessionSplitViewNotifierProvider);
+    final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
 
     final Widget left = Column(
       children: [

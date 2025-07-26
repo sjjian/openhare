@@ -1,9 +1,7 @@
-import 'package:client/models/instance_metadata.dart';
-import 'package:client/models/session_conn.dart';
+import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
-import 'package:client/services/session_conn.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,18 +18,15 @@ class SelectedSessionSQLEditorNotifier
     extends _$SelectedSessionSQLEditorNotifier {
   @override
   SessionSQLEditorModel build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return const SessionSQLEditorModel();
     }
     InstanceMetadataModel? sessionMeta =
         ref.watch(sessionMetadataNotifierProvider);
 
-    SessionConnModel? sessionConnModel = ref.watch(sessionConnServicesProvider(
-        sessionIdModel.connId ?? const ConnId(value: 0)));
-
     return SessionSQLEditorModel(
-      currentSchema: sessionConnModel?.currentSchema,
+      currentSchema: sessionIdModel.currentSchema,
       metadata: sessionMeta?.metadata,
     );
   }

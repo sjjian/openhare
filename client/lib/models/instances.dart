@@ -4,6 +4,28 @@ import 'package:flutter/foundation.dart';
 
 part 'instances.freezed.dart';
 
+abstract class InstanceRepo {
+  Future<void> add(InstanceModel model);
+  Future<void> update(InstanceModel model);
+  Future<void> delete(InstanceId id);
+  bool isInstanceExist(String name);
+  InstanceModel? getInstanceByName(String name);
+  InstanceModel? getInstanceById(InstanceId id);
+  List<InstanceModel> search(String key, {int? pageNumber, int? pageSize});
+  int count(String key);
+  List<InstanceModel> getActiveInstances(int top);
+  Future<void> addActiveInstance(InstanceId id);
+  Future<void> addInstanceActiveSchema(InstanceId id, String schema);
+}
+
+abstract class InstanceMetadataRepo {
+  InstanceMetadataModel getMetadata(InstanceId instanceId);
+  void updateMetadata(InstanceId instanceId, MetaDataNode metadata);
+  void addMetadata(InstanceId instanceId, MetaDataNode metadata);
+}
+
+// instances model
+
 @freezed
 abstract class InstanceId with _$InstanceId {
   const factory InstanceId({
@@ -42,27 +64,23 @@ abstract class InstanceModel with _$InstanceModel {
       initQuerys: initQuerys);
 }
 
-abstract class InstanceRepo {
-  Future<void> add(InstanceModel model);
-  Future<void> update(InstanceModel model);
-  Future<void> delete(InstanceId id);
-  bool isInstanceExist(String name);
-  InstanceModel? getInstanceByName(String name);
-  InstanceModel? getInstanceById(InstanceId id);
-  List<InstanceModel> search(String key, {int? pageNumber, int? pageSize});
-  int count(String key);
-  List<InstanceModel> getActiveInstances(int top);
-  Future<void> addActiveInstance(InstanceId id);
-  Future<void> addInstanceActiveSchema(InstanceId id, String schema);
-}
-
 @freezed
 abstract class PaginationInstanceListModel with _$PaginationInstanceListModel {
   const factory PaginationInstanceListModel({
     required List<InstanceModel> instances,
-    required  int currentPage,
+    required int currentPage,
     required int pageSize,
-    required  int count,
+    required int count,
     required String key,
   }) = _PaginationInstanceListModel;
+}
+
+// instances metadata model
+
+@freezed
+abstract class InstanceMetadataModel with _$InstanceMetadataModel {
+  const factory InstanceMetadataModel({
+    required InstanceId instanceId,
+    MetaDataNode? metadata,
+  }) = _InstanceMetadataModel;
 }

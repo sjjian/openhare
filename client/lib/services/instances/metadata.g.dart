@@ -6,104 +6,175 @@ part of 'metadata.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-@ProviderFor(InstanceMetadataServices)
-const instanceMetadataServicesProvider = InstanceMetadataServicesFamily._();
+String _$instanceMetadataServicesHash() =>
+    r'795b9174e2f236e08ff34466eaf2ad6beaf3b7ba';
 
-final class InstanceMetadataServicesProvider
-    extends $NotifierProvider<InstanceMetadataServices, InstanceMetadataModel> {
-  const InstanceMetadataServicesProvider._(
-      {required InstanceMetadataServicesFamily super.from,
-      required InstanceId super.argument})
-      : super(
-          retry: null,
-          name: r'instanceMetadataServicesProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
 
-  @override
-  String debugGetCreateSourceHash() => _$instanceMetadataServicesHash();
-
-  @override
-  String toString() {
-    return r'instanceMetadataServicesProvider'
-        ''
-        '($argument)';
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
   }
 
-  @$internal
-  @override
-  InstanceMetadataServices create() => InstanceMetadataServices();
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
 
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(InstanceMetadataModel value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<InstanceMetadataModel>(value),
+abstract class _$InstanceMetadataServices
+    extends BuildlessAutoDisposeNotifier<InstanceMetadataModel> {
+  late final InstanceId instanceId;
+
+  InstanceMetadataModel build(
+    InstanceId instanceId,
+  );
+}
+
+/// See also [InstanceMetadataServices].
+@ProviderFor(InstanceMetadataServices)
+const instanceMetadataServicesProvider = InstanceMetadataServicesFamily();
+
+/// See also [InstanceMetadataServices].
+class InstanceMetadataServicesFamily extends Family<InstanceMetadataModel> {
+  /// See also [InstanceMetadataServices].
+  const InstanceMetadataServicesFamily();
+
+  /// See also [InstanceMetadataServices].
+  InstanceMetadataServicesProvider call(
+    InstanceId instanceId,
+  ) {
+    return InstanceMetadataServicesProvider(
+      instanceId,
     );
+  }
+
+  @override
+  InstanceMetadataServicesProvider getProviderOverride(
+    covariant InstanceMetadataServicesProvider provider,
+  ) {
+    return call(
+      provider.instanceId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'instanceMetadataServicesProvider';
+}
+
+/// See also [InstanceMetadataServices].
+class InstanceMetadataServicesProvider extends AutoDisposeNotifierProviderImpl<
+    InstanceMetadataServices, InstanceMetadataModel> {
+  /// See also [InstanceMetadataServices].
+  InstanceMetadataServicesProvider(
+    InstanceId instanceId,
+  ) : this._internal(
+          () => InstanceMetadataServices()..instanceId = instanceId,
+          from: instanceMetadataServicesProvider,
+          name: r'instanceMetadataServicesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$instanceMetadataServicesHash,
+          dependencies: InstanceMetadataServicesFamily._dependencies,
+          allTransitiveDependencies:
+              InstanceMetadataServicesFamily._allTransitiveDependencies,
+          instanceId: instanceId,
+        );
+
+  InstanceMetadataServicesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.instanceId,
+  }) : super.internal();
+
+  final InstanceId instanceId;
+
+  @override
+  InstanceMetadataModel runNotifierBuild(
+    covariant InstanceMetadataServices notifier,
+  ) {
+    return notifier.build(
+      instanceId,
+    );
+  }
+
+  @override
+  Override overrideWith(InstanceMetadataServices Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: InstanceMetadataServicesProvider._internal(
+        () => create()..instanceId = instanceId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        instanceId: instanceId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeNotifierProviderElement<InstanceMetadataServices,
+      InstanceMetadataModel> createElement() {
+    return _InstanceMetadataServicesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
     return other is InstanceMetadataServicesProvider &&
-        other.argument == argument;
+        other.instanceId == instanceId;
   }
 
   @override
   int get hashCode {
-    return argument.hashCode;
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, instanceId.hashCode);
+
+    return _SystemHash.finish(hash);
   }
 }
 
-String _$instanceMetadataServicesHash() =>
-    r'795b9174e2f236e08ff34466eaf2ad6beaf3b7ba';
-
-final class InstanceMetadataServicesFamily extends $Family
-    with
-        $ClassFamilyOverride<InstanceMetadataServices, InstanceMetadataModel,
-            InstanceMetadataModel, InstanceMetadataModel, InstanceId> {
-  const InstanceMetadataServicesFamily._()
-      : super(
-          retry: null,
-          name: r'instanceMetadataServicesProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
-
-  InstanceMetadataServicesProvider call(
-    InstanceId instanceId,
-  ) =>
-      InstanceMetadataServicesProvider._(argument: instanceId, from: this);
-
-  @override
-  String toString() => r'instanceMetadataServicesProvider';
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin InstanceMetadataServicesRef
+    on AutoDisposeNotifierProviderRef<InstanceMetadataModel> {
+  /// The parameter `instanceId` of this provider.
+  InstanceId get instanceId;
 }
 
-abstract class _$InstanceMetadataServices
-    extends $Notifier<InstanceMetadataModel> {
-  late final _$args = ref.$arg as InstanceId;
-  InstanceId get instanceId => _$args;
+class _InstanceMetadataServicesProviderElement
+    extends AutoDisposeNotifierProviderElement<InstanceMetadataServices,
+        InstanceMetadataModel> with InstanceMetadataServicesRef {
+  _InstanceMetadataServicesProviderElement(super.provider);
 
-  InstanceMetadataModel build(
-    InstanceId instanceId,
-  );
-  @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build(
-      _$args,
-    );
-    final ref = this.ref as $Ref<InstanceMetadataModel, InstanceMetadataModel>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<InstanceMetadataModel, InstanceMetadataModel>,
-        InstanceMetadataModel,
-        Object?,
-        Object?>;
-    element.handleValue(ref, created);
-  }
+  InstanceId get instanceId =>
+      (origin as InstanceMetadataServicesProvider).instanceId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,9 +1,8 @@
-import 'package:client/models/session_sql_result.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/session_conn.dart';
+import 'package:client/repositories/sessions/session_conn.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
-import 'package:client/services/session_sql_result.dart';
-import 'package:client/services/sessions.dart';
+import 'package:client/services/sessions/session_sql_result.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
@@ -33,10 +32,10 @@ SessionEditorModel sessionEditor(Ref ref, SessionId sessionId) {
 }
 
 @Riverpod(keepAlive: true)
-class SessionEditorController extends _$SessionEditorController {
+class SessionEditorNotifier extends _$SessionEditorNotifier {
   @override
   SessionEditorModel build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return ref.watch(sessionEditorProvider(const SessionId(value: 0)));
     }
@@ -48,7 +47,7 @@ class SessionEditorController extends _$SessionEditorController {
 class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
   @override
   SQLResultListModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }
@@ -60,7 +59,7 @@ class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
 class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
   @override
   SQLResultModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionIdServicesProvider);
+    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
     if (sessionIdModel == null) {
       return null;
     }
@@ -217,7 +216,7 @@ class SqlResultTable extends ConsumerWidget {
         key: ObjectKey(model),
         mode: PlutoGridMode.selectWithOneTap,
         onSelected: (event) {
-          ref.read(sessionDrawerControllerProvider.notifier).showSQLResult(
+          ref.read(sessionDrawerNotifierProvider.notifier).showSQLResult(
                 result: model.data!.rows[event.rowIdx!]
                     .getValue(event.cell!.column.title),
                 column: model.data!.rows[event.rowIdx!]
