@@ -77,6 +77,11 @@ class SessionConnRepoImpl extends SessionConnRepo {
   Future<BaseQueryResult?> query(ConnId connId, String query) {
     return conns[connId.value]!.query(query);
   }
+
+  @override
+  Future<void> killQuery(ConnId connId) {
+    return conns[connId.value]!.killQuery();
+  }
 }
 
 class SessionConn {
@@ -181,6 +186,14 @@ class SessionConn {
       rethrow;
     } finally {
       _setState(SQLConnectState.connected);
+    }
+  }
+
+  Future<void> killQuery() async {
+    try {
+      await conn2!.killQuery();
+    } catch (e) {
+      print("Failed to kill query: $e");
     }
   }
 

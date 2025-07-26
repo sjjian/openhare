@@ -78,6 +78,7 @@ abstract class BaseConnection {
 
   Future<void> ping();
   Future<BaseQueryResult> query(String sql);
+  Future<void> killQuery();
   Future<void> close();
   Future<MetaDataNode> metadata();
   Future<List<String>> schemas();

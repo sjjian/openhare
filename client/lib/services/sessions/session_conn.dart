@@ -72,4 +72,8 @@ class SessionConnServices extends _$SessionConnServices {
   Future<BaseQueryResult?> query(String query) async {
     return ref.read(sessionConnRepoProvider).query(connId, query);
   }
+
+  Future<void> killQuery() async {
+    await ref.read(sessionConnRepoProvider).killQuery(connId);
+  }
 }

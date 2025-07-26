@@ -109,6 +109,12 @@ class PGConnection extends BaseConnection {
   }
 
   @override
+  Future<void> killQuery() async {
+    return;
+    // await _conn.killQuery();
+  }
+
+  @override
   Future<BaseQueryResult> query(String sql) async {
     final qs = await _conn.query(query: sql);
     final columns = qs.schema.columns

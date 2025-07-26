@@ -125,8 +125,10 @@ class MysqlQueryColumn extends BaseQueryColumn {
 
 class MySQLConnection extends BaseConnection {
   final ConnWrapper _conn;
+  late String? _sessionId;
+  late String _dsn;
 
-  MySQLConnection(this._conn);
+  MySQLConnection(this._conn, this._dsn);
 
   static Future<BaseConnection> open(
       {required ConnectValue meta, String? schema}) async {
@@ -138,7 +140,9 @@ class MySQLConnection extends BaseConnection {
       path: schema ?? "",
     ).toString();
     final conn = await ConnWrapper.open(dsn: dsn);
-    return MySQLConnection(conn);
+    final mc = MySQLConnection(conn, dsn);
+    await mc.loadSessionId();
+    return mc;
   }
 
   @override
@@ -150,6 +154,25 @@ class MySQLConnection extends BaseConnection {
   @override
   Future<void> ping() async {
     await _query("SELECT 1");
+  }
+
+  Future<void> loadSessionId() async {
+    final results = await _query("SELECT CONNECTION_ID() AS session_id;");
+    final rows = results.rows;
+    _sessionId = rows.first.getString("session_id");
+  }
+
+  @override
+  Future<void> killQuery() async {
+    // create new connection to kill query
+    MySQLConnection? tmp;
+    try {
+      final tmpConn = await ConnWrapper.open(dsn: _dsn);
+      tmp = MySQLConnection(tmpConn, _dsn);
+      await tmp._query("KILL QUERY $_sessionId");
+    } finally {
+      await tmp?.close();
+    }
   }
 
   @override
