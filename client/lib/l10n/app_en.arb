@@ -182,5 +182,13 @@
   "tip_connect_desc": "You are not connected. Please connect to execute queries.",
   "@tip_connect_desc": {
     "description": "tips when connect session desc"
+  },
+  "tip_connect_busy": "Executing",
+  "@tip_connect_busy": {
+    "description": "tips when connect session busy"
+  },
+  "tip_connect_busy_desc": "the connect is executing query, please wait",
+    "@tip_connect_busy_desc": {
+    "description": "tips when connect session busy"
   }
 }

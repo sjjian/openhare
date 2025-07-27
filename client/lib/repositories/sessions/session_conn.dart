@@ -20,9 +20,10 @@ class SessionConnRepoImpl extends SessionConnRepo {
   @override
   SessionConnModel getConn(ConnId connId) {
     return SessionConnModel(
-        connId: connId,
-        instanceId: conns[connId.value]?.model.id ?? const InstanceId(value: 0),
-        canQuery: conns[connId.value]?.canQuery() ?? false);
+      connId: connId,
+      instanceId: conns[connId.value]?.model.id ?? const InstanceId(value: 0),
+      state: conns[connId.value]?.state ?? SQLConnectState.disconnected,
+    );
   }
 
   @override
@@ -31,9 +32,10 @@ class SessionConnRepoImpl extends SessionConnRepo {
     final id = getConnId();
     conns[id] = conn;
     return SessionConnModel(
-        connId: ConnId(value: id),
-        instanceId: model.id,
-        canQuery: conn.canQuery());
+      connId: ConnId(value: id),
+      instanceId: model.id,
+      state: conn.state,
+    );
   }
 
   @override

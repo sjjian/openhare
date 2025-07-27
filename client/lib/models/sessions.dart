@@ -1,7 +1,6 @@
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:client/widgets/split_view.dart';
 
@@ -84,7 +83,7 @@ abstract class SessionOpBarModel with _$SessionOpBarModel {
   const factory SessionOpBarModel({
     required SessionId sessionId,
     required ConnId? connId,
-    required bool canQuery,
+    required SQLConnectState? state,
     required String currentSchema,
     required bool isRightPageOpen,
   }) = _SessionOpBarModel;
@@ -168,7 +167,7 @@ abstract class SessionConnModel with _$SessionConnModel {
   const factory SessionConnModel({
     required ConnId connId,
     required InstanceId instanceId,
-    required bool canQuery,
+    required SQLConnectState state,
   }) = _SessionConnModel;
 }
 
