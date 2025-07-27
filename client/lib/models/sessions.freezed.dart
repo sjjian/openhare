@@ -14,7 +14,7 @@ part of 'sessions.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$SessionId implements DiagnosticableTreeMixin {
+mixin _$SessionId {
   int get value;
 
   /// Create a copy of SessionId
@@ -23,13 +23,6 @@ mixin _$SessionId implements DiagnosticableTreeMixin {
   @pragma('vm:prefer-inline')
   $SessionIdCopyWith<SessionId> get copyWith =>
       _$SessionIdCopyWithImpl<SessionId>(this as SessionId, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionId'))
-      ..add(DiagnosticsProperty('value', value));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -43,7 +36,7 @@ mixin _$SessionId implements DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, value);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionId(value: $value)';
   }
 }
@@ -81,7 +74,7 @@ class _$SessionIdCopyWithImpl<$Res> implements $SessionIdCopyWith<$Res> {
 
 /// @nodoc
 
-class _SessionId with DiagnosticableTreeMixin implements SessionId {
+class _SessionId implements SessionId {
   const _SessionId({required this.value});
 
   @override
@@ -96,13 +89,6 @@ class _SessionId with DiagnosticableTreeMixin implements SessionId {
       __$SessionIdCopyWithImpl<_SessionId>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionId'))
-      ..add(DiagnosticsProperty('value', value));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -114,7 +100,7 @@ class _SessionId with DiagnosticableTreeMixin implements SessionId {
   int get hashCode => Object.hash(runtimeType, value);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionId(value: $value)';
   }
 }
@@ -154,7 +140,7 @@ class __$SessionIdCopyWithImpl<$Res> implements _$SessionIdCopyWith<$Res> {
 }
 
 /// @nodoc
-mixin _$SessionModel implements DiagnosticableTreeMixin {
+mixin _$SessionModel {
   SessionId get sessionId;
   InstanceId? get instanceId;
   String? get instanceName;
@@ -169,18 +155,6 @@ mixin _$SessionModel implements DiagnosticableTreeMixin {
   $SessionModelCopyWith<SessionModel> get copyWith =>
       _$SessionModelCopyWithImpl<SessionModel>(
           this as SessionModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('instanceId', instanceId))
-      ..add(DiagnosticsProperty('instanceName', instanceName))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
-      ..add(DiagnosticsProperty('dbType', dbType))
-      ..add(DiagnosticsProperty('connId', connId));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -204,7 +178,7 @@ mixin _$SessionModel implements DiagnosticableTreeMixin {
       instanceName, currentSchema, dbType, connId);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, currentSchema: $currentSchema, dbType: $dbType, connId: $connId)';
   }
 }
@@ -316,7 +290,7 @@ class _$SessionModelCopyWithImpl<$Res> implements $SessionModelCopyWith<$Res> {
 
 /// @nodoc
 
-class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
+class _SessionModel implements SessionModel {
   const _SessionModel(
       {required this.sessionId,
       this.instanceId,
@@ -347,18 +321,6 @@ class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
       __$SessionModelCopyWithImpl<_SessionModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('instanceId', instanceId))
-      ..add(DiagnosticsProperty('instanceName', instanceName))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
-      ..add(DiagnosticsProperty('dbType', dbType))
-      ..add(DiagnosticsProperty('connId', connId));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -380,7 +342,7 @@ class _SessionModel with DiagnosticableTreeMixin implements SessionModel {
       instanceName, currentSchema, dbType, connId);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, currentSchema: $currentSchema, dbType: $dbType, connId: $connId)';
   }
 }
@@ -497,7 +459,7 @@ class __$SessionModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SessionListModel implements DiagnosticableTreeMixin {
+mixin _$SessionListModel {
   List<SessionModel> get sessions;
   SessionModel? get selectedSession;
 
@@ -508,14 +470,6 @@ mixin _$SessionListModel implements DiagnosticableTreeMixin {
   $SessionListModelCopyWith<SessionListModel> get copyWith =>
       _$SessionListModelCopyWithImpl<SessionListModel>(
           this as SessionListModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionListModel'))
-      ..add(DiagnosticsProperty('sessions', sessions))
-      ..add(DiagnosticsProperty('selectedSession', selectedSession));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -532,7 +486,7 @@ mixin _$SessionListModel implements DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(sessions), selectedSession);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionListModel(sessions: $sessions, selectedSession: $selectedSession)';
   }
 }
@@ -593,9 +547,7 @@ class _$SessionListModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionListModel
-    with DiagnosticableTreeMixin
-    implements SessionListModel {
+class _SessionListModel implements SessionListModel {
   const _SessionListModel(
       {required final List<SessionModel> sessions, this.selectedSession})
       : _sessions = sessions;
@@ -620,14 +572,6 @@ class _SessionListModel
       __$SessionListModelCopyWithImpl<_SessionListModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionListModel'))
-      ..add(DiagnosticsProperty('sessions', sessions))
-      ..add(DiagnosticsProperty('selectedSession', selectedSession));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -642,7 +586,7 @@ class _SessionListModel
       const DeepCollectionEquality().hash(_sessions), selectedSession);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionListModel(sessions: $sessions, selectedSession: $selectedSession)';
   }
 }
@@ -705,10 +649,10 @@ class __$SessionListModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
+mixin _$SessionOpBarModel {
   SessionId get sessionId;
   ConnId? get connId;
-  bool get canQuery;
+  SQLConnectState? get state;
   String get currentSchema;
   bool get isRightPageOpen;
 
@@ -721,17 +665,6 @@ mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
           this as SessionOpBarModel, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionOpBarModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('connId', connId))
-      ..add(DiagnosticsProperty('canQuery', canQuery))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
-      ..add(DiagnosticsProperty('isRightPageOpen', isRightPageOpen));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -739,8 +672,7 @@ mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
             (identical(other.connId, connId) || other.connId == connId) &&
-            (identical(other.canQuery, canQuery) ||
-                other.canQuery == canQuery) &&
+            (identical(other.state, state) || other.state == state) &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
             (identical(other.isRightPageOpen, isRightPageOpen) ||
@@ -749,11 +681,11 @@ mixin _$SessionOpBarModel implements DiagnosticableTreeMixin {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, sessionId, connId, canQuery, currentSchema, isRightPageOpen);
+      runtimeType, sessionId, connId, state, currentSchema, isRightPageOpen);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, canQuery: $canQuery, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
+  String toString() {
+    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, state: $state, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
   }
 }
 
@@ -766,7 +698,7 @@ abstract mixin class $SessionOpBarModelCopyWith<$Res> {
   $Res call(
       {SessionId sessionId,
       ConnId? connId,
-      bool canQuery,
+      SQLConnectState? state,
       String currentSchema,
       bool isRightPageOpen});
 
@@ -789,7 +721,7 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
   $Res call({
     Object? sessionId = null,
     Object? connId = freezed,
-    Object? canQuery = null,
+    Object? state = freezed,
     Object? currentSchema = null,
     Object? isRightPageOpen = null,
   }) {
@@ -802,10 +734,10 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
               as ConnId?,
-      canQuery: null == canQuery
-          ? _self.canQuery
-          : canQuery // ignore: cast_nullable_to_non_nullable
-              as bool,
+      state: freezed == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLConnectState?,
       currentSchema: null == currentSchema
           ? _self.currentSchema
           : currentSchema // ignore: cast_nullable_to_non_nullable
@@ -844,13 +776,11 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionOpBarModel
-    with DiagnosticableTreeMixin
-    implements SessionOpBarModel {
+class _SessionOpBarModel implements SessionOpBarModel {
   const _SessionOpBarModel(
       {required this.sessionId,
       required this.connId,
-      required this.canQuery,
+      required this.state,
       required this.currentSchema,
       required this.isRightPageOpen});
 
@@ -859,7 +789,7 @@ class _SessionOpBarModel
   @override
   final ConnId? connId;
   @override
-  final bool canQuery;
+  final SQLConnectState? state;
   @override
   final String currentSchema;
   @override
@@ -874,17 +804,6 @@ class _SessionOpBarModel
       __$SessionOpBarModelCopyWithImpl<_SessionOpBarModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionOpBarModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('connId', connId))
-      ..add(DiagnosticsProperty('canQuery', canQuery))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
-      ..add(DiagnosticsProperty('isRightPageOpen', isRightPageOpen));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -892,8 +811,7 @@ class _SessionOpBarModel
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
             (identical(other.connId, connId) || other.connId == connId) &&
-            (identical(other.canQuery, canQuery) ||
-                other.canQuery == canQuery) &&
+            (identical(other.state, state) || other.state == state) &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
             (identical(other.isRightPageOpen, isRightPageOpen) ||
@@ -902,11 +820,11 @@ class _SessionOpBarModel
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, sessionId, connId, canQuery, currentSchema, isRightPageOpen);
+      runtimeType, sessionId, connId, state, currentSchema, isRightPageOpen);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, canQuery: $canQuery, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
+  String toString() {
+    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, state: $state, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
   }
 }
 
@@ -921,7 +839,7 @@ abstract mixin class _$SessionOpBarModelCopyWith<$Res>
   $Res call(
       {SessionId sessionId,
       ConnId? connId,
-      bool canQuery,
+      SQLConnectState? state,
       String currentSchema,
       bool isRightPageOpen});
 
@@ -946,7 +864,7 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
   $Res call({
     Object? sessionId = null,
     Object? connId = freezed,
-    Object? canQuery = null,
+    Object? state = freezed,
     Object? currentSchema = null,
     Object? isRightPageOpen = null,
   }) {
@@ -959,10 +877,10 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
               as ConnId?,
-      canQuery: null == canQuery
-          ? _self.canQuery
-          : canQuery // ignore: cast_nullable_to_non_nullable
-              as bool,
+      state: freezed == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLConnectState?,
       currentSchema: null == currentSchema
           ? _self.currentSchema
           : currentSchema // ignore: cast_nullable_to_non_nullable
@@ -1000,7 +918,7 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SessionEditorModel implements DiagnosticableTreeMixin {
+mixin _$SessionEditorModel {
   CodeLineEditingController get code;
 
   /// Create a copy of SessionEditorModel
@@ -1010,13 +928,6 @@ mixin _$SessionEditorModel implements DiagnosticableTreeMixin {
   $SessionEditorModelCopyWith<SessionEditorModel> get copyWith =>
       _$SessionEditorModelCopyWithImpl<SessionEditorModel>(
           this as SessionEditorModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionEditorModel'))
-      ..add(DiagnosticsProperty('code', code));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -1030,7 +941,7 @@ mixin _$SessionEditorModel implements DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, code);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionEditorModel(code: $code)';
   }
 }
@@ -1070,9 +981,7 @@ class _$SessionEditorModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionEditorModel
-    with DiagnosticableTreeMixin
-    implements SessionEditorModel {
+class _SessionEditorModel implements SessionEditorModel {
   const _SessionEditorModel({required this.code});
 
   @override
@@ -1087,13 +996,6 @@ class _SessionEditorModel
       __$SessionEditorModelCopyWithImpl<_SessionEditorModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionEditorModel'))
-      ..add(DiagnosticsProperty('code', code));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -1105,7 +1007,7 @@ class _SessionEditorModel
   int get hashCode => Object.hash(runtimeType, code);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionEditorModel(code: $code)';
   }
 }
@@ -1146,7 +1048,7 @@ class __$SessionEditorModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SessionDrawerModel implements DiagnosticableTreeMixin {
+mixin _$SessionDrawerModel {
   DrawerPage get drawerPage;
   BaseQueryValue? get sqlResult;
   BaseQueryColumn? get sqlColumn;
@@ -1160,17 +1062,6 @@ mixin _$SessionDrawerModel implements DiagnosticableTreeMixin {
   $SessionDrawerModelCopyWith<SessionDrawerModel> get copyWith =>
       _$SessionDrawerModelCopyWithImpl<SessionDrawerModel>(
           this as SessionDrawerModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionDrawerModel'))
-      ..add(DiagnosticsProperty('drawerPage', drawerPage))
-      ..add(DiagnosticsProperty('sqlResult', sqlResult))
-      ..add(DiagnosticsProperty('sqlColumn', sqlColumn))
-      ..add(DiagnosticsProperty('showRecord', showRecord))
-      ..add(DiagnosticsProperty('isRightPageOpen', isRightPageOpen));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -1194,7 +1085,7 @@ mixin _$SessionDrawerModel implements DiagnosticableTreeMixin {
       showRecord, isRightPageOpen);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionDrawerModel(drawerPage: $drawerPage, sqlResult: $sqlResult, sqlColumn: $sqlColumn, showRecord: $showRecord, isRightPageOpen: $isRightPageOpen)';
   }
 }
@@ -1259,9 +1150,7 @@ class _$SessionDrawerModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionDrawerModel
-    with DiagnosticableTreeMixin
-    implements SessionDrawerModel {
+class _SessionDrawerModel implements SessionDrawerModel {
   const _SessionDrawerModel(
       {required this.drawerPage,
       required this.sqlResult,
@@ -1289,17 +1178,6 @@ class _SessionDrawerModel
       __$SessionDrawerModelCopyWithImpl<_SessionDrawerModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionDrawerModel'))
-      ..add(DiagnosticsProperty('drawerPage', drawerPage))
-      ..add(DiagnosticsProperty('sqlResult', sqlResult))
-      ..add(DiagnosticsProperty('sqlColumn', sqlColumn))
-      ..add(DiagnosticsProperty('showRecord', showRecord))
-      ..add(DiagnosticsProperty('isRightPageOpen', isRightPageOpen));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -1321,7 +1199,7 @@ class _SessionDrawerModel
       showRecord, isRightPageOpen);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionDrawerModel(drawerPage: $drawerPage, sqlResult: $sqlResult, sqlColumn: $sqlColumn, showRecord: $showRecord, isRightPageOpen: $isRightPageOpen)';
   }
 }
@@ -1387,7 +1265,7 @@ class __$SessionDrawerModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SessionSplitViewModel implements DiagnosticableTreeMixin {
+mixin _$SessionSplitViewModel {
   SplitViewController get multiSplitViewCtrl;
   SplitViewController get metaDataSplitViewCtrl;
 
@@ -1398,15 +1276,6 @@ mixin _$SessionSplitViewModel implements DiagnosticableTreeMixin {
   $SessionSplitViewModelCopyWith<SessionSplitViewModel> get copyWith =>
       _$SessionSplitViewModelCopyWithImpl<SessionSplitViewModel>(
           this as SessionSplitViewModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionSplitViewModel'))
-      ..add(DiagnosticsProperty('multiSplitViewCtrl', multiSplitViewCtrl))
-      ..add(
-          DiagnosticsProperty('metaDataSplitViewCtrl', metaDataSplitViewCtrl));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -1424,7 +1293,7 @@ mixin _$SessionSplitViewModel implements DiagnosticableTreeMixin {
       Object.hash(runtimeType, multiSplitViewCtrl, metaDataSplitViewCtrl);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionSplitViewModel(multiSplitViewCtrl: $multiSplitViewCtrl, metaDataSplitViewCtrl: $metaDataSplitViewCtrl)';
   }
 }
@@ -1471,9 +1340,7 @@ class _$SessionSplitViewModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionSplitViewModel
-    with DiagnosticableTreeMixin
-    implements SessionSplitViewModel {
+class _SessionSplitViewModel implements SessionSplitViewModel {
   const _SessionSplitViewModel(
       {required this.multiSplitViewCtrl, required this.metaDataSplitViewCtrl});
 
@@ -1492,15 +1359,6 @@ class _SessionSplitViewModel
           this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionSplitViewModel'))
-      ..add(DiagnosticsProperty('multiSplitViewCtrl', multiSplitViewCtrl))
-      ..add(
-          DiagnosticsProperty('metaDataSplitViewCtrl', metaDataSplitViewCtrl));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -1516,7 +1374,7 @@ class _SessionSplitViewModel
       Object.hash(runtimeType, multiSplitViewCtrl, metaDataSplitViewCtrl);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionSplitViewModel(multiSplitViewCtrl: $multiSplitViewCtrl, metaDataSplitViewCtrl: $metaDataSplitViewCtrl)';
   }
 }
@@ -1564,7 +1422,7 @@ class __$SessionSplitViewModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SessionStatusModel implements DiagnosticableTreeMixin {
+mixin _$SessionStatusModel {
   SessionId get sessionId;
   String get instanceName; // sql result
   ResultId? get resultId;
@@ -1580,19 +1438,6 @@ mixin _$SessionStatusModel implements DiagnosticableTreeMixin {
   $SessionStatusModelCopyWith<SessionStatusModel> get copyWith =>
       _$SessionStatusModelCopyWithImpl<SessionStatusModel>(
           this as SessionStatusModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionStatusModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('instanceName', instanceName))
-      ..add(DiagnosticsProperty('resultId', resultId))
-      ..add(DiagnosticsProperty('state', state))
-      ..add(DiagnosticsProperty('executeTime', executeTime))
-      ..add(DiagnosticsProperty('affectedRows', affectedRows))
-      ..add(DiagnosticsProperty('query', query));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -1618,7 +1463,7 @@ mixin _$SessionStatusModel implements DiagnosticableTreeMixin {
       resultId, state, executeTime, affectedRows, query);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
   }
 }
@@ -1722,9 +1567,7 @@ class _$SessionStatusModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionStatusModel
-    with DiagnosticableTreeMixin
-    implements SessionStatusModel {
+class _SessionStatusModel implements SessionStatusModel {
   const _SessionStatusModel(
       {required this.sessionId,
       required this.instanceName,
@@ -1759,19 +1602,6 @@ class _SessionStatusModel
       __$SessionStatusModelCopyWithImpl<_SessionStatusModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionStatusModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('instanceName', instanceName))
-      ..add(DiagnosticsProperty('resultId', resultId))
-      ..add(DiagnosticsProperty('state', state))
-      ..add(DiagnosticsProperty('executeTime', executeTime))
-      ..add(DiagnosticsProperty('affectedRows', affectedRows))
-      ..add(DiagnosticsProperty('query', query));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -1795,7 +1625,7 @@ class _SessionStatusModel
       resultId, state, executeTime, affectedRows, query);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
   }
 }
@@ -1902,7 +1732,7 @@ class __$SessionStatusModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SessionSQLEditorModel implements DiagnosticableTreeMixin {
+mixin _$SessionSQLEditorModel {
   String? get currentSchema;
   MetaDataNode? get metadata;
 
@@ -1913,14 +1743,6 @@ mixin _$SessionSQLEditorModel implements DiagnosticableTreeMixin {
   $SessionSQLEditorModelCopyWith<SessionSQLEditorModel> get copyWith =>
       _$SessionSQLEditorModelCopyWithImpl<SessionSQLEditorModel>(
           this as SessionSQLEditorModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionSQLEditorModel'))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
-      ..add(DiagnosticsProperty('metadata', metadata));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -1937,7 +1759,7 @@ mixin _$SessionSQLEditorModel implements DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, currentSchema, metadata);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionSQLEditorModel(currentSchema: $currentSchema, metadata: $metadata)';
   }
 }
@@ -1982,9 +1804,7 @@ class _$SessionSQLEditorModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionSQLEditorModel
-    with DiagnosticableTreeMixin
-    implements SessionSQLEditorModel {
+class _SessionSQLEditorModel implements SessionSQLEditorModel {
   const _SessionSQLEditorModel({this.currentSchema, this.metadata});
 
   @override
@@ -2002,14 +1822,6 @@ class _SessionSQLEditorModel
           this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionSQLEditorModel'))
-      ..add(DiagnosticsProperty('currentSchema', currentSchema))
-      ..add(DiagnosticsProperty('metadata', metadata));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -2024,7 +1836,7 @@ class _SessionSQLEditorModel
   int get hashCode => Object.hash(runtimeType, currentSchema, metadata);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SessionSQLEditorModel(currentSchema: $currentSchema, metadata: $metadata)';
   }
 }
@@ -2070,7 +1882,7 @@ class __$SessionSQLEditorModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$ConnId implements DiagnosticableTreeMixin {
+mixin _$ConnId {
   int get value;
 
   /// Create a copy of ConnId
@@ -2079,13 +1891,6 @@ mixin _$ConnId implements DiagnosticableTreeMixin {
   @pragma('vm:prefer-inline')
   $ConnIdCopyWith<ConnId> get copyWith =>
       _$ConnIdCopyWithImpl<ConnId>(this as ConnId, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'ConnId'))
-      ..add(DiagnosticsProperty('value', value));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -2099,7 +1904,7 @@ mixin _$ConnId implements DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, value);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'ConnId(value: $value)';
   }
 }
@@ -2137,7 +1942,7 @@ class _$ConnIdCopyWithImpl<$Res> implements $ConnIdCopyWith<$Res> {
 
 /// @nodoc
 
-class _ConnId with DiagnosticableTreeMixin implements ConnId {
+class _ConnId implements ConnId {
   const _ConnId({required this.value});
 
   @override
@@ -2152,13 +1957,6 @@ class _ConnId with DiagnosticableTreeMixin implements ConnId {
       __$ConnIdCopyWithImpl<_ConnId>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'ConnId'))
-      ..add(DiagnosticsProperty('value', value));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -2170,7 +1968,7 @@ class _ConnId with DiagnosticableTreeMixin implements ConnId {
   int get hashCode => Object.hash(runtimeType, value);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'ConnId(value: $value)';
   }
 }
@@ -2208,10 +2006,10 @@ class __$ConnIdCopyWithImpl<$Res> implements _$ConnIdCopyWith<$Res> {
 }
 
 /// @nodoc
-mixin _$SessionConnModel implements DiagnosticableTreeMixin {
+mixin _$SessionConnModel {
   ConnId get connId;
   InstanceId get instanceId;
-  bool get canQuery;
+  SQLConnectState get state;
 
   /// Create a copy of SessionConnModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2222,15 +2020,6 @@ mixin _$SessionConnModel implements DiagnosticableTreeMixin {
           this as SessionConnModel, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionConnModel'))
-      ..add(DiagnosticsProperty('connId', connId))
-      ..add(DiagnosticsProperty('instanceId', instanceId))
-      ..add(DiagnosticsProperty('canQuery', canQuery));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -2238,16 +2027,15 @@ mixin _$SessionConnModel implements DiagnosticableTreeMixin {
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.instanceId, instanceId) ||
                 other.instanceId == instanceId) &&
-            (identical(other.canQuery, canQuery) ||
-                other.canQuery == canQuery));
+            (identical(other.state, state) || other.state == state));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, connId, instanceId, canQuery);
+  int get hashCode => Object.hash(runtimeType, connId, instanceId, state);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, canQuery: $canQuery)';
+  String toString() {
+    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, state: $state)';
   }
 }
 
@@ -2257,7 +2045,7 @@ abstract mixin class $SessionConnModelCopyWith<$Res> {
           SessionConnModel value, $Res Function(SessionConnModel) _then) =
       _$SessionConnModelCopyWithImpl;
   @useResult
-  $Res call({ConnId connId, InstanceId instanceId, bool canQuery});
+  $Res call({ConnId connId, InstanceId instanceId, SQLConnectState state});
 
   $ConnIdCopyWith<$Res> get connId;
   $InstanceIdCopyWith<$Res> get instanceId;
@@ -2278,7 +2066,7 @@ class _$SessionConnModelCopyWithImpl<$Res>
   $Res call({
     Object? connId = null,
     Object? instanceId = null,
-    Object? canQuery = null,
+    Object? state = null,
   }) {
     return _then(_self.copyWith(
       connId: null == connId
@@ -2289,10 +2077,10 @@ class _$SessionConnModelCopyWithImpl<$Res>
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      canQuery: null == canQuery
-          ? _self.canQuery
-          : canQuery // ignore: cast_nullable_to_non_nullable
-              as bool,
+      state: null == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLConnectState,
     ));
   }
 
@@ -2319,18 +2107,16 @@ class _$SessionConnModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionConnModel
-    with DiagnosticableTreeMixin
-    implements SessionConnModel {
+class _SessionConnModel implements SessionConnModel {
   const _SessionConnModel(
-      {required this.connId, required this.instanceId, required this.canQuery});
+      {required this.connId, required this.instanceId, required this.state});
 
   @override
   final ConnId connId;
   @override
   final InstanceId instanceId;
   @override
-  final bool canQuery;
+  final SQLConnectState state;
 
   /// Create a copy of SessionConnModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2341,15 +2127,6 @@ class _SessionConnModel
       __$SessionConnModelCopyWithImpl<_SessionConnModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SessionConnModel'))
-      ..add(DiagnosticsProperty('connId', connId))
-      ..add(DiagnosticsProperty('instanceId', instanceId))
-      ..add(DiagnosticsProperty('canQuery', canQuery));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -2357,16 +2134,15 @@ class _SessionConnModel
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.instanceId, instanceId) ||
                 other.instanceId == instanceId) &&
-            (identical(other.canQuery, canQuery) ||
-                other.canQuery == canQuery));
+            (identical(other.state, state) || other.state == state));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, connId, instanceId, canQuery);
+  int get hashCode => Object.hash(runtimeType, connId, instanceId, state);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, canQuery: $canQuery)';
+  String toString() {
+    return 'SessionConnModel(connId: $connId, instanceId: $instanceId, state: $state)';
   }
 }
 
@@ -2378,7 +2154,7 @@ abstract mixin class _$SessionConnModelCopyWith<$Res>
       __$SessionConnModelCopyWithImpl;
   @override
   @useResult
-  $Res call({ConnId connId, InstanceId instanceId, bool canQuery});
+  $Res call({ConnId connId, InstanceId instanceId, SQLConnectState state});
 
   @override
   $ConnIdCopyWith<$Res> get connId;
@@ -2401,7 +2177,7 @@ class __$SessionConnModelCopyWithImpl<$Res>
   $Res call({
     Object? connId = null,
     Object? instanceId = null,
-    Object? canQuery = null,
+    Object? state = null,
   }) {
     return _then(_SessionConnModel(
       connId: null == connId
@@ -2412,10 +2188,10 @@ class __$SessionConnModelCopyWithImpl<$Res>
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      canQuery: null == canQuery
-          ? _self.canQuery
-          : canQuery // ignore: cast_nullable_to_non_nullable
-              as bool,
+      state: null == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLConnectState,
     ));
   }
 
@@ -2441,7 +2217,7 @@ class __$SessionConnModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$ResultId implements DiagnosticableTreeMixin {
+mixin _$ResultId {
   SessionId get sessionId;
   int get value;
 
@@ -2451,14 +2227,6 @@ mixin _$ResultId implements DiagnosticableTreeMixin {
   @pragma('vm:prefer-inline')
   $ResultIdCopyWith<ResultId> get copyWith =>
       _$ResultIdCopyWithImpl<ResultId>(this as ResultId, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'ResultId'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('value', value));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -2474,7 +2242,7 @@ mixin _$ResultId implements DiagnosticableTreeMixin {
   int get hashCode => Object.hash(runtimeType, sessionId, value);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'ResultId(sessionId: $sessionId, value: $value)';
   }
 }
@@ -2529,7 +2297,7 @@ class _$ResultIdCopyWithImpl<$Res> implements $ResultIdCopyWith<$Res> {
 
 /// @nodoc
 
-class _ResultId with DiagnosticableTreeMixin implements ResultId {
+class _ResultId implements ResultId {
   const _ResultId({required this.sessionId, required this.value});
 
   @override
@@ -2546,14 +2314,6 @@ class _ResultId with DiagnosticableTreeMixin implements ResultId {
       __$ResultIdCopyWithImpl<_ResultId>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'ResultId'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('value', value));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -2567,7 +2327,7 @@ class _ResultId with DiagnosticableTreeMixin implements ResultId {
   int get hashCode => Object.hash(runtimeType, sessionId, value);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'ResultId(sessionId: $sessionId, value: $value)';
   }
 }
@@ -2624,7 +2384,7 @@ class __$ResultIdCopyWithImpl<$Res> implements _$ResultIdCopyWith<$Res> {
 }
 
 /// @nodoc
-mixin _$SQLResultModel implements DiagnosticableTreeMixin {
+mixin _$SQLResultModel {
   ResultId get resultId;
   SQLExecuteState get state;
   String? get query;
@@ -2639,18 +2399,6 @@ mixin _$SQLResultModel implements DiagnosticableTreeMixin {
   $SQLResultModelCopyWith<SQLResultModel> get copyWith =>
       _$SQLResultModelCopyWithImpl<SQLResultModel>(
           this as SQLResultModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SQLResultModel'))
-      ..add(DiagnosticsProperty('resultId', resultId))
-      ..add(DiagnosticsProperty('state', state))
-      ..add(DiagnosticsProperty('query', query))
-      ..add(DiagnosticsProperty('executeTime', executeTime))
-      ..add(DiagnosticsProperty('error', error))
-      ..add(DiagnosticsProperty('data', data));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -2672,7 +2420,7 @@ mixin _$SQLResultModel implements DiagnosticableTreeMixin {
       runtimeType, resultId, state, query, executeTime, error, data);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SQLResultModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
   }
 }
@@ -2755,7 +2503,7 @@ class _$SQLResultModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SQLResultModel with DiagnosticableTreeMixin implements SQLResultModel {
+class _SQLResultModel implements SQLResultModel {
   const _SQLResultModel(
       {required this.resultId,
       required this.state,
@@ -2786,18 +2534,6 @@ class _SQLResultModel with DiagnosticableTreeMixin implements SQLResultModel {
       __$SQLResultModelCopyWithImpl<_SQLResultModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SQLResultModel'))
-      ..add(DiagnosticsProperty('resultId', resultId))
-      ..add(DiagnosticsProperty('state', state))
-      ..add(DiagnosticsProperty('query', query))
-      ..add(DiagnosticsProperty('executeTime', executeTime))
-      ..add(DiagnosticsProperty('error', error))
-      ..add(DiagnosticsProperty('data', data));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -2817,7 +2553,7 @@ class _SQLResultModel with DiagnosticableTreeMixin implements SQLResultModel {
       runtimeType, resultId, state, query, executeTime, error, data);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SQLResultModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
   }
 }
@@ -2902,7 +2638,7 @@ class __$SQLResultModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SQLResultListModel implements DiagnosticableTreeMixin {
+mixin _$SQLResultListModel {
   SessionId get sessionId;
   List<SQLResultModel> get results;
   SQLResultModel? get selected;
@@ -2914,15 +2650,6 @@ mixin _$SQLResultListModel implements DiagnosticableTreeMixin {
   $SQLResultListModelCopyWith<SQLResultListModel> get copyWith =>
       _$SQLResultListModelCopyWithImpl<SQLResultListModel>(
           this as SQLResultListModel, _$identity);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SQLResultListModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('results', results))
-      ..add(DiagnosticsProperty('selected', selected));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -2941,7 +2668,7 @@ mixin _$SQLResultListModel implements DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(results), selected);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SQLResultListModel(sessionId: $sessionId, results: $results, selected: $selected)';
   }
 }
@@ -3021,9 +2748,7 @@ class _$SQLResultListModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SQLResultListModel
-    with DiagnosticableTreeMixin
-    implements SQLResultListModel {
+class _SQLResultListModel implements SQLResultListModel {
   const _SQLResultListModel(
       {required this.sessionId,
       required final List<SQLResultModel> results,
@@ -3052,15 +2777,6 @@ class _SQLResultListModel
       __$SQLResultListModelCopyWithImpl<_SQLResultListModel>(this, _$identity);
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    properties
-      ..add(DiagnosticsProperty('type', 'SQLResultListModel'))
-      ..add(DiagnosticsProperty('sessionId', sessionId))
-      ..add(DiagnosticsProperty('results', results))
-      ..add(DiagnosticsProperty('selected', selected));
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -3077,7 +2793,7 @@ class _SQLResultListModel
       const DeepCollectionEquality().hash(_results), selected);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SQLResultListModel(sessionId: $sessionId, results: $results, selected: $selected)';
   }
 }

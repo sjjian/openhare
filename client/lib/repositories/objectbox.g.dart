@@ -271,12 +271,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (SessionStorage object, fb.Builder fbb) {
-        final textOffset =
-            object.text == null ? null : fbb.writeString(object.text!);
-        final currentSchemaOffset =
-            object.currentSchema == null
-                ? null
-                : fbb.writeString(object.currentSchema!);
+        final textOffset = object.text == null
+            ? null
+            : fbb.writeString(object.text!);
+        final currentSchemaOffset = object.currentSchema == null
+            ? null
+            : fbb.writeString(object.currentSchema!);
         fbb.startTable(5);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.instance.targetId);
@@ -403,28 +403,28 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0),
         );
-        final latestOpenAtParam =
-            latestOpenAtValue == null
-                ? null
-                : DateTime.fromMillisecondsSinceEpoch(latestOpenAtValue);
-        final object = InstanceStorage(
-            id: idParam,
-            stDbType: stDbTypeParam,
-            name: nameParam,
-            host: hostParam,
-            port: portParam,
-            user: userParam,
-            password: passwordParam,
-            desc: descParam,
-            stCustom: stCustomParam,
-            initQuerys: initQuerysParam,
-            createdAt: createdAtParam,
-            latestOpenAt: latestOpenAtParam,
-          )
-          ..stActiveSchemas = const fb.ListReader<String>(
-            fb.StringReader(asciiOptimization: true),
-            lazy: false,
-          ).vTableGet(buffer, rootOffset, 28, []);
+        final latestOpenAtParam = latestOpenAtValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(latestOpenAtValue);
+        final object =
+            InstanceStorage(
+                id: idParam,
+                stDbType: stDbTypeParam,
+                name: nameParam,
+                host: hostParam,
+                port: portParam,
+                user: userParam,
+                password: passwordParam,
+                desc: descParam,
+                stCustom: stCustomParam,
+                initQuerys: initQuerysParam,
+                createdAt: createdAtParam,
+                latestOpenAt: latestOpenAtParam,
+              )
+              ..stActiveSchemas = const fb.ListReader<String>(
+                fb.StringReader(asciiOptimization: true),
+                lazy: false,
+              ).vTableGet(buffer, rootOffset, 28, []);
 
         return object;
       },
