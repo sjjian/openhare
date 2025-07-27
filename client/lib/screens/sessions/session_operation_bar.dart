@@ -73,7 +73,20 @@ class SessionOpBar extends ConsumerWidget {
   }
 
   void disconnectDialog(
-      BuildContext context, WidgetRef ref, SessionId sessionId) {
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    // 如果正在执行语句，则提示连接繁忙，请稍后执行
+    if (connIsBusy(model)) {
+      return doActionDialog(
+        context,
+        AppLocalizations.of(context)!.tip_connect_busy,
+        AppLocalizations.of(context)!.tip_connect_busy_desc,
+        () {
+          // do nothing, just close the dialog
+        },
+        icon: Icon(Icons.warning_amber_rounded,
+            color: Theme.of(context).colorScheme.error),
+      );
+    }
     return doActionDialog(
       context,
       AppLocalizations.of(context)!.tip_disconnect,
@@ -81,7 +94,7 @@ class SessionOpBar extends ConsumerWidget {
       () async {
         await ref
             .read(sessionsServicesProvider.notifier)
-            .disconnectSession(sessionId);
+            .disconnectSession(model.sessionId);
       },
       icon: Icon(Icons.link_off_rounded,
           color: Theme.of(context).colorScheme.error),
@@ -162,7 +175,7 @@ class SessionOpBar extends ConsumerWidget {
         icon:
             Icon(Icons.link_off_rounded, color: Theme.of(context).primaryColor),
         onPressed: () async {
-          disconnectDialog(context, ref, model.sessionId);
+          disconnectDialog(context, ref, model);
         },
       );
     }
@@ -252,7 +265,7 @@ class SessionOpBar extends ConsumerWidget {
               String query = getQuery();
               if (query.isNotEmpty) {
                 final resultModel = ref
-                    .read(sQLResultsServicesProvider(model!.sessionId).notifier)
+                    .read(sQLResultsServicesProvider(model.sessionId).notifier)
                     .addSQLResult();
                 ref
                     .read(sQLResultServicesProvider(resultModel.resultId)
@@ -296,9 +309,11 @@ class SessionOpBar extends ConsumerWidget {
           divider(),
           // schema list
           SchemaBar(
-              connId: model.connId,
-              disable: !connIsConnected(model),
-              currentSchema: model.currentSchema),
+            connId: model.connId,
+            disable: !connIsIdle(model),
+            currentSchema: model.currentSchema,
+            iconColor: connIsConnected(model) ? Colors.green : Colors.grey,
+          ),
           divider(),
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
@@ -323,11 +338,14 @@ class SchemaBar extends ConsumerStatefulWidget {
   final String? currentSchema;
   final bool disable;
   final ConnId? connId;
+  final Color? iconColor;
+
   const SchemaBar({
     Key? key,
     this.connId,
     required this.disable,
     this.currentSchema,
+    this.iconColor,
   }) : super(key: key);
 
   @override
@@ -394,9 +412,10 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                 : null,
             child: Row(
               children: [
-                const HugeIcon(
+                HugeIcon(
                   icon: HugeIcons.strokeRoundedDatabase,
-                  color: Colors.black,
+                  color: widget.iconColor ??
+                      Theme.of(context).colorScheme.onSurface,
                   size: 20,
                 ),
                 Container(

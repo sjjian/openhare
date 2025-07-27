@@ -18,6 +18,7 @@ class InstanceMetadataServices extends _$InstanceMetadataServices {
     await ref.read(sessionConnServicesProvider(connModel.connId).notifier).connect();
     final metadata = await ref.read(sessionConnServicesProvider(connModel.connId).notifier).getMetadata();
     ref.read(instanceMetadataRepoProvider).updateMetadata(state.instanceId, metadata);
+    await ref.read(sessionConnServicesProvider(connModel.connId).notifier).close();
     await ref.read(sessionConnsServicesProvider.notifier).removeConn(connModel.connId);
     ref.invalidateSelf();
   }
