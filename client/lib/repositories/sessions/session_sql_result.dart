@@ -1,5 +1,4 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/sessions/session_conn.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/reorder_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,7 +62,7 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
-  SQLResultModel getSQLReuslt(ResultId resultId) {
+  SQLResultModel getSQLResult(ResultId resultId) {
     final result = _getSQLResult(resultId.sessionId.value, resultId.value);
     return _toModel(result);
   }

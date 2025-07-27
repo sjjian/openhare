@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:db_driver/db_driver.dart';
@@ -18,9 +20,10 @@ class SessionConnRepoImpl extends SessionConnRepo {
   @override
   SessionConnModel getConn(ConnId connId) {
     return SessionConnModel(
-        connId: connId,
-        instanceId: conns[connId.value]?.model.id ?? const InstanceId(value: 0),
-        canQuery: conns[connId.value]?.canQuery() ?? false);
+      connId: connId,
+      instanceId: conns[connId.value]?.model.id ?? const InstanceId(value: 0),
+      state: conns[connId.value]?.state ?? SQLConnectState.disconnected,
+    );
   }
 
   @override
@@ -29,9 +32,10 @@ class SessionConnRepoImpl extends SessionConnRepo {
     final id = getConnId();
     conns[id] = conn;
     return SessionConnModel(
-        connId: ConnId(value: id),
-        instanceId: model.id,
-        canQuery: conn.canQuery());
+      connId: ConnId(value: id),
+      instanceId: model.id,
+      state: conn.state,
+    );
   }
 
   @override
@@ -42,11 +46,11 @@ class SessionConnRepoImpl extends SessionConnRepo {
   @override
   Future<void> connect(
     ConnId connId, {
-    Function()? onCloseCallback,
+    Function()? onStateChangedCallback,
     Function(String)? onSchemaChangedCallback,
   }) {
     return conns[connId.value]!.connect(
-      onCloseCallback: onCloseCallback,
+      onStateChangedCallback: onStateChangedCallback,
       onSchemaChangedCallback: onSchemaChangedCallback,
     );
   }
@@ -75,45 +79,85 @@ class SessionConnRepoImpl extends SessionConnRepo {
   Future<BaseQueryResult?> query(ConnId connId, String query) {
     return conns[connId.value]!.query(query);
   }
+
+  @override
+  Future<void> killQuery(ConnId connId) {
+    return conns[connId.value]!.killQuery();
+  }
 }
-
-enum SQLConnectState { pending, connecting, connected, failed }
-
-enum SQLExecuteState { init, executing, done, error }
 
 class SessionConn {
   final InstanceModel model;
   BaseConnection? conn2;
-  SQLConnectState state = SQLConnectState.pending;
-  SQLExecuteState queryState = SQLExecuteState.init;
+  SQLConnectState state = SQLConnectState.disconnected;
   String? currentSchema;
+  Timer? _timer;
+  Function()? _onStateChangedCallback;
 
   SessionConn({
     required this.model,
     this.currentSchema,
   });
 
+  void _setState(SQLConnectState state) {
+    this.state = state;
+    _onStateChangedCallback?.call();
+  }
+
   Future<void> connect(
-      {Function()? onCloseCallback,
+      {Function()? onStateChangedCallback,
       Function(String)? onSchemaChangedCallback}) async {
     try {
+      if (conn2 != null) {
+        await conn2!.close();
+      }
+      _setState(SQLConnectState.connecting);
       conn2 = await ConnectionFactory.open(
         type: model.dbType,
         meta: model.connectValue,
         schema: currentSchema,
-        onCloseCallback: () {
-          state = SQLConnectState.pending;
-          onCloseCallback?.call();
-        },
         onSchemaChangedCallback: (schema) {
           currentSchema = schema;
           onSchemaChangedCallback?.call(schema);
         },
       );
-      state = SQLConnectState.connected;
+      _onStateChangedCallback = onStateChangedCallback;
+      _setState(SQLConnectState.connected);
+      startHealthCheck();
     } catch (e, s) {
       print("conn error: ${e}; ${s}");
-      state = SQLConnectState.failed;
+      _setState(SQLConnectState.failed);
+    }
+  }
+
+  // 后台循环ping进行探活，每隔5秒，如果探活失败则调用 onCloseCallback，并关闭连接
+  void startHealthCheck() {
+    // 然后每隔5秒检查一次
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      _checkConnection();
+    });
+  }
+
+  void stopHealthCheck() {
+    _timer?.cancel();
+  }
+
+  Future<void> _checkConnection() async {
+    try {
+      if (conn2 == null || state != SQLConnectState.connected) {
+        return;
+      }
+      await conn2!.ping();
+      print("Connection $hashCode is alive");
+    } catch (e) {
+      print("Connection $hashCode check failed: $e");
+
+      _setState(SQLConnectState.unHealth);
+      try {
+        _onStateChangedCallback?.call();
+      } catch (callbackError) {
+        print("调用 onCloseCallback 时出错: $callbackError");
+      }
     }
   }
 
@@ -122,27 +166,36 @@ class SessionConn {
       return;
     }
     try {
+      stopHealthCheck();
       conn2!.close();
-      state = SQLConnectState.pending;
+      state = SQLConnectState.disconnected;
+      _onStateChangedCallback?.call();
     } catch (e) {
       // todo: handler error;
     }
   }
 
   bool canQuery() {
-    return (queryState != SQLExecuteState.executing &&
-        state == SQLConnectState.connected);
+    return (conn2 != null && state == SQLConnectState.connected);
   }
 
   Future<BaseQueryResult?> query(String query) async {
     try {
-      queryState = SQLExecuteState.executing;
+      _setState(SQLConnectState.executing);
       BaseQueryResult queryResult = await conn2!.query(query);
       return queryResult;
     } catch (e) {
       rethrow;
     } finally {
-      queryState = SQLExecuteState.init;
+      _setState(SQLConnectState.connected);
+    }
+  }
+
+  Future<void> killQuery() async {
+    try {
+      await conn2!.killQuery();
+    } catch (e) {
+      print("Failed to kill query: $e");
     }
   }
 

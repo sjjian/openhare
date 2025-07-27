@@ -72,12 +72,13 @@ class BaseQueryResult {
 }
 
 abstract class BaseConnection {
-  void Function()? onCloseCallback;
   void Function(String)? onSchemaChangedCallback;
 
   BaseConnection();
 
+  Future<void> ping();
   Future<BaseQueryResult> query(String sql);
+  Future<void> killQuery();
   Future<void> close();
   Future<MetaDataNode> metadata();
   Future<List<String>> schemas();
@@ -87,10 +88,8 @@ abstract class BaseConnection {
   void listen(
       {Function()? onCloseCallback,
       Function(String)? onSchemaChangedCallback}) {
-    this.onCloseCallback = onCloseCallback;
     this.onSchemaChangedCallback = onSchemaChangedCallback;
   }
 
-  void onClose() => onCloseCallback?.call();
   void onSchemaChanged(String schema) => onSchemaChangedCallback?.call(schema);
 }

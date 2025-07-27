@@ -1,6 +1,6 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/repositories/sessions/session_conn.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
+import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
@@ -248,11 +248,34 @@ class SqlResultTable extends ConsumerWidget {
       return Container(
           alignment: Alignment.topLeft,
           color: color,
-          child: const Center(
-            child: SizedBox(
-              height: 40,
-              width: 40,
-              child: CircularProgressIndicator(),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 30,
+                  width: 30,
+                  child: CircularProgressIndicator(),
+                ),
+                const SizedBox(height: 20),
+                FilledButton(
+                    onPressed: () async {
+                      SessionModel? sessionModel = ref
+                          .read(sessionsServicesProvider.notifier)
+                          .getSession(model.resultId.sessionId);
+
+                      if (sessionModel == null || sessionModel.connId == null) {
+                        return;
+                      }
+                      await ref
+                          .read(
+                              sessionConnServicesProvider(sessionModel.connId!)
+                                  .notifier)
+                          .killQuery();
+                    },
+                    child: Text(AppLocalizations.of(context)!.cancel))
+              ],
             ),
           ));
     }

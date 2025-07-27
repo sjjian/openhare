@@ -44,5 +44,7 @@
     "tip_disconnect": "断开连接",
     "tip_disconnect_desc": "确定断开连接吗?",
     "tip_connect": "连接",
-    "tip_connect_desc": "未连接数据库，请先连接数据库。"
+    "tip_connect_desc": "未连接数据库，请先连接数据库。",
+    "tip_connect_busy": "连接繁忙",
+    "tip_connect_busy_desc": "当前连接正在执行语句，请稍后再试。"
 }

@@ -34,7 +34,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
     return SessionOpBarModel(
       sessionId: sessionIdModel.sessionId,
       connId: sessionIdModel.connId,
-      canQuery: sessionConnModel?.canQuery ?? false,
+      state: sessionConnModel?.state,
       currentSchema: sessionIdModel.currentSchema ?? "",
       isRightPageOpen: sessionDrawer.isRightPageOpen,
     );
@@ -73,7 +73,20 @@ class SessionOpBar extends ConsumerWidget {
   }
 
   void disconnectDialog(
-      BuildContext context, WidgetRef ref, SessionId sessionId) {
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    // 如果正在执行语句，则提示连接繁忙，请稍后执行
+    if (connIsBusy(model)) {
+      return doActionDialog(
+        context,
+        AppLocalizations.of(context)!.tip_connect_busy,
+        AppLocalizations.of(context)!.tip_connect_busy_desc,
+        () {
+          // do nothing, just close the dialog
+        },
+        icon: Icon(Icons.warning_amber_rounded,
+            color: Theme.of(context).colorScheme.error),
+      );
+    }
     return doActionDialog(
       context,
       AppLocalizations.of(context)!.tip_disconnect,
@@ -81,14 +94,29 @@ class SessionOpBar extends ConsumerWidget {
       () async {
         await ref
             .read(sessionsServicesProvider.notifier)
-            .disconnectSession(sessionId);
+            .disconnectSession(model.sessionId);
       },
       icon: Icon(Icons.link_off_rounded,
           color: Theme.of(context).colorScheme.error),
     );
   }
 
-  void connectDialog(BuildContext context, WidgetRef ref, SessionId sessionId) {
+  void connectDialog(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    // 如果是connIsBusy，则提示连接繁忙，请稍后执行
+    if (connIsBusy(model)) {
+      return doActionDialog(
+        context,
+        AppLocalizations.of(context)!.tip_connect_busy,
+        AppLocalizations.of(context)!.tip_connect_busy_desc,
+        () {
+          // do nothing, just close the dialog
+        },
+        icon: Icon(Icons.warning_amber_rounded,
+            color: Theme.of(context).colorScheme.error),
+      );
+    }
+    // 如果是connIsDisconnected，则提示连接未建立，请先连接
     return doActionDialog(
       context,
       AppLocalizations.of(context)!.tip_connect,
@@ -96,17 +124,179 @@ class SessionOpBar extends ConsumerWidget {
       () async {
         await ref
             .read(sessionsServicesProvider.notifier)
-            .connectSession(sessionId);
+            .connectSession(model.sessionId);
       },
       icon: Icon(Icons.link_rounded,
           color: Theme.of(context).colorScheme.primary),
     );
   }
 
+  bool connIsConnected(SessionOpBarModel model) {
+    return (model.connId != null &&
+        model.state != null &&
+        (model.state == SQLConnectState.connected ||
+            model.state == SQLConnectState.executing));
+  }
+
+  bool connIsDisconnected(SessionOpBarModel model) {
+    return (model.connId == null ||
+        model.state == null ||
+        model.state == SQLConnectState.disconnected ||
+        model.state == SQLConnectState.failed);
+  }
+
+  bool connIsIdle(SessionOpBarModel model) {
+    return (model.connId != null &&
+        model.state != null &&
+        model.state == SQLConnectState.connected);
+  }
+
+  bool connIsBusy(SessionOpBarModel model) {
+    return (model.connId != null &&
+        model.state != null &&
+        (model.state == SQLConnectState.executing ||
+            model.state == SQLConnectState.connecting));
+  }
+
+  Widget connectWidget(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    if (connIsDisconnected(model)) {
+      return IconButton(
+        icon: Icon(Icons.link_rounded, color: Theme.of(context).primaryColor),
+        onPressed: () async {
+          await ref
+              .read(sessionsServicesProvider.notifier)
+              .connectSession(model.sessionId);
+        },
+      );
+    } else {
+      // disconnect
+      return IconButton(
+        icon:
+            Icon(Icons.link_off_rounded, color: Theme.of(context).primaryColor),
+        onPressed: () async {
+          disconnectDialog(context, ref, model);
+        },
+      );
+    }
+  }
+
+  Widget executeWidget(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    return IconButton(
+      iconSize: height,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(2),
+      icon: Icon(
+        Icons.play_arrow_rounded,
+        color: connIsIdle(model) ? Colors.green : Colors.grey,
+      ),
+      onPressed: connIsIdle(model)
+          ? () {
+              String query = getQuery();
+
+              SQLResultModel? resultModel = ref
+                  .read(sQLResultsServicesProvider(model.sessionId).notifier)
+                  .selectedSQLResult();
+
+              resultModel ??= ref
+                  .read(sQLResultsServicesProvider(model.sessionId).notifier)
+                  .addSQLResult();
+
+              ref
+                  .read(
+                      sQLResultServicesProvider(resultModel.resultId).notifier)
+                  .loadFromQuery(query);
+            }
+          : () {
+              connectDialog(context, ref, model);
+            },
+    );
+  }
+
+  Widget executeAddWidget(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    return IconButton(
+      iconSize: height,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(2),
+      icon: Stack(alignment: Alignment.center, children: [
+        Icon(Icons.play_arrow_rounded,
+            color: connIsIdle(model) ? Colors.green : Colors.grey),
+        const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 12,
+        ),
+      ]),
+      onPressed: connIsIdle(model)
+          ? () {
+              String query = getQuery();
+              if (query.isNotEmpty) {
+                final resultModel = ref
+                    .read(sQLResultsServicesProvider(model.sessionId).notifier)
+                    .addSQLResult();
+                ref
+                    .read(sQLResultServicesProvider(resultModel.resultId)
+                        .notifier)
+                    .loadFromQuery(query);
+              }
+            }
+          : () {
+              connectDialog(context, ref, model);
+            },
+    );
+  }
+
+  Widget explainWidget(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    return IconButton(
+      iconSize: height,
+      padding: const EdgeInsets.all(2),
+      alignment: Alignment.topLeft,
+      icon: Icon(
+        Icons.e_mobiledata,
+        color: connIsIdle(model)
+            ? const Color.fromARGB(255, 241, 192, 84)
+            : Colors.grey,
+      ),
+      onPressed: connIsIdle(model)
+          ? () {
+              String query = getQuery();
+              if (query.isNotEmpty) {
+                final resultModel = ref
+                    .read(sQLResultsServicesProvider(model.sessionId).notifier)
+                    .addSQLResult();
+                ref
+                    .read(sQLResultServicesProvider(resultModel.resultId)
+                        .notifier)
+                    .loadFromQuery("explain $query");
+              }
+            }
+          : () {
+              connectDialog(context, ref, model);
+            },
+    );
+  }
+
+  Widget divider() {
+    return const VerticalDivider(
+      width: 5,
+      indent: 10,
+      endIndent: 10,
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionOpBarModel? model = ref.watch(sessionOpBarNotifierProvider);
-    bool canQuery = model?.canQuery ?? false;
+
+    if (model == null) {
+      return Container(
+        constraints: BoxConstraints(maxHeight: height),
+        child: const Spacer(),
+      );
+    }
     return Container(
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
@@ -115,127 +305,19 @@ class SessionOpBar extends ConsumerWidget {
         children: [
           const SizedBox(width: 5),
           // connect
-          !canQuery
-              ? IconButton(
-                  onPressed: () async {
-                    await ref
-                        .read(sessionsServicesProvider.notifier)
-                        .connectSession(model!.sessionId);
-                  },
-                  icon: Icon(Icons.link_rounded,
-                      color: Theme.of(context).primaryColor))
-              :
-              // disconnect
-              IconButton(
-                  onPressed: () async {
-                    disconnectDialog(context, ref, model!.sessionId);
-                  },
-                  icon: Icon(Icons.link_off_rounded,
-                      color: Theme.of(context).primaryColor)),
-
-          const VerticalDivider(
-            width: 5,
-            indent: 10,
-            endIndent: 10,
-          ),
+          connectWidget(context, ref, model),
+          divider(),
           // schema list
           SchemaBar(
-              connId: model!.connId,
-              disable: model.canQuery ? false : true,
-              currentSchema: model.currentSchema),
-          const VerticalDivider(
-            width: 5,
-            indent: 10,
-            endIndent: 10,
+            connId: model.connId,
+            disable: !connIsIdle(model),
+            currentSchema: model.currentSchema,
+            iconColor: connIsConnected(model) ? Colors.green : Colors.grey,
           ),
-          IconButton(
-              iconSize: height,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(2),
-              onPressed: canQuery
-                  ? () {
-                      String query = getQuery();
-
-                      SQLResultModel? resultModel = ref
-                          .read(sQLResultsServicesProvider(model!.sessionId)
-                              .notifier)
-                          .selectedSQLResult();
-
-                      resultModel ??= ref
-                          .read(sQLResultsServicesProvider(model.sessionId)
-                              .notifier)
-                          .addSQLResult();
-
-                      ref
-                          .read(sQLResultServicesProvider(resultModel.resultId)
-                              .notifier)
-                          .loadFromQuery(query);
-                    }
-                  : () {
-                      connectDialog(context, ref, model!.sessionId);
-                    },
-              icon: Icon(Icons.play_arrow_rounded,
-                  color: canQuery ? Colors.green : Colors.grey)),
-          IconButton(
-              iconSize: height,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(2),
-              onPressed: canQuery
-                  ? () {
-                      String query = getQuery();
-                      if (query.isNotEmpty) {
-                        final resultModel = ref
-                            .read(sQLResultsServicesProvider(model!.sessionId)
-                                .notifier)
-                            .addSQLResult();
-                        ref
-                            .read(
-                                sQLResultServicesProvider(resultModel.resultId)
-                                    .notifier)
-                            .loadFromQuery(query);
-                      }
-                    }
-                  : () {
-                      connectDialog(context, ref, model!.sessionId);
-                    },
-              icon: Stack(alignment: Alignment.center, children: [
-                Icon(Icons.play_arrow_rounded,
-                    color: canQuery ? Colors.green : Colors.grey),
-                const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 12,
-                ),
-              ])),
-          IconButton(
-              iconSize: height,
-              padding: const EdgeInsets.all(2),
-              alignment: Alignment.topLeft,
-              onPressed: canQuery
-                  ? () {
-                      String query = getQuery();
-                      if (query.isNotEmpty) {
-                        final resultModel = ref
-                            .read(sQLResultsServicesProvider(model!.sessionId)
-                                .notifier)
-                            .addSQLResult();
-                        ref
-                            .read(
-                                sQLResultServicesProvider(resultModel.resultId)
-                                    .notifier)
-                            .loadFromQuery("explain $query");
-                      }
-                    }
-                  : () {
-                      connectDialog(context, ref, model!.sessionId);
-                    },
-              icon: Icon(
-                Icons.e_mobiledata,
-                color: canQuery
-                    ? const Color.fromARGB(255, 241, 192, 84)
-                    : Colors.grey,
-              )),
-
+          divider(),
+          executeWidget(context, ref, model),
+          executeAddWidget(context, ref, model),
+          explainWidget(context, ref, model),
           const Spacer(),
           if (model.isRightPageOpen == false)
             IconButton(
@@ -256,11 +338,14 @@ class SchemaBar extends ConsumerStatefulWidget {
   final String? currentSchema;
   final bool disable;
   final ConnId? connId;
+  final Color? iconColor;
+
   const SchemaBar({
     Key? key,
     this.connId,
     required this.disable,
     this.currentSchema,
+    this.iconColor,
   }) : super(key: key);
 
   @override
@@ -327,9 +412,10 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                 : null,
             child: Row(
               children: [
-                const HugeIcon(
+                HugeIcon(
                   icon: HugeIcons.strokeRoundedDatabase,
-                  color: Colors.black,
+                  color: widget.iconColor ??
+                      Theme.of(context).colorScheme.onSurface,
                   size: 20,
                 ),
                 Container(

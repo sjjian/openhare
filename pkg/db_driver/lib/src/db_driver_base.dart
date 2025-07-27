@@ -13,7 +13,6 @@ class ConnectionFactory {
       {required DatabaseType type,
       required ConnectValue meta,
       String? schema,
-      Function()? onCloseCallback,
       Function(String)? onSchemaChangedCallback}) async {
     BaseConnection? conn;
     try {
@@ -22,9 +21,7 @@ class ConnectionFactory {
           await MySQLConnection.open(meta: meta, schema: schema),
         DatabaseType.pg => await PGConnection.open(meta: meta, schema: schema),
       };
-      conn.listen(
-          onCloseCallback: onCloseCallback,
-          onSchemaChangedCallback: onSchemaChangedCallback);
+      conn.listen(onSchemaChangedCallback: onSchemaChangedCallback);
 
       for (var sql in meta.initQuerys) {
         await conn.query(sql);
