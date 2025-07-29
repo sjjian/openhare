@@ -7,7 +7,7 @@ part of 'metadata.dart';
 // **************************************************************************
 
 String _$instanceMetadataServicesHash() =>
-    r'795b9174e2f236e08ff34466eaf2ad6beaf3b7ba';
+    r'720f8d5b26cca5b7a09dfb08f58cfaa6615a4318';
 
 /// Copied from Dart SDK
 class _SystemHash {

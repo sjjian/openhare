@@ -7,12 +7,12 @@ part of 'session_conn.dart';
 // **************************************************************************
 
 String _$sessionConnsServicesHash() =>
-    r'3770fe1a1a765806d8e9e490c6af5088766d1e43';
+    r'0bc0e61285252ca4072d2cd8c838f36f96ae57a0';
 
 /// See also [SessionConnsServices].
 @ProviderFor(SessionConnsServices)
 final sessionConnsServicesProvider =
-    AutoDisposeNotifierProvider<SessionConnsServices, int>.internal(
+    NotifierProvider<SessionConnsServices, SessionConnListModel>.internal(
   SessionConnsServices.new,
   name: r'sessionConnsServicesProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,9 +22,9 @@ final sessionConnsServicesProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionConnsServices = AutoDisposeNotifier<int>;
+typedef _$SessionConnsServices = Notifier<SessionConnListModel>;
 String _$sessionConnServicesHash() =>
-    r'0ea5eb0c0ad5eb58c4b8cfedbe0f228a1b7261cf';
+    r'2d738ff187426b69ad69e5d673c0cb591af4101f';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -48,7 +48,7 @@ class _SystemHash {
 }
 
 abstract class _$SessionConnServices
-    extends BuildlessNotifier<SessionConnModel?> {
+    extends BuildlessAutoDisposeNotifier<SessionConnModel?> {
   late final ConnId connId;
 
   SessionConnModel? build(
@@ -99,8 +99,8 @@ class SessionConnServicesFamily extends Family<SessionConnModel?> {
 }
 
 /// See also [SessionConnServices].
-class SessionConnServicesProvider
-    extends NotifierProviderImpl<SessionConnServices, SessionConnModel?> {
+class SessionConnServicesProvider extends AutoDisposeNotifierProviderImpl<
+    SessionConnServices, SessionConnModel?> {
   /// See also [SessionConnServices].
   SessionConnServicesProvider(
     ConnId connId,
@@ -156,7 +156,7 @@ class SessionConnServicesProvider
   }
 
   @override
-  NotifierProviderElement<SessionConnServices, SessionConnModel?>
+  AutoDisposeNotifierProviderElement<SessionConnServices, SessionConnModel?>
       createElement() {
     return _SessionConnServicesProviderElement(this);
   }
@@ -177,14 +177,15 @@ class SessionConnServicesProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin SessionConnServicesRef on NotifierProviderRef<SessionConnModel?> {
+mixin SessionConnServicesRef
+    on AutoDisposeNotifierProviderRef<SessionConnModel?> {
   /// The parameter `connId` of this provider.
   ConnId get connId;
 }
 
 class _SessionConnServicesProviderElement
-    extends NotifierProviderElement<SessionConnServices, SessionConnModel?>
-    with SessionConnServicesRef {
+    extends AutoDisposeNotifierProviderElement<SessionConnServices,
+        SessionConnModel?> with SessionConnServicesRef {
   _SessionConnServicesProviderElement(super.provider);
 
   @override

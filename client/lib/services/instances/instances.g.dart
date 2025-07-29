@@ -6,7 +6,7 @@ part of 'instances.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$instancesServicesHash() => r'eb17812f0255c23be92ff64ef5e10222d4ffdd38';
+String _$instancesServicesHash() => r'07f03cf18663d130d0b1fd117ea19016f01ca80e';
 
 /// See also [InstancesServices].
 @ProviderFor(InstancesServices)
