@@ -7,7 +7,7 @@ import 'package:client/widgets/split_view.dart';
 part 'sessions.freezed.dart';
 
 abstract class SessionRepo {
-  Future<SessionModel> newSession();
+  Future<SessionId> newSession();
   SessionListModel getSessions();
   SessionModel? getSession(SessionId sessionId);
   Future<void> updateSession(SessionId sessionId,
@@ -20,6 +20,7 @@ abstract class SessionRepo {
 }
 
 abstract class SessionConnRepo {
+  SessionConnListModel getConns();
   SessionConnModel getConn(ConnId connId);
   SessionConnModel createConn(InstanceModel model, {String? currentSchema});
   void removeConn(ConnId connId);
@@ -63,11 +64,25 @@ abstract class SessionModel with _$SessionModel {
   const factory SessionModel({
     required SessionId sessionId,
     InstanceId? instanceId,
-    String? instanceName,
-    String? currentSchema,
-    DatabaseType? dbType,
     ConnId? connId,
+    String? currentSchema,
   }) = _SessionModel;
+}
+
+@freezed
+abstract class SessionDetailModel with _$SessionDetailModel {
+  const factory SessionDetailModel({
+    required SessionId sessionId,
+    // instance
+    InstanceId? instanceId,
+    String? instanceName,
+    DatabaseType? dbType,
+    // conn
+    ConnId? connId,
+    SQLConnectState? connState,
+    // schema
+    String? currentSchema,
+  }) = _SessionDetailModel;
 }
 
 @freezed
@@ -76,6 +91,14 @@ abstract class SessionListModel with _$SessionListModel {
     required List<SessionModel> sessions,
     SessionModel? selectedSession,
   }) = _SessionListModel;
+}
+
+@freezed
+abstract class SessionDetailListModel with _$SessionDetailListModel {
+  const factory SessionDetailListModel({
+    required List<SessionDetailModel> sessions,
+    SessionDetailModel? selectedSession,
+  }) = _SessionDetailListModel;
 }
 
 @freezed
@@ -166,9 +189,15 @@ abstract class ConnId with _$ConnId {
 abstract class SessionConnModel with _$SessionConnModel {
   const factory SessionConnModel({
     required ConnId connId,
-    required InstanceId instanceId,
     required SQLConnectState state,
   }) = _SessionConnModel;
+}
+
+@freezed
+abstract class SessionConnListModel with _$SessionConnListModel {
+  const factory SessionConnListModel({
+    required Map<ConnId, SessionConnModel> conns,
+  }) = _SessionConnListModel;
 }
 
 // sessions sql result model

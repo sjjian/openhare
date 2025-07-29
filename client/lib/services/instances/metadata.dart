@@ -1,4 +1,5 @@
 import 'package:client/models/instances.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/repositories/instances/metadata.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,12 +15,23 @@ class InstanceMetadataServices extends _$InstanceMetadataServices {
 
   // todo: 需要对conn 判空
   Future<void> refreshMetadata() async {
-    final connModel = await ref.read(sessionConnsServicesProvider.notifier).createConn(instanceId);
-    await ref.read(sessionConnServicesProvider(connModel.connId).notifier).connect();
-    final metadata = await ref.read(sessionConnServicesProvider(connModel.connId).notifier).getMetadata();
-    ref.read(instanceMetadataRepoProvider).updateMetadata(state.instanceId, metadata);
-    await ref.read(sessionConnServicesProvider(connModel.connId).notifier).close();
-    await ref.read(sessionConnsServicesProvider.notifier).removeConn(connModel.connId);
-    ref.invalidateSelf();
+    final connServices = ref.read(sessionConnsServicesProvider.notifier);
+    SessionConnModel? connModel;
+    try {
+      connModel = await connServices.createConn(instanceId);
+      await connServices.connect(connModel.connId);
+      final metadata = await connServices.getMetadata(connModel.connId);
+      ref
+          .read(instanceMetadataRepoProvider)
+          .updateMetadata(state.instanceId, metadata);
+    } catch (e) {
+      rethrow;
+    } finally {
+      if (connModel != null) {
+        await connServices.close(connModel.connId);
+        await connServices.removeConn(connModel.connId);
+      }
+      ref.invalidateSelf();
+    }
   }
 }

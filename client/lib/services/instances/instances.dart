@@ -16,6 +16,11 @@ class InstancesServices extends _$InstancesServices {
     await repo.add(instance);
   }
 
+  InstanceModel? getInstanceById(InstanceId instanceId) {
+    final repo = ref.read(instanceRepoProvider);
+    return repo.getInstanceById(instanceId);
+  }
+
   Future<void> updateInstance(InstanceModel instance) async {
     final repo = ref.read(instanceRepoProvider);
     await repo.update(instance);

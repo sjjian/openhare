@@ -1,5 +1,4 @@
 import 'package:client/models/instances.dart';
-import 'package:client/models/sessions.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/data_tree.dart';
@@ -9,22 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'session_drawer_metadata.g.dart';
-
-@Riverpod(keepAlive: true)
-class SessionMetadataNotifier extends _$SessionMetadataNotifier {
-  @override
-  InstanceMetadataModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null || sessionIdModel.instanceId == null) {
-      return null;
-    }
-    return ref
-        .watch(instanceMetadataServicesProvider(sessionIdModel.instanceId!));
-  }
-}
 
 class RootNode implements DataNode {
   final String name;

@@ -1,39 +1,12 @@
 import 'dart:io';
 import 'package:client/models/sessions.dart';
-import 'package:client/screens/sessions/session_sql_results.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-part 'session_status.g.dart';
-
-@Riverpod(keepAlive: true)
-class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
-  @override
-  SessionStatusModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null) {
-      return null;
-    }
-    SQLResultModel? sqlResultModel =
-        ref.watch(selectedSQLResultNotifierProvider);
-
-    return SessionStatusModel(
-      sessionId: sessionIdModel.sessionId,
-      instanceName: sessionIdModel.instanceName ?? "",
-      resultId: sqlResultModel?.resultId,
-      state: sqlResultModel?.state ?? SQLExecuteState.init,
-      query: sqlResultModel?.query,
-      executeTime: sqlResultModel?.executeTime,
-      affectedRows: sqlResultModel?.data?.affectedRows,
-    );
-  }
-}
 
 class SessionStatusTab extends ConsumerWidget {
   const SessionStatusTab({Key? key}) : super(key: key);

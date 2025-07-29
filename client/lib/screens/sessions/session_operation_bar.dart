@@ -1,5 +1,4 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/sessions.dart';
@@ -9,37 +8,8 @@ import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-part 'session_operation_bar.g.dart';
-
-@Riverpod()
-class SessionOpBarNotifier extends _$SessionOpBarNotifier {
-  @override
-  SessionOpBarModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null) {
-      return null;
-    }
-    SessionConnModel? sessionConnModel = ref.watch(sessionConnServicesProvider(
-        sessionIdModel.connId ?? const ConnId(value: 0)));
-
-    SessionDrawerModel? sessionDrawer =
-        ref.watch(sessionDrawerNotifierProvider);
-    if (sessionDrawer == null) {
-      return null;
-    }
-
-    return SessionOpBarModel(
-      sessionId: sessionIdModel.sessionId,
-      connId: sessionIdModel.connId,
-      state: sessionConnModel?.state,
-      currentSchema: sessionIdModel.currentSchema ?? "",
-      isRightPageOpen: sessionDrawer.isRightPageOpen,
-    );
-  }
-}
 
 class SessionOpBar extends ConsumerWidget {
   final CodeLineEditingController codeController;
@@ -379,8 +349,8 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
           final overlayPos = overlay.localToGlobal(Offset.zero);
 
           List<String> schemas = await ref
-              .read(sessionConnServicesProvider(widget.connId!).notifier)
-              .getSchemas();
+              .read(sessionConnsServicesProvider.notifier)
+              .getSchemas(widget.connId!);
 
           // todo
           showMenu(
@@ -396,9 +366,8 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     height: 30,
                     onTap: () async {
                       await ref
-                          .read(sessionConnServicesProvider(widget.connId!)
-                              .notifier)
-                          .setCurrentSchema(schema);
+                          .read(sessionConnsServicesProvider.notifier)
+                          .setCurrentSchema(widget.connId!, schema);
                     },
                     child: Text(schema));
               }).toList());

@@ -29,9 +29,9 @@ class SQLResultServices extends _$SQLResultServices {
 
     try {
       DateTime start = DateTime.now();
-      BaseQueryResult? queryResult = await ref
-          .read(sessionConnServicesProvider(sessionModel!.connId!).notifier)
-          .query(query);
+      final connServices = ref.read(sessionConnsServicesProvider.notifier);
+      BaseQueryResult? queryResult =
+          await connServices.query(sessionModel!.connId!, query);
       DateTime end = DateTime.now();
       repo.updateSQLResult(
           resultId,

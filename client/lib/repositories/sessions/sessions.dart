@@ -51,11 +51,11 @@ class SessionRepoImpl extends SessionRepo {
     return SessionModel(
       sessionId: SessionId(value: session.id),
       instanceId: session.instance.target != null
-          ? InstanceId(value: session.instance.target!.id)
+          ? InstanceId(value: session.instance.targetId)
           : null,
-      instanceName: session.instance.target?.name,
+      // instanceName: session.instance.target?.name,
       currentSchema: session.currentSchema,
-      dbType: session.instance.target?.dbType,
+      // dbType: session.instance.target?.dbType,
       connId: _connIdMap[session.id],
     );
   }
@@ -67,10 +67,10 @@ class SessionRepoImpl extends SessionRepo {
   }
 
   @override
-  Future<SessionModel> newSession() async {
+  Future<SessionId> newSession() async {
     final session = await _sessionBox.putAndGetAsync(SessionStorage());
     _sessions.add(session);
-    return SessionModel(sessionId: SessionId(value: session.id));
+    return SessionId(value: session.id);
   }
 
   @override

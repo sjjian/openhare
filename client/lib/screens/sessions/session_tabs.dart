@@ -4,25 +4,14 @@ import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-part 'session_tabs.g.dart';
-
-@Riverpod(keepAlive: true)
-class SessionsTabNotifier extends _$SessionsTabNotifier {
-  @override
-  SessionListModel build() {
-    return ref.watch(sessionsServicesProvider);
-  }
-}
 
 class SessionTabs extends ConsumerWidget {
   const SessionTabs({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionListModel model = ref.watch(sessionsTabNotifierProvider);
+    SessionDetailListModel model = ref.watch(sessionsNotifierProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: CommonTabBar(
@@ -59,7 +48,7 @@ class SessionTabs extends ConsumerWidget {
                             .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
-                      selected: model.sessions[i] == model.selectedSession,
+                      selected: model.sessions[i].sessionId == model.selectedSession?.sessionId,
                     )
                   : CommonTabWrap(
                       avatar: Image.asset(
@@ -107,7 +96,7 @@ class SessionTabs extends ConsumerWidget {
                             .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
-                      selected: model.sessions[i] == model.selectedSession,
+                      selected: model.sessions[i].sessionId == model.selectedSession?.sessionId,
                     )
           ]),
     );

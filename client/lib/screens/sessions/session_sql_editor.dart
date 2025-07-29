@@ -1,6 +1,4 @@
-import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -9,28 +7,7 @@ import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:sql_parser/parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'session_sql_editor.g.dart';
-
-@Riverpod(keepAlive: true)
-class SelectedSessionSQLEditorNotifier
-    extends _$SelectedSessionSQLEditorNotifier {
-  @override
-  SessionSQLEditorModel build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null) {
-      return const SessionSQLEditorModel();
-    }
-    InstanceMetadataModel? sessionMeta =
-        ref.watch(sessionMetadataNotifierProvider);
-
-    return SessionSQLEditorModel(
-      currentSchema: sessionIdModel.currentSchema,
-      metadata: sessionMeta?.metadata,
-    );
-  }
-}
 
 class SQLEditor extends ConsumerWidget {
   final CodeLineEditingController codeController;

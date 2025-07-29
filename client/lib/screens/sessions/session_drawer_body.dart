@@ -2,59 +2,8 @@ import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
-import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'session_drawer_body.g.dart';
-
-@Riverpod(keepAlive: true)
-SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
-  return const SessionDrawerModel(
-      drawerPage: DrawerPage.metadataTree,
-      sqlResult: null,
-      sqlColumn: null,
-      showRecord: false,
-      isRightPageOpen: true);
-}
-
-@Riverpod(keepAlive: true)
-class SessionDrawerNotifier extends _$SessionDrawerNotifier {
-  @override
-  SessionDrawerModel build() {
-    SessionModel? sessionIdModel =
-        ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null) {
-      return ref.watch(sessionDrawerStateProvider(const SessionId(value: 0)));
-    }
-    return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
-  }
-
-  void showRightPage() {
-    state = state.copyWith(isRightPageOpen: true);
-  }
-
-  void hideRightPage() {
-    state = state.copyWith(isRightPageOpen: false);
-  }
-
-  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
-    state = state.copyWith(
-      drawerPage: DrawerPage.sqlResult,
-      sqlColumn: column ?? state.sqlColumn,
-      sqlResult: result ?? state.sqlResult,
-    );
-  }
-
-  void goToTree() {
-    state = state.copyWith(
-      drawerPage: DrawerPage.metadataTree,
-      sqlColumn: null,
-      sqlResult: null,
-    );
-  }
-}
 
 class SessionDrawerBody extends ConsumerWidget {
   const SessionDrawerBody({Key? key}) : super(key: key);

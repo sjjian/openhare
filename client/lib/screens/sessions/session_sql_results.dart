@@ -1,5 +1,4 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
@@ -8,71 +7,8 @@ import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:pluto_grid/pluto_grid.dart';
-import 'package:sql_editor/re_editor.dart';
-import 'package:client/utils/sql_highlight.dart';
-import 'package:sql_parser/parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-part 'session_sql_results.g.dart';
-
-@Riverpod(keepAlive: true)
-SessionEditorModel sessionEditor(Ref ref, SessionId sessionId) {
-  return SessionEditorModel(code: CodeLineEditingController(
-      spanBuilder: ({required codeLines, required context, required style}) {
-    return TextSpan(
-        children: Lexer(codeLines.asString(TextLineBreak.lf))
-            .tokens()
-            .map<TextSpan>((tok) => TextSpan(
-                text: tok.content,
-                style: style.merge(getStyle(tok.id) ?? style)))
-            .toList());
-  }));
-}
-
-@Riverpod(keepAlive: true)
-class SessionEditorNotifier extends _$SessionEditorNotifier {
-  @override
-  SessionEditorModel build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null) {
-      return ref.watch(sessionEditorProvider(const SessionId(value: 0)));
-    }
-    return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
-  @override
-  SQLResultListModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null) {
-      return null;
-    }
-    return ref.watch(sQLResultsServicesProvider(sessionIdModel.sessionId));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
-  @override
-  SQLResultModel? build() {
-    SessionModel? sessionIdModel = ref.watch(selectedSessionServicesProvider);
-    if (sessionIdModel == null) {
-      return null;
-    }
-    ResultId? resultId = ref
-        .watch(sQLResultsServicesProvider(sessionIdModel.sessionId).select((m) {
-      return m.selected?.resultId;
-    }));
-    if (resultId == null) {
-      return null;
-    }
-    return ref.watch(sQLResultServicesProvider(resultId));
-  }
-}
 
 class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);
@@ -261,7 +197,7 @@ class SqlResultTable extends ConsumerWidget {
                 const SizedBox(height: 20),
                 FilledButton(
                     onPressed: () async {
-                      SessionModel? sessionModel = ref
+                      SessionDetailModel? sessionModel = ref
                           .read(sessionsServicesProvider.notifier)
                           .getSession(model.resultId.sessionId);
 
@@ -269,10 +205,8 @@ class SqlResultTable extends ConsumerWidget {
                         return;
                       }
                       await ref
-                          .read(
-                              sessionConnServicesProvider(sessionModel.connId!)
-                                  .notifier)
-                          .killQuery();
+                          .read(sessionConnsServicesProvider.notifier)
+                          .killQuery(sessionModel.connId!);
                     },
                     child: Text(AppLocalizations.of(context)!.cancel))
               ],

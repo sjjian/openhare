@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:client/models/sessions.dart';
-import 'package:client/screens/sessions/session_drawer_body.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/file_type.dart';
 import 'package:flutter/material.dart';
