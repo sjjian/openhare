@@ -139,7 +139,16 @@ class SessionOpBar extends ConsumerWidget {
               .connectSession(model.sessionId);
         },
       );
-    } else {
+    } else if (connIsBusy(model)) {
+      return  Container(
+        width: 36,
+        height: 36,
+        padding: const EdgeInsets.all(8),
+        child: const CircularProgressIndicator(
+          strokeWidth: 2,
+        ),
+      );
+    }else {
       // disconnect
       return IconButton(
         icon:
