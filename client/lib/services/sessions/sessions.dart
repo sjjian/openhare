@@ -190,6 +190,7 @@ class SessionsNotifier extends _$SessionsNotifier {
         dbType: selectedInstance?.dbType,
         connId: conns.conns[sessions.selectedSession!.connId]?.connId,
         connState: conns.conns[sessions.selectedSession!.connId]?.state,
+        connErrorMsg: conns.conns[sessions.selectedSession!.connId]?.errorMsg,
         currentSchema: sessions.selectedSession!.currentSchema,
       );
     }
@@ -205,6 +206,7 @@ class SessionsNotifier extends _$SessionsNotifier {
           dbType: instance?.dbType,
           connId: conns.conns[session.connId]?.connId,
           connState: conns.conns[session.connId]?.state,
+          connErrorMsg: conns.conns[session.connId]?.errorMsg,
           currentSchema: session.currentSchema,
         );
       }).toList(),
@@ -426,6 +428,8 @@ class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
     return SessionStatusModel(
       sessionId: session.sessionId,
       instanceName: session.instanceName ?? "",
+      connState: session.connState,
+      connErrorMsg: session.connErrorMsg,
       resultId: sqlResultModel?.resultId,
       state: sqlResultModel?.state ?? SQLExecuteState.init,
       query: sqlResultModel?.query,

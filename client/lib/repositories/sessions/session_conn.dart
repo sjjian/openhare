@@ -25,6 +25,7 @@ class SessionConnRepoImpl extends SessionConnRepo {
             SessionConnModel(
               connId: ConnId(value: key),
               state: value.state,
+              errorMsg: value.errorMsg,
             ),
           )),
     );
@@ -101,6 +102,7 @@ class SessionConn {
   final InstanceModel model;
   BaseConnection? conn2;
   SQLConnectState state = SQLConnectState.disconnected;
+  String? errorMsg;
   String? currentSchema;
   Timer? _timer;
   Function()? _onStateChangedCallback;
@@ -119,6 +121,7 @@ class SessionConn {
       {Function()? onStateChangedCallback,
       Function(String)? onSchemaChangedCallback}) async {
     try {
+      _onStateChangedCallback = onStateChangedCallback;
       if (conn2 != null) {
         await conn2!.close();
       }
@@ -132,11 +135,11 @@ class SessionConn {
           onSchemaChangedCallback?.call(schema);
         },
       );
-      _onStateChangedCallback = onStateChangedCallback;
       _setState(SQLConnectState.connected);
       startHealthCheck();
     } catch (e, s) {
-      print("conn error: ${e}; ${s}");
+      errorMsg = e.toString();
+      print("conn error: $e; $s");
       _setState(SQLConnectState.failed);
     }
   }

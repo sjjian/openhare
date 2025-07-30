@@ -11,6 +11,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class SessionStatusTab extends ConsumerWidget {
   const SessionStatusTab({Key? key}) : super(key: key);
 
+  Widget divider(BuildContext context) {
+    return VerticalDivider(
+      width: 10,
+      indent: 10,
+      endIndent: 10,
+      color: Theme.of(context).dividerColor,
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionStatusModel? model =
@@ -30,27 +39,58 @@ class SessionStatusTab extends ConsumerWidget {
       child: Row(
         children: [
           Tooltip(
-              message:
-                  '${AppLocalizations.of(context)!.effect_rows}: $affectedRowsDisplay',
-              child: Text(
-                  '${AppLocalizations.of(context)!.effect_rows}: $affectedRowsDisplay')),
-          const Text("  |  "),
-          Tooltip(
-              message:
-                  '${AppLocalizations.of(context)!.duration}: $executeTimeDisplay',
-              child: Text(
-                  '${AppLocalizations.of(context)!.duration}: $executeTimeDisplay')),
-          const Text("  |  "),
-          Tooltip(
-            message:
-                model.query ?? AppLocalizations.of(context)!.no_query_executed,
-            child: SizedBox(
-                width: 200,
-                child: Text(
-                    "${AppLocalizations.of(context)!.query}: $shortQueryDisplay",
-                    overflow: TextOverflow.ellipsis)),
+            message: model.connErrorMsg ??
+                '-',
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                width: 80,
+                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("${AppLocalizations.of(context)!.short_conn}:"),
+                    const SizedBox(width: 4),
+                    Expanded(
+                        child: switch (model.connState) {
+                      SQLConnectState.connected ||
+                      SQLConnectState.executing =>
+                        const Icon(Icons.check_circle,
+                            size: 16, color: Colors.green),
+                      SQLConnectState.connecting => const Icon(
+                          Icons.hourglass_empty,
+                          size: 16,
+                          color: Colors.orange),
+                      SQLConnectState.failed ||
+                      SQLConnectState.unHealth =>
+                        const Icon(Icons.error, size: 16, color: Colors.red),
+                      _ => const Text("-"),
+                    } // 根据model.state展示不同的图标
+                        ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          const Text("  |  "),
+          // const ValueStatusWidget(
+          //     label: '连接', value: '已连接', tooltip: '连接状态: 已连接'),
+          divider(context),
+          ValueStatusWidget(
+              label: AppLocalizations.of(context)!.effect_rows,
+              value: affectedRowsDisplay,
+              tooltip: affectedRowsDisplay),
+          divider(context),
+          ValueStatusWidget(
+              label: AppLocalizations.of(context)!.duration,
+              value: executeTimeDisplay,
+              tooltip: executeTimeDisplay),
+          divider(context),
+          ValueStatusWidget(
+              width: 300,
+              label: AppLocalizations.of(context)!.query,
+              value: shortQueryDisplay,
+              tooltip: model.query ??
+                  AppLocalizations.of(context)!.no_query_executed),
           if (model.state == SQLExecuteState.done && model.resultId != null)
             IconButton(
                 onPressed: () async {
@@ -75,6 +115,48 @@ class SessionStatusTab extends ConsumerWidget {
                   color: Colors.green,
                 ))
         ],
+      ),
+    );
+  }
+}
+
+class ValueStatusWidget extends StatelessWidget {
+  final String label;
+  final String value;
+  final String? tooltip;
+  final double width;
+
+  const ValueStatusWidget({
+    Key? key,
+    required this.label,
+    required this.value,
+    this.tooltip,
+    this.width = 120,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip ?? value,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          width: width,
+          padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('$label:'),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  value,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

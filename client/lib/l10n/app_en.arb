@@ -190,5 +190,9 @@
   "tip_connect_busy_desc": "the connect is executing query, please wait",
     "@tip_connect_busy_desc": {
     "description": "tips when connect session busy"
+  },
+  "short_conn": "Conn",
+  "@short_conn": {
+    "description": "short conn for status bar"
   }
 }

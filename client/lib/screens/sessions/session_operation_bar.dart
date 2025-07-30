@@ -10,7 +10,6 @@ import 'package:sql_editor/re_editor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class SessionOpBar extends ConsumerWidget {
   final CodeLineEditingController codeController;
   final double height;
@@ -128,6 +127,12 @@ class SessionOpBar extends ConsumerWidget {
             model.state == SQLConnectState.connecting));
   }
 
+  bool connIsConnecting(SessionOpBarModel model) {
+    return (model.connId != null &&
+        model.state != null &&
+        model.state == SQLConnectState.connecting);
+  }
+
   Widget connectWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     if (connIsDisconnected(model)) {
@@ -139,8 +144,8 @@ class SessionOpBar extends ConsumerWidget {
               .connectSession(model.sessionId);
         },
       );
-    } else if (connIsBusy(model)) {
-      return  Container(
+    } else if (connIsConnecting(model)) {
+      return Container(
         width: 36,
         height: 36,
         padding: const EdgeInsets.all(8),
@@ -148,7 +153,7 @@ class SessionOpBar extends ConsumerWidget {
           strokeWidth: 2,
         ),
       );
-    }else {
+    } else {
       // disconnect
       return IconButton(
         icon:

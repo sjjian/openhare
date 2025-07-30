@@ -239,6 +239,7 @@ class _CommonTabState extends State<CommonTab> {
                 if (widget.avatar != null)
                   SizedBox(
                     width: 20,
+                    height: 20,
                     child: widget.avatar,
                   ),
                 Expanded(

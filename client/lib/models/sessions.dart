@@ -80,6 +80,8 @@ abstract class SessionDetailModel with _$SessionDetailModel {
     // conn
     ConnId? connId,
     SQLConnectState? connState,
+    String? connErrorMsg,
+
     // schema
     String? currentSchema,
   }) = _SessionDetailModel;
@@ -159,6 +161,9 @@ abstract class SessionStatusModel with _$SessionStatusModel {
   const factory SessionStatusModel({
     required SessionId sessionId,
     required String instanceName,
+    // conn
+    required SQLConnectState? connState,
+    required String? connErrorMsg,
     // sql result
     ResultId? resultId,
     required SQLExecuteState state,
@@ -190,6 +195,7 @@ abstract class SessionConnModel with _$SessionConnModel {
   const factory SessionConnModel({
     required ConnId connId,
     required SQLConnectState state,
+    String? errorMsg,
   }) = _SessionConnModel;
 }
 

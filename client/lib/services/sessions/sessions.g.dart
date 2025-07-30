@@ -438,7 +438,7 @@ final sessionsServicesProvider =
 );
 
 typedef _$SessionsServices = Notifier<SessionListModel>;
-String _$sessionsNotifierHash() => r'840b637de152b4c17d6472fc59302b0541152417';
+String _$sessionsNotifierHash() => r'b2abc950856cab92cc3cbcad51c9242538836f40';
 
 /// See also [SessionsNotifier].
 @ProviderFor(SessionsNotifier)
@@ -523,7 +523,7 @@ final sessionMetadataNotifierProvider =
 
 typedef _$SessionMetadataNotifier = Notifier<InstanceMetadataModel?>;
 String _$sessionOpBarNotifierHash() =>
-    r'68c9ae22b2c2f433fe95bf32ed4309a632e3f684';
+    r'dbb26e7ddc0617ce4dda534b460c1e9686eded9b';
 
 /// See also [SessionOpBarNotifier].
 @ProviderFor(SessionOpBarNotifier)
@@ -608,7 +608,7 @@ final selectedSQLResultNotifierProvider =
 
 typedef _$SelectedSQLResultNotifier = Notifier<SQLResultModel?>;
 String _$selectedSessionStatusNotifierHash() =>
-    r'7600d9fdc5f1c848929a99ca572ce2086a71e4db';
+    r'634ae1088ac7d9745aea9e8b09bfe8306b6c34ef';
 
 /// See also [SelectedSessionStatusNotifier].
 @ProviderFor(SelectedSessionStatusNotifier)

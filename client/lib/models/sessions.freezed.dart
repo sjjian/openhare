@@ -427,7 +427,8 @@ mixin _$SessionDetailModel {
   String? get instanceName;
   DatabaseType? get dbType; // conn
   ConnId? get connId;
-  SQLConnectState? get connState; // schema
+  SQLConnectState? get connState;
+  String? get connErrorMsg; // schema
   String? get currentSchema;
 
   /// Create a copy of SessionDetailModel
@@ -453,17 +454,19 @@ mixin _$SessionDetailModel {
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.connState, connState) ||
                 other.connState == connState) &&
+            (identical(other.connErrorMsg, connErrorMsg) ||
+                other.connErrorMsg == connErrorMsg) &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, sessionId, instanceId,
-      instanceName, dbType, connId, connState, currentSchema);
+      instanceName, dbType, connId, connState, connErrorMsg, currentSchema);
 
   @override
   String toString() {
-    return 'SessionDetailModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType, connId: $connId, connState: $connState, currentSchema: $currentSchema)';
+    return 'SessionDetailModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType, connId: $connId, connState: $connState, connErrorMsg: $connErrorMsg, currentSchema: $currentSchema)';
   }
 }
 
@@ -480,6 +483,7 @@ abstract mixin class $SessionDetailModelCopyWith<$Res> {
       DatabaseType? dbType,
       ConnId? connId,
       SQLConnectState? connState,
+      String? connErrorMsg,
       String? currentSchema});
 
   $SessionIdCopyWith<$Res> get sessionId;
@@ -506,6 +510,7 @@ class _$SessionDetailModelCopyWithImpl<$Res>
     Object? dbType = freezed,
     Object? connId = freezed,
     Object? connState = freezed,
+    Object? connErrorMsg = freezed,
     Object? currentSchema = freezed,
   }) {
     return _then(_self.copyWith(
@@ -533,6 +538,10 @@ class _$SessionDetailModelCopyWithImpl<$Res>
           ? _self.connState
           : connState // ignore: cast_nullable_to_non_nullable
               as SQLConnectState?,
+      connErrorMsg: freezed == connErrorMsg
+          ? _self.connErrorMsg
+          : connErrorMsg // ignore: cast_nullable_to_non_nullable
+              as String?,
       currentSchema: freezed == currentSchema
           ? _self.currentSchema
           : currentSchema // ignore: cast_nullable_to_non_nullable
@@ -589,6 +598,7 @@ class _SessionDetailModel implements SessionDetailModel {
       this.dbType,
       this.connId,
       this.connState,
+      this.connErrorMsg,
       this.currentSchema});
 
   @override
@@ -605,6 +615,8 @@ class _SessionDetailModel implements SessionDetailModel {
   final ConnId? connId;
   @override
   final SQLConnectState? connState;
+  @override
+  final String? connErrorMsg;
 // schema
   @override
   final String? currentSchema;
@@ -632,17 +644,19 @@ class _SessionDetailModel implements SessionDetailModel {
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.connState, connState) ||
                 other.connState == connState) &&
+            (identical(other.connErrorMsg, connErrorMsg) ||
+                other.connErrorMsg == connErrorMsg) &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, sessionId, instanceId,
-      instanceName, dbType, connId, connState, currentSchema);
+      instanceName, dbType, connId, connState, connErrorMsg, currentSchema);
 
   @override
   String toString() {
-    return 'SessionDetailModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType, connId: $connId, connState: $connState, currentSchema: $currentSchema)';
+    return 'SessionDetailModel(sessionId: $sessionId, instanceId: $instanceId, instanceName: $instanceName, dbType: $dbType, connId: $connId, connState: $connState, connErrorMsg: $connErrorMsg, currentSchema: $currentSchema)';
   }
 }
 
@@ -661,6 +675,7 @@ abstract mixin class _$SessionDetailModelCopyWith<$Res>
       DatabaseType? dbType,
       ConnId? connId,
       SQLConnectState? connState,
+      String? connErrorMsg,
       String? currentSchema});
 
   @override
@@ -690,6 +705,7 @@ class __$SessionDetailModelCopyWithImpl<$Res>
     Object? dbType = freezed,
     Object? connId = freezed,
     Object? connState = freezed,
+    Object? connErrorMsg = freezed,
     Object? currentSchema = freezed,
   }) {
     return _then(_SessionDetailModel(
@@ -717,6 +733,10 @@ class __$SessionDetailModelCopyWithImpl<$Res>
           ? _self.connState
           : connState // ignore: cast_nullable_to_non_nullable
               as SQLConnectState?,
+      connErrorMsg: freezed == connErrorMsg
+          ? _self.connErrorMsg
+          : connErrorMsg // ignore: cast_nullable_to_non_nullable
+              as String?,
       currentSchema: freezed == currentSchema
           ? _self.currentSchema
           : currentSchema // ignore: cast_nullable_to_non_nullable
@@ -1922,7 +1942,9 @@ class __$SessionSplitViewModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$SessionStatusModel {
   SessionId get sessionId;
-  String get instanceName; // sql result
+  String get instanceName; // conn
+  SQLConnectState? get connState;
+  String? get connErrorMsg; // sql result
   ResultId? get resultId;
   SQLExecuteState get state;
   Duration? get executeTime;
@@ -1946,6 +1968,10 @@ mixin _$SessionStatusModel {
                 other.sessionId == sessionId) &&
             (identical(other.instanceName, instanceName) ||
                 other.instanceName == instanceName) &&
+            (identical(other.connState, connState) ||
+                other.connState == connState) &&
+            (identical(other.connErrorMsg, connErrorMsg) ||
+                other.connErrorMsg == connErrorMsg) &&
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
             (identical(other.state, state) || other.state == state) &&
@@ -1957,12 +1983,21 @@ mixin _$SessionStatusModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, sessionId, instanceName,
-      resultId, state, executeTime, affectedRows, query);
+  int get hashCode => Object.hash(
+      runtimeType,
+      sessionId,
+      instanceName,
+      connState,
+      connErrorMsg,
+      resultId,
+      state,
+      executeTime,
+      affectedRows,
+      query);
 
   @override
   String toString() {
-    return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
+    return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, connState: $connState, connErrorMsg: $connErrorMsg, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
   }
 }
 
@@ -1975,6 +2010,8 @@ abstract mixin class $SessionStatusModelCopyWith<$Res> {
   $Res call(
       {SessionId sessionId,
       String instanceName,
+      SQLConnectState? connState,
+      String? connErrorMsg,
       ResultId? resultId,
       SQLExecuteState state,
       Duration? executeTime,
@@ -2000,6 +2037,8 @@ class _$SessionStatusModelCopyWithImpl<$Res>
   $Res call({
     Object? sessionId = null,
     Object? instanceName = null,
+    Object? connState = freezed,
+    Object? connErrorMsg = freezed,
     Object? resultId = freezed,
     Object? state = null,
     Object? executeTime = freezed,
@@ -2015,6 +2054,14 @@ class _$SessionStatusModelCopyWithImpl<$Res>
           ? _self.instanceName
           : instanceName // ignore: cast_nullable_to_non_nullable
               as String,
+      connState: freezed == connState
+          ? _self.connState
+          : connState // ignore: cast_nullable_to_non_nullable
+              as SQLConnectState?,
+      connErrorMsg: freezed == connErrorMsg
+          ? _self.connErrorMsg
+          : connErrorMsg // ignore: cast_nullable_to_non_nullable
+              as String?,
       resultId: freezed == resultId
           ? _self.resultId
           : resultId // ignore: cast_nullable_to_non_nullable
@@ -2069,6 +2116,8 @@ class _SessionStatusModel implements SessionStatusModel {
   const _SessionStatusModel(
       {required this.sessionId,
       required this.instanceName,
+      required this.connState,
+      required this.connErrorMsg,
       this.resultId,
       required this.state,
       this.executeTime,
@@ -2079,6 +2128,11 @@ class _SessionStatusModel implements SessionStatusModel {
   final SessionId sessionId;
   @override
   final String instanceName;
+// conn
+  @override
+  final SQLConnectState? connState;
+  @override
+  final String? connErrorMsg;
 // sql result
   @override
   final ResultId? resultId;
@@ -2108,6 +2162,10 @@ class _SessionStatusModel implements SessionStatusModel {
                 other.sessionId == sessionId) &&
             (identical(other.instanceName, instanceName) ||
                 other.instanceName == instanceName) &&
+            (identical(other.connState, connState) ||
+                other.connState == connState) &&
+            (identical(other.connErrorMsg, connErrorMsg) ||
+                other.connErrorMsg == connErrorMsg) &&
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
             (identical(other.state, state) || other.state == state) &&
@@ -2119,12 +2177,21 @@ class _SessionStatusModel implements SessionStatusModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, sessionId, instanceName,
-      resultId, state, executeTime, affectedRows, query);
+  int get hashCode => Object.hash(
+      runtimeType,
+      sessionId,
+      instanceName,
+      connState,
+      connErrorMsg,
+      resultId,
+      state,
+      executeTime,
+      affectedRows,
+      query);
 
   @override
   String toString() {
-    return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
+    return 'SessionStatusModel(sessionId: $sessionId, instanceName: $instanceName, connState: $connState, connErrorMsg: $connErrorMsg, resultId: $resultId, state: $state, executeTime: $executeTime, affectedRows: $affectedRows, query: $query)';
   }
 }
 
@@ -2139,6 +2206,8 @@ abstract mixin class _$SessionStatusModelCopyWith<$Res>
   $Res call(
       {SessionId sessionId,
       String instanceName,
+      SQLConnectState? connState,
+      String? connErrorMsg,
       ResultId? resultId,
       SQLExecuteState state,
       Duration? executeTime,
@@ -2166,6 +2235,8 @@ class __$SessionStatusModelCopyWithImpl<$Res>
   $Res call({
     Object? sessionId = null,
     Object? instanceName = null,
+    Object? connState = freezed,
+    Object? connErrorMsg = freezed,
     Object? resultId = freezed,
     Object? state = null,
     Object? executeTime = freezed,
@@ -2181,6 +2252,14 @@ class __$SessionStatusModelCopyWithImpl<$Res>
           ? _self.instanceName
           : instanceName // ignore: cast_nullable_to_non_nullable
               as String,
+      connState: freezed == connState
+          ? _self.connState
+          : connState // ignore: cast_nullable_to_non_nullable
+              as SQLConnectState?,
+      connErrorMsg: freezed == connErrorMsg
+          ? _self.connErrorMsg
+          : connErrorMsg // ignore: cast_nullable_to_non_nullable
+              as String?,
       resultId: freezed == resultId
           ? _self.resultId
           : resultId // ignore: cast_nullable_to_non_nullable
@@ -2507,6 +2586,7 @@ class __$ConnIdCopyWithImpl<$Res> implements _$ConnIdCopyWith<$Res> {
 mixin _$SessionConnModel {
   ConnId get connId;
   SQLConnectState get state;
+  String? get errorMsg;
 
   /// Create a copy of SessionConnModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2522,15 +2602,17 @@ mixin _$SessionConnModel {
         (other.runtimeType == runtimeType &&
             other is SessionConnModel &&
             (identical(other.connId, connId) || other.connId == connId) &&
-            (identical(other.state, state) || other.state == state));
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.errorMsg, errorMsg) ||
+                other.errorMsg == errorMsg));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, connId, state);
+  int get hashCode => Object.hash(runtimeType, connId, state, errorMsg);
 
   @override
   String toString() {
-    return 'SessionConnModel(connId: $connId, state: $state)';
+    return 'SessionConnModel(connId: $connId, state: $state, errorMsg: $errorMsg)';
   }
 }
 
@@ -2540,7 +2622,7 @@ abstract mixin class $SessionConnModelCopyWith<$Res> {
           SessionConnModel value, $Res Function(SessionConnModel) _then) =
       _$SessionConnModelCopyWithImpl;
   @useResult
-  $Res call({ConnId connId, SQLConnectState state});
+  $Res call({ConnId connId, SQLConnectState state, String? errorMsg});
 
   $ConnIdCopyWith<$Res> get connId;
 }
@@ -2560,6 +2642,7 @@ class _$SessionConnModelCopyWithImpl<$Res>
   $Res call({
     Object? connId = null,
     Object? state = null,
+    Object? errorMsg = freezed,
   }) {
     return _then(_self.copyWith(
       connId: null == connId
@@ -2570,6 +2653,10 @@ class _$SessionConnModelCopyWithImpl<$Res>
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
               as SQLConnectState,
+      errorMsg: freezed == errorMsg
+          ? _self.errorMsg
+          : errorMsg // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 
@@ -2587,12 +2674,15 @@ class _$SessionConnModelCopyWithImpl<$Res>
 /// @nodoc
 
 class _SessionConnModel implements SessionConnModel {
-  const _SessionConnModel({required this.connId, required this.state});
+  const _SessionConnModel(
+      {required this.connId, required this.state, this.errorMsg});
 
   @override
   final ConnId connId;
   @override
   final SQLConnectState state;
+  @override
+  final String? errorMsg;
 
   /// Create a copy of SessionConnModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2608,15 +2698,17 @@ class _SessionConnModel implements SessionConnModel {
         (other.runtimeType == runtimeType &&
             other is _SessionConnModel &&
             (identical(other.connId, connId) || other.connId == connId) &&
-            (identical(other.state, state) || other.state == state));
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.errorMsg, errorMsg) ||
+                other.errorMsg == errorMsg));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, connId, state);
+  int get hashCode => Object.hash(runtimeType, connId, state, errorMsg);
 
   @override
   String toString() {
-    return 'SessionConnModel(connId: $connId, state: $state)';
+    return 'SessionConnModel(connId: $connId, state: $state, errorMsg: $errorMsg)';
   }
 }
 
@@ -2628,7 +2720,7 @@ abstract mixin class _$SessionConnModelCopyWith<$Res>
       __$SessionConnModelCopyWithImpl;
   @override
   @useResult
-  $Res call({ConnId connId, SQLConnectState state});
+  $Res call({ConnId connId, SQLConnectState state, String? errorMsg});
 
   @override
   $ConnIdCopyWith<$Res> get connId;
@@ -2649,6 +2741,7 @@ class __$SessionConnModelCopyWithImpl<$Res>
   $Res call({
     Object? connId = null,
     Object? state = null,
+    Object? errorMsg = freezed,
   }) {
     return _then(_SessionConnModel(
       connId: null == connId
@@ -2659,6 +2752,10 @@ class __$SessionConnModelCopyWithImpl<$Res>
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
               as SQLConnectState,
+      errorMsg: freezed == errorMsg
+          ? _self.errorMsg
+          : errorMsg // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 

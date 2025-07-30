@@ -9,6 +9,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class SessionTabs extends ConsumerWidget {
   const SessionTabs({Key? key}) : super(key: key);
 
+  bool connIsBusy(SessionDetailModel model) {
+    return (model.connId != null &&
+        model.connState != null &&
+        (model.connState == SQLConnectState.executing ||
+            model.connState == SQLConnectState.connecting));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionDetailListModel model = ref.watch(sessionsNotifierProvider);
@@ -48,12 +55,22 @@ class SessionTabs extends ConsumerWidget {
                             .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
-                      selected: model.sessions[i].sessionId == model.selectedSession?.sessionId,
+                      selected: model.sessions[i].sessionId ==
+                          model.selectedSession?.sessionId,
                     )
                   : CommonTabWrap(
-                      avatar: Image.asset(
-                          connectionMetaMap[model.sessions[i].dbType!]!
-                              .logoAssertPath),
+                      avatar: (model.sessions[i].sessionId !=
+                                  model.selectedSession?.sessionId &&
+                              connIsBusy(model.sessions[i]))
+                          ? const Padding(
+                              padding: EdgeInsets.all(2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Image.asset(
+                              connectionMetaMap[model.sessions[i].dbType!]!
+                                  .logoAssertPath),
                       label: model.sessions[i].instanceName!,
                       items: <PopupMenuEntry>[
                         PopupMenuItem<String>(
@@ -96,7 +113,8 @@ class SessionTabs extends ConsumerWidget {
                             .read(sessionsServicesProvider.notifier)
                             .deleteSessionByIndex(i);
                       },
-                      selected: model.sessions[i].sessionId == model.selectedSession?.sessionId,
+                      selected: model.sessions[i].sessionId ==
+                          model.selectedSession?.sessionId,
                     )
           ]),
     );

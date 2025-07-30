@@ -71,9 +71,17 @@ class SqlResultTables extends ConsumerWidget {
                             .notifier)
                         .deleteSQLResult(model.results[i].resultId);
                   },
-                  avatar: const Icon(
-                    Icons.grid_on,
-                  ),
+                  avatar: (model.results[i] != model.selected &&
+                          model.results[i].state == SQLExecuteState.init)
+                      ? const Padding(
+                          padding: EdgeInsets.all(2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Icon(
+                          Icons.grid_on,
+                        ),
                 )
             ]))
       ]);
