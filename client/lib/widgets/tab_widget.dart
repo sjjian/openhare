@@ -5,7 +5,7 @@ const double defaultTabMaxWidth = 200;
 
 class CommonTabBar extends StatefulWidget {
   final double? height;
-  final List<CommonTabWrap>? tabs;
+  final List<CommonTabWrap> tabs;
   final ReorderCallback? onReorder;
   final VoidCallback? addTab;
   final Color? color;
@@ -14,7 +14,7 @@ class CommonTabBar extends StatefulWidget {
   const CommonTabBar(
       {Key? key,
       this.height,
-      this.tabs,
+      required this.tabs,
       this.onReorder,
       this.addTab,
       this.color,
@@ -30,22 +30,38 @@ class _CommonTabBarState extends State<CommonTabBar> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, c) {
       CommonTabStyle style = widget.tabStyle ?? CommonTabStyle();
-      double width = min(c.maxWidth / widget.tabs!.length,
+      // 设置的tab最小width;
+      final minWidth = style.minWidth ?? (35 + 20 + 10);
+      final addTabWidth = widget.addTab != null ? 36 : 0;
+      // tab 可用的总width;
+      final sumTabLength = c.maxWidth - addTabWidth;
+
+      // 每个tab的平均 width；
+      double width = min(sumTabLength / widget.tabs.length,
           style.maxWidth ?? defaultTabMaxWidth);
 
+      // 如果总宽度不够，就只能展示后面length个tab
+      int length = widget.tabs.length;
+      if (width < minWidth) {
+        width = minWidth;
+        length = sumTabLength ~/ minWidth; // 取整
+      }
+
+      final start = widget.tabs.length - length;
+
+      // size 36
       Widget addTabWidget = SizedBox(
-          height: widget.height ?? 35,
-          // padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-          child: IconButton(
-            alignment: Alignment.center,
-            constraints: const BoxConstraints(),
-            onPressed: widget.addTab,
-            icon: Icon(
-                size: 20,
-                Icons.add,
-                color:
-                    Theme.of(context).colorScheme.onSurface), // tab add 的字体颜色
-          ));
+        height: widget.height ?? 35,
+        child: IconButton(
+          alignment: Alignment.center,
+          constraints: const BoxConstraints(),
+          onPressed: widget.addTab,
+          icon: Icon(
+              size: 20,
+              Icons.add,
+              color: Theme.of(context).colorScheme.onSurface), // tab add 的字体颜色
+        ),
+      );
 
       return Container(
         constraints: BoxConstraints(maxHeight: widget.height ?? 40),
@@ -58,31 +74,31 @@ class _CommonTabBarState extends State<CommonTabBar> {
                   footer: widget.addTab != null ? addTabWidget : null,
                   buildDefaultDragHandles: false,
                   scrollDirection: Axis.horizontal,
-                  onReorder: widget.onReorder!,
+                  onReorder: (oldIndex, newIndex) {
+                    widget.onReorder!(oldIndex + start, newIndex + start);
+                  },
                   children: [
-                    if (widget.tabs != null)
-                      for (var i = 0; i < widget.tabs!.length; i++)
-                        ReorderableDragStartListener(
-                          index: i,
-                          key: ValueKey(i),
-                          child: CommonTab.fromWarp(
-                              warp: widget.tabs![i],
-                              width: width,
-                              height: widget.height,
-                              style: style),
-                        ),
+                    for (var i = start; i < widget.tabs.length; i++)
+                      ReorderableDragStartListener(
+                        index: i - start,
+                        key: ValueKey(i - start),
+                        child: CommonTab.fromWarp(
+                            warp: widget.tabs[i],
+                            width: width,
+                            height: widget.height,
+                            style: style),
+                      )
                   ],
                 )
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    if (widget.tabs != null)
-                      for (var i = 0; i < widget.tabs!.length; i++)
-                        CommonTab.fromWarp(
-                            warp: widget.tabs![i],
-                            width: width,
-                            height: widget.height,
-                            style: style),
+                    for (var i = start; i < widget.tabs.length; i++)
+                      CommonTab.fromWarp(
+                          warp: widget.tabs[i],
+                          width: width,
+                          height: widget.height,
+                          style: style),
                     if (widget.addTab != null) addTabWidget,
                     const Spacer()
                   ],
@@ -114,6 +130,7 @@ class CommonTabWrap {
 class CommonTabStyle {
   final double? height;
   final double? maxWidth;
+  final double? minWidth;
   final Color? color;
   final Color? selectedColor;
   final Color? hoverColor;
@@ -121,6 +138,7 @@ class CommonTabStyle {
   CommonTabStyle(
       {this.height,
       this.maxWidth,
+      this.minWidth,
       this.color,
       this.selectedColor,
       this.hoverColor,
@@ -139,7 +157,7 @@ class CommonTab extends StatefulWidget {
   final GestureTapCallback? onTap;
   final VoidCallback? onDeleted;
 
-  const CommonTab(
+  CommonTab(
       {Key? key,
       this.avatar,
       required this.label,
@@ -163,7 +181,9 @@ class CommonTab extends StatefulWidget {
         items = warp.items,
         onTap = warp.onTap,
         onDeleted = warp.onDeleted,
-        selected = warp.selected;
+        selected = warp.selected {
+    print(warp.label);
+  }
 
   @override
   State<CommonTab> createState() => _CommonTabState();
