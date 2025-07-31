@@ -23,6 +23,7 @@ class SessionTabs extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 6),
       child: CommonTabBar(
           tabStyle: CommonTabStyle(
+            minWidth: 90,
             color: Theme.of(context)
                 .colorScheme
                 .surfaceContainerHighest, // session tab 背景色

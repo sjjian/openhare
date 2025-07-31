@@ -6,7 +6,7 @@ const double defaultTabMaxWidth = 200;
 class CommonTabBar extends StatefulWidget {
   final double? height;
   final List<CommonTabWrap> tabs;
-  final ReorderCallback? onReorder;
+  final ReorderCallback onReorder;
   final VoidCallback? addTab;
   final Color? color;
   final CommonTabStyle? tabStyle;
@@ -15,7 +15,7 @@ class CommonTabBar extends StatefulWidget {
       {Key? key,
       this.height,
       required this.tabs,
-      this.onReorder,
+      required this.onReorder,
       this.addTab,
       this.color,
       this.tabStyle})
@@ -26,6 +26,21 @@ class CommonTabBar extends StatefulWidget {
 }
 
 class _CommonTabBarState extends State<CommonTabBar> {
+  Widget addTabWidget() {
+    return SizedBox(
+      height: widget.height ?? 35,
+      child: IconButton(
+        alignment: Alignment.center,
+        constraints: const BoxConstraints(),
+        onPressed: widget.addTab,
+        icon: Icon(
+            size: 20,
+            Icons.add,
+            color: Theme.of(context).colorScheme.onSurface), // tab add 的字体颜色
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, c) {
@@ -33,8 +48,9 @@ class _CommonTabBarState extends State<CommonTabBar> {
       // 设置的tab最小width;
       final minWidth = style.minWidth ?? (35 + 20 + 10);
       final addTabWidth = widget.addTab != null ? 36 : 0;
+      const moreWidth = 36;
       // tab 可用的总width;
-      final sumTabLength = c.maxWidth - addTabWidth;
+      final sumTabLength = c.maxWidth - addTabWidth - moreWidth;
 
       // 每个tab的平均 width；
       double width = min(sumTabLength / widget.tabs.length,
@@ -42,26 +58,15 @@ class _CommonTabBarState extends State<CommonTabBar> {
 
       // 如果总宽度不够，就只能展示后面length个tab
       int length = widget.tabs.length;
+      int start = 0;
       if (width < minWidth) {
         width = minWidth;
         length = sumTabLength ~/ minWidth; // 取整
+
+        start = widget.tabs.length - length;
+        // 重新计算width, 让length个tab占据总宽度
+        width = sumTabLength / length;
       }
-
-      final start = widget.tabs.length - length;
-
-      // size 36
-      Widget addTabWidget = SizedBox(
-        height: widget.height ?? 35,
-        child: IconButton(
-          alignment: Alignment.center,
-          constraints: const BoxConstraints(),
-          onPressed: widget.addTab,
-          icon: Icon(
-              size: 20,
-              Icons.add,
-              color: Theme.of(context).colorScheme.onSurface), // tab add 的字体颜色
-        ),
-      );
 
       return Container(
         constraints: BoxConstraints(maxHeight: widget.height ?? 40),
@@ -69,40 +74,34 @@ class _CommonTabBarState extends State<CommonTabBar> {
           color: widget.color,
         ),
         child: SizedBox(
-          child: widget.onReorder != null
-              ? ReorderableListView(
-                  footer: widget.addTab != null ? addTabWidget : null,
-                  buildDefaultDragHandles: false,
-                  scrollDirection: Axis.horizontal,
-                  onReorder: (oldIndex, newIndex) {
-                    widget.onReorder!(oldIndex + start, newIndex + start);
-                  },
-                  children: [
-                    for (var i = start; i < widget.tabs.length; i++)
-                      ReorderableDragStartListener(
-                        index: i - start,
-                        key: ValueKey(i - start),
-                        child: CommonTab.fromWarp(
-                            warp: widget.tabs[i],
-                            width: width,
-                            height: widget.height,
-                            style: style),
-                      )
-                  ],
+          child: ReorderableListView(
+            header: start > 0
+                ? MoreTabMenuWidget(
+                    height: widget.height,
+                    tabs: widget.tabs.sublist(0, start),
+                    onTabSelected: (index) {
+                      widget.onReorder(index, index);
+                    })
+                : null,
+            footer: widget.addTab != null ? addTabWidget() : null,
+            buildDefaultDragHandles: false,
+            scrollDirection: Axis.horizontal,
+            onReorder: (oldIndex, newIndex) {
+              widget.onReorder(oldIndex + start, newIndex + start);
+            },
+            children: [
+              for (var i = start; i < widget.tabs.length; i++)
+                ReorderableDragStartListener(
+                  index: i - start,
+                  key: ValueKey(i - start),
+                  child: CommonTab.fromWarp(
+                      warp: widget.tabs[i],
+                      width: width,
+                      height: widget.height,
+                      style: style),
                 )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (var i = start; i < widget.tabs.length; i++)
-                      CommonTab.fromWarp(
-                          warp: widget.tabs[i],
-                          width: width,
-                          height: widget.height,
-                          style: style),
-                    if (widget.addTab != null) addTabWidget,
-                    const Spacer()
-                  ],
-                ),
+            ],
+          ),
         ),
       );
     });
@@ -157,7 +156,7 @@ class CommonTab extends StatefulWidget {
   final GestureTapCallback? onTap;
   final VoidCallback? onDeleted;
 
-  CommonTab(
+  const CommonTab(
       {Key? key,
       this.avatar,
       required this.label,
@@ -181,9 +180,7 @@ class CommonTab extends StatefulWidget {
         items = warp.items,
         onTap = warp.onTap,
         onDeleted = warp.onDeleted,
-        selected = warp.selected {
-    print(warp.label);
-  }
+        selected = warp.selected;
 
   @override
   State<CommonTab> createState() => _CommonTabState();
@@ -287,5 +284,90 @@ class _CommonTabState extends State<CommonTab> {
             ),
           ),
         ));
+  }
+}
+
+class MoreTabMenuWidget extends StatefulWidget {
+  final double? height;
+  final List<CommonTabWrap> tabs;
+  final void Function(int index) onTabSelected;
+  // final VoidCallback? onMore;
+
+  const MoreTabMenuWidget({
+    Key? key,
+    required this.height,
+    required this.tabs,
+    required this.onTabSelected,
+  }) : super(key: key);
+
+  @override
+  State<MoreTabMenuWidget> createState() => _MoreTabMenuWidgetState();
+}
+
+class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: widget.height ?? 35,
+      child: PopupMenuButton<int>(
+        icon: Icon(
+          size: 20,
+          Icons.more_vert,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        itemBuilder: (ctx) {
+          // 只显示0到start的tab
+          return [
+            for (int i = 0; i < widget.tabs.length; i++)
+              PopupMenuItem<int>(
+                height: widget.height ?? 35,
+                value: i,
+                child: SizedBox(
+                  // width: 100,
+                  child: Row(
+                    children: [
+                      if (widget.tabs[i].avatar != null)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
+                          child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: widget.tabs[i].avatar),
+                        ),
+                      SizedBox(
+                        width: 60,
+                        child: Text(
+                          widget.tabs[i].label,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            if (widget.tabs[i].onDeleted != null)
+                              IconButton(
+                                onPressed: widget.tabs[i].onDeleted,
+                                icon: const Icon(size: 15, Icons.close),
+                              ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+          ];
+        },
+        onSelected: (index) {
+          setState(() {});
+          widget.tabs[index].onTap?.call();
+          widget.onTabSelected(index);
+        },
+        tooltip: '更多标签',
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+      ),
+    );
   }
 }

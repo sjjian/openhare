@@ -18,6 +18,7 @@ class SqlResultTables extends ConsumerWidget {
     SQLResultListModel? model = ref.watch(selectedSQLResultTabNotifierProvider);
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
+      minWidth: 90,
       labelAlign: TextAlign.center,
       selectedColor: Theme.of(context)
           .colorScheme
@@ -34,15 +35,6 @@ class SqlResultTables extends ConsumerWidget {
       tab = const Spacer();
     } else {
       tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        // CommonTab(
-        //   label: "执行记录",
-        //   selected: false, // todo
-        //   width: 100,
-        //   style: style,
-        //   onTap: () {
-        //     // session.selectToRecord();
-        //   },
-        // ),
         Expanded(
             child: CommonTabBar(
                 height: 35,
