@@ -44,7 +44,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
 
   List<MoreTabMenuItemWidget> _buildItems(int start) {
     return [
-      for (var i = 0; i < start; i++)
+      for (var i = start - 1; i >= 0; i--)
         MoreTabMenuItemWidget(
           height: widget.height,
           child: Row(
@@ -86,6 +86,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
           ),
           onTabSelected: () {
             widget.onReorder(i, widget.tabs.length);
+            widget.tabs[i].onTap?.call();
           },
         )
     ];
@@ -118,6 +119,16 @@ class _CommonTabBarState extends State<CommonTabBar> {
         width = sumTabLength / length;
       }
 
+      final moreTabIcon = SizedBox(
+        width: 36,
+        height: 36,
+        child: Icon(
+          size: 20,
+          Icons.more_vert,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      );
+
       return Container(
         constraints: BoxConstraints(maxHeight: widget.height ?? 40),
         decoration: BoxDecoration(
@@ -129,10 +140,9 @@ class _CommonTabBarState extends State<CommonTabBar> {
                 ? MoreTabMenuWidget(
                     height: widget.height,
                     tabs: _buildItems(start),
-                    onTabSelected: (index) {
-                      widget.onReorder(index, index);
-                    })
-                : null,
+                    child: moreTabIcon,
+                  )
+                : moreTabIcon,
             footer: widget.addTab != null ? addTabWidget() : null,
             buildDefaultDragHandles: false,
             scrollDirection: Axis.horizontal,

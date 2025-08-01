@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class MoreTabMenuWidget extends StatefulWidget {
   final double? height;
   final List<MoreTabMenuItemWidget> tabs;
-  final void Function(int index) onTabSelected;
+  final Widget child;
 
   const MoreTabMenuWidget({
     Key? key,
     required this.height,
     required this.tabs,
-    required this.onTabSelected,
+    required this.child,
   }) : super(key: key);
 
   @override
@@ -31,7 +31,7 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
       });
       _portalController.hide();
     } else {
-      // 这里需要获取icon的全局位置和大小
+      // 这里需要获取宿主widget的全局位置和大小
       final RenderBox? button = context.findRenderObject() as RenderBox?;
       if (button != null) {
         final Offset position = button.localToGlobal(Offset.zero);
@@ -64,7 +64,17 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
         padding: EdgeInsets.zero,
         shrinkWrap: true,
         children: [
-          for (int i = 0; i < widget.tabs.length; i++) widget.tabs[i],
+          for (int i = 0; i < widget.tabs.length; i++)
+            InkWell(
+              onTap: () {
+                widget.tabs[i].onTabSelected();
+                setState(() {
+                  _showingMenu = false;
+                });
+                _portalController.hide();
+              },
+              child: widget.tabs[i],
+            )
         ],
       ),
     );
@@ -76,17 +86,10 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
       link: _layerLink,
       child: Stack(
         children: [
-          SizedBox(
-            height: widget.height ?? 35,
-            child: Builder(
-              builder: (iconContext) => GestureDetector(
-                onTap: () => _toggleMenu(iconContext),
-                child: Icon(
-                  size: 20,
-                  Icons.more_vert,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
+          Builder(
+            builder: (iconContext) => GestureDetector(
+              onTap: () => _toggleMenu(iconContext),
+              child: widget.child,
             ),
           ),
           OverlayPortal(
@@ -167,16 +170,11 @@ class _MoreTabMenuItemWidgetState extends State<MoreTabMenuItemWidget> {
       onExit: (_) => setState(() => _hovering = false),
       child: SizedBox(
         height: widget.height ?? 35,
-        child: InkWell(
-          onTap: () {
-            widget.onTabSelected();
-          },
-          child: Container(
-            color: _hovering
-                ? Theme.of(context).colorScheme.surfaceContainerHighest
-                : Theme.of(context).colorScheme.surfaceContainerHigh,
-            child: widget.child,
-          ),
+        child: Container(
+          color: _hovering
+              ? Theme.of(context).colorScheme.surfaceContainerHighest
+              : Theme.of(context).colorScheme.surfaceContainerHigh,
+          child: widget.child,
         ),
       ),
     );
