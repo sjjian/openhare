@@ -3081,10 +3081,6 @@ class __$ResultIdCopyWithImpl<$Res> implements _$ResultIdCopyWith<$Res> {
 mixin _$SQLResultModel {
   ResultId get resultId;
   SQLExecuteState get state;
-  String? get query;
-  Duration? get executeTime;
-  String? get error;
-  BaseQueryResult? get data;
 
   /// Create a copy of SQLResultModel
   /// with the given fields replaced by the non-null parameter values.
@@ -3101,6 +3097,182 @@ mixin _$SQLResultModel {
             other is SQLResultModel &&
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
+            (identical(other.state, state) || other.state == state));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, resultId, state);
+
+  @override
+  String toString() {
+    return 'SQLResultModel(resultId: $resultId, state: $state)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SQLResultModelCopyWith<$Res> {
+  factory $SQLResultModelCopyWith(
+          SQLResultModel value, $Res Function(SQLResultModel) _then) =
+      _$SQLResultModelCopyWithImpl;
+  @useResult
+  $Res call({ResultId resultId, SQLExecuteState state});
+
+  $ResultIdCopyWith<$Res> get resultId;
+}
+
+/// @nodoc
+class _$SQLResultModelCopyWithImpl<$Res>
+    implements $SQLResultModelCopyWith<$Res> {
+  _$SQLResultModelCopyWithImpl(this._self, this._then);
+
+  final SQLResultModel _self;
+  final $Res Function(SQLResultModel) _then;
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? resultId = null,
+    Object? state = null,
+  }) {
+    return _then(_self.copyWith(
+      resultId: null == resultId
+          ? _self.resultId
+          : resultId // ignore: cast_nullable_to_non_nullable
+              as ResultId,
+      state: null == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLExecuteState,
+    ));
+  }
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ResultIdCopyWith<$Res> get resultId {
+    return $ResultIdCopyWith<$Res>(_self.resultId, (value) {
+      return _then(_self.copyWith(resultId: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class _SQLResultModel implements SQLResultModel {
+  const _SQLResultModel({required this.resultId, required this.state});
+
+  @override
+  final ResultId resultId;
+  @override
+  final SQLExecuteState state;
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SQLResultModelCopyWith<_SQLResultModel> get copyWith =>
+      __$SQLResultModelCopyWithImpl<_SQLResultModel>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SQLResultModel &&
+            (identical(other.resultId, resultId) ||
+                other.resultId == resultId) &&
+            (identical(other.state, state) || other.state == state));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, resultId, state);
+
+  @override
+  String toString() {
+    return 'SQLResultModel(resultId: $resultId, state: $state)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SQLResultModelCopyWith<$Res>
+    implements $SQLResultModelCopyWith<$Res> {
+  factory _$SQLResultModelCopyWith(
+          _SQLResultModel value, $Res Function(_SQLResultModel) _then) =
+      __$SQLResultModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({ResultId resultId, SQLExecuteState state});
+
+  @override
+  $ResultIdCopyWith<$Res> get resultId;
+}
+
+/// @nodoc
+class __$SQLResultModelCopyWithImpl<$Res>
+    implements _$SQLResultModelCopyWith<$Res> {
+  __$SQLResultModelCopyWithImpl(this._self, this._then);
+
+  final _SQLResultModel _self;
+  final $Res Function(_SQLResultModel) _then;
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? resultId = null,
+    Object? state = null,
+  }) {
+    return _then(_SQLResultModel(
+      resultId: null == resultId
+          ? _self.resultId
+          : resultId // ignore: cast_nullable_to_non_nullable
+              as ResultId,
+      state: null == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as SQLExecuteState,
+    ));
+  }
+
+  /// Create a copy of SQLResultModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ResultIdCopyWith<$Res> get resultId {
+    return $ResultIdCopyWith<$Res>(_self.resultId, (value) {
+      return _then(_self.copyWith(resultId: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$SQLResultDetailModel {
+  ResultId get resultId;
+  SQLExecuteState get state;
+  String? get query;
+  Duration? get executeTime;
+  String? get error;
+  BaseQueryResult? get data;
+
+  /// Create a copy of SQLResultDetailModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SQLResultDetailModelCopyWith<SQLResultDetailModel> get copyWith =>
+      _$SQLResultDetailModelCopyWithImpl<SQLResultDetailModel>(
+          this as SQLResultDetailModel, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SQLResultDetailModel &&
+            (identical(other.resultId, resultId) ||
+                other.resultId == resultId) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.query, query) || other.query == query) &&
             (identical(other.executeTime, executeTime) ||
@@ -3115,15 +3287,15 @@ mixin _$SQLResultModel {
 
   @override
   String toString() {
-    return 'SQLResultModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
+    return 'SQLResultDetailModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
   }
 }
 
 /// @nodoc
-abstract mixin class $SQLResultModelCopyWith<$Res> {
-  factory $SQLResultModelCopyWith(
-          SQLResultModel value, $Res Function(SQLResultModel) _then) =
-      _$SQLResultModelCopyWithImpl;
+abstract mixin class $SQLResultDetailModelCopyWith<$Res> {
+  factory $SQLResultDetailModelCopyWith(SQLResultDetailModel value,
+          $Res Function(SQLResultDetailModel) _then) =
+      _$SQLResultDetailModelCopyWithImpl;
   @useResult
   $Res call(
       {ResultId resultId,
@@ -3137,14 +3309,14 @@ abstract mixin class $SQLResultModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SQLResultModelCopyWithImpl<$Res>
-    implements $SQLResultModelCopyWith<$Res> {
-  _$SQLResultModelCopyWithImpl(this._self, this._then);
+class _$SQLResultDetailModelCopyWithImpl<$Res>
+    implements $SQLResultDetailModelCopyWith<$Res> {
+  _$SQLResultDetailModelCopyWithImpl(this._self, this._then);
 
-  final SQLResultModel _self;
-  final $Res Function(SQLResultModel) _then;
+  final SQLResultDetailModel _self;
+  final $Res Function(SQLResultDetailModel) _then;
 
-  /// Create a copy of SQLResultModel
+  /// Create a copy of SQLResultDetailModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -3184,7 +3356,7 @@ class _$SQLResultModelCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of SQLResultModel
+  /// Create a copy of SQLResultDetailModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3197,8 +3369,8 @@ class _$SQLResultModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SQLResultModel implements SQLResultModel {
-  const _SQLResultModel(
+class _SQLResultDetailModel implements SQLResultDetailModel {
+  const _SQLResultDetailModel(
       {required this.resultId,
       required this.state,
       this.query,
@@ -3219,19 +3391,20 @@ class _SQLResultModel implements SQLResultModel {
   @override
   final BaseQueryResult? data;
 
-  /// Create a copy of SQLResultModel
+  /// Create a copy of SQLResultDetailModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$SQLResultModelCopyWith<_SQLResultModel> get copyWith =>
-      __$SQLResultModelCopyWithImpl<_SQLResultModel>(this, _$identity);
+  _$SQLResultDetailModelCopyWith<_SQLResultDetailModel> get copyWith =>
+      __$SQLResultDetailModelCopyWithImpl<_SQLResultDetailModel>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _SQLResultModel &&
+            other is _SQLResultDetailModel &&
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
             (identical(other.state, state) || other.state == state) &&
@@ -3248,16 +3421,16 @@ class _SQLResultModel implements SQLResultModel {
 
   @override
   String toString() {
-    return 'SQLResultModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
+    return 'SQLResultDetailModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$SQLResultModelCopyWith<$Res>
-    implements $SQLResultModelCopyWith<$Res> {
-  factory _$SQLResultModelCopyWith(
-          _SQLResultModel value, $Res Function(_SQLResultModel) _then) =
-      __$SQLResultModelCopyWithImpl;
+abstract mixin class _$SQLResultDetailModelCopyWith<$Res>
+    implements $SQLResultDetailModelCopyWith<$Res> {
+  factory _$SQLResultDetailModelCopyWith(_SQLResultDetailModel value,
+          $Res Function(_SQLResultDetailModel) _then) =
+      __$SQLResultDetailModelCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -3273,14 +3446,14 @@ abstract mixin class _$SQLResultModelCopyWith<$Res>
 }
 
 /// @nodoc
-class __$SQLResultModelCopyWithImpl<$Res>
-    implements _$SQLResultModelCopyWith<$Res> {
-  __$SQLResultModelCopyWithImpl(this._self, this._then);
+class __$SQLResultDetailModelCopyWithImpl<$Res>
+    implements _$SQLResultDetailModelCopyWith<$Res> {
+  __$SQLResultDetailModelCopyWithImpl(this._self, this._then);
 
-  final _SQLResultModel _self;
-  final $Res Function(_SQLResultModel) _then;
+  final _SQLResultDetailModel _self;
+  final $Res Function(_SQLResultDetailModel) _then;
 
-  /// Create a copy of SQLResultModel
+  /// Create a copy of SQLResultDetailModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3292,7 +3465,7 @@ class __$SQLResultModelCopyWithImpl<$Res>
     Object? error = freezed,
     Object? data = freezed,
   }) {
-    return _then(_SQLResultModel(
+    return _then(_SQLResultDetailModel(
       resultId: null == resultId
           ? _self.resultId
           : resultId // ignore: cast_nullable_to_non_nullable
@@ -3320,7 +3493,7 @@ class __$SQLResultModelCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of SQLResultModel
+  /// Create a copy of SQLResultDetailModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3332,24 +3505,24 @@ class __$SQLResultModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$SQLResultListModel {
+mixin _$SessionSQLResultsModel {
   SessionId get sessionId;
   List<SQLResultModel> get results;
   SQLResultModel? get selected;
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $SQLResultListModelCopyWith<SQLResultListModel> get copyWith =>
-      _$SQLResultListModelCopyWithImpl<SQLResultListModel>(
-          this as SQLResultListModel, _$identity);
+  $SessionSQLResultsModelCopyWith<SessionSQLResultsModel> get copyWith =>
+      _$SessionSQLResultsModelCopyWithImpl<SessionSQLResultsModel>(
+          this as SessionSQLResultsModel, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is SQLResultListModel &&
+            other is SessionSQLResultsModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
             const DeepCollectionEquality().equals(other.results, results) &&
@@ -3363,15 +3536,15 @@ mixin _$SQLResultListModel {
 
   @override
   String toString() {
-    return 'SQLResultListModel(sessionId: $sessionId, results: $results, selected: $selected)';
+    return 'SessionSQLResultsModel(sessionId: $sessionId, results: $results, selected: $selected)';
   }
 }
 
 /// @nodoc
-abstract mixin class $SQLResultListModelCopyWith<$Res> {
-  factory $SQLResultListModelCopyWith(
-          SQLResultListModel value, $Res Function(SQLResultListModel) _then) =
-      _$SQLResultListModelCopyWithImpl;
+abstract mixin class $SessionSQLResultsModelCopyWith<$Res> {
+  factory $SessionSQLResultsModelCopyWith(SessionSQLResultsModel value,
+          $Res Function(SessionSQLResultsModel) _then) =
+      _$SessionSQLResultsModelCopyWithImpl;
   @useResult
   $Res call(
       {SessionId sessionId,
@@ -3383,14 +3556,14 @@ abstract mixin class $SQLResultListModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SQLResultListModelCopyWithImpl<$Res>
-    implements $SQLResultListModelCopyWith<$Res> {
-  _$SQLResultListModelCopyWithImpl(this._self, this._then);
+class _$SessionSQLResultsModelCopyWithImpl<$Res>
+    implements $SessionSQLResultsModelCopyWith<$Res> {
+  _$SessionSQLResultsModelCopyWithImpl(this._self, this._then);
 
-  final SQLResultListModel _self;
-  final $Res Function(SQLResultListModel) _then;
+  final SessionSQLResultsModel _self;
+  final $Res Function(SessionSQLResultsModel) _then;
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -3415,7 +3588,7 @@ class _$SQLResultListModelCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3425,7 +3598,7 @@ class _$SQLResultListModelCopyWithImpl<$Res>
     });
   }
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3442,8 +3615,8 @@ class _$SQLResultListModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SQLResultListModel implements SQLResultListModel {
-  const _SQLResultListModel(
+class _SessionSQLResultsModel implements SessionSQLResultsModel {
+  const _SessionSQLResultsModel(
       {required this.sessionId,
       required final List<SQLResultModel> results,
       this.selected})
@@ -3462,19 +3635,20 @@ class _SQLResultListModel implements SQLResultListModel {
   @override
   final SQLResultModel? selected;
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$SQLResultListModelCopyWith<_SQLResultListModel> get copyWith =>
-      __$SQLResultListModelCopyWithImpl<_SQLResultListModel>(this, _$identity);
+  _$SessionSQLResultsModelCopyWith<_SessionSQLResultsModel> get copyWith =>
+      __$SessionSQLResultsModelCopyWithImpl<_SessionSQLResultsModel>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _SQLResultListModel &&
+            other is _SessionSQLResultsModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
             const DeepCollectionEquality().equals(other._results, _results) &&
@@ -3488,16 +3662,16 @@ class _SQLResultListModel implements SQLResultListModel {
 
   @override
   String toString() {
-    return 'SQLResultListModel(sessionId: $sessionId, results: $results, selected: $selected)';
+    return 'SessionSQLResultsModel(sessionId: $sessionId, results: $results, selected: $selected)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$SQLResultListModelCopyWith<$Res>
-    implements $SQLResultListModelCopyWith<$Res> {
-  factory _$SQLResultListModelCopyWith(
-          _SQLResultListModel value, $Res Function(_SQLResultListModel) _then) =
-      __$SQLResultListModelCopyWithImpl;
+abstract mixin class _$SessionSQLResultsModelCopyWith<$Res>
+    implements $SessionSQLResultsModelCopyWith<$Res> {
+  factory _$SessionSQLResultsModelCopyWith(_SessionSQLResultsModel value,
+          $Res Function(_SessionSQLResultsModel) _then) =
+      __$SessionSQLResultsModelCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -3512,14 +3686,14 @@ abstract mixin class _$SQLResultListModelCopyWith<$Res>
 }
 
 /// @nodoc
-class __$SQLResultListModelCopyWithImpl<$Res>
-    implements _$SQLResultListModelCopyWith<$Res> {
-  __$SQLResultListModelCopyWithImpl(this._self, this._then);
+class __$SessionSQLResultsModelCopyWithImpl<$Res>
+    implements _$SessionSQLResultsModelCopyWith<$Res> {
+  __$SessionSQLResultsModelCopyWithImpl(this._self, this._then);
 
-  final _SQLResultListModel _self;
-  final $Res Function(_SQLResultListModel) _then;
+  final _SessionSQLResultsModel _self;
+  final $Res Function(_SessionSQLResultsModel) _then;
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3528,7 +3702,7 @@ class __$SQLResultListModelCopyWithImpl<$Res>
     Object? results = null,
     Object? selected = freezed,
   }) {
-    return _then(_SQLResultListModel(
+    return _then(_SessionSQLResultsModel(
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
@@ -3544,7 +3718,7 @@ class __$SQLResultListModelCopyWithImpl<$Res>
     ));
   }
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3554,7 +3728,7 @@ class __$SQLResultListModelCopyWithImpl<$Res>
     });
   }
 
-  /// Create a copy of SQLResultListModel
+  /// Create a copy of SessionSQLResultsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -3566,6 +3740,145 @@ class __$SQLResultListModelCopyWithImpl<$Res>
     return $SQLResultModelCopyWith<$Res>(_self.selected!, (value) {
       return _then(_self.copyWith(selected: value));
     });
+  }
+}
+
+/// @nodoc
+mixin _$SQLResultsModel {
+  Map<SessionId, SessionSQLResultsModel> get cache;
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SQLResultsModelCopyWith<SQLResultsModel> get copyWith =>
+      _$SQLResultsModelCopyWithImpl<SQLResultsModel>(
+          this as SQLResultsModel, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SQLResultsModel &&
+            const DeepCollectionEquality().equals(other.cache, cache));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(cache));
+
+  @override
+  String toString() {
+    return 'SQLResultsModel(cache: $cache)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SQLResultsModelCopyWith<$Res> {
+  factory $SQLResultsModelCopyWith(
+          SQLResultsModel value, $Res Function(SQLResultsModel) _then) =
+      _$SQLResultsModelCopyWithImpl;
+  @useResult
+  $Res call({Map<SessionId, SessionSQLResultsModel> cache});
+}
+
+/// @nodoc
+class _$SQLResultsModelCopyWithImpl<$Res>
+    implements $SQLResultsModelCopyWith<$Res> {
+  _$SQLResultsModelCopyWithImpl(this._self, this._then);
+
+  final SQLResultsModel _self;
+  final $Res Function(SQLResultsModel) _then;
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? cache = null,
+  }) {
+    return _then(_self.copyWith(
+      cache: null == cache
+          ? _self.cache
+          : cache // ignore: cast_nullable_to_non_nullable
+              as Map<SessionId, SessionSQLResultsModel>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _SQLResultsModel implements SQLResultsModel {
+  const _SQLResultsModel(
+      {required final Map<SessionId, SessionSQLResultsModel> cache})
+      : _cache = cache;
+
+  final Map<SessionId, SessionSQLResultsModel> _cache;
+  @override
+  Map<SessionId, SessionSQLResultsModel> get cache {
+    if (_cache is EqualUnmodifiableMapView) return _cache;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_cache);
+  }
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SQLResultsModelCopyWith<_SQLResultsModel> get copyWith =>
+      __$SQLResultsModelCopyWithImpl<_SQLResultsModel>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SQLResultsModel &&
+            const DeepCollectionEquality().equals(other._cache, _cache));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_cache));
+
+  @override
+  String toString() {
+    return 'SQLResultsModel(cache: $cache)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SQLResultsModelCopyWith<$Res>
+    implements $SQLResultsModelCopyWith<$Res> {
+  factory _$SQLResultsModelCopyWith(
+          _SQLResultsModel value, $Res Function(_SQLResultsModel) _then) =
+      __$SQLResultsModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({Map<SessionId, SessionSQLResultsModel> cache});
+}
+
+/// @nodoc
+class __$SQLResultsModelCopyWithImpl<$Res>
+    implements _$SQLResultsModelCopyWith<$Res> {
+  __$SQLResultsModelCopyWithImpl(this._self, this._then);
+
+  final _SQLResultsModel _self;
+  final $Res Function(_SQLResultsModel) _then;
+
+  /// Create a copy of SQLResultsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? cache = null,
+  }) {
+    return _then(_SQLResultsModel(
+      cache: null == cache
+          ? _self._cache
+          : cache // ignore: cast_nullable_to_non_nullable
+              as Map<SessionId, SessionSQLResultsModel>,
+    ));
   }
 }
 

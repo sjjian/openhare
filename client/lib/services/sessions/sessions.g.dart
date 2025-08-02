@@ -438,7 +438,7 @@ final sessionsServicesProvider =
 );
 
 typedef _$SessionsServices = Notifier<SessionListModel>;
-String _$sessionsNotifierHash() => r'b2abc950856cab92cc3cbcad51c9242538836f40';
+String _$sessionsNotifierHash() => r'212cae0abe875e854818233fea3f558b4f4937e1';
 
 /// See also [SessionsNotifier].
 @ProviderFor(SessionsNotifier)
@@ -574,12 +574,12 @@ final sessionEditorNotifierProvider =
 
 typedef _$SessionEditorNotifier = Notifier<SessionEditorModel>;
 String _$selectedSQLResultTabNotifierHash() =>
-    r'7d3228cadde9ecc601b1e05d26aca5627f9ee828';
+    r'1d8461051552b03eb2718a0dd417da8b98789c57';
 
 /// See also [SelectedSQLResultTabNotifier].
 @ProviderFor(SelectedSQLResultTabNotifier)
 final selectedSQLResultTabNotifierProvider = NotifierProvider<
-    SelectedSQLResultTabNotifier, SQLResultListModel?>.internal(
+    SelectedSQLResultTabNotifier, SessionSQLResultsModel?>.internal(
   SelectedSQLResultTabNotifier.new,
   name: r'selectedSQLResultTabNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -589,14 +589,14 @@ final selectedSQLResultTabNotifierProvider = NotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$SelectedSQLResultTabNotifier = Notifier<SQLResultListModel?>;
+typedef _$SelectedSQLResultTabNotifier = Notifier<SessionSQLResultsModel?>;
 String _$selectedSQLResultNotifierHash() =>
-    r'd5fc23f6c760620d991f4efd2cf33f8058e57239';
+    r'711988cfda75a87cad5dc61d7d7946149c2efe29';
 
 /// See also [SelectedSQLResultNotifier].
 @ProviderFor(SelectedSQLResultNotifier)
 final selectedSQLResultNotifierProvider =
-    NotifierProvider<SelectedSQLResultNotifier, SQLResultModel?>.internal(
+    NotifierProvider<SelectedSQLResultNotifier, SQLResultDetailModel?>.internal(
   SelectedSQLResultNotifier.new,
   name: r'selectedSQLResultNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -606,9 +606,9 @@ final selectedSQLResultNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SelectedSQLResultNotifier = Notifier<SQLResultModel?>;
+typedef _$SelectedSQLResultNotifier = Notifier<SQLResultDetailModel?>;
 String _$selectedSessionStatusNotifierHash() =>
-    r'634ae1088ac7d9745aea9e8b09bfe8306b6c34ef';
+    r'9dcd0ea6b92a40cf73d34ce3dd68753cbfb83b36';
 
 /// See also [SelectedSessionStatusNotifier].
 @ProviderFor(SelectedSessionStatusNotifier)
