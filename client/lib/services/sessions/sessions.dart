@@ -89,13 +89,12 @@ class SessionsServices extends _$SessionsServices {
   }
 
   Future<void> deleteSessionByIndex(int index) async {
+    SessionModel session = state.sessions[index];
+
     // 1. delete session
-    await ref
-        .read(sessionRepoProvider)
-        .deleteSession(state.sessions[index].sessionId);
+    await ref.read(sessionRepoProvider).deleteSession(session.sessionId);
 
     // 2. close conn
-    final session = state.sessions[index];
     if (session.connId != null) {
       final connsServices = ref.read(sessionConnsServicesProvider.notifier);
       await connsServices.close(session.connId!);
@@ -104,6 +103,11 @@ class SessionsServices extends _$SessionsServices {
 
     // 3. delete result
     ref.read(sqlResultsRepoProvider).deleteSQLResults(session.sessionId);
+
+    // 4. delete provider status
+    ref.invalidate(sessionSQLEditorServiceProvider(session.sessionId));
+    ref.invalidate(sessionSplitViewStateProvider(session.sessionId));
+    ref.invalidate(sessionDrawerStateProvider(session.sessionId));
 
     ref.invalidateSelf();
   }
@@ -169,6 +173,51 @@ class SessionsServices extends _$SessionsServices {
 }
 
 @Riverpod(keepAlive: true)
+class SessionSQLEditorService extends _$SessionSQLEditorService {
+  @override
+  SessionEditorModel build(SessionId sessionId) {
+    final controller = CodeLineEditingController(
+      spanBuilder: ({required codeLines, required context, required style}) {
+        return TextSpan(
+          children: Lexer(codeLines.asString(TextLineBreak.lf))
+              .tokens()
+              .map<TextSpan>((tok) => TextSpan(
+                  text: tok.content,
+                  style: style.merge(getStyle(tok.id) ?? style)))
+              .toList(),
+        );
+      },
+    );
+
+    final code = ref.read(sessionRepoProvider).getCode(sessionId);
+    controller.text = code ?? "";
+    return SessionEditorModel(code: controller);
+  }
+
+  void saveCode() {
+    ref.read(sessionRepoProvider).saveCode(sessionId, state.code.text);
+  }
+}
+
+@Riverpod(keepAlive: true)
+SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
+  return const SessionDrawerModel(
+      drawerPage: DrawerPage.metadataTree,
+      sqlResult: null,
+      sqlColumn: null,
+      showRecord: false,
+      isRightPageOpen: true);
+}
+
+@Riverpod(keepAlive: true)
+SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
+  return SessionSplitViewModel(
+      multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
+      metaDataSplitViewCtrl:
+          SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
+}
+
+@Riverpod(keepAlive: true)
 class SessionsNotifier extends _$SessionsNotifier {
   @override
   SessionDetailListModel build() {
@@ -228,14 +277,6 @@ class SelectedSessionNotifier extends _$SelectedSessionNotifier {
 }
 
 @Riverpod(keepAlive: true)
-SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
-  return SessionSplitViewModel(
-      multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
-      metaDataSplitViewCtrl:
-          SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
-}
-
-@Riverpod(keepAlive: true)
 class SessionSplitViewNotifier extends _$SessionSplitViewNotifier {
   @override
   SessionSplitViewModel build() {
@@ -247,16 +288,6 @@ class SessionSplitViewNotifier extends _$SessionSplitViewNotifier {
     }
     return ref.watch(sessionSplitViewStateProvider(sessionModel.sessionId));
   }
-}
-
-@Riverpod(keepAlive: true)
-SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
-  return const SessionDrawerModel(
-      drawerPage: DrawerPage.metadataTree,
-      sqlResult: null,
-      sqlColumn: null,
-      showRecord: false,
-      isRightPageOpen: true);
 }
 
 @Riverpod(keepAlive: true)
@@ -356,29 +387,16 @@ class SelectedSessionSQLEditorNotifier
 }
 
 @Riverpod(keepAlive: true)
-SessionEditorModel sessionEditor(Ref ref, SessionId sessionId) {
-  return SessionEditorModel(code: CodeLineEditingController(
-      spanBuilder: ({required codeLines, required context, required style}) {
-    return TextSpan(
-        children: Lexer(codeLines.asString(TextLineBreak.lf))
-            .tokens()
-            .map<TextSpan>((tok) => TextSpan(
-                text: tok.content,
-                style: style.merge(getStyle(tok.id) ?? style)))
-            .toList());
-  }));
-}
-
-@Riverpod(keepAlive: true)
 class SessionEditorNotifier extends _$SessionEditorNotifier {
   @override
   SessionEditorModel build() {
     SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
-      return ref.watch(sessionEditorProvider(const SessionId(value: 0)));
+      return ref
+          .watch(sessionSQLEditorServiceProvider(const SessionId(value: 0)));
     }
-    return ref.watch(sessionEditorProvider(sessionModel.sessionId));
+    return ref.watch(sessionSQLEditorServiceProvider(sessionModel.sessionId));
   }
 }
 

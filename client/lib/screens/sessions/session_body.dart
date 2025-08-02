@@ -1,3 +1,4 @@
+import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
@@ -12,9 +13,10 @@ class SessionBodyPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionEditor = ref.watch(sessionEditorNotifierProvider);
-    final sessionSplitView = ref.watch(sessionSplitViewNotifierProvider);
-    final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
+    SessionEditorModel sessionEditor = ref.watch(sessionEditorNotifierProvider);
+    SessionSplitViewModel sessionSplitView =
+        ref.watch(sessionSplitViewNotifierProvider);
+    SessionDrawerModel sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
 
     final Widget left = Column(
       children: [

@@ -1,21 +1,25 @@
+import 'package:client/models/sessions.dart';
 import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
+import 'package:client/services/sessions/sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'shell');
 
-class App extends ConsumerWidget {
+class App extends HookConsumerWidget {
   App({super.key});
 
   final GoRouter _router = GoRouter(
@@ -79,6 +83,13 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        windowManager.addListener(_WindowListener(ref));
+      });
+      return null;
+    }, []);
+
     final model = ref.watch(settingNotifierProvider);
 
     return MaterialApp.router(
@@ -235,5 +246,20 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
       case 3:
         GoRouter.of(context).go('/about');
     }
+  }
+}
+
+class _WindowListener with WindowListener {
+  final WidgetRef ref;
+
+  _WindowListener(this.ref);
+
+  @override
+  void onWindowClose() async {
+    SessionDetailListModel sessionRepo = ref.read(sessionsNotifierProvider);
+    for (var session in sessionRepo.sessions) {
+      ref.read(sessionSQLEditorServiceProvider(session.sessionId).notifier).saveCode();
+    }
+    await windowManager.destroy();
   }
 }

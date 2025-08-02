@@ -17,6 +17,8 @@ abstract class SessionRepo {
   Future<void> deleteSession(SessionId sessionId);
   void selectSessionByIndex(int index);
   void reorderSession(int oldIndex, int newIndex);
+  String? getCode(SessionId sessionId);
+  void saveCode(SessionId sessionId, String code);
 }
 
 abstract class SessionConnRepo {
