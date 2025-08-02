@@ -55,10 +55,6 @@ class SessionStatusTab extends ConsumerWidget {
                       SQLConnectState.executing =>
                         const Icon(Icons.check_circle,
                             size: 16, color: Colors.green),
-                      SQLConnectState.connecting => const Icon(
-                          Icons.hourglass_empty,
-                          size: 16,
-                          color: Colors.orange),
                       SQLConnectState.failed ||
                       SQLConnectState.unHealth =>
                         const Icon(Icons.error, size: 16, color: Colors.red),
@@ -70,48 +66,48 @@ class SessionStatusTab extends ConsumerWidget {
               ),
             ),
           ),
-          // const ValueStatusWidget(
-          //     label: '连接', value: '已连接', tooltip: '连接状态: 已连接'),
-          divider(context),
-          ValueStatusWidget(
-              label: AppLocalizations.of(context)!.effect_rows,
-              value: affectedRowsDisplay,
-              tooltip: affectedRowsDisplay),
-          divider(context),
-          ValueStatusWidget(
-              label: AppLocalizations.of(context)!.duration,
-              value: executeTimeDisplay,
-              tooltip: executeTimeDisplay),
-          divider(context),
-          ValueStatusWidget(
-              width: 300,
-              label: AppLocalizations.of(context)!.query,
-              value: shortQueryDisplay,
-              tooltip: model.query ??
-                  AppLocalizations.of(context)!.no_query_executed),
-          if (model.state == SQLExecuteState.done && model.resultId != null)
-            IconButton(
-                onPressed: () async {
-                  //todo: 下载失效了，需要测试。
-                  String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle:
-                        AppLocalizations.of(context)!.display_msg_downlaod,
-                    fileName:
-                        '${model.instanceName}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
-                  );
-                  if (outputFile == null) {
-                    return;
-                  }
-                  File file = File(outputFile);
-                  await file.writeAsBytes(ref
-                      .read(selectedSQLResultNotifierProvider.notifier)
-                      .toExcel()
-                      .save()!);
-                },
-                icon: const Icon(
-                  Icons.download_rounded,
-                  color: Colors.green,
-                ))
+          if (model.resultId != null) ...[
+            divider(context),
+            ValueStatusWidget(
+                label: AppLocalizations.of(context)!.effect_rows,
+                value: affectedRowsDisplay,
+                tooltip: affectedRowsDisplay),
+            divider(context),
+            ValueStatusWidget(
+                label: AppLocalizations.of(context)!.duration,
+                value: executeTimeDisplay,
+                tooltip: executeTimeDisplay),
+            divider(context),
+            ValueStatusWidget(
+                width: 300,
+                label: AppLocalizations.of(context)!.query,
+                value: shortQueryDisplay,
+                tooltip: model.query ??
+                    AppLocalizations.of(context)!.no_query_executed),
+            if (model.state == SQLExecuteState.done && model.resultId != null)
+              IconButton(
+                  onPressed: () async {
+                    //todo: 下载失效了，需要测试。
+                    String? outputFile = await FilePicker.platform.saveFile(
+                      dialogTitle:
+                          AppLocalizations.of(context)!.display_msg_downlaod,
+                      fileName:
+                          '${model.instanceName}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+                    );
+                    if (outputFile == null) {
+                      return;
+                    }
+                    File file = File(outputFile);
+                    await file.writeAsBytes(ref
+                        .read(selectedSQLResultNotifierProvider.notifier)
+                        .toExcel()
+                        .save()!);
+                  },
+                  icon: const Icon(
+                    Icons.download_rounded,
+                    color: Colors.green,
+                  ))
+          ],
         ],
       ),
     );

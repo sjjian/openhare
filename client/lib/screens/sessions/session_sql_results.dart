@@ -15,7 +15,8 @@ class SqlResultTables extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionSQLResultsModel? model = ref.watch(selectedSQLResultTabNotifierProvider);
+    SessionSQLResultsModel? model =
+        ref.watch(selectedSQLResultTabNotifierProvider);
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
       minWidth: 90,
@@ -30,56 +31,55 @@ class SqlResultTables extends ConsumerWidget {
           .surfaceContainer, // sql result tab 的鼠标移入色
     );
 
-    Widget tab;
-    if (model == null) {
-      tab = const Spacer();
-    } else {
-      tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        Expanded(
-            child: CommonTabBar(
-                height: 35,
-                color: Theme.of(context).colorScheme.surfaceContainer,
-                tabStyle: style,
-                onReorder: (oldIndex, newIndex) {
-                  final sqlResultsServices =
-                      ref.read(sQLResultsServicesProvider.notifier);
+    Widget tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+      Expanded(
+        child: CommonTabBar(
+          height: 35,
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          tabStyle: style,
+          onReorder: (oldIndex, newIndex) {
+            final sqlResultsServices =
+                ref.read(sQLResultsServicesProvider.notifier);
 
-                  sqlResultsServices.reorderSQLResult(
-                      model.sessionId, oldIndex, newIndex);
-                },
-                tabs: [
-              for (var i = 0; i < model.results.length; i++)
-                CommonTabWrap(
-                  label: "${model.results[i].resultId.value}",
-                  selected: model.results[i] == model.selected,
-                  onTap: () {
-                    final sqlResultsServices =
-                        ref.read(sQLResultsServicesProvider.notifier);
+            sqlResultsServices.reorderSQLResult(
+                model!.sessionId, oldIndex, newIndex);
+          },
+          tabs: (model != null)
+              ? [
+                  for (var i = 0; i < model.results.length; i++)
+                    CommonTabWrap(
+                      label: "${model.results[i].resultId.value}",
+                      selected: model.results[i] == model.selected,
+                      onTap: () {
+                        final sqlResultsServices =
+                            ref.read(sQLResultsServicesProvider.notifier);
 
-                    sqlResultsServices
-                        .selectSQLResult(model.results[i].resultId);
-                  },
-                  onDeleted: () {
-                    final sqlResultsServices =
-                        ref.read(sQLResultsServicesProvider.notifier);
-                    sqlResultsServices
-                        .deleteSQLResult(model.results[i].resultId);
-                  },
-                  avatar: (model.results[i] != model.selected &&
-                          model.results[i].state == SQLExecuteState.init)
-                      ? const Padding(
-                          padding: EdgeInsets.all(2),
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Icon(
-                          Icons.grid_on,
-                        ),
-                )
-            ]))
-      ]);
-    }
+                        sqlResultsServices
+                            .selectSQLResult(model.results[i].resultId);
+                      },
+                      onDeleted: () {
+                        final sqlResultsServices =
+                            ref.read(sQLResultsServicesProvider.notifier);
+                        sqlResultsServices
+                            .deleteSQLResult(model.results[i].resultId);
+                      },
+                      avatar: (model.results[i] != model.selected &&
+                              model.results[i].state == SQLExecuteState.init)
+                          ? const Padding(
+                              padding: EdgeInsets.all(2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.grid_on,
+                            ),
+                    ),
+                ]
+              : [],
+        ),
+      )
+    ]);
 
     return Row(
       children: [

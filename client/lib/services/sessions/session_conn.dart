@@ -37,6 +37,7 @@ class SessionConnsServices extends _$SessionConnsServices {
     await ref.read(sessionConnRepoProvider).connect(
       connId,
       onStateChangedCallback: () {
+        print('onStateChangedCallback ${connId.value}');
         ref.invalidateSelf(); // todo: 订阅不了，因为rebuild了
       },
       onSchemaChangedCallback: onSchemaChangedCallback,

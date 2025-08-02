@@ -125,6 +125,7 @@ class SessionsServices extends _$SessionsServices {
       final repo = ref.read(sessionRepoProvider);
       repo.setConnId(session.sessionId, connModel.connId);
       connId = connModel.connId;
+      ref.invalidateSelf();
     }
 
     // connect conn

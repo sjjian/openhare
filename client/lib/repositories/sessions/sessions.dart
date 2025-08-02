@@ -50,12 +50,10 @@ class SessionRepoImpl extends SessionRepo {
   SessionModel toModel(SessionStorage session) {
     return SessionModel(
       sessionId: SessionId(value: session.id),
-      instanceId: session.instance.target != null
+      instanceId: session.instance.hasValue
           ? InstanceId(value: session.instance.targetId)
           : null,
-      // instanceName: session.instance.target?.name,
       currentSchema: session.currentSchema,
-      // dbType: session.instance.target?.dbType,
       connId: _connIdMap[session.id],
     );
   }
@@ -86,6 +84,8 @@ class SessionRepoImpl extends SessionRepo {
       session.currentSchema = currentSchema;
     }
     await _sessionBox.putAsync(session);
+    final session2 = await _sessionBox.getAsync(sessionId.value);
+    _sessions.replace(session, session2!);
   }
 
   @override
