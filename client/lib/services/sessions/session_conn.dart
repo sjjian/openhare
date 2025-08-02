@@ -30,7 +30,8 @@ class SessionConnsServices extends _$SessionConnsServices {
     ref.read(sessionConnRepoProvider).removeConn(connId);
   }
 
-  Future<void> connect(ConnId connId, {
+  Future<void> connect(
+    ConnId connId, {
     Function(String)? onSchemaChangedCallback,
   }) async {
     await ref.read(sessionConnRepoProvider).connect(
@@ -67,18 +68,5 @@ class SessionConnsServices extends _$SessionConnsServices {
 
   Future<void> killQuery(ConnId connId) async {
     await ref.read(sessionConnRepoProvider).killQuery(connId);
-  }
-}
-
-@Riverpod()
-class SessionConnServices extends _$SessionConnServices {
-  @override
-  SessionConnModel? build(ConnId connId) {
-    if (connId.value == 0) {
-      return null;
-    }
-    return ref.watch(sessionConnsServicesProvider.select((s) {
-      return s.conns[connId];
-    }));
   }
 }

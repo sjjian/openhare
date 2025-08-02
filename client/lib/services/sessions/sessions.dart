@@ -15,6 +15,7 @@ import 'package:multi_split_view/multi_split_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:sql_parser/parser.dart';
+import 'package:excel/excel.dart' as excel;
 
 part 'sessions.g.dart';
 
@@ -237,13 +238,13 @@ SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
 class SessionSplitViewNotifier extends _$SessionSplitViewNotifier {
   @override
   SessionSplitViewModel build() {
-    SessionDetailModel? sessionIdModel =
+    SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
-    if (sessionIdModel == null) {
+    if (sessionModel == null) {
       return ref.watch(sessionSplitViewStateProvider(
           const SessionId(value: 0))); // todo: 空值处理
     }
-    return ref.watch(sessionSplitViewStateProvider(sessionIdModel.sessionId));
+    return ref.watch(sessionSplitViewStateProvider(sessionModel.sessionId));
   }
 }
 
@@ -261,12 +262,12 @@ SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
 class SessionDrawerNotifier extends _$SessionDrawerNotifier {
   @override
   SessionDrawerModel build() {
-    SessionDetailModel? sessionIdModel =
+    SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
-    if (sessionIdModel == null) {
+    if (sessionModel == null) {
       return ref.watch(sessionDrawerStateProvider(const SessionId(value: 0)));
     }
-    return ref.watch(sessionDrawerStateProvider(sessionIdModel.sessionId));
+    return ref.watch(sessionDrawerStateProvider(sessionModel.sessionId));
   }
 
   void showRightPage() {
@@ -298,13 +299,13 @@ class SessionDrawerNotifier extends _$SessionDrawerNotifier {
 class SessionMetadataNotifier extends _$SessionMetadataNotifier {
   @override
   InstanceMetadataModel? build() {
-    SessionDetailModel? sessionIdModel =
+    SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
-    if (sessionIdModel == null || sessionIdModel.instanceId == null) {
+    if (sessionModel == null || sessionModel.instanceId == null) {
       return null;
     }
     return ref
-        .watch(instanceMetadataServicesProvider(sessionIdModel.instanceId!));
+        .watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
   }
 }
 
@@ -338,16 +339,16 @@ class SelectedSessionSQLEditorNotifier
     extends _$SelectedSessionSQLEditorNotifier {
   @override
   SessionSQLEditorModel build() {
-    SessionDetailModel? sessionIdModel =
+    SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
-    if (sessionIdModel == null) {
+    if (sessionModel == null) {
       return const SessionSQLEditorModel();
     }
     InstanceMetadataModel? sessionMeta =
         ref.watch(sessionMetadataNotifierProvider);
 
     return SessionSQLEditorModel(
-      currentSchema: sessionIdModel.currentSchema,
+      currentSchema: sessionModel.currentSchema,
       metadata: sessionMeta?.metadata,
     );
   }
@@ -371,45 +372,64 @@ SessionEditorModel sessionEditor(Ref ref, SessionId sessionId) {
 class SessionEditorNotifier extends _$SessionEditorNotifier {
   @override
   SessionEditorModel build() {
-    SessionDetailModel? sessionIdModel =
+    SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
-    if (sessionIdModel == null) {
+    if (sessionModel == null) {
       return ref.watch(sessionEditorProvider(const SessionId(value: 0)));
     }
-    return ref.watch(sessionEditorProvider(sessionIdModel.sessionId));
+    return ref.watch(sessionEditorProvider(sessionModel.sessionId));
   }
 }
 
 @Riverpod(keepAlive: true)
 class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
   @override
-  SQLResultListModel? build() {
-    SessionDetailModel? sessionIdModel =
+  SessionSQLResultsModel? build() {
+    SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
-    if (sessionIdModel == null) {
+    if (sessionModel == null) {
       return null;
     }
-    return ref.watch(sQLResultsServicesProvider(sessionIdModel.sessionId));
+    return ref.watch(sQLResultsServicesProvider.select((m) {
+      return m.cache[sessionModel.sessionId];
+    }));
   }
 }
 
 @Riverpod(keepAlive: true)
 class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
   @override
-  SQLResultModel? build() {
-    SessionDetailModel? sessionIdModel =
+  SQLResultDetailModel? build() {
+    SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
-    if (sessionIdModel == null) {
+    if (sessionModel == null) {
       return null;
     }
-    ResultId? resultId = ref
-        .watch(sQLResultsServicesProvider(sessionIdModel.sessionId).select((m) {
-      return m.selected?.resultId;
+    SQLResultModel? sqlResultModel =
+        ref.watch(sQLResultsServicesProvider.select((m) {
+      return m.cache[sessionModel.sessionId]?.selected;
     }));
-    if (resultId == null) {
+    if (sqlResultModel == null) {
       return null;
     }
-    return ref.watch(sQLResultServicesProvider(resultId));
+    return ref
+        .read(sQLResultsServicesProvider.notifier)
+        .getSQLResult(sqlResultModel.resultId);
+  }
+
+  excel.Excel toExcel() {
+    final data = excel.Excel.createExcel();
+    final sheet = data["Sheet1"];
+    sheet.appendRow(state!.data!.columns
+        .map<excel.TextCellValue>((e) => excel.TextCellValue(e.name))
+        .toList());
+    for (final row in state!.data!.rows) {
+      sheet.appendRow(row.values
+          .map<excel.TextCellValue>(
+              (e) => excel.TextCellValue(e.getString() ?? ''))
+          .toList());
+    }
+    return data;
   }
 }
 
@@ -422,7 +442,7 @@ class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
       return null;
     }
 
-    SQLResultModel? sqlResultModel =
+    SQLResultDetailModel? sqlResultModel =
         ref.watch(selectedSQLResultNotifierProvider);
 
     return SessionStatusModel(

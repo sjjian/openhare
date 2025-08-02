@@ -137,10 +137,11 @@ class SessionConn {
       );
       _setState(SQLConnectState.connected);
       startHealthCheck();
-    } catch (e, s) {
+    } catch (e) {
       errorMsg = e.toString();
-      print("conn error: $e; $s");
+      print("conn error: $e");
       _setState(SQLConnectState.failed);
+      rethrow;
     }
   }
 

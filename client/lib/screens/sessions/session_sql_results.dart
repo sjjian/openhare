@@ -15,7 +15,7 @@ class SqlResultTables extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SQLResultListModel? model = ref.watch(selectedSQLResultTabNotifierProvider);
+    SessionSQLResultsModel? model = ref.watch(selectedSQLResultTabNotifierProvider);
     CommonTabStyle style = CommonTabStyle(
       maxWidth: 100,
       minWidth: 90,
@@ -41,10 +41,11 @@ class SqlResultTables extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.surfaceContainer,
                 tabStyle: style,
                 onReorder: (oldIndex, newIndex) {
-                  ref
-                      .read(
-                          sQLResultsServicesProvider(model.sessionId).notifier)
-                      .reorderSQLResult(oldIndex, newIndex);
+                  final sqlResultsServices =
+                      ref.read(sQLResultsServicesProvider.notifier);
+
+                  sqlResultsServices.reorderSQLResult(
+                      model.sessionId, oldIndex, newIndex);
                 },
                 tabs: [
               for (var i = 0; i < model.results.length; i++)
@@ -52,15 +53,16 @@ class SqlResultTables extends ConsumerWidget {
                   label: "${model.results[i].resultId.value}",
                   selected: model.results[i] == model.selected,
                   onTap: () {
-                    ref
-                        .read(sQLResultsServicesProvider(model.sessionId)
-                            .notifier)
+                    final sqlResultsServices =
+                        ref.read(sQLResultsServicesProvider.notifier);
+
+                    sqlResultsServices
                         .selectSQLResult(model.results[i].resultId);
                   },
                   onDeleted: () {
-                    ref
-                        .read(sQLResultsServicesProvider(model.sessionId)
-                            .notifier)
+                    final sqlResultsServices =
+                        ref.read(sQLResultsServicesProvider.notifier);
+                    sqlResultsServices
                         .deleteSQLResult(model.results[i].resultId);
                   },
                   avatar: (model.results[i] != model.selected &&

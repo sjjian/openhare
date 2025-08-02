@@ -39,15 +39,15 @@ abstract class SessionConnRepo {
 }
 
 abstract class SQLResultRepo {
-  SQLResultListModel getSqlResults(SessionId sessionId);
+  SQLResultsModel getSqlResults();
   void deleteSQLResults(SessionId sessionId);
-  SQLResultModel getSQLResult(ResultId resultId);
   void selectSQLResult(ResultId resultId);
   SQLResultModel? selectedSQLResult(SessionId sessionId);
   void reorderSQLResult(SessionId sessionId, int oldIndex, int newIndex);
   SQLResultModel addSQLResult(SessionId sessionId);
   void deleteSQLResult(ResultId resultId);
-  void updateSQLResult(ResultId resultId, SQLResultModel result);
+  SQLResultDetailModel getSQLResult(ResultId resultId);
+  void updateSQLResult(ResultId resultId, SQLResultDetailModel result);
 }
 
 // sessions model
@@ -221,18 +221,33 @@ abstract class SQLResultModel with _$SQLResultModel {
   const factory SQLResultModel({
     required ResultId resultId,
     required SQLExecuteState state,
-    String? query,
-    Duration? executeTime,
-    String? error,
-    BaseQueryResult? data,
   }) = _SQLResultModel;
 }
 
 @freezed
-abstract class SQLResultListModel with _$SQLResultListModel {
-  const factory SQLResultListModel({
+abstract class SQLResultDetailModel with _$SQLResultDetailModel {
+  const factory SQLResultDetailModel({
+    required ResultId resultId,
+    required SQLExecuteState state,
+    String? query,
+    Duration? executeTime,
+    String? error,
+    BaseQueryResult? data,
+  }) = _SQLResultDetailModel;
+}
+
+@freezed
+abstract class SessionSQLResultsModel with _$SessionSQLResultsModel {
+  const factory SessionSQLResultsModel({
     required SessionId sessionId,
     required List<SQLResultModel> results,
     SQLResultModel? selected,
-  }) = _SQLResultListModel;
+  }) = _SessionSQLResultsModel;
+}
+
+@freezed
+abstract class SQLResultsModel with _$SQLResultsModel {
+  const factory SQLResultsModel({
+    required Map<SessionId, SessionSQLResultsModel> cache,
+  }) = _SQLResultsModel;
 }

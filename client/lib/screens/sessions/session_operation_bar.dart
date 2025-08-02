@@ -178,19 +178,15 @@ class SessionOpBar extends ConsumerWidget {
       onPressed: connIsIdle(model)
           ? () {
               String query = getQuery();
+              final sqlResultsServices =
+                  ref.read(sQLResultsServicesProvider.notifier);
 
-              SQLResultModel? resultModel = ref
-                  .read(sQLResultsServicesProvider(model.sessionId).notifier)
-                  .selectedSQLResult();
+              SQLResultModel? resultModel =
+                  sqlResultsServices.selectedSQLResult(model.sessionId);
 
-              resultModel ??= ref
-                  .read(sQLResultsServicesProvider(model.sessionId).notifier)
-                  .addSQLResult();
+              resultModel ??= sqlResultsServices.addSQLResult(model.sessionId);
 
-              ref
-                  .read(
-                      sQLResultServicesProvider(resultModel.resultId).notifier)
-                  .loadFromQuery(query);
+              sqlResultsServices.loadFromQuery(resultModel.resultId, query);
             }
           : () {
               connectDialog(context, ref, model);
@@ -217,13 +213,11 @@ class SessionOpBar extends ConsumerWidget {
           ? () {
               String query = getQuery();
               if (query.isNotEmpty) {
-                final resultModel = ref
-                    .read(sQLResultsServicesProvider(model.sessionId).notifier)
-                    .addSQLResult();
-                ref
-                    .read(sQLResultServicesProvider(resultModel.resultId)
-                        .notifier)
-                    .loadFromQuery(query);
+                final sqlResultsServices =
+                    ref.read(sQLResultsServicesProvider.notifier);
+                final resultModel =
+                    sqlResultsServices.addSQLResult(model.sessionId);
+                sqlResultsServices.loadFromQuery(resultModel.resultId, query);
               }
             }
           : () {
@@ -248,13 +242,12 @@ class SessionOpBar extends ConsumerWidget {
           ? () {
               String query = getQuery();
               if (query.isNotEmpty) {
-                final resultModel = ref
-                    .read(sQLResultsServicesProvider(model.sessionId).notifier)
-                    .addSQLResult();
-                ref
-                    .read(sQLResultServicesProvider(resultModel.resultId)
-                        .notifier)
-                    .loadFromQuery("explain $query");
+                final sqlResultsServices =
+                    ref.read(sQLResultsServicesProvider.notifier);
+                final resultModel =
+                    sqlResultsServices.addSQLResult(model.sessionId);
+                sqlResultsServices.loadFromQuery(
+                    resultModel.resultId, "explain $query");
               }
             }
           : () {

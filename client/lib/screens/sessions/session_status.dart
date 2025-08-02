@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:client/models/sessions.dart';
-import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +38,7 @@ class SessionStatusTab extends ConsumerWidget {
       child: Row(
         children: [
           Tooltip(
-            message: model.connErrorMsg ??
-                '-',
+            message: model.connErrorMsg ?? '-',
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Container(
@@ -106,7 +104,7 @@ class SessionStatusTab extends ConsumerWidget {
                   }
                   File file = File(outputFile);
                   await file.writeAsBytes(ref
-                      .read(sQLResultServicesProvider(model.resultId!).notifier)
+                      .read(selectedSQLResultNotifierProvider.notifier)
                       .toExcel()
                       .save()!);
                 },
