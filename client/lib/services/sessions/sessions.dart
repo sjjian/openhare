@@ -94,9 +94,10 @@ class SessionsServices extends _$SessionsServices {
     // 1. delete session
     await ref.read(sessionRepoProvider).deleteSession(session.sessionId);
 
-    // 2. close conn
+    // 2. kill and close conn
     if (session.connId != null) {
       final connsServices = ref.read(sessionConnsServicesProvider.notifier);
+      await connsServices.killQuery(session.connId!);
       await connsServices.close(session.connId!);
       await connsServices.removeConn(session.connId!);
     }

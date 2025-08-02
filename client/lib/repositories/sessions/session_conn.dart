@@ -93,8 +93,15 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
-  Future<void> killQuery(ConnId connId) {
-    return conns[connId.value]!.killQuery();
+  Future<void> killQuery(ConnId connId) async {
+    final conn = conns[connId.value];
+    if (conn == null) {
+      return;
+    }
+    if (conn.state != SQLConnectState.executing) {
+      return;
+    }
+    return conn.killQuery();
   }
 }
 
