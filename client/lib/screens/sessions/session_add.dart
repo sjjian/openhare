@@ -185,7 +185,7 @@ class AddSession extends HookConsumerWidget {
                         width: 200,
                         child: Row(
                           children: [
-                            Text(inst.connectValue.desc ?? ""),
+                            Text(inst.connectValue.desc),
                           ],
                         ),
                       ),

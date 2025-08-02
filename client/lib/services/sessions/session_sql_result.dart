@@ -4,74 +4,19 @@ import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:excel/excel.dart';
 
 part 'session_sql_result.g.dart';
 
-@Riverpod()
-class SQLResultServices extends _$SQLResultServices {
-  @override
-  SQLResultModel build(ResultId resultId) {
-    return ref.watch(sqlResultsRepoProvider).getSQLResult(resultId);
-  }
-
-  Future<void> loadFromQuery(String query) async {
-    final repo = ref.read(sqlResultsRepoProvider);
-
-    repo.updateSQLResult(
-        resultId, state.copyWith(query: query, state: SQLExecuteState.init));
-    ref.invalidateSelf();
-
-    // todo
-    final sessionModel = ref
-        .read(sessionsServicesProvider.notifier)
-        .getSession(state.resultId.sessionId);
-
-    try {
-      DateTime start = DateTime.now();
-      BaseQueryResult? queryResult = await ref
-          .read(sessionConnServicesProvider(sessionModel!.connId!).notifier)
-          .query(query);
-      DateTime end = DateTime.now();
-      repo.updateSQLResult(
-          resultId,
-          state.copyWith(
-              data: queryResult,
-              executeTime: end.difference(start),
-              state: SQLExecuteState.done));
-    } catch (e) {
-      repo.updateSQLResult(resultId,
-          state.copyWith(state: SQLExecuteState.error, error: e.toString()));
-    } finally {
-      ref.invalidateSelf();
-    }
-  }
-
-  Excel toExcel() {
-    Excel excel = Excel.createExcel();
-    Sheet sheet = excel["Sheet1"];
-    sheet.appendRow(state.data!.columns
-        .map<TextCellValue>((e) => TextCellValue(e.name))
-        .toList());
-    for (final row in state.data!.rows) {
-      sheet.appendRow(row.values
-          .map<TextCellValue>((e) => TextCellValue(e.getString() ?? ''))
-          .toList());
-    }
-    return excel;
-  }
-}
-
-@Riverpod()
+@Riverpod(keepAlive: true)
 class SQLResultsServices extends _$SQLResultsServices {
   @override
-  SQLResultListModel build(SessionId sessionId) {
-    return ref.watch(sqlResultsRepoProvider).getSqlResults(sessionId);
+  SQLResultsModel build() {
+    return ref.watch(sqlResultsRepoProvider).getSqlResults();
   }
 
-  SQLResultModel? selectedSQLResult() {
+  SQLResultModel? selectedSQLResult(SessionId sessionId) {
     SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
-    return repo.selectedSQLResult(state.sessionId);
+    return repo.selectedSQLResult(sessionId);
   }
 
   void deleteSQLResult(ResultId resultId) {
@@ -86,16 +31,63 @@ class SQLResultsServices extends _$SQLResultsServices {
     ref.invalidateSelf();
   }
 
-  void reorderSQLResult(int oldIndex, int newIndex) {
+  void reorderSQLResult(SessionId sessionId, int oldIndex, int newIndex) {
     SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
-    repo.reorderSQLResult(state.sessionId, oldIndex, newIndex);
+    repo.reorderSQLResult(sessionId, oldIndex, newIndex);
     ref.invalidateSelf();
   }
 
-  SQLResultModel addSQLResult() {
+  SQLResultModel addSQLResult(SessionId sessionId) {
     SQLResultRepo repo = ref.read(sqlResultsRepoProvider);
-    final result = repo.addSQLResult(state.sessionId);
+    final result = repo.addSQLResult(sessionId);
     ref.invalidateSelf();
     return result;
+  }
+
+  Future<void> loadFromQuery(ResultId resultId, String query) async {
+    final repo = ref.read(sqlResultsRepoProvider);
+
+    repo.updateSQLResult(
+        resultId,
+        SQLResultDetailModel(
+            resultId: resultId, query: query, state: SQLExecuteState.init));
+    ref.invalidateSelf();
+
+    // todo
+    final sessionModel = ref
+        .read(sessionsServicesProvider.notifier)
+        .getSession(resultId.sessionId);
+
+    try {
+      DateTime start = DateTime.now();
+      final connServices = ref.read(sessionConnsServicesProvider.notifier);
+      BaseQueryResult? queryResult =
+          await connServices.query(sessionModel!.connId!, query);
+      DateTime end = DateTime.now();
+
+      repo.updateSQLResult(
+          resultId,
+          SQLResultDetailModel(
+              resultId: resultId,
+              query: query,
+              data: queryResult,
+              executeTime: end.difference(start),
+              state: SQLExecuteState.done));
+    } catch (e) {
+      repo.updateSQLResult(
+          resultId,
+          SQLResultDetailModel(
+              resultId: resultId,
+              query: query,
+              state: SQLExecuteState.error,
+              error: e.toString()));
+    } finally {
+      ref.invalidateSelf();
+    }
+  }
+
+  SQLResultDetailModel? getSQLResult(ResultId resultId) {
+    final repo = ref.read(sqlResultsRepoProvider);
+    return repo.getSQLResult(resultId);
   }
 }

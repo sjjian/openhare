@@ -1,12 +1,13 @@
 import 'dart:math';
+import 'package:client/widgets/menu.dart';
 import 'package:flutter/material.dart';
 
 const double defaultTabMaxWidth = 200;
 
 class CommonTabBar extends StatefulWidget {
   final double? height;
-  final List<CommonTabWrap>? tabs;
-  final ReorderCallback? onReorder;
+  final List<CommonTabWrap> tabs;
+  final ReorderCallback onReorder;
   final VoidCallback? addTab;
   final Color? color;
   final CommonTabStyle? tabStyle;
@@ -14,8 +15,8 @@ class CommonTabBar extends StatefulWidget {
   const CommonTabBar(
       {Key? key,
       this.height,
-      this.tabs,
-      this.onReorder,
+      required this.tabs,
+      required this.onReorder,
       this.addTab,
       this.color,
       this.tabStyle})
@@ -26,26 +27,107 @@ class CommonTabBar extends StatefulWidget {
 }
 
 class _CommonTabBarState extends State<CommonTabBar> {
+  Widget addTabWidget() {
+    return SizedBox(
+      height: widget.height ?? 35,
+      child: IconButton(
+        alignment: Alignment.center,
+        constraints: const BoxConstraints(),
+        onPressed: widget.addTab,
+        icon: Icon(
+            size: 20,
+            Icons.add,
+            color: Theme.of(context).colorScheme.onSurface), // tab add 的字体颜色
+      ),
+    );
+  }
+
+  List<MoreTabMenuItemWidget> _buildItems(int start) {
+    return [
+      for (var i = start - 1; i >= 0; i--)
+        MoreTabMenuItemWidget(
+          height: widget.height,
+          child: Row(
+            children: [
+              if (widget.tabs[i].avatar != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 16, 0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: widget.tabs[i].avatar,
+                  ),
+                ),
+              SizedBox(
+                width: 60,
+                child: Text(
+                  widget.tabs[i].label,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (widget.tabs[i].onDeleted != null)
+                      IconButton(
+                        icon: const Icon(size: 15, Icons.close),
+                        padding: const EdgeInsets.all(5),
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          widget.tabs[i].onDeleted?.call();
+                        },
+                        splashRadius: 16,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          onTabSelected: () {
+            widget.onReorder(i, widget.tabs.length);
+            widget.tabs[i].onTap?.call();
+          },
+        )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, c) {
       CommonTabStyle style = widget.tabStyle ?? CommonTabStyle();
-      double width = min(c.maxWidth / widget.tabs!.length,
+      // 设置的tab最小width;
+      final minWidth = style.minWidth ?? (35 + 20 + 10);
+      final addTabWidth = widget.addTab != null ? 36 : 0;
+      const moreWidth = 36;
+      // tab 可用的总width;
+      final sumTabLength = c.maxWidth - addTabWidth - moreWidth;
+
+      // 每个tab的平均 width；
+      double width = min(sumTabLength / widget.tabs.length,
           style.maxWidth ?? defaultTabMaxWidth);
 
-      Widget addTabWidget = SizedBox(
-          height: widget.height ?? 35,
-          // padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-          child: IconButton(
-            alignment: Alignment.center,
-            constraints: const BoxConstraints(),
-            onPressed: widget.addTab,
-            icon: Icon(
-                size: 20,
-                Icons.add,
-                color:
-                    Theme.of(context).colorScheme.onSurface), // tab add 的字体颜色
-          ));
+      // 如果总宽度不够，就只能展示后面length个tab
+      int length = widget.tabs.length;
+      int start = 0;
+      if (width < minWidth) {
+        width = minWidth;
+        length = sumTabLength ~/ minWidth; // 取整
+
+        start = widget.tabs.length - length;
+        // 重新计算width, 让length个tab占据总宽度
+        width = sumTabLength / length;
+      }
+
+      final moreTabIcon = SizedBox(
+        width: 36,
+        height: 36,
+        child: Icon(
+          size: 20,
+          Icons.more_vert,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      );
 
       return Container(
         constraints: BoxConstraints(maxHeight: widget.height ?? 40),
@@ -53,40 +135,33 @@ class _CommonTabBarState extends State<CommonTabBar> {
           color: widget.color,
         ),
         child: SizedBox(
-          child: widget.onReorder != null
-              ? ReorderableListView(
-                  footer: widget.addTab != null ? addTabWidget : null,
-                  buildDefaultDragHandles: false,
-                  scrollDirection: Axis.horizontal,
-                  onReorder: widget.onReorder!,
-                  children: [
-                    if (widget.tabs != null)
-                      for (var i = 0; i < widget.tabs!.length; i++)
-                        ReorderableDragStartListener(
-                          index: i,
-                          key: ValueKey(i),
-                          child: CommonTab.fromWarp(
-                              warp: widget.tabs![i],
-                              width: width,
-                              height: widget.height,
-                              style: style),
-                        ),
-                  ],
+          child: ReorderableListView(
+            header: start > 0
+                ? MoreTabMenuWidget(
+                    height: widget.height,
+                    tabs: _buildItems(start),
+                    child: moreTabIcon,
+                  )
+                : moreTabIcon,
+            footer: widget.addTab != null ? addTabWidget() : null,
+            buildDefaultDragHandles: false,
+            scrollDirection: Axis.horizontal,
+            onReorder: (oldIndex, newIndex) {
+              widget.onReorder(oldIndex + start, newIndex + start);
+            },
+            children: [
+              for (var i = start; i < widget.tabs.length; i++)
+                ReorderableDragStartListener(
+                  index: i - start,
+                  key: ValueKey(i - start),
+                  child: CommonTab.fromWarp(
+                      warp: widget.tabs[i],
+                      width: width,
+                      height: widget.height,
+                      style: style),
                 )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if (widget.tabs != null)
-                      for (var i = 0; i < widget.tabs!.length; i++)
-                        CommonTab.fromWarp(
-                            warp: widget.tabs![i],
-                            width: width,
-                            height: widget.height,
-                            style: style),
-                    if (widget.addTab != null) addTabWidget,
-                    const Spacer()
-                  ],
-                ),
+            ],
+          ),
         ),
       );
     });
@@ -114,6 +189,7 @@ class CommonTabWrap {
 class CommonTabStyle {
   final double? height;
   final double? maxWidth;
+  final double? minWidth;
   final Color? color;
   final Color? selectedColor;
   final Color? hoverColor;
@@ -121,6 +197,7 @@ class CommonTabStyle {
   CommonTabStyle(
       {this.height,
       this.maxWidth,
+      this.minWidth,
       this.color,
       this.selectedColor,
       this.hoverColor,
@@ -239,6 +316,7 @@ class _CommonTabState extends State<CommonTab> {
                 if (widget.avatar != null)
                   SizedBox(
                     width: 20,
+                    height: 20,
                     child: widget.avatar,
                   ),
                 Expanded(

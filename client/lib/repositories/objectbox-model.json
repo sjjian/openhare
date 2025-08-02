@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "3:954363933915371259",
-      "lastPropertyId": "4:2680331308371878199",
+      "lastPropertyId": "5:9052036293034370497",
       "name": "SessionStorage",
       "properties": [
         {
@@ -23,14 +23,17 @@
           "relationTarget": "InstanceStorage"
         },
         {
-          "id": "3:4040787782661306959",
-          "name": "text",
-          "type": 9
-        },
-        {
           "id": "4:2680331308371878199",
           "name": "currentSchema",
           "type": 9
+        },
+        {
+          "id": "5:9052036293034370497",
+          "name": "codeId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "3:6583598154122015850",
+          "relationTarget": "SessionCodeStorage"
         }
       ],
       "relations": []
@@ -132,10 +135,29 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "7:634128806298847270",
+      "lastPropertyId": "2:3148689854157331823",
+      "name": "SessionCodeStorage",
+      "properties": [
+        {
+          "id": "1:1353875858792390118",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3148689854157331823",
+          "name": "text",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "6:7763174657391623643",
-  "lastIndexId": "2:3493315780447542151",
+  "lastEntityId": "7:634128806298847270",
+  "lastIndexId": "3:6583598154122015850",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
@@ -176,7 +198,8 @@
     7345410915938135096,
     6439919288390320832,
     6403594309000127769,
-    452695194295216491
+    452695194295216491,
+    4040787782661306959
   ],
   "retiredRelationUids": [],
   "version": 1

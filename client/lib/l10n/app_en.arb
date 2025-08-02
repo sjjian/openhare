@@ -190,5 +190,17 @@
   "tip_connect_busy_desc": "the connect is executing query, please wait",
     "@tip_connect_busy_desc": {
     "description": "tips when connect session busy"
+  },
+  "short_conn": "Conn",
+  "@short_conn": {
+    "description": "short conn for status bar"
+  },
+  "tip_close_session": "Close active session",
+  "@tip_close_session": {
+    "description": "tips when close active session"
+  },
+  "tip_close_session_desc": "This action will kill the query and close the connection, are you sure you want to close the active session? ",
+  "@tip_close_session_desc": {
+    "description": "tips when close active session desc"
   }
 }

@@ -18,10 +18,23 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
+  SessionConnListModel getConns() {
+    return SessionConnListModel(
+      conns: conns.map((key, value) => MapEntry(
+            ConnId(value: key),
+            SessionConnModel(
+              connId: ConnId(value: key),
+              state: value.state,
+              errorMsg: value.errorMsg,
+            ),
+          )),
+    );
+  }
+
+  @override
   SessionConnModel getConn(ConnId connId) {
     return SessionConnModel(
       connId: connId,
-      instanceId: conns[connId.value]?.model.id ?? const InstanceId(value: 0),
       state: conns[connId.value]?.state ?? SQLConnectState.disconnected,
     );
   }
@@ -33,7 +46,6 @@ class SessionConnRepoImpl extends SessionConnRepo {
     conns[id] = conn;
     return SessionConnModel(
       connId: ConnId(value: id),
-      instanceId: model.id,
       state: conn.state,
     );
   }
@@ -81,8 +93,15 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
-  Future<void> killQuery(ConnId connId) {
-    return conns[connId.value]!.killQuery();
+  Future<void> killQuery(ConnId connId) async {
+    final conn = conns[connId.value];
+    if (conn == null) {
+      return;
+    }
+    if (conn.state != SQLConnectState.executing) {
+      return;
+    }
+    return conn.killQuery();
   }
 }
 
@@ -90,6 +109,7 @@ class SessionConn {
   final InstanceModel model;
   BaseConnection? conn2;
   SQLConnectState state = SQLConnectState.disconnected;
+  String? errorMsg;
   String? currentSchema;
   Timer? _timer;
   Function()? _onStateChangedCallback;
@@ -108,6 +128,7 @@ class SessionConn {
       {Function()? onStateChangedCallback,
       Function(String)? onSchemaChangedCallback}) async {
     try {
+      _onStateChangedCallback = onStateChangedCallback;
       if (conn2 != null) {
         await conn2!.close();
       }
@@ -121,12 +142,13 @@ class SessionConn {
           onSchemaChangedCallback?.call(schema);
         },
       );
-      _onStateChangedCallback = onStateChangedCallback;
       _setState(SQLConnectState.connected);
       startHealthCheck();
-    } catch (e, s) {
-      print("conn error: ${e}; ${s}");
+    } catch (e) {
+      errorMsg = e.toString();
+      print("conn error: $e");
       _setState(SQLConnectState.failed);
+      rethrow;
     }
   }
 

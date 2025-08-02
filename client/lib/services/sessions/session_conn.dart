@@ -7,11 +7,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_conn.g.dart';
 
-@Riverpod()
+@Riverpod(keepAlive: true)
 class SessionConnsServices extends _$SessionConnsServices {
   @override
-  int build() {
-    return 0;
+  SessionConnListModel build() {
+    return ref.read(sessionConnRepoProvider).getConns();
+  }
+
+  SessionConnModel? getConn(ConnId connId) {
+    return ref.read(sessionConnRepoProvider).getConn(connId);
   }
 
   Future<SessionConnModel> createConn(InstanceId instanceId,
@@ -25,20 +29,9 @@ class SessionConnsServices extends _$SessionConnsServices {
   Future<void> removeConn(ConnId connId) async {
     ref.read(sessionConnRepoProvider).removeConn(connId);
   }
-}
 
-@Riverpod(keepAlive: true)
-class SessionConnServices extends _$SessionConnServices {
-  @override
-  SessionConnModel? build(ConnId connId) {
-    if (connId.value == 0) {
-      return null;
-    }
-    final model = ref.watch(sessionConnRepoProvider).getConn(connId);
-    return model;
-  }
-
-  Future<void> connect({
+  Future<void> connect(
+    ConnId connId, {
     Function(String)? onSchemaChangedCallback,
   }) async {
     await ref.read(sessionConnRepoProvider).connect(
@@ -51,29 +44,29 @@ class SessionConnServices extends _$SessionConnServices {
     ref.invalidateSelf();
   }
 
-  Future<void> close() async {
+  Future<void> close(ConnId connId) async {
     await ref.read(sessionConnRepoProvider).close(connId);
     ref.invalidateSelf();
   }
 
-  Future<void> setCurrentSchema(String schema) async {
+  Future<void> setCurrentSchema(ConnId connId, String schema) async {
     await ref.read(sessionConnRepoProvider).setCurrentSchema(connId, schema);
     ref.invalidateSelf();
   }
 
-  Future<List<String>> getSchemas() async {
+  Future<List<String>> getSchemas(ConnId connId) async {
     return ref.read(sessionConnRepoProvider).getSchemas(connId);
   }
 
-  Future<MetaDataNode> getMetadata() async {
+  Future<MetaDataNode> getMetadata(ConnId connId) async {
     return ref.read(sessionConnRepoProvider).getMetadata(connId);
   }
 
-  Future<BaseQueryResult?> query(String query) async {
+  Future<BaseQueryResult?> query(ConnId connId, String query) async {
     return ref.read(sessionConnRepoProvider).query(connId, query);
   }
 
-  Future<void> killQuery() async {
+  Future<void> killQuery(ConnId connId) async {
     await ref.read(sessionConnRepoProvider).killQuery(connId);
   }
 }

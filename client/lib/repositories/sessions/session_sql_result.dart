@@ -32,8 +32,8 @@ class SQLResultRepoImpl extends SQLResultRepo {
     );
   }
 
-  SQLResultModel _toModel(SQLResult result) {
-    return SQLResultModel(
+  SQLResultDetailModel _toModelDetail(SQLResult result) {
+    return SQLResultDetailModel(
       resultId: ResultId(
           sessionId: SessionId(value: result.sessionId), value: result.id),
       query: result.query,
@@ -44,16 +44,29 @@ class SQLResultRepoImpl extends SQLResultRepo {
     );
   }
 
+  SQLResultModel _toModel(SQLResult result) {
+    return SQLResultModel(
+      resultId: ResultId(
+          sessionId: SessionId(value: result.sessionId), value: result.id),
+      state: result.state,
+    );
+  }
+
   @override
-  SQLResultListModel getSqlResults(SessionId sessionId) {
-    final results = sessionSqlResults(sessionId.value);
-    return SQLResultListModel(
-        sessionId: sessionId,
-        results: results.map((m) {
-          return _toModel(m);
-        }).toList(),
-        selected:
-            results.selected() != null ? _toModel(results.selected()!) : null);
+  SQLResultsModel getSqlResults() {
+    // 遍历 sqlResults，组装成 Map<SessionId, SQLResultListModel>
+    final Map<SessionId, SessionSQLResultsModel> cache = {};
+    sqlResults.forEach((sessionId, resultList) {
+      final sessionIdObj = SessionId(value: sessionId);
+      cache[sessionIdObj] = SessionSQLResultsModel(
+        sessionId: sessionIdObj,
+        results: resultList.map((r) => _toModel(r)).toList(),
+        selected: resultList.selected() != null
+            ? _toModel(resultList.selected()!)
+            : null,
+      );
+    });
+    return SQLResultsModel(cache: cache);
   }
 
   @override
@@ -62,9 +75,9 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
-  SQLResultModel getSQLResult(ResultId resultId) {
+  SQLResultDetailModel getSQLResult(ResultId resultId) {
     final result = _getSQLResult(resultId.sessionId.value, resultId.value);
-    return _toModel(result);
+    return _toModelDetail(result);
   }
 
   @override
@@ -89,7 +102,7 @@ class SQLResultRepoImpl extends SQLResultRepo {
   }
 
   @override
-  void updateSQLResult(ResultId resultId, SQLResultModel result) {
+  void updateSQLResult(ResultId resultId, SQLResultDetailModel result) {
     final orginResult = _getSQLResult(resultId.sessionId.value, resultId.value);
     orginResult.query = result.query;
     orginResult.data = result.data;

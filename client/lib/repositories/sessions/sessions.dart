@@ -16,25 +16,39 @@ class SessionStorage {
 
   final instance = ToOne<InstanceStorage>();
 
-  String? text;
+  final code = ToOne<SessionCodeStorage>();
 
   String? currentSchema;
 
   SessionStorage({
     this.id = 0,
-    this.text,
     this.currentSchema,
+  });
+}
+
+@Entity()
+class SessionCodeStorage {
+  @Id()
+  int id;
+  String? text;
+
+  SessionCodeStorage({
+    this.id = 0,
+    this.text,
   });
 }
 
 class SessionRepoImpl extends SessionRepo {
   final ObjectBox ob;
   final Box<SessionStorage> _sessionBox;
+  final Box<SessionCodeStorage> _sessionCodeBox;
   ReorderSelectedList<SessionStorage>? _sessionCache;
 
   final Map<int, ConnId> _connIdMap = {};
 
-  SessionRepoImpl(this.ob) : _sessionBox = ob.store.box();
+  SessionRepoImpl(this.ob)
+      : _sessionBox = ob.store.box(),
+        _sessionCodeBox = ob.store.box();
 
   void _refreshSessionCache() {
     _sessionCache = ReorderSelectedList(data: _sessionBox.getAll());
@@ -50,12 +64,10 @@ class SessionRepoImpl extends SessionRepo {
   SessionModel toModel(SessionStorage session) {
     return SessionModel(
       sessionId: SessionId(value: session.id),
-      instanceId: session.instance.target != null
-          ? InstanceId(value: session.instance.target!.id)
+      instanceId: session.instance.hasValue
+          ? InstanceId(value: session.instance.targetId)
           : null,
-      instanceName: session.instance.target?.name,
       currentSchema: session.currentSchema,
-      dbType: session.instance.target?.dbType,
       connId: _connIdMap[session.id],
     );
   }
@@ -67,10 +79,15 @@ class SessionRepoImpl extends SessionRepo {
   }
 
   @override
-  Future<SessionModel> newSession() async {
+  Future<SessionId> newSession() async {
     final session = await _sessionBox.putAndGetAsync(SessionStorage());
     _sessions.add(session);
-    return SessionModel(sessionId: SessionId(value: session.id));
+    return SessionId(value: session.id);
+  }
+
+  void refreshSessionCache(SessionStorage session) {
+    final session2 = _sessionBox.get(session.id);
+    _sessions.replace(session, session2!);
   }
 
   @override
@@ -86,6 +103,7 @@ class SessionRepoImpl extends SessionRepo {
       session.currentSchema = currentSchema;
     }
     await _sessionBox.putAsync(session);
+    refreshSessionCache(session);
   }
 
   @override
@@ -102,6 +120,14 @@ class SessionRepoImpl extends SessionRepo {
   Future<void> deleteSession(SessionId sessionId) async {
     _sessions.removeAt(
         _sessions.indexWhere((session) => session.id == sessionId.value));
+
+    final session = await _sessionBox.getAsync(sessionId.value);
+    if (session == null) {
+      return;
+    }
+    if (session.code.hasValue) {
+      await _sessionCodeBox.removeAsync(sessionId.value);
+    }
     await _sessionBox.removeAsync(sessionId.value);
   }
 
@@ -124,6 +150,34 @@ class SessionRepoImpl extends SessionRepo {
   @override
   void reorderSession(int oldIndex, int newIndex) {
     _sessions.reorder(oldIndex, newIndex);
+  }
+
+  @override
+  String? getCode(SessionId sessionId) {
+    final session = _sessionBox.get(sessionId.value);
+    if (session == null) {
+      return null;
+    }
+
+    if (!session.code.hasValue) {
+      final code = SessionCodeStorage();
+      _sessionCodeBox.put(code);
+      session.code.target = code;
+      _sessionBox.put(session);
+      return "";
+    }
+    return session.code.target?.text;
+  }
+
+  @override
+  void saveCode(SessionId sessionId, String code) {
+    final session = _sessionBox.get(sessionId.value);
+    if (session == null) {
+      return;
+    }
+    final codeStorage = session.code.target!;
+    codeStorage.text = code;
+    _sessionCodeBox.put(codeStorage);
   }
 }
 
