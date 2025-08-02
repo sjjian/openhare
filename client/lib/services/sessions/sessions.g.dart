@@ -292,137 +292,7 @@ class _SessionDrawerStateProviderElement
   SessionId get sessionId => (origin as SessionDrawerStateProvider).sessionId;
 }
 
-String _$sessionEditorHash() => r'25523e840883285f6d1dce3a71e7c5f5cf85ae46';
-
-/// See also [sessionEditor].
-@ProviderFor(sessionEditor)
-const sessionEditorProvider = SessionEditorFamily();
-
-/// See also [sessionEditor].
-class SessionEditorFamily extends Family<SessionEditorModel> {
-  /// See also [sessionEditor].
-  const SessionEditorFamily();
-
-  /// See also [sessionEditor].
-  SessionEditorProvider call(
-    SessionId sessionId,
-  ) {
-    return SessionEditorProvider(
-      sessionId,
-    );
-  }
-
-  @override
-  SessionEditorProvider getProviderOverride(
-    covariant SessionEditorProvider provider,
-  ) {
-    return call(
-      provider.sessionId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'sessionEditorProvider';
-}
-
-/// See also [sessionEditor].
-class SessionEditorProvider extends Provider<SessionEditorModel> {
-  /// See also [sessionEditor].
-  SessionEditorProvider(
-    SessionId sessionId,
-  ) : this._internal(
-          (ref) => sessionEditor(
-            ref as SessionEditorRef,
-            sessionId,
-          ),
-          from: sessionEditorProvider,
-          name: r'sessionEditorProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$sessionEditorHash,
-          dependencies: SessionEditorFamily._dependencies,
-          allTransitiveDependencies:
-              SessionEditorFamily._allTransitiveDependencies,
-          sessionId: sessionId,
-        );
-
-  SessionEditorProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.sessionId,
-  }) : super.internal();
-
-  final SessionId sessionId;
-
-  @override
-  Override overrideWith(
-    SessionEditorModel Function(SessionEditorRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: SessionEditorProvider._internal(
-        (ref) => create(ref as SessionEditorRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        sessionId: sessionId,
-      ),
-    );
-  }
-
-  @override
-  ProviderElement<SessionEditorModel> createElement() {
-    return _SessionEditorProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is SessionEditorProvider && other.sessionId == sessionId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, sessionId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin SessionEditorRef on ProviderRef<SessionEditorModel> {
-  /// The parameter `sessionId` of this provider.
-  SessionId get sessionId;
-}
-
-class _SessionEditorProviderElement extends ProviderElement<SessionEditorModel>
-    with SessionEditorRef {
-  _SessionEditorProviderElement(super.provider);
-
-  @override
-  SessionId get sessionId => (origin as SessionEditorProvider).sessionId;
-}
-
-String _$sessionsServicesHash() => r'59116a971831c23e57412ab4f6175f44ae8fc92e';
+String _$sessionsServicesHash() => r'40a65158fac5c54e2116f4067904070aaafbc28f';
 
 /// See also [SessionsServices].
 @ProviderFor(SessionsServices)
@@ -472,7 +342,7 @@ final selectedSessionNotifierProvider =
 
 typedef _$SelectedSessionNotifier = Notifier<SessionDetailModel?>;
 String _$sessionSplitViewNotifierHash() =>
-    r'f2149f2dd39202d91276d05b72c47f9e082a046e';
+    r'acb640b92ae2864f52911bc0748473fa65d6da1b';
 
 /// See also [SessionSplitViewNotifier].
 @ProviderFor(SessionSplitViewNotifier)
@@ -489,7 +359,7 @@ final sessionSplitViewNotifierProvider =
 
 typedef _$SessionSplitViewNotifier = Notifier<SessionSplitViewModel>;
 String _$sessionDrawerNotifierHash() =>
-    r'3387e5a2348af6e5f5c15713616778de5410750e';
+    r'7c1c14fa6cbc919e104508e305985e00d3542f86';
 
 /// See also [SessionDrawerNotifier].
 @ProviderFor(SessionDrawerNotifier)
@@ -506,7 +376,7 @@ final sessionDrawerNotifierProvider =
 
 typedef _$SessionDrawerNotifier = Notifier<SessionDrawerModel>;
 String _$sessionMetadataNotifierHash() =>
-    r'c3ce4c7e1da0acbb1b7c2039f3fa3d4a16223fd4';
+    r'6f5a3f76177ed4185619767efcb65c063851dd23';
 
 /// See also [SessionMetadataNotifier].
 @ProviderFor(SessionMetadataNotifier)
@@ -540,7 +410,7 @@ final sessionOpBarNotifierProvider = AutoDisposeNotifierProvider<
 
 typedef _$SessionOpBarNotifier = AutoDisposeNotifier<SessionOpBarModel?>;
 String _$selectedSessionSQLEditorNotifierHash() =>
-    r'50cddca3ec0f97d5a60e687b8a9049f139aa14ea';
+    r'2e8fe32b94e3018aa00d5d023834e003e612c3b5';
 
 /// See also [SelectedSessionSQLEditorNotifier].
 @ProviderFor(SelectedSessionSQLEditorNotifier)
@@ -556,8 +426,157 @@ final selectedSessionSQLEditorNotifierProvider = NotifierProvider<
 );
 
 typedef _$SelectedSessionSQLEditorNotifier = Notifier<SessionSQLEditorModel>;
+String _$sessionSQLEditorServiceHash() =>
+    r'e2e253be7b9b3e94e069b421d57982b725935d1d';
+
+abstract class _$SessionSQLEditorService
+    extends BuildlessNotifier<SessionEditorModel> {
+  late final SessionId sessionId;
+
+  SessionEditorModel build(
+    SessionId sessionId,
+  );
+}
+
+/// See also [SessionSQLEditorService].
+@ProviderFor(SessionSQLEditorService)
+const sessionSQLEditorServiceProvider = SessionSQLEditorServiceFamily();
+
+/// See also [SessionSQLEditorService].
+class SessionSQLEditorServiceFamily extends Family<SessionEditorModel> {
+  /// See also [SessionSQLEditorService].
+  const SessionSQLEditorServiceFamily();
+
+  /// See also [SessionSQLEditorService].
+  SessionSQLEditorServiceProvider call(
+    SessionId sessionId,
+  ) {
+    return SessionSQLEditorServiceProvider(
+      sessionId,
+    );
+  }
+
+  @override
+  SessionSQLEditorServiceProvider getProviderOverride(
+    covariant SessionSQLEditorServiceProvider provider,
+  ) {
+    return call(
+      provider.sessionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'sessionSQLEditorServiceProvider';
+}
+
+/// See also [SessionSQLEditorService].
+class SessionSQLEditorServiceProvider
+    extends NotifierProviderImpl<SessionSQLEditorService, SessionEditorModel> {
+  /// See also [SessionSQLEditorService].
+  SessionSQLEditorServiceProvider(
+    SessionId sessionId,
+  ) : this._internal(
+          () => SessionSQLEditorService()..sessionId = sessionId,
+          from: sessionSQLEditorServiceProvider,
+          name: r'sessionSQLEditorServiceProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sessionSQLEditorServiceHash,
+          dependencies: SessionSQLEditorServiceFamily._dependencies,
+          allTransitiveDependencies:
+              SessionSQLEditorServiceFamily._allTransitiveDependencies,
+          sessionId: sessionId,
+        );
+
+  SessionSQLEditorServiceProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.sessionId,
+  }) : super.internal();
+
+  final SessionId sessionId;
+
+  @override
+  SessionEditorModel runNotifierBuild(
+    covariant SessionSQLEditorService notifier,
+  ) {
+    return notifier.build(
+      sessionId,
+    );
+  }
+
+  @override
+  Override overrideWith(SessionSQLEditorService Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: SessionSQLEditorServiceProvider._internal(
+        () => create()..sessionId = sessionId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        sessionId: sessionId,
+      ),
+    );
+  }
+
+  @override
+  NotifierProviderElement<SessionSQLEditorService, SessionEditorModel>
+      createElement() {
+    return _SessionSQLEditorServiceProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SessionSQLEditorServiceProvider &&
+        other.sessionId == sessionId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, sessionId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SessionSQLEditorServiceRef on NotifierProviderRef<SessionEditorModel> {
+  /// The parameter `sessionId` of this provider.
+  SessionId get sessionId;
+}
+
+class _SessionSQLEditorServiceProviderElement
+    extends NotifierProviderElement<SessionSQLEditorService, SessionEditorModel>
+    with SessionSQLEditorServiceRef {
+  _SessionSQLEditorServiceProviderElement(super.provider);
+
+  @override
+  SessionId get sessionId =>
+      (origin as SessionSQLEditorServiceProvider).sessionId;
+}
+
 String _$sessionEditorNotifierHash() =>
-    r'83754876e81f75d2c417aa16b6e627db8b8f14b4';
+    r'f70c136916c9d3075b389c5e8cc365a03fc5a52d';
 
 /// See also [SessionEditorNotifier].
 @ProviderFor(SessionEditorNotifier)
@@ -574,7 +593,7 @@ final sessionEditorNotifierProvider =
 
 typedef _$SessionEditorNotifier = Notifier<SessionEditorModel>;
 String _$selectedSQLResultTabNotifierHash() =>
-    r'1d8461051552b03eb2718a0dd417da8b98789c57';
+    r'b704a8604cf1b91e02b547c4708d91f4583d961e';
 
 /// See also [SelectedSQLResultTabNotifier].
 @ProviderFor(SelectedSQLResultTabNotifier)

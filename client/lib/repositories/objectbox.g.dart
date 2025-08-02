@@ -24,7 +24,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(3, 954363933915371259),
     name: 'SessionStorage',
-    lastPropertyId: const obx_int.IdUid(4, 2680331308371878199),
+    lastPropertyId: const obx_int.IdUid(5, 9052036293034370497),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -42,16 +42,18 @@ final _entities = <obx_int.ModelEntity>[
         relationTarget: 'InstanceStorage',
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 4040787782661306959),
-        name: 'text',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
         id: const obx_int.IdUid(4, 2680331308371878199),
         name: 'currentSchema',
         type: 9,
         flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 9052036293034370497),
+        name: 'codeId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(3, 6583598154122015850),
+        relationTarget: 'SessionCodeStorage',
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -173,6 +175,28 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(7, 634128806298847270),
+    name: 'SessionCodeStorage',
+    lastPropertyId: const obx_int.IdUid(2, 3148689854157331823),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 1353875858792390118),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3148689854157331823),
+        name: 'text',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -213,8 +237,8 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(6, 7763174657391623643),
-    lastIndexId: const obx_int.IdUid(2, 3493315780447542151),
+    lastEntityId: const obx_int.IdUid(7, 634128806298847270),
+    lastIndexId: const obx_int.IdUid(3, 6583598154122015850),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [
@@ -254,6 +278,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       6439919288390320832,
       6403594309000127769,
       452695194295216491,
+      4040787782661306959,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -264,24 +289,21 @@ obx_int.ModelDefinition getObjectBoxModel() {
   final bindings = <Type, obx_int.EntityDefinition>{
     SessionStorage: obx_int.EntityDefinition<SessionStorage>(
       model: _entities[0],
-      toOneRelations: (SessionStorage object) => [object.instance],
+      toOneRelations: (SessionStorage object) => [object.instance, object.code],
       toManyRelations: (SessionStorage object) => {},
       getId: (SessionStorage object) => object.id,
       setId: (SessionStorage object, int id) {
         object.id = id;
       },
       objectToFB: (SessionStorage object, fb.Builder fbb) {
-        final textOffset =
-            object.text == null ? null : fbb.writeString(object.text!);
-        final currentSchemaOffset =
-            object.currentSchema == null
-                ? null
-                : fbb.writeString(object.currentSchema!);
-        fbb.startTable(5);
+        final currentSchemaOffset = object.currentSchema == null
+            ? null
+            : fbb.writeString(object.currentSchema!);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.instance.targetId);
-        fbb.addOffset(2, textOffset);
         fbb.addOffset(3, currentSchemaOffset);
+        fbb.addInt64(4, object.code.targetId);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -294,15 +316,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final textParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 8);
         final currentSchemaParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 10);
         final object = SessionStorage(
           id: idParam,
-          text: textParam,
           currentSchema: currentSchemaParam,
         );
         object.instance.targetId = const fb.Int64Reader().vTableGet(
@@ -312,6 +330,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
           0,
         );
         object.instance.attach(store);
+        object.code.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        object.code.attach(store);
         return object;
       },
     ),
@@ -403,28 +428,28 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0),
         );
-        final latestOpenAtParam =
-            latestOpenAtValue == null
-                ? null
-                : DateTime.fromMillisecondsSinceEpoch(latestOpenAtValue);
-        final object = InstanceStorage(
-            id: idParam,
-            stDbType: stDbTypeParam,
-            name: nameParam,
-            host: hostParam,
-            port: portParam,
-            user: userParam,
-            password: passwordParam,
-            desc: descParam,
-            stCustom: stCustomParam,
-            initQuerys: initQuerysParam,
-            createdAt: createdAtParam,
-            latestOpenAt: latestOpenAtParam,
-          )
-          ..stActiveSchemas = const fb.ListReader<String>(
-            fb.StringReader(asciiOptimization: true),
-            lazy: false,
-          ).vTableGet(buffer, rootOffset, 28, []);
+        final latestOpenAtParam = latestOpenAtValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(latestOpenAtValue);
+        final object =
+            InstanceStorage(
+                id: idParam,
+                stDbType: stDbTypeParam,
+                name: nameParam,
+                host: hostParam,
+                port: portParam,
+                user: userParam,
+                password: passwordParam,
+                desc: descParam,
+                stCustom: stCustomParam,
+                initQuerys: initQuerysParam,
+                createdAt: createdAtParam,
+                latestOpenAt: latestOpenAtParam,
+              )
+              ..stActiveSchemas = const fb.ListReader<String>(
+                fb.StringReader(asciiOptimization: true),
+                lazy: false,
+              ).vTableGet(buffer, rootOffset, 28, []);
 
         return object;
       },
@@ -471,6 +496,41 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    SessionCodeStorage: obx_int.EntityDefinition<SessionCodeStorage>(
+      model: _entities[3],
+      toOneRelations: (SessionCodeStorage object) => [],
+      toManyRelations: (SessionCodeStorage object) => {},
+      getId: (SessionCodeStorage object) => object.id,
+      setId: (SessionCodeStorage object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SessionCodeStorage object, fb.Builder fbb) {
+        final textOffset = object.text == null
+            ? null
+            : fbb.writeString(object.text!);
+        fbb.startTable(3);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, textOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final textParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 6);
+        final object = SessionCodeStorage(id: idParam, text: textParam);
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -489,15 +549,16 @@ class SessionStorage_ {
         _entities[0].properties[1],
       );
 
-  /// See [SessionStorage.text].
-  static final text = obx.QueryStringProperty<SessionStorage>(
+  /// See [SessionStorage.currentSchema].
+  static final currentSchema = obx.QueryStringProperty<SessionStorage>(
     _entities[0].properties[2],
   );
 
-  /// See [SessionStorage.currentSchema].
-  static final currentSchema = obx.QueryStringProperty<SessionStorage>(
-    _entities[0].properties[3],
-  );
+  /// See [SessionStorage.code].
+  static final code =
+      obx.QueryRelationToOne<SessionStorage, SessionCodeStorage>(
+        _entities[0].properties[3],
+      );
 }
 
 /// [InstanceStorage] entity fields to define ObjectBox queries.
@@ -583,5 +644,18 @@ class SettingsStorage_ {
   /// See [SettingsStorage.language].
   static final language = obx.QueryStringProperty<SettingsStorage>(
     _entities[2].properties[2],
+  );
+}
+
+/// [SessionCodeStorage] entity fields to define ObjectBox queries.
+class SessionCodeStorage_ {
+  /// See [SessionCodeStorage.id].
+  static final id = obx.QueryIntegerProperty<SessionCodeStorage>(
+    _entities[3].properties[0],
+  );
+
+  /// See [SessionCodeStorage.text].
+  static final text = obx.QueryStringProperty<SessionCodeStorage>(
+    _entities[3].properties[1],
   );
 }
