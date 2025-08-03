@@ -2,6 +2,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -49,39 +50,43 @@ class SessionDrawerBar extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IconButton(
+          RectangleIconButton(
+              icon: (sessionDrawer.drawerPage == DrawerPage.metadataTree)
+                  ? Icons.account_tree_rounded
+                  : Icons.account_tree_outlined,
+              iconColor: (sessionDrawer.drawerPage == DrawerPage.metadataTree)
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface,
               onPressed: () {
                 ref.read(sessionDrawerNotifierProvider.notifier).goToTree();
-              },
-              icon: (sessionDrawer.drawerPage == DrawerPage.metadataTree)
-                  ? Icon(
-                      Icons.account_tree_rounded,
-                      color:
-                          Theme.of(context).colorScheme.primary, // metadata 按钮色
-                    )
-                  : const Icon(Icons.account_tree_outlined)),
-          IconButton(
-              onPressed: () {
-                ref.read(sessionDrawerNotifierProvider.notifier).showSQLResult();
-              },
+              }),
+          RectangleIconButton(
               icon: (sessionDrawer.drawerPage == DrawerPage.sqlResult)
-                  ? Icon(
-                      Icons.article_rounded,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary, // sql result 按钮色
-                    )
-                  : const Icon(Icons.article_outlined)),
+                  ? Icons.article_rounded
+                  : Icons.article_outlined,
+              iconColor: (sessionDrawer.drawerPage == DrawerPage.sqlResult)
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface,
+              onPressed: () {
+                ref
+                    .read(sessionDrawerNotifierProvider.notifier)
+                    .showSQLResult();
+              }),
           const Spacer(),
-          IconButton(
+          RectangleIconButton(
+            icon: sessionDrawer.isRightPageOpen
+                ? Icons.format_indent_increase
+                : Icons.format_indent_decrease,
+            iconColor: Theme.of(context).colorScheme.onSurface,
             onPressed: () {
               sessionDrawer.isRightPageOpen
-                  ? ref.read(sessionDrawerNotifierProvider.notifier).hideRightPage()
-                  : ref.read(sessionDrawerNotifierProvider.notifier).showRightPage();
+                  ? ref
+                      .read(sessionDrawerNotifierProvider.notifier)
+                      .hideRightPage()
+                  : ref
+                      .read(sessionDrawerNotifierProvider.notifier)
+                      .showRightPage();
             },
-            icon: sessionDrawer.isRightPageOpen
-                ? const Icon(Icons.format_indent_increase)
-                : const Icon(Icons.format_indent_decrease),
           )
         ],
       ),

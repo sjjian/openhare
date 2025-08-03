@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/widgets/loading.dart';
 
 class AddInstancePage extends StatefulWidget {
   const AddInstancePage({Key? key}) : super(key: key);
@@ -699,7 +700,7 @@ class AddInstanceBottomBar extends StatelessWidget {
 
     if (isDatabasePingDoing) {
       msg = Text(AppLocalizations.of(context)!.testing);
-      status = const CircularProgressIndicator(strokeWidth: 2);
+      status = const Loading();
     } else if (isDatabaseConnectable == null) {
       msg = const Text("");
       status = const Spacer();
@@ -716,11 +717,7 @@ class AddInstanceBottomBar extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: SizedBox(
-            height: 20,
-            width: 20,
-            child: status,
-          ),
+          child: status,
         ),
         Expanded(child: msg)
       ],

@@ -1,6 +1,7 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/dialog.dart';
+import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -95,12 +96,7 @@ class SessionTabs extends ConsumerWidget {
                             avatar: (model.sessions[i].sessionId !=
                                         model.selectedSession?.sessionId &&
                                     connIsBusy(model.sessions[i]))
-                                ? const Padding(
-                                    padding: EdgeInsets.all(2),
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
+                                ? const Loading.small()
                                 : Image.asset(
                                     connectionMetaMap[model.sessions[i].dbType!]!
                                         .logoAssertPath),

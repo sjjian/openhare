@@ -1,4 +1,5 @@
 import 'package:client/screens/app.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -50,7 +51,7 @@ class PageSkeleton extends StatelessWidget {
               color: Theme.of(context)
                   .colorScheme
                   .surfaceContainerHighest, // header 背景色
-              height: 40,
+              height: tabbarHeight,
               child: Row(
                 children: [
                   Expanded(
@@ -66,7 +67,7 @@ class PageSkeleton extends StatelessWidget {
             child: child,
           ),
           Container(
-            height: 40,
+            height: tabbarHeight,
             color: Theme.of(context)
                 .colorScheme
                 .surfaceContainerHighest, // bottom 背景色

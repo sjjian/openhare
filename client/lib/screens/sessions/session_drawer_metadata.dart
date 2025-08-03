@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:client/widgets/loading.dart';
 
 class RootNode implements DataNode {
   final String name;
@@ -134,11 +134,7 @@ class SessionDrawerMetadata extends ConsumerWidget {
     InstanceMetadataModel? model = ref.watch(sessionMetadataNotifierProvider);
     Widget body = const Align(
       alignment: Alignment.center,
-      child: SizedBox(
-        height: 40,
-        width: 40,
-        child: CircularProgressIndicator(),
-      ),
+      child: Loading.big(),
     );
 
     RootNode root = RootNode();

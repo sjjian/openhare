@@ -2,6 +2,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/loading.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
@@ -65,12 +66,7 @@ class SqlResultTables extends ConsumerWidget {
                       },
                       avatar: (model.results[i] != model.selected &&
                               model.results[i].state == SQLExecuteState.init)
-                          ? const Padding(
-                              padding: EdgeInsets.all(2),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            )
+                          ? const Loading.small()
                           : const Icon(
                               Icons.grid_on,
                             ),
@@ -191,11 +187,7 @@ class SqlResultTable extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: CircularProgressIndicator(),
-                ),
+                const Loading.big(),
                 const SizedBox(height: 20),
                 FilledButton(
                     onPressed: () async {
