@@ -78,3 +78,42 @@ class PageSkeleton extends StatelessWidget {
     );
   }
 }
+
+class BodyPageSkeleton extends StatelessWidget {
+  final Widget header;
+  final Widget child;
+  const BodyPageSkeleton({Key? key, required this.header, required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 36,
+                  child: header,
+                ),
+                const SizedBox(height: 10),
+                const Divider(
+                  thickness: 1,
+                  height: 5,
+                  // height: 1,
+                  // color: Colors.grey,
+                ),
+                const SizedBox(height: 10),
+                // 产品描述部分
+                Expanded(child: child),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

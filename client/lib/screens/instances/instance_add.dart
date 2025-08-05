@@ -90,116 +90,94 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                decoration: BoxDecoration(
-                    border: Border(bottom: Divider.createBorderSide(context))),
-                child: Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.add_db_instance,
-                      style: Theme.of(context).textTheme.titleLarge,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    TextButton(
-                        onPressed: addInstanceController.isDatabasePingDoing
-                            ? null
-                            : () {
-                                addInstanceController.databasePing();
-                              },
-                        child: Text(
-                            AppLocalizations.of(context)!.db_instance_test)),
-                    TextButton(
-                        onPressed: () async {
-                          if (addInstanceController.validate()) {
-                            await ref
-                                .read(instancesServicesProvider.notifier)
-                                .addInstance(
-                                    addInstanceController.getInstanceModel());
-
-                            addInstanceController.clear();
-
-                            ref
-                                .read(instancesNotifierProvider.notifier)
-                                .changePage("");
-                          }
-                        },
-                        child: Text(
-                            AppLocalizations.of(context)!.submit_and_continue)),
-                    TextButton(
-                        onPressed: () async {
-                          if (addInstanceController.validate()) {
-                            await ref
-                                .read(instancesServicesProvider.notifier)
-                                .addInstance(
-                                    addInstanceController.getInstanceModel());
-
-                            addInstanceController.clear();
-
-                            ref
-                                .read(instancesNotifierProvider.notifier)
-                                .changePage("");
-
-                            GoRouter.of(context).go('/instances/list');
-                          }
-                        },
-                        child: Text(AppLocalizations.of(context)!.submit)),
-                  ],
-                ),
-              ),
-              Expanded(
-                  child: SizedBox(
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        DatabaseTypeCardList(
-                          connectionMetas: connectionMetas,
-                          selectedDatabaseType:
-                              addInstanceController.selectedDatabaseType,
-                          onDatabaseTypeChange: (type) {
-                            addInstanceController.onDatabaseTypeChange(type);
-                          },
-                          selectedColor: selectedColor(addInstanceController),
-                        ),
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: AddInstanceForm(
-                            infos: addInstanceController.dbInfos,
-                            selectedGroup: addInstanceController.selectedGroup,
-                            onValid: (info, isValid) {
-                              addInstanceController.updateValidState(
-                                  info, isValid);
-                            },
-                            onGroupChange: (group) {
-                              addInstanceController.onGroupChange(group);
-                            },
-                            codeController: addInstanceController.code,
-                          ),
-                        )
-                      ]),
-                ),
-              )),
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: const Row(
-                  children: [],
-                ),
-              )
-            ],
+    return BodyPageSkeleton(
+      header: Row(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.add_db_instance,
+            style: Theme.of(context).textTheme.titleLarge,
+            overflow: TextOverflow.ellipsis,
           ),
-        )),
-      ],
+          const Spacer(),
+          TextButton(
+              onPressed: addInstanceController.isDatabasePingDoing
+                  ? null
+                  : () {
+                      addInstanceController.databasePing();
+                    },
+              child: Text(AppLocalizations.of(context)!.db_instance_test)),
+          TextButton(
+              onPressed: () async {
+                if (addInstanceController.validate()) {
+                  await ref
+                      .read(instancesServicesProvider.notifier)
+                      .addInstance(addInstanceController.getInstanceModel());
+
+                  addInstanceController.clear();
+
+                  ref.read(instancesNotifierProvider.notifier).changePage("");
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.submit_and_continue)),
+          TextButton(
+              onPressed: () async {
+                if (addInstanceController.validate()) {
+                  await ref
+                      .read(instancesServicesProvider.notifier)
+                      .addInstance(addInstanceController.getInstanceModel());
+
+                  addInstanceController.clear();
+
+                  ref.read(instancesNotifierProvider.notifier).changePage("");
+
+                  GoRouter.of(context).go('/instances/list');
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.submit)),
+        ],
+      ),
+      child: Column(
+        children: [
+          Expanded(
+              child: SizedBox(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
+              child:
+                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                DatabaseTypeCardList(
+                  connectionMetas: connectionMetas,
+                  selectedDatabaseType:
+                      addInstanceController.selectedDatabaseType,
+                  onDatabaseTypeChange: (type) {
+                    addInstanceController.onDatabaseTypeChange(type);
+                  },
+                  selectedColor: selectedColor(addInstanceController),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: AddInstanceForm(
+                    infos: addInstanceController.dbInfos,
+                    selectedGroup: addInstanceController.selectedGroup,
+                    onValid: (info, isValid) {
+                      addInstanceController.updateValidState(info, isValid);
+                    },
+                    onGroupChange: (group) {
+                      addInstanceController.onGroupChange(group);
+                    },
+                    codeController: addInstanceController.code,
+                  ),
+                )
+              ]),
+            ),
+          )),
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+            child: const Row(
+              children: [],
+            ),
+          )
+        ],
+      ),
     );
   }
 }

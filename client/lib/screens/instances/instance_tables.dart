@@ -110,98 +110,86 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
     final model = ref.watch(instancesNotifierProvider);
 
     final searchTextController = TextEditingController(text: model.key);
-
-    return Row(
-      children: [
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                decoration: BoxDecoration(
-                    border: Border(bottom: Divider.createBorderSide(context))),
-                child: Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.db_instance,
-                      style: Theme.of(context).textTheme.titleLarge,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Expanded(
-                        child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          width: 35,
-                          height: 35,
-                          child: FloatingActionButton.small(
-                            elevation: 2,
-                            onPressed: () =>
-                                GoRouter.of(context).go('/instances/add'),
-                            child: const Icon(Icons.add),
-                          ),
-                        ),
-                        const SizedBox(width: 15),
-                        SearchBarTheme(
-                            data: const SearchBarThemeData(
-                                elevation: WidgetStatePropertyAll(0),
-                                constraints: BoxConstraints(
-                                    minHeight: 35, maxWidth: 200)),
-                            child: SearchBar(
-                              controller: searchTextController,
-                              onChanged: (value) {
-                                ref
-                                    .read(instancesNotifierProvider.notifier)
-                                    .changePage(value,
-                                        pageNumber: model.currentPage,
-                                        pageSize: model.pageSize);
-                              },
-                              trailing: const [Icon(Icons.search)],
-                            )),
-                      ],
-                    ))
-                  ],
-                ),
-              ),
-              Scrollbar(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: DataTable(
-                    checkboxHorizontalMargin: 0,
-                    showBottomBorder: true,
-                    columns: column,
-                    rows: model.instances.map((instance) {
-                      return buildDataRow(instance);
-                    }).toList(),
-                    sortAscending: false,
-                    showCheckboxColumn: true,
-                  ),
-                ),
-              ),
-              TablePaginatedBar(
-                  count: model.count,
-                  pageSize: model.pageSize,
-                  pageNumber: model.currentPage,
-                  onChange: (pageNumber) {
-                    ref.read(instancesNotifierProvider.notifier).changePage(
-                        searchTextController.text,
-                        pageNumber: pageNumber,
-                        pageSize: model.pageSize);
-                  }),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: const Row(
-                  children: [],
-                ),
-              )
-            ],
+    return BodyPageSkeleton(
+      header: Row(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.db_instance,
+            style: Theme.of(context).textTheme.titleLarge,
+            overflow: TextOverflow.ellipsis,
           ),
-        )),
-      ],
+          Expanded(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 36,
+                height: 36,
+                child: FloatingActionButton.small(
+                  elevation: 2,
+                  onPressed: () => GoRouter.of(context).go('/instances/add'),
+                  child: const Icon(Icons.add),
+                ),
+              ),
+              const SizedBox(width: 15),
+              SearchBarTheme(
+                  data: const SearchBarThemeData(
+                      elevation: WidgetStatePropertyAll(0),
+                      constraints:
+                          BoxConstraints(minHeight: 35, maxWidth: 200)),
+                  child: SearchBar(
+                    controller: searchTextController,
+                    onChanged: (value) {
+                      ref.read(instancesNotifierProvider.notifier).changePage(
+                          value,
+                          pageNumber: model.currentPage,
+                          pageSize: model.pageSize);
+                    },
+                    trailing: const [Icon(Icons.search)],
+                  )),
+            ],
+          ))
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: DataTable(
+                  checkboxHorizontalMargin: 0,
+                  showBottomBorder: true,
+                  columns: column,
+                  rows: model.instances.map((instance) {
+                    return buildDataRow(instance);
+                  }).toList(),
+                  sortAscending: false,
+                  showCheckboxColumn: true,
+                ),
+              ),
+            ),
+          ),
+          TablePaginatedBar(
+            count: model.count,
+            pageSize: model.pageSize,
+            pageNumber: model.currentPage,
+            onChange: (pageNumber) {
+              ref.read(instancesNotifierProvider.notifier).changePage(
+                  searchTextController.text,
+                  pageNumber: pageNumber,
+                  pageSize: model.pageSize);
+            },
+          ),
+          // Container(
+          //   padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          //   child: const Row(
+          //     children: [],
+          //   ),
+          // )
+        ],
+      ),
     );
   }
 }

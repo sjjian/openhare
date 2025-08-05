@@ -87,100 +87,81 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                decoration: BoxDecoration(
-                    border: Border(bottom: Divider.createBorderSide(context))),
-                child: Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.update_db_instance,
-                      style: Theme.of(context).textTheme.titleLarge,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    TextButton(
-                        onPressed: updateInstanceController.isDatabasePingDoing
-                            ? null
-                            : () {
-                                updateInstanceController.databasePing();
-                              },
-                        child: Text(
-                            AppLocalizations.of(context)!.db_instance_test)),
-                    TextButton(
-                        onPressed: () async {
-                          if (updateInstanceController.validate()) {
-                            await ref
-                                .read(instancesServicesProvider.notifier)
-                                .updateInstance(
-                                  updateInstanceController.getInstanceModel(),
-                                );
-
-                            updateInstanceController.clear();
-
-                            ref
-                                .read(instancesNotifierProvider.notifier)
-                                .refresh();
-
-                            GoRouter.of(context).go('/instances/list');
-                          }
-                        },
-                        child: Text(AppLocalizations.of(context)!.submit)),
-                  ],
-                ),
-              ),
-              Expanded(
-                  child: SizedBox(
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        DatabaseTypeCardList(
-                          connectionMetas: [
-                            connectionMetaMap[
-                                updateInstanceController.selectedDatabaseType]!
-                          ],
-                          selectedColor:
-                              selectedColor(updateInstanceController),
-                        ),
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: UpdateInstanceForm(
-                            infos: updateInstanceController.dbInfos,
-                            selectedGroup:
-                                updateInstanceController.selectedGroup,
-                            onValid: (info, isValid) {
-                              updateInstanceController.updateValidState(
-                                  info, isValid);
-                            },
-                            onGroupChange: (group) {
-                              updateInstanceController.onGroupChange(group);
-                            },
-                            codeController: updateInstanceController.code,
-                          ),
-                        )
-                      ]),
-                ),
-              )),
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: const Row(
-                  children: [],
-                ),
-              )
-            ],
+    return BodyPageSkeleton(
+      header: Row(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.update_db_instance,
+            style: Theme.of(context).textTheme.titleLarge,
+            overflow: TextOverflow.ellipsis,
           ),
-        )),
-      ],
+          const Spacer(),
+          TextButton(
+              onPressed: updateInstanceController.isDatabasePingDoing
+                  ? null
+                  : () {
+                      updateInstanceController.databasePing();
+                    },
+              child: Text(AppLocalizations.of(context)!.db_instance_test)),
+          TextButton(
+              onPressed: () async {
+                if (updateInstanceController.validate()) {
+                  await ref
+                      .read(instancesServicesProvider.notifier)
+                      .updateInstance(
+                        updateInstanceController.getInstanceModel(),
+                      );
+
+                  updateInstanceController.clear();
+
+                  ref.read(instancesNotifierProvider.notifier).refresh();
+
+                  GoRouter.of(context).go('/instances/list');
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.submit)),
+        ],
+      ),
+      child: Column(
+        children: [
+          Expanded(
+              child: SizedBox(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
+              child:
+                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                DatabaseTypeCardList(
+                  connectionMetas: [
+                    connectionMetaMap[
+                        updateInstanceController.selectedDatabaseType]!
+                  ],
+                  selectedColor: selectedColor(updateInstanceController),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: UpdateInstanceForm(
+                    infos: updateInstanceController.dbInfos,
+                    selectedGroup: updateInstanceController.selectedGroup,
+                    onValid: (info, isValid) {
+                      updateInstanceController.updateValidState(info, isValid);
+                    },
+                    onGroupChange: (group) {
+                      updateInstanceController.onGroupChange(group);
+                    },
+                    codeController: updateInstanceController.code,
+                  ),
+                )
+              ]),
+            ),
+          )),
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+            child: const Row(
+              children: [],
+            ),
+          )
+        ],
+      ),
     );
   }
 }

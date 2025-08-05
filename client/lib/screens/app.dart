@@ -6,6 +6,7 @@ import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -131,7 +132,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
     return Row(
       children: <Widget>[
         NavigationRail(
-          minWidth: 70,
+          minWidth: navigationRailWidth,
           backgroundColor:
               Theme.of(context).colorScheme.surfaceDim, // navigation color
           useIndicator: true,
@@ -143,7 +144,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
           leading: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 35),
+              const SizedBox(height: tabbarHeight),
               GestureDetector(
                 onTap: () {
                   setState(() {
@@ -161,7 +162,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               icon: const Icon(Icons.personal_video),
               label: Text(
                 AppLocalizations.of(context)!.sessions,
-                style: const TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             NavigationRailDestination(
@@ -172,7 +173,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               label: Center(
                 child: Text(
                   AppLocalizations.of(context)!.db_instance,
-                  style: const TextStyle(fontSize: 16),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
             ),
@@ -181,7 +182,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               label: Center(
                 child: Text(
                   AppLocalizations.of(context)!.sys_settings,
-                  style: const TextStyle(fontSize: 16),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
             ),
@@ -191,7 +192,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               label: Center(
                 child: Text(
                   AppLocalizations.of(context)!.about,
-                  style: const TextStyle(fontSize: 16),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
             ),
@@ -200,7 +201,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
                 child: Image.asset(
                   "assets/icons/logo.png",
                   height: 36,
@@ -258,7 +259,9 @@ class _WindowListener with WindowListener {
   void onWindowClose() async {
     SessionDetailListModel sessionRepo = ref.read(sessionsNotifierProvider);
     for (var session in sessionRepo.sessions) {
-      ref.read(sessionSQLEditorServiceProvider(session.sessionId).notifier).saveCode();
+      ref
+          .read(sessionSQLEditorServiceProvider(session.sessionId).notifier)
+          .saveCode();
     }
     await windowManager.destroy();
   }
