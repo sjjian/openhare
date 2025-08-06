@@ -168,32 +168,3 @@ class SessionDrawerMetadata extends ConsumerWidget {
         ]);
   }
 }
-
-class SessionMetadataInfo extends StatelessWidget {
-  final String name;
-  final Widget? child;
-  const SessionMetadataInfo({Key? key, required this.name, this.child})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Divider(),
-        Container(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Text(
-              name,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
-            )),
-        Container(
-          padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-          child: child ?? const Text("null"),
-        )
-      ],
-    );
-  }
-}

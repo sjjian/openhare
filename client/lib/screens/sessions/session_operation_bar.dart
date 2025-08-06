@@ -359,7 +359,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
               }).toList());
         },
         child: Container(
-            padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+            // padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
             color: (isEnter && !widget.disable)
                 ? Theme.of(context)
                     .colorScheme
@@ -374,7 +374,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                   size: 20,
                 ),
                 Container(
-                    padding: const EdgeInsets.only(left: 2),
+                    // padding: const EdgeInsets.only(left: 2),
                     width: 120,
                     child: Align(
                         alignment: Alignment.centerLeft,

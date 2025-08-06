@@ -1,6 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/widgets/const.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -131,12 +132,12 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                   child: const Icon(Icons.add),
                 ),
               ),
-              const SizedBox(width: 15),
+              const SizedBox(width: kSpacingSmall),
               SearchBarTheme(
                   data: const SearchBarThemeData(
                       elevation: WidgetStatePropertyAll(0),
                       constraints:
-                          BoxConstraints(minHeight: 35, maxWidth: 200)),
+                          BoxConstraints(minHeight: 36, maxWidth: 200)),
                   child: SearchBar(
                     controller: searchTextController,
                     onChanged: (value) {
@@ -182,12 +183,6 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                   pageSize: model.pageSize);
             },
           ),
-          // Container(
-          //   padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-          //   child: const Row(
-          //     children: [],
-          //   ),
-          // )
         ],
       ),
     );

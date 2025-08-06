@@ -1,6 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -139,43 +140,40 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
       child: Column(
         children: [
           Expanded(
-              child: SizedBox(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
-              child:
-                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-                DatabaseTypeCardList(
-                  connectionMetas: connectionMetas,
-                  selectedDatabaseType:
-                      addInstanceController.selectedDatabaseType,
-                  onDatabaseTypeChange: (type) {
-                    addInstanceController.onDatabaseTypeChange(type);
-                  },
-                  selectedColor: selectedColor(addInstanceController),
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: AddInstanceForm(
-                    infos: addInstanceController.dbInfos,
-                    selectedGroup: addInstanceController.selectedGroup,
-                    onValid: (info, isValid) {
-                      addInstanceController.updateValidState(info, isValid);
-                    },
-                    onGroupChange: (group) {
-                      addInstanceController.onGroupChange(group);
-                    },
-                    codeController: addInstanceController.code,
-                  ),
-                )
-              ]),
+            child: SizedBox(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(0, kSpacingSmall, 0, 0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      DatabaseTypeCardList(
+                        connectionMetas: connectionMetas,
+                        selectedDatabaseType:
+                            addInstanceController.selectedDatabaseType,
+                        onDatabaseTypeChange: (type) {
+                          addInstanceController.onDatabaseTypeChange(type);
+                        },
+                        selectedColor: selectedColor(addInstanceController),
+                      ),
+                      const SizedBox(height: kSpacingMedium),
+                      Expanded(
+                        child: AddInstanceForm(
+                          infos: addInstanceController.dbInfos,
+                          selectedGroup: addInstanceController.selectedGroup,
+                          onValid: (info, isValid) {
+                            addInstanceController.updateValidState(
+                                info, isValid);
+                          },
+                          onGroupChange: (group) {
+                            addInstanceController.onGroupChange(group);
+                          },
+                          codeController: addInstanceController.code,
+                        ),
+                      )
+                    ]),
+              ),
             ),
-          )),
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-            child: const Row(
-              children: [],
-            ),
-          )
+          ),
         ],
       ),
     );
@@ -585,17 +583,16 @@ class AddInstanceForm extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 500),
           child: Column(
             children: [
-              const SizedBox(height: 5),
-              Row(
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.db_base_config,
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  )
-                ],
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                child: Text(
+                  AppLocalizations.of(context)!.db_base_config,
+                  textAlign: TextAlign.left,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: kSpacingSmall),
               Column(
                 children: [
                   buildNameField(context),
@@ -609,7 +606,7 @@ class AddInstanceForm extends StatelessWidget {
           ),
         ),
         const SizedBox(
-          width: 40,
+          width: kSpacingLarge,
         ),
         Expanded(
             child: Container(
@@ -641,7 +638,7 @@ class AddInstanceForm extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: kSpacingSmall),
               IndexedStack(
                 index: selectedGroupIndex,
                 children: [
@@ -694,7 +691,8 @@ class AddInstanceBottomBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          padding:
+              const EdgeInsets.fromLTRB(kSpacingSmall, 0, kSpacingSmall, 0),
           child: status,
         ),
         Expanded(child: msg)

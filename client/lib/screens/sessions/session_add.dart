@@ -2,6 +2,7 @@ import 'package:client/screens/page_skeleton.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/screens/instances/instance_tables.dart';
+import 'package:client/widgets/const.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -27,21 +28,20 @@ class AddSession extends HookConsumerWidget {
       ),
       child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.only(top: 5, bottom: 5),
-            child: Row(
-              children: [
-                SizedBox(
-                    width: 200,
-                    child:
-                        Text(AppLocalizations.of(context)!.db_instance_name)),
-                Container(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Text(
-                        AppLocalizations.of(context)!.recently_used_schema))
-              ],
-            ),
+          Row(
+            children: [
+              SizedBox(
+                  width: 200,
+                  child: Text(AppLocalizations.of(context)!.db_instance_name)),
+              Container(
+                  padding: const EdgeInsets.only(
+                    left: 12,
+                  ), // 与下面的TextButton的padding对齐
+                  child:
+                      Text(AppLocalizations.of(context)!.recently_used_schema))
+            ],
           ),
+          const SizedBox(height: kSpacingSmall),
           for (var inst in ref
               .read(instancesServicesProvider.notifier)
               .activeInstances()) // todo
@@ -68,9 +68,6 @@ class AddSession extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                const VerticalDivider(
-                  width: 5,
-                ),
                 for (final schema in inst.activeSchemas.toList())
                   TextButton(
                     onPressed: () {
@@ -82,64 +79,62 @@ class AddSession extends HookConsumerWidget {
                   )
               ],
             ),
-          Container(
-            padding: const EdgeInsets.only(bottom: 5, top: 35),
-            child: Row(
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.db_instance,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SearchBarTheme(
-                            data: const SearchBarThemeData(
-                                elevation: WidgetStatePropertyAll(0),
-                                constraints: BoxConstraints(
-                                    minHeight: 35, maxWidth: 200)),
-                            child: SearchBar(
-                              controller: searchTextController,
-                              onChanged: (value) {
-                                ref
-                                    .read(instancesNotifierProvider.notifier)
-                                    .changePage(value,
-                                        pageNumber: model.currentPage,
-                                        pageSize: model.pageSize);
-                              },
-                              trailing: const [Icon(Icons.search)],
-                            )),
-                      ],
-                    ),
+          const SizedBox(height: kSpacingMedium),
+          Row(
+            children: [
+              Text(
+                AppLocalizations.of(context)!.db_instance,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SearchBarTheme(
+                          data: const SearchBarThemeData(
+                              elevation: WidgetStatePropertyAll(0),
+                              constraints:
+                                  BoxConstraints(minHeight: 36, maxWidth: 200)),
+                          child: SearchBar(
+                            controller: searchTextController,
+                            onChanged: (value) {
+                              ref
+                                  .read(instancesNotifierProvider.notifier)
+                                  .changePage(value,
+                                      pageNumber: model.currentPage,
+                                      pageSize: model.pageSize);
+                            },
+                            trailing: const [Icon(Icons.search)],
+                          )),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const Divider(),
-          Container(
-            padding: const EdgeInsets.only(top: 5, bottom: 5),
-            child: Row(
-              children: [
-                SizedBox(
-                    width: 200,
-                    child:
-                        Text(AppLocalizations.of(context)!.db_instance_name)),
-                Container(
-                    width: 200,
-                    padding: const EdgeInsets.only(left: 15),
-                    child:
-                        Text(AppLocalizations.of(context)!.db_instance_host)),
-                Container(
-                    padding: const EdgeInsets.only(left: 15),
-                    child:
-                        Text(AppLocalizations.of(context)!.db_instance_desc)),
-              ],
-            ),
+          const SizedBox(height: kSpacingSmall),
+          const Divider(
+            thickness: 1,
+            height: 5,
           ),
+          const SizedBox(height: kSpacingMedium),
+          Row(
+            children: [
+              SizedBox(
+                  width: 200,
+                  child: Text(AppLocalizations.of(context)!.db_instance_name)),
+              Container(
+                  width: 200,
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Text(AppLocalizations.of(context)!.db_instance_host)),
+              Container(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Text(AppLocalizations.of(context)!.db_instance_desc)),
+            ],
+          ),
+          const SizedBox(height: kSpacingSmall),
           for (var inst in model.instances) //todo
             Row(
               children: [
@@ -163,7 +158,7 @@ class AddSession extends HookConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.only(left: 15),
+                  padding: const EdgeInsets.only(left: 12),
                   width: 200,
                   child: Row(
                     children: [
@@ -174,7 +169,7 @@ class AddSession extends HookConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.only(left: 15),
+                  padding: const EdgeInsets.only(left: 12),
                   width: 200,
                   child: Row(
                     children: [

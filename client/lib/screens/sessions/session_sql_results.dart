@@ -35,7 +35,7 @@ class SqlResultTables extends ConsumerWidget {
     Widget tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
       Expanded(
         child: CommonTabBar(
-          height: 35,
+          height: 36,
           color: Theme.of(context).colorScheme.surfaceContainer,
           tabStyle: style,
           onReorder: (oldIndex, newIndex) {
@@ -84,7 +84,7 @@ class SqlResultTables extends ConsumerWidget {
             children: [
               Container(
                 alignment: Alignment.centerLeft,
-                constraints: const BoxConstraints(maxHeight: 35),
+                constraints: const BoxConstraints(maxHeight: 36),
                 child: tab,
               ),
               const Expanded(child: SqlResultTable())
@@ -112,7 +112,7 @@ class SqlResultTable extends ConsumerWidget {
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 2),
+                    padding: const EdgeInsets.only(right: 5),
                     child: DataTypeIcon(type: e.dataType(), size: 20),
                   ),
                   Expanded(

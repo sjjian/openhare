@@ -91,7 +91,12 @@ class BodyPageSkeleton extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
+            padding: const EdgeInsets.fromLTRB(
+              kSpacingLarge,
+              kSpacingMedium,
+              kSpacingLarge,
+              0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -99,14 +104,14 @@ class BodyPageSkeleton extends StatelessWidget {
                   height: 36,
                   child: header,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: kSpacingSmall),
                 const Divider(
                   thickness: 1,
                   height: 5,
                   // height: 1,
                   // color: Colors.grey,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: kSpacingMedium),
                 // 产品描述部分
                 Expanded(child: child),
               ],

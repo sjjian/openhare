@@ -1,6 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -127,7 +128,7 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
           Expanded(
               child: SizedBox(
             child: Container(
-              padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
+              padding: const EdgeInsets.fromLTRB(0, kSpacingMedium, 0, 0),
               child:
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                 DatabaseTypeCardList(
@@ -137,7 +138,7 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
                   ],
                   selectedColor: selectedColor(updateInstanceController),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: kSpacingMedium),
                 Expanded(
                   child: UpdateInstanceForm(
                     infos: updateInstanceController.dbInfos,
@@ -154,12 +155,6 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
               ]),
             ),
           )),
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-            child: const Row(
-              children: [],
-            ),
-          )
         ],
       ),
     );
