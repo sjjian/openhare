@@ -93,21 +93,24 @@ class AddSession extends HookConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       SearchBarTheme(
-                          data: const SearchBarThemeData(
-                              elevation: WidgetStatePropertyAll(0),
-                              constraints:
-                                  BoxConstraints(minHeight: 36, maxWidth: 200)),
-                          child: SearchBar(
-                            controller: searchTextController,
-                            onChanged: (value) {
-                              ref
-                                  .read(instancesNotifierProvider.notifier)
-                                  .changePage(value,
-                                      pageNumber: model.currentPage,
-                                      pageSize: model.pageSize);
-                            },
-                            trailing: const [Icon(Icons.search)],
-                          )),
+                        data: const SearchBarThemeData(
+                            elevation: WidgetStatePropertyAll(0),
+                            constraints: BoxConstraints(
+                              minHeight: kIconSizeLarge,
+                              maxWidth: 200,
+                            )),
+                        child: SearchBar(
+                          controller: searchTextController,
+                          onChanged: (value) {
+                            ref
+                                .read(instancesNotifierProvider.notifier)
+                                .changePage(value,
+                                    pageNumber: model.currentPage,
+                                    pageSize: model.pageSize);
+                          },
+                          trailing: const [Icon(Icons.search)],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -144,7 +147,7 @@ class AddSession extends HookConsumerWidget {
                     children: [
                       Image.asset(
                         connectionMetaMap[inst.dbType]!.logoAssertPath,
-                        height: 24,
+                        height: kIconSizeMedium,
                       ),
                       TextButton(
                           onPressed: () {

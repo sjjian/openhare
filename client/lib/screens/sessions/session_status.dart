@@ -55,10 +55,11 @@ class SessionStatusTab extends ConsumerWidget {
                       SQLConnectState.connected ||
                       SQLConnectState.executing =>
                         const Icon(Icons.check_circle,
-                            size: 16, color: Colors.green),
+                            size: kIconSizeTiny, color: Colors.green),
                       SQLConnectState.failed ||
                       SQLConnectState.unHealth =>
-                        const Icon(Icons.error, size: 16, color: Colors.red),
+                        const Icon(Icons.error,
+                            size: kIconSizeTiny, color: Colors.red),
                       _ => const Text("-"),
                     } // 根据model.state展示不同的图标
                         ),
@@ -137,13 +138,13 @@ class ValueStatusWidget extends StatelessWidget {
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Container(
-          constraints:  BoxConstraints(maxWidth: width),
+          constraints: BoxConstraints(maxWidth: width),
           padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text('$label:'),
-              const SizedBox(width: 5),
+              const SizedBox(width: kSpacingTiny),
               Expanded(
                 child: Text(
                   value,

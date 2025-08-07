@@ -204,8 +204,8 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                 padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
                 child: Image.asset(
                   "assets/icons/logo.png",
-                  height: 36,
-                  width: 36,
+                  height: kIconSizeLarge,
+                  width: kIconSizeLarge,
                 ),
               ),
             ),

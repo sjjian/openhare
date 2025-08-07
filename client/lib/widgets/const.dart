@@ -10,3 +10,9 @@ const double kSpacingLarge = 40.0;
 // 分割线
 const double kDividerThickness = 1.0;
 const double kDividerSize = 5.0;
+
+// icon
+const double kIconSizeTiny = 16.0;
+const double kIconSizeSmall = 20.0;
+const double kIconSizeMedium = 24.0;
+const double kIconSizeLarge = 36.0;

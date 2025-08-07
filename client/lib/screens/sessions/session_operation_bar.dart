@@ -213,7 +213,7 @@ class SessionOpBar extends ConsumerWidget {
   Widget explainWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton(
-      iconSize: 36,
+      iconSize: kIconSizeLarge,
       icon: Icons.e_mobiledata,
       iconColor: connIsIdle(model)
           ? const Color.fromARGB(255, 241, 192, 84)
@@ -371,7 +371,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                   icon: HugeIcons.strokeRoundedDatabase,
                   color: widget.iconColor ??
                       Theme.of(context).colorScheme.onSurface,
-                  size: 20,
+                  size: kIconSizeSmall,
                 ),
                 Container(
                     padding: const EdgeInsets.only(left: kSpacingTiny),

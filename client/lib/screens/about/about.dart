@@ -82,7 +82,7 @@ class _AboutPageState extends State<AboutPage> {
                 HugeIcon(
                   icon: HugeIcons.strokeRoundedGithub,
                   color: Theme.of(context).colorScheme.onSurface,
-                  size: 24,
+                  size: kIconSizeMedium,
                 ),
                 const SizedBox(height: kSpacingSmall),
                 InkWell(

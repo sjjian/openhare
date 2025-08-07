@@ -124,8 +124,8 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SizedBox(
-                width: 36,
-                height: 36,
+                width: kIconSizeLarge,
+                height: kIconSizeLarge,
                 child: FloatingActionButton.small(
                   elevation: 2,
                   onPressed: () => GoRouter.of(context).go('/instances/add'),
@@ -134,20 +134,23 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
               ),
               const SizedBox(width: kSpacingSmall),
               SearchBarTheme(
-                  data: const SearchBarThemeData(
-                      elevation: WidgetStatePropertyAll(0),
-                      constraints:
-                          BoxConstraints(minHeight: 36, maxWidth: 200)),
-                  child: SearchBar(
-                    controller: searchTextController,
-                    onChanged: (value) {
-                      ref.read(instancesNotifierProvider.notifier).changePage(
-                          value,
-                          pageNumber: model.currentPage,
-                          pageSize: model.pageSize);
-                    },
-                    trailing: const [Icon(Icons.search)],
-                  )),
+                data: const SearchBarThemeData(
+                    elevation: WidgetStatePropertyAll(0),
+                    constraints: BoxConstraints(
+                      minHeight: kIconSizeLarge,
+                      maxWidth: 200,
+                    )),
+                child: SearchBar(
+                  controller: searchTextController,
+                  onChanged: (value) {
+                    ref.read(instancesNotifierProvider.notifier).changePage(
+                        value,
+                        pageNumber: model.currentPage,
+                        pageSize: model.pageSize);
+                  },
+                  trailing: const [Icon(Icons.search)],
+                ),
+              ),
             ],
           ))
         ],

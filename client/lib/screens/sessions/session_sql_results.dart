@@ -2,6 +2,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
@@ -180,32 +181,33 @@ class SqlResultTable extends ConsumerWidget {
           child: Text('${model.error}'));
     } else {
       return Container(
-          alignment: Alignment.topLeft,
-          color: color,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Loading.big(),
-                const SizedBox(height: 20),
-                FilledButton(
-                    onPressed: () async {
-                      SessionDetailModel? sessionModel = ref
-                          .read(sessionsServicesProvider.notifier)
-                          .getSession(model.resultId.sessionId);
+        alignment: Alignment.topLeft,
+        color: color,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Loading.big(),
+              const SizedBox(height: kSpacingMedium),
+              FilledButton(
+                  onPressed: () async {
+                    SessionDetailModel? sessionModel = ref
+                        .read(sessionsServicesProvider.notifier)
+                        .getSession(model.resultId.sessionId);
 
-                      if (sessionModel == null || sessionModel.connId == null) {
-                        return;
-                      }
-                      await ref
-                          .read(sessionConnsServicesProvider.notifier)
-                          .killQuery(sessionModel.connId!);
-                    },
-                    child: Text(AppLocalizations.of(context)!.cancel))
-              ],
-            ),
-          ));
+                    if (sessionModel == null || sessionModel.connId == null) {
+                      return;
+                    }
+                    await ref
+                        .read(sessionConnsServicesProvider.notifier)
+                        .killQuery(sessionModel.connId!);
+                  },
+                  child: Text(AppLocalizations.of(context)!.cancel))
+            ],
+          ),
+        ),
+      );
     }
   }
 }

@@ -60,7 +60,7 @@ class PageSkeleton extends StatelessWidget {
                     child: topBar,
                   ),
                 ),
-                const SizedBox(width: 20), // 顶部 tab 空20, 防止无法拖动窗口.
+                const SizedBox(width: kSpacingLarge), // 顶部 tab 空部分空间, 防止无法拖动窗口.
                 if (!kIsWeb) const WindowButtons(),
               ],
             ),

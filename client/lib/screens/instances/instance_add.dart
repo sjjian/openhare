@@ -220,16 +220,17 @@ class DatabaseTypeCard extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.only(top: kSpacingTiny),
               child: Image.asset(logoPath),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+              padding:
+                  const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
               child: Text(name, style: Theme.of(context).textTheme.bodyMedium),
             ),
             if (selected)
               Container(
-                padding: const EdgeInsets.only(bottom: 5),
+                padding: const EdgeInsets.only(bottom: kSpacingTiny),
                 width: 5,
                 height: 5,
                 decoration: BoxDecoration(
@@ -457,7 +458,7 @@ class AddInstanceForm extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            width: 5,
+            width: kSpacingTiny,
           ),
           Container(
             constraints: const BoxConstraints(maxWidth: 120),

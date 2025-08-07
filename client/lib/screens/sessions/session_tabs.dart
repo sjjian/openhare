@@ -1,5 +1,6 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/tab_widget.dart';
@@ -51,7 +52,7 @@ class SessionTabs extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     SessionDetailListModel model = ref.watch(sessionsNotifierProvider);
     return Padding(
-      padding: const EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.only(top: kSpacingTiny),
       child: Row(
         children: [
           Expanded(
