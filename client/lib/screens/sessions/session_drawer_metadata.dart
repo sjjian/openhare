@@ -157,14 +157,11 @@ class SessionDrawerMetadata extends ConsumerWidget {
     body = DataTree(controller: metadataController);
 
     return Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // SessionMetadataTitle(),
-          // const Divider(
-          //   endIndent: 10,
-          // ),
-          Expanded(child: body),
-        ]);
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: body),
+      ],
+    );
   }
 }

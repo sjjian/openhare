@@ -1,4 +1,5 @@
 import 'package:client/screens/page_skeleton.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -53,21 +54,11 @@ class _AboutPageState extends State<AboutPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 产品描述部分
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HugeIcon(
-                  icon: HugeIcons.strokeRoundedInformationCircle,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  AppLocalizations.of(context)!.app_desc,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
+            Text(
+              AppLocalizations.of(context)!.app_desc,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: kSpacingMedium),
             // 版本信息部分
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,14 +67,14 @@ class _AboutPageState extends State<AboutPage> {
                   icon: HugeIcons.strokeRoundedWorkflowCircle06,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: kSpacingSmall),
                 Text(
                   '${AppLocalizations.of(context)!.version}: $_version',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: kSpacingMedium),
             // GitHub 地址部分
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,17 +84,16 @@ class _AboutPageState extends State<AboutPage> {
                   color: Theme.of(context).colorScheme.onSurface,
                   size: 24,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: kSpacingSmall),
                 InkWell(
                   onTap: () => _launchUrl(
                     Uri.parse('https://github.com/sjjian/snowhare'),
                   ),
                   child: Text(
                     'https://github.com/sjjian/snowhare',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 16,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                   ),
                 ),
               ],

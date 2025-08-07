@@ -48,21 +48,23 @@ class PageSkeleton extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceContainer, // 全局背景色
         child: Column(children: [
           Container(
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest, // header 背景色
-              height: tabbarHeight,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: MoveWindow(
-                      // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
-                      child: topBar,
-                    ),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest, // header 背景色
+            height: tabbarHeight,
+            child: Row(
+              children: [
+                Expanded(
+                  child: MoveWindow(
+                    // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
+                    child: topBar,
                   ),
-                  if (!kIsWeb) const WindowButtons(),
-                ],
-              )),
+                ),
+                const SizedBox(width: 20), // 顶部 tab 空20, 防止无法拖动窗口.
+                if (!kIsWeb) const WindowButtons(),
+              ],
+            ),
+          ),
           Expanded(
             child: child,
           ),
@@ -106,10 +108,8 @@ class BodyPageSkeleton extends StatelessWidget {
                 ),
                 const SizedBox(height: kSpacingSmall),
                 const Divider(
-                  thickness: 1,
-                  height: 5,
-                  // height: 1,
-                  // color: Colors.grey,
+                  thickness: kDividerThickness,
+                  height: kDividerSize,
                 ),
                 const SizedBox(height: kSpacingMedium),
                 // 产品描述部分

@@ -2,6 +2,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/icon_button.dart';
 import 'package:client/widgets/loading.dart';
@@ -237,7 +238,8 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget divider() {
     return const VerticalDivider(
-      width: 5,
+      thickness: kDividerThickness,
+      width: kDividerSize,
       indent: 10,
       endIndent: 10,
     );
@@ -261,13 +263,11 @@ class SessionOpBar extends ConsumerWidget {
         children: [
           // connect
           connectWidget(context, ref, model),
-          divider(),
           // schema list
           SchemaBar(
             connId: model.connId,
             disable: !connIsIdle(model),
             currentSchema: model.currentSchema,
-            iconColor: connIsConnected(model) ? Colors.green : Colors.grey,
           ),
           divider(),
           executeWidget(context, ref, model),
@@ -359,7 +359,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
               }).toList());
         },
         child: Container(
-            // padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+            padding: const EdgeInsets.only(left: kSpacingTiny),
             color: (isEnter && !widget.disable)
                 ? Theme.of(context)
                     .colorScheme
@@ -374,7 +374,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                   size: 20,
                 ),
                 Container(
-                    // padding: const EdgeInsets.only(left: 2),
+                    padding: const EdgeInsets.only(left: kSpacingTiny),
                     width: 120,
                     child: Align(
                         alignment: Alignment.centerLeft,

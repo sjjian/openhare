@@ -15,14 +15,12 @@ class SessionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
     return PageSkeleton(
-        key: const Key("sessions"),
-        topBar: const SessionTabs(),
-        bottomBar: const SessionStatusTab(),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: (session == null || session.instanceId == null)
-              ? const AddSession()
-              : const SessionBodyPage(),
-        ));
+      key: const Key("sessions"),
+      topBar: const SessionTabs(),
+      bottomBar: const SessionStatusTab(),
+      child: (session == null || session.instanceId == null)
+          ? const AddSession()
+          : const SessionBodyPage(),
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:client/models/settings.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:client/services/settings/settings.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,110 +39,105 @@ class SettingsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              // padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 140,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.language),
-                        const SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.language)
-                      ],
-                    ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.language),
+                      const SizedBox(width: kSpacingSmall),
+                      Text(AppLocalizations.of(context)!.language)
+                    ],
                   ),
-                  SizedBox(
-                    width: 140,
-                    child: RadioListTile<String>(
-                      title: const Text("English"),
-                      value: "en",
-                      groupValue: model.language,
-                      onChanged: (value) {
-                        ref
-                            .read(settingServiceProvider.notifier)
-                            .setLanguage(value!);
-                      },
-                      dense: true,
-                      visualDensity: VisualDensity.compact,
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: RadioListTile<String>(
+                    title: const Text("English"),
+                    value: "en",
+                    groupValue: model.language,
+                    onChanged: (value) {
+                      ref
+                          .read(settingServiceProvider.notifier)
+                          .setLanguage(value!);
+                    },
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    contentPadding: EdgeInsets.zero,
                   ),
-                  SizedBox(
-                    width: 140,
-                    child: RadioListTile<String>(
-                      title: const Text("中文"),
-                      value: "zh",
-                      groupValue: model.language,
-                      onChanged: (value) {
-                        ref
-                            .read(settingServiceProvider.notifier)
-                            .setLanguage(value!);
-                      },
-                      dense: true,
-                      visualDensity: VisualDensity.compact,
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: RadioListTile<String>(
+                    title: const Text("中文"),
+                    value: "zh",
+                    groupValue: model.language,
+                    onChanged: (value) {
+                      ref
+                          .read(settingServiceProvider.notifier)
+                          .setLanguage(value!);
+                    },
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    contentPadding: EdgeInsets.zero,
                   ),
-                  const Spacer(),
-                ],
-              ),
+                ),
+                const Spacer(),
+              ],
             ),
+            const SizedBox(height: kSpacingTiny),
             const Divider(
-              thickness: 1,
-              height: 5,
+              thickness: kDividerThickness,
+              height: kDividerSize,
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 140,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.color_lens),
-                        const SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.theme)
-                      ],
-                    ),
+            const SizedBox(height: kSpacingTiny),
+            Row(
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.color_lens),
+                      const SizedBox(width: kSpacingSmall),
+                      Text(AppLocalizations.of(context)!.theme)
+                    ],
                   ),
-                  SizedBox(
-                    width: 140,
-                    child: RadioListTile<String>(
-                      title: Text(AppLocalizations.of(context)!.theme_light),
-                      value: "light",
-                      groupValue: model.theme,
-                      onChanged: (value) {
-                        ref
-                            .read(settingServiceProvider.notifier)
-                            .setTheme(value!);
-                      },
-                      dense: true,
-                      visualDensity: VisualDensity.compact,
-                      contentPadding: EdgeInsets.zero, // Remove default padding
-                    ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: RadioListTile<String>(
+                    title: Text(AppLocalizations.of(context)!.theme_light),
+                    value: "light",
+                    groupValue: model.theme,
+                    onChanged: (value) {
+                      ref
+                          .read(settingServiceProvider.notifier)
+                          .setTheme(value!);
+                    },
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    contentPadding: EdgeInsets.zero, // Remove default padding
                   ),
-                  SizedBox(
-                    width: 140,
-                    child: RadioListTile<String>(
-                      title: Text(AppLocalizations.of(context)!.theme_dark),
-                      value: "dark",
-                      groupValue: model.theme,
-                      onChanged: (value) {
-                        ref
-                            .read(settingServiceProvider.notifier)
-                            .setTheme(value!);
-                      },
-                      dense: true,
-                      visualDensity: VisualDensity.compact,
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: RadioListTile<String>(
+                    title: Text(AppLocalizations.of(context)!.theme_dark),
+                    value: "dark",
+                    groupValue: model.theme,
+                    onChanged: (value) {
+                      ref
+                          .read(settingServiceProvider.notifier)
+                          .setTheme(value!);
+                    },
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    contentPadding: EdgeInsets.zero,
                   ),
-                  const Spacer(),
-                ],
-              ),
+                ),
+                const Spacer(),
+              ],
             ),
             const Spacer(),
           ],

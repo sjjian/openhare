@@ -116,8 +116,8 @@ class AddSession extends HookConsumerWidget {
           ),
           const SizedBox(height: kSpacingSmall),
           const Divider(
-            thickness: 1,
-            height: 5,
+            thickness: kDividerThickness,
+            height: kDividerSize,
           ),
           const SizedBox(height: kSpacingMedium),
           Row(

@@ -56,74 +56,74 @@ class SessionTabs extends ConsumerWidget {
         children: [
           Expanded(
             child: CommonTabBar(
-                tabStyle: CommonTabStyle(
-                  minWidth: 90,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surfaceContainerHighest, // session tab 背景色
-                  selectedColor: Theme.of(context)
-                      .colorScheme
-                      .surfaceContainer, // session tab 选择的颜色
-                  hoverColor: Theme.of(context)
-                      .colorScheme
-                      .surfaceDim, // session tab 鼠标移入的颜色
-                ),
-                addTab: () {
-                  ref.read(sessionsServicesProvider.notifier).newSession();
-                },
-                onReorder: (oldIndex, newIndex) {
-                  ref
-                      .read(sessionsServicesProvider.notifier)
-                      .reorderSession(oldIndex, newIndex);
-                },
-                tabs: [
-                  for (var i = 0; i < model.sessions.length; i++)
-                    (model.sessions[i].instanceId == null)
-                        ? CommonTabWrap(
-                            label: AppLocalizations.of(context)!.new_tab,
-                            onTap: () {
-                              ref
-                                  .read(sessionsServicesProvider.notifier)
-                                  .selectSessionByIndex(i);
-                            },
-                            onDeleted: () {
-                              closeSessionDialog(context, ref, model, i);
-                            },
-                            selected: model.sessions[i].sessionId ==
-                                model.selectedSession?.sessionId,
-                          )
-                        : CommonTabWrap(
-                            avatar: (model.sessions[i].sessionId !=
-                                        model.selectedSession?.sessionId &&
-                                    connIsBusy(model.sessions[i]))
-                                ? const Loading.small()
-                                : Image.asset(
-                                    connectionMetaMap[model.sessions[i].dbType!]!
-                                        .logoAssertPath),
-                            label: model.sessions[i].instanceName!,
-                            items: <PopupMenuEntry>[
-                              PopupMenuItem<String>(
-                                height: 30,
-                                onTap: () {
-                                  closeSessionDialog(context, ref, model, i);
-                                },
-                                child: Text(AppLocalizations.of(context)!.close),
-                              ),
-                            ],
-                            onTap: () {
-                              ref
-                                  .read(sessionsServicesProvider.notifier)
-                                  .selectSessionByIndex(i);
-                            },
-                            onDeleted: () {
-                              closeSessionDialog(context, ref, model, i);
-                            },
-                            selected: model.sessions[i].sessionId ==
-                                model.selectedSession?.sessionId,
-                          )
-                ]),
+              tabStyle: CommonTabStyle(
+                minWidth: 90,
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest, // session tab 背景色
+                selectedColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainer, // session tab 选择的颜色
+                hoverColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceDim, // session tab 鼠标移入的颜色
+              ),
+              addTab: () {
+                ref.read(sessionsServicesProvider.notifier).newSession();
+              },
+              onReorder: (oldIndex, newIndex) {
+                ref
+                    .read(sessionsServicesProvider.notifier)
+                    .reorderSession(oldIndex, newIndex);
+              },
+              tabs: [
+                for (var i = 0; i < model.sessions.length; i++)
+                  (model.sessions[i].instanceId == null)
+                      ? CommonTabWrap(
+                          label: AppLocalizations.of(context)!.new_tab,
+                          onTap: () {
+                            ref
+                                .read(sessionsServicesProvider.notifier)
+                                .selectSessionByIndex(i);
+                          },
+                          onDeleted: () {
+                            closeSessionDialog(context, ref, model, i);
+                          },
+                          selected: model.sessions[i].sessionId ==
+                              model.selectedSession?.sessionId,
+                        )
+                      : CommonTabWrap(
+                          avatar: (model.sessions[i].sessionId !=
+                                      model.selectedSession?.sessionId &&
+                                  connIsBusy(model.sessions[i]))
+                              ? const Loading.small()
+                              : Image.asset(
+                                  connectionMetaMap[model.sessions[i].dbType!]!
+                                      .logoAssertPath),
+                          label: model.sessions[i].instanceName!,
+                          items: <PopupMenuEntry>[
+                            PopupMenuItem<String>(
+                              height: 30,
+                              onTap: () {
+                                closeSessionDialog(context, ref, model, i);
+                              },
+                              child: Text(AppLocalizations.of(context)!.close),
+                            ),
+                          ],
+                          onTap: () {
+                            ref
+                                .read(sessionsServicesProvider.notifier)
+                                .selectSessionByIndex(i);
+                          },
+                          onDeleted: () {
+                            closeSessionDialog(context, ref, model, i);
+                          },
+                          selected: model.sessions[i].sessionId ==
+                              model.selectedSession?.sessionId,
+                        )
+              ],
+            ),
           ),
-          const SizedBox(width: 20),
         ],
       ),
     );
