@@ -1,6 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -12,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/widgets/loading.dart';
 
 class AddInstancePage extends StatefulWidget {
   const AddInstancePage({Key? key}) : super(key: key);
@@ -89,116 +91,91 @@ class _AddInstanceState extends ConsumerState<AddInstance> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                decoration: BoxDecoration(
-                    border: Border(bottom: Divider.createBorderSide(context))),
-                child: Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.add_db_instance,
-                      style: Theme.of(context).textTheme.titleLarge,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    TextButton(
-                        onPressed: addInstanceController.isDatabasePingDoing
-                            ? null
-                            : () {
-                                addInstanceController.databasePing();
-                              },
-                        child: Text(
-                            AppLocalizations.of(context)!.db_instance_test)),
-                    TextButton(
-                        onPressed: () async {
-                          if (addInstanceController.validate()) {
-                            await ref
-                                .read(instancesServicesProvider.notifier)
-                                .addInstance(
-                                    addInstanceController.getInstanceModel());
-
-                            addInstanceController.clear();
-
-                            ref
-                                .read(instancesNotifierProvider.notifier)
-                                .changePage("");
-                          }
-                        },
-                        child: Text(
-                            AppLocalizations.of(context)!.submit_and_continue)),
-                    TextButton(
-                        onPressed: () async {
-                          if (addInstanceController.validate()) {
-                            await ref
-                                .read(instancesServicesProvider.notifier)
-                                .addInstance(
-                                    addInstanceController.getInstanceModel());
-
-                            addInstanceController.clear();
-
-                            ref
-                                .read(instancesNotifierProvider.notifier)
-                                .changePage("");
-
-                            GoRouter.of(context).go('/instances/list');
-                          }
-                        },
-                        child: Text(AppLocalizations.of(context)!.submit)),
-                  ],
-                ),
-              ),
-              Expanded(
-                  child: SizedBox(
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        DatabaseTypeCardList(
-                          connectionMetas: connectionMetas,
-                          selectedDatabaseType:
-                              addInstanceController.selectedDatabaseType,
-                          onDatabaseTypeChange: (type) {
-                            addInstanceController.onDatabaseTypeChange(type);
-                          },
-                          selectedColor: selectedColor(addInstanceController),
-                        ),
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: AddInstanceForm(
-                            infos: addInstanceController.dbInfos,
-                            selectedGroup: addInstanceController.selectedGroup,
-                            onValid: (info, isValid) {
-                              addInstanceController.updateValidState(
-                                  info, isValid);
-                            },
-                            onGroupChange: (group) {
-                              addInstanceController.onGroupChange(group);
-                            },
-                            codeController: addInstanceController.code,
-                          ),
-                        )
-                      ]),
-                ),
-              )),
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: const Row(
-                  children: [],
-                ),
-              )
-            ],
+    return BodyPageSkeleton(
+      header: Row(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.add_db_instance,
+            style: Theme.of(context).textTheme.titleLarge,
+            overflow: TextOverflow.ellipsis,
           ),
-        )),
-      ],
+          const Spacer(),
+          TextButton(
+              onPressed: addInstanceController.isDatabasePingDoing
+                  ? null
+                  : () {
+                      addInstanceController.databasePing();
+                    },
+              child: Text(AppLocalizations.of(context)!.db_instance_test)),
+          TextButton(
+              onPressed: () async {
+                if (addInstanceController.validate()) {
+                  await ref
+                      .read(instancesServicesProvider.notifier)
+                      .addInstance(addInstanceController.getInstanceModel());
+
+                  addInstanceController.clear();
+
+                  ref.read(instancesNotifierProvider.notifier).changePage("");
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.submit_and_continue)),
+          TextButton(
+              onPressed: () async {
+                if (addInstanceController.validate()) {
+                  await ref
+                      .read(instancesServicesProvider.notifier)
+                      .addInstance(addInstanceController.getInstanceModel());
+
+                  addInstanceController.clear();
+
+                  ref.read(instancesNotifierProvider.notifier).changePage("");
+
+                  GoRouter.of(context).go('/instances/list');
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.submit)),
+        ],
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: SizedBox(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(0, kSpacingSmall, 0, 0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      DatabaseTypeCardList(
+                        connectionMetas: connectionMetas,
+                        selectedDatabaseType:
+                            addInstanceController.selectedDatabaseType,
+                        onDatabaseTypeChange: (type) {
+                          addInstanceController.onDatabaseTypeChange(type);
+                        },
+                        selectedColor: selectedColor(addInstanceController),
+                      ),
+                      const SizedBox(height: kSpacingMedium),
+                      Expanded(
+                        child: AddInstanceForm(
+                          infos: addInstanceController.dbInfos,
+                          selectedGroup: addInstanceController.selectedGroup,
+                          onValid: (info, isValid) {
+                            addInstanceController.updateValidState(
+                                info, isValid);
+                          },
+                          onGroupChange: (group) {
+                            addInstanceController.onGroupChange(group);
+                          },
+                          codeController: addInstanceController.code,
+                        ),
+                      )
+                    ]),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -243,16 +220,17 @@ class DatabaseTypeCard extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.only(top: kSpacingTiny),
               child: Image.asset(logoPath),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+              padding:
+                  const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
               child: Text(name, style: Theme.of(context).textTheme.bodyMedium),
             ),
             if (selected)
               Container(
-                padding: const EdgeInsets.only(bottom: 5),
+                padding: const EdgeInsets.only(bottom: kSpacingTiny),
                 width: 5,
                 height: 5,
                 decoration: BoxDecoration(
@@ -480,7 +458,7 @@ class AddInstanceForm extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            width: 5,
+            width: kSpacingTiny,
           ),
           Container(
             constraints: const BoxConstraints(maxWidth: 120),
@@ -606,17 +584,16 @@ class AddInstanceForm extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 500),
           child: Column(
             children: [
-              const SizedBox(height: 5),
-              Row(
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.db_base_config,
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  )
-                ],
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                child: Text(
+                  AppLocalizations.of(context)!.db_base_config,
+                  textAlign: TextAlign.left,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: kSpacingSmall),
               Column(
                 children: [
                   buildNameField(context),
@@ -630,7 +607,7 @@ class AddInstanceForm extends StatelessWidget {
           ),
         ),
         const SizedBox(
-          width: 40,
+          width: kSpacingLarge,
         ),
         Expanded(
             child: Container(
@@ -662,7 +639,7 @@ class AddInstanceForm extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: kSpacingSmall),
               IndexedStack(
                 index: selectedGroupIndex,
                 children: [
@@ -699,7 +676,7 @@ class AddInstanceBottomBar extends StatelessWidget {
 
     if (isDatabasePingDoing) {
       msg = Text(AppLocalizations.of(context)!.testing);
-      status = const CircularProgressIndicator(strokeWidth: 2);
+      status = const Loading();
     } else if (isDatabaseConnectable == null) {
       msg = const Text("");
       status = const Spacer();
@@ -715,12 +692,9 @@ class AddInstanceBottomBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: SizedBox(
-            height: 20,
-            width: 20,
-            child: status,
-          ),
+          padding:
+              const EdgeInsets.fromLTRB(kSpacingSmall, 0, kSpacingSmall, 0),
+          child: status,
         ),
         Expanded(child: msg)
       ],

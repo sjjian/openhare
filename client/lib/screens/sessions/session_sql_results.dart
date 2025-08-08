@@ -2,6 +2,8 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
+import 'package:client/widgets/loading.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +36,7 @@ class SqlResultTables extends ConsumerWidget {
     Widget tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
       Expanded(
         child: CommonTabBar(
-          height: 35,
+          height: 36,
           color: Theme.of(context).colorScheme.surfaceContainer,
           tabStyle: style,
           onReorder: (oldIndex, newIndex) {
@@ -65,12 +67,7 @@ class SqlResultTables extends ConsumerWidget {
                       },
                       avatar: (model.results[i] != model.selected &&
                               model.results[i].state == SQLExecuteState.init)
-                          ? const Padding(
-                              padding: EdgeInsets.all(2),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            )
+                          ? const Loading.small()
                           : const Icon(
                               Icons.grid_on,
                             ),
@@ -88,7 +85,7 @@ class SqlResultTables extends ConsumerWidget {
             children: [
               Container(
                 alignment: Alignment.centerLeft,
-                constraints: const BoxConstraints(maxHeight: 35),
+                constraints: const BoxConstraints(maxHeight: 36),
                 child: tab,
               ),
               const Expanded(child: SqlResultTable())
@@ -116,7 +113,7 @@ class SqlResultTable extends ConsumerWidget {
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 2),
+                    padding: const EdgeInsets.only(right: 5),
                     child: DataTypeIcon(type: e.dataType(), size: 20),
                   ),
                   Expanded(
@@ -184,36 +181,33 @@ class SqlResultTable extends ConsumerWidget {
           child: Text('${model.error}'));
     } else {
       return Container(
-          alignment: Alignment.topLeft,
-          color: color,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: CircularProgressIndicator(),
-                ),
-                const SizedBox(height: 20),
-                FilledButton(
-                    onPressed: () async {
-                      SessionDetailModel? sessionModel = ref
-                          .read(sessionsServicesProvider.notifier)
-                          .getSession(model.resultId.sessionId);
+        alignment: Alignment.topLeft,
+        color: color,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Loading.big(),
+              const SizedBox(height: kSpacingMedium),
+              FilledButton(
+                  onPressed: () async {
+                    SessionDetailModel? sessionModel = ref
+                        .read(sessionsServicesProvider.notifier)
+                        .getSession(model.resultId.sessionId);
 
-                      if (sessionModel == null || sessionModel.connId == null) {
-                        return;
-                      }
-                      await ref
-                          .read(sessionConnsServicesProvider.notifier)
-                          .killQuery(sessionModel.connId!);
-                    },
-                    child: Text(AppLocalizations.of(context)!.cancel))
-              ],
-            ),
-          ));
+                    if (sessionModel == null || sessionModel.connId == null) {
+                      return;
+                    }
+                    await ref
+                        .read(sessionConnsServicesProvider.notifier)
+                        .killQuery(sessionModel.connId!);
+                  },
+                  child: Text(AppLocalizations.of(context)!.cancel))
+            ],
+          ),
+        ),
+      );
     }
   }
 }

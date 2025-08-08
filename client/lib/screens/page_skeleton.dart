@@ -1,4 +1,5 @@
 import 'package:client/screens/app.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -47,26 +48,28 @@ class PageSkeleton extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceContainer, // 全局背景色
         child: Column(children: [
           Container(
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest, // header 背景色
-              height: 40,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: MoveWindow(
-                      // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
-                      child: topBar,
-                    ),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest, // header 背景色
+            height: tabbarHeight,
+            child: Row(
+              children: [
+                Expanded(
+                  child: MoveWindow(
+                    // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
+                    child: topBar,
                   ),
-                  if (!kIsWeb) const WindowButtons(),
-                ],
-              )),
+                ),
+                const SizedBox(width: kSpacingLarge), // 顶部 tab 空部分空间, 防止无法拖动窗口.
+                if (!kIsWeb) const WindowButtons(),
+              ],
+            ),
+          ),
           Expanded(
             child: child,
           ),
           Container(
-            height: 40,
+            height: tabbarHeight,
             color: Theme.of(context)
                 .colorScheme
                 .surfaceContainerHighest, // bottom 背景色
@@ -74,6 +77,48 @@ class PageSkeleton extends StatelessWidget {
           )
         ]),
       ),
+    );
+  }
+}
+
+class BodyPageSkeleton extends StatelessWidget {
+  final Widget header;
+  final Widget child;
+  const BodyPageSkeleton({Key? key, required this.header, required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(
+              kSpacingLarge,
+              kSpacingMedium,
+              kSpacingLarge,
+              0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 36,
+                  child: header,
+                ),
+                const SizedBox(height: kSpacingSmall),
+                const Divider(
+                  thickness: kDividerThickness,
+                  height: kDividerSize,
+                ),
+                const SizedBox(height: kSpacingMedium),
+                // 产品描述部分
+                Expanded(child: child),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

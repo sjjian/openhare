@@ -2,7 +2,10 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
+import 'package:client/widgets/icon_button.dart';
+import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -136,8 +139,9 @@ class SessionOpBar extends ConsumerWidget {
   Widget connectWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     if (connIsDisconnected(model)) {
-      return IconButton(
-        icon: Icon(Icons.link_rounded, color: Theme.of(context).primaryColor),
+      return RectangleIconButton(
+        icon: Icons.link_rounded,
+        iconColor: Theme.of(context).primaryColor,
         onPressed: () async {
           await ref
               .read(sessionsServicesProvider.notifier)
@@ -145,19 +149,12 @@ class SessionOpBar extends ConsumerWidget {
         },
       );
     } else if (connIsConnecting(model)) {
-      return Container(
-        width: 36,
-        height: 36,
-        padding: const EdgeInsets.all(8),
-        child: const CircularProgressIndicator(
-          strokeWidth: 2,
-        ),
-      );
+      return const Loading();
     } else {
       // disconnect
-      return IconButton(
-        icon:
-            Icon(Icons.link_off_rounded, color: Theme.of(context).primaryColor),
+      return RectangleIconButton(
+        icon: Icons.link_off_rounded,
+        iconColor: Theme.of(context).primaryColor,
         onPressed: () async {
           disconnectDialog(context, ref, model);
         },
@@ -167,14 +164,9 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget executeWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    return IconButton(
-      iconSize: height,
-      alignment: Alignment.center,
-      padding: const EdgeInsets.all(2),
-      icon: Icon(
-        Icons.play_arrow_rounded,
-        color: connIsIdle(model) ? Colors.green : Colors.grey,
-      ),
+    return RectangleIconButton(
+      icon: Icons.play_circle_outline_rounded,
+      iconColor: connIsIdle(model) ? Colors.green : Colors.grey,
       onPressed: connIsIdle(model)
           ? () {
               String query = getQuery();
@@ -196,48 +188,36 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget executeAddWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    return IconButton(
-      iconSize: height,
-      alignment: Alignment.center,
-      padding: const EdgeInsets.all(2),
-      icon: Stack(alignment: Alignment.center, children: [
-        Icon(Icons.play_arrow_rounded,
-            color: connIsIdle(model) ? Colors.green : Colors.grey),
-        const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 12,
-        ),
-      ]),
-      onPressed: connIsIdle(model)
-          ? () {
-              String query = getQuery();
-              if (query.isNotEmpty) {
-                final sqlResultsServices =
-                    ref.read(sQLResultsServicesProvider.notifier);
-                final resultModel =
-                    sqlResultsServices.addSQLResult(model.sessionId);
-                sqlResultsServices.loadFromQuery(resultModel.resultId, query);
+    return Stack(alignment: Alignment.center, children: [
+      RectangleIconButton(
+        icon: Icons.not_started_outlined,
+        iconColor: connIsIdle(model) ? Colors.green : Colors.grey,
+        onPressed: connIsIdle(model)
+            ? () {
+                String query = getQuery();
+                if (query.isNotEmpty) {
+                  final sqlResultsServices =
+                      ref.read(sQLResultsServicesProvider.notifier);
+                  final resultModel =
+                      sqlResultsServices.addSQLResult(model.sessionId);
+                  sqlResultsServices.loadFromQuery(resultModel.resultId, query);
+                }
               }
-            }
-          : () {
-              connectDialog(context, ref, model);
-            },
-    );
+            : () {
+                connectDialog(context, ref, model);
+              },
+      ),
+    ]);
   }
 
   Widget explainWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    return IconButton(
-      iconSize: height,
-      padding: const EdgeInsets.all(2),
-      alignment: Alignment.topLeft,
-      icon: Icon(
-        Icons.e_mobiledata,
-        color: connIsIdle(model)
-            ? const Color.fromARGB(255, 241, 192, 84)
-            : Colors.grey,
-      ),
+    return RectangleIconButton(
+      iconSize: kIconSizeLarge,
+      icon: Icons.e_mobiledata,
+      iconColor: connIsIdle(model)
+          ? const Color.fromARGB(255, 241, 192, 84)
+          : Colors.grey,
       onPressed: connIsIdle(model)
           ? () {
               String query = getQuery();
@@ -258,7 +238,8 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget divider() {
     return const VerticalDivider(
-      width: 5,
+      thickness: kDividerThickness,
+      width: kDividerSize,
       indent: 10,
       endIndent: 10,
     );
@@ -280,16 +261,13 @@ class SessionOpBar extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(width: 5),
           // connect
           connectWidget(context, ref, model),
-          divider(),
           // schema list
           SchemaBar(
             connId: model.connId,
             disable: !connIsIdle(model),
             currentSchema: model.currentSchema,
-            iconColor: connIsConnected(model) ? Colors.green : Colors.grey,
           ),
           divider(),
           executeWidget(context, ref, model),
@@ -297,13 +275,14 @@ class SessionOpBar extends ConsumerWidget {
           explainWidget(context, ref, model),
           const Spacer(),
           if (model.isRightPageOpen == false)
-            IconButton(
+            RectangleIconButton(
+              icon: Icons.format_indent_decrease,
+              iconColor: Theme.of(context).colorScheme.onSurface,
               onPressed: () {
                 ref
                     .read(sessionDrawerNotifierProvider.notifier)
                     .showRightPage();
               },
-              icon: const Icon(Icons.format_indent_decrease),
             )
         ],
       ),
@@ -380,7 +359,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
               }).toList());
         },
         child: Container(
-            padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+            padding: const EdgeInsets.only(left: kSpacingTiny),
             color: (isEnter && !widget.disable)
                 ? Theme.of(context)
                     .colorScheme
@@ -392,10 +371,10 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                   icon: HugeIcons.strokeRoundedDatabase,
                   color: widget.iconColor ??
                       Theme.of(context).colorScheme.onSurface,
-                  size: 20,
+                  size: kIconSizeSmall,
                 ),
                 Container(
-                    padding: const EdgeInsets.only(left: 2),
+                    padding: const EdgeInsets.only(left: kSpacingTiny),
                     width: 120,
                     child: Align(
                         alignment: Alignment.centerLeft,

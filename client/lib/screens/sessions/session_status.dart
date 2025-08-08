@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';
@@ -11,11 +12,11 @@ class SessionStatusTab extends ConsumerWidget {
   const SessionStatusTab({Key? key}) : super(key: key);
 
   Widget divider(BuildContext context) {
-    return VerticalDivider(
-      width: 10,
+    return const VerticalDivider(
+      thickness: kDividerThickness,
+      width: kDividerSize,
       indent: 10,
       endIndent: 10,
-      color: Theme.of(context).dividerColor,
     );
   }
 
@@ -33,8 +34,8 @@ class SessionStatusTab extends ConsumerWidget {
     String shortQueryDisplay = model.query?.trimLeft().split("\n")[0] ?? "-";
 
     return Container(
-      padding: const EdgeInsets.only(left: 5),
-      height: 30,
+      padding: const EdgeInsets.only(left: 10),
+      // height: 30,
       child: Row(
         children: [
           Tooltip(
@@ -42,7 +43,7 @@ class SessionStatusTab extends ConsumerWidget {
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Container(
-                width: 80,
+                constraints: const BoxConstraints(maxWidth: 80),
                 padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -54,10 +55,11 @@ class SessionStatusTab extends ConsumerWidget {
                       SQLConnectState.connected ||
                       SQLConnectState.executing =>
                         const Icon(Icons.check_circle,
-                            size: 16, color: Colors.green),
+                            size: kIconSizeTiny, color: Colors.green),
                       SQLConnectState.failed ||
                       SQLConnectState.unHealth =>
-                        const Icon(Icons.error, size: 16, color: Colors.red),
+                        const Icon(Icons.error,
+                            size: kIconSizeTiny, color: Colors.red),
                       _ => const Text("-"),
                     } // 根据model.state展示不同的图标
                         ),
@@ -108,6 +110,7 @@ class SessionStatusTab extends ConsumerWidget {
                     color: Colors.green,
                   ))
           ],
+          const Spacer(),
         ],
       ),
     );
@@ -135,13 +138,13 @@ class ValueStatusWidget extends StatelessWidget {
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Container(
-          width: width,
+          constraints: BoxConstraints(maxWidth: width),
           padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text('$label:'),
-              const SizedBox(width: 4),
+              const SizedBox(width: kSpacingTiny),
               Expanded(
                 child: Text(
                   value,

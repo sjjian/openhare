@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:client/widgets/loading.dart';
 
 class RootNode implements DataNode {
   final String name;
@@ -134,11 +134,7 @@ class SessionDrawerMetadata extends ConsumerWidget {
     InstanceMetadataModel? model = ref.watch(sessionMetadataNotifierProvider);
     Widget body = const Align(
       alignment: Alignment.center,
-      child: SizedBox(
-        height: 40,
-        width: 40,
-        child: CircularProgressIndicator(),
-      ),
+      child: Loading.big(),
     );
 
     RootNode root = RootNode();
@@ -161,42 +157,10 @@ class SessionDrawerMetadata extends ConsumerWidget {
     body = DataTree(controller: metadataController);
 
     return Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // SessionMetadataTitle(),
-          // const Divider(
-          //   endIndent: 10,
-          // ),
-          Expanded(child: body),
-        ]);
-  }
-}
-
-class SessionMetadataInfo extends StatelessWidget {
-  final String name;
-  final Widget? child;
-  const SessionMetadataInfo({Key? key, required this.name, this.child})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(),
-        Container(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Text(
-              name,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
-            )),
-        Container(
-          padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-          child: child ?? const Text("null"),
-        )
+        Expanded(child: body),
       ],
     );
   }

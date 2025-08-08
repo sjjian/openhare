@@ -53,15 +53,11 @@ class SessionDrawerSqlResult extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // const SizedBox(height: 32),
-          // const Divider(
-          //   endIndent: 10,
-          // ),
           Expanded(
             child: buildDisplayField(context, sessionDrawer),
             // child: buildDisplayField(context),
           ),
-        ]);
+        ],);
   }
 }
 
