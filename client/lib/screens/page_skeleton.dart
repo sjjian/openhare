@@ -84,8 +84,13 @@ class PageSkeleton extends StatelessWidget {
 class BodyPageSkeleton extends StatelessWidget {
   final Widget header;
   final Widget child;
-  const BodyPageSkeleton({Key? key, required this.header, required this.child})
-      : super(key: key);
+  final double? bottomSpaceSize;
+  const BodyPageSkeleton({
+    Key? key,
+    required this.header,
+    required this.child,
+    this.bottomSpaceSize = kSpacingMedium,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +116,7 @@ class BodyPageSkeleton extends StatelessWidget {
                   thickness: kDividerThickness,
                   height: kDividerSize,
                 ),
-                const SizedBox(height: kSpacingMedium),
+                SizedBox(height: bottomSpaceSize),
                 // 产品描述部分
                 Expanded(child: child),
               ],

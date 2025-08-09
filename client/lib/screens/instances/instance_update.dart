@@ -2,6 +2,7 @@ import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -36,9 +37,12 @@ class _UpdateInstancePageState extends State<UpdateInstancePage> {
     return PageSkeleton(
       topBar: Row(
         children: [
-          IconButton(
-              onPressed: () => GoRouter.of(context).go('/instances/list'),
-              icon: const Icon(Icons.arrow_back))
+          RectangleIconButton(
+            iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            iconSize: kIconSizeSmall,
+            icon: Icons.arrow_back,
+            onPressed: () => GoRouter.of(context).go('/instances/list'),
+          )
         ],
       ),
       bottomBar: AddInstanceBottomBar(
@@ -128,7 +132,7 @@ class _UpdateInstanceState extends ConsumerState<UpdateInstance> {
           Expanded(
               child: SizedBox(
             child: Container(
-              padding: const EdgeInsets.fromLTRB(0, kSpacingMedium, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, kSpacingSmall, 0, 0),
               child:
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                 DatabaseTypeCardList(

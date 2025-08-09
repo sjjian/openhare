@@ -2,6 +2,7 @@ import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
@@ -40,9 +41,12 @@ class _AddInstancePageState extends State<AddInstancePage> {
     return PageSkeleton(
       topBar: Row(
         children: [
-          IconButton(
-              onPressed: () => GoRouter.of(context).go('/instances/list'),
-              icon: const Icon(Icons.arrow_back))
+          RectangleIconButton(
+            iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            iconSize: kIconSizeSmall,
+            icon: Icons.arrow_back,
+            onPressed: () => GoRouter.of(context).go('/instances/list'),
+          )
         ],
       ),
       bottomBar: AddInstanceBottomBar(
@@ -207,7 +211,7 @@ class DatabaseTypeCard extends StatelessWidget {
         color: selected
             ? Theme.of(context)
                 .colorScheme
-                .surfaceContainerHighest // db type card selected color
+                .surfaceContainerHigh // db type card selected color
             : null,
       ),
       child: InkWell(
@@ -514,7 +518,7 @@ class AddInstanceForm extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               color: Theme.of(context)
                   .colorScheme
-                  .surfaceContainerHighest // db type card selected color
+                  .surfaceContainer // SQL 编辑器 color
               ,
             ),
             child: CodeEditor(
@@ -522,7 +526,7 @@ class AddInstanceForm extends StatelessWidget {
               style: CodeEditorStyle(
                 backgroundColor: Theme.of(context)
                     .colorScheme
-                    .surfaceContainerHigh, // SQL 编辑器背景色
+                    .surfaceContainer, // SQL 编辑器背景色
                 textStyle: GoogleFonts.robotoMono(
                     textStyle: Theme.of(context).textTheme.bodyMedium,
                     color:
@@ -625,7 +629,7 @@ class AddInstanceForm extends StatelessWidget {
                         backgroundColor: group == selectedGroup
                             ? Theme.of(context)
                                 .colorScheme
-                                .surfaceContainerHighest // custom config tab selected color
+                                .surfaceContainerHigh // custom config tab selected color
                             : null,
                       ),
                       child: Text(
@@ -682,10 +686,18 @@ class AddInstanceBottomBar extends StatelessWidget {
       status = const Spacer();
     } else if (isDatabaseConnectable == true) {
       msg = Text(AppLocalizations.of(context)!.test_success);
-      status = const Icon(Icons.check_circle, size: 20, color: Colors.green);
+      status = const Icon(
+        Icons.check_circle,
+        size: kIconSizeSmall,
+        color: Colors.green,
+      );
     } else {
       msg = Text(databaseConnectError ?? "", overflow: TextOverflow.ellipsis);
-      status = const Icon(Icons.error, size: 20, color: Colors.red);
+      status = const Icon(
+        Icons.error,
+        size: kIconSizeSmall,
+        color: Colors.red,
+      );
     }
 
     return Row(

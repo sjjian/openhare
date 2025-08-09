@@ -21,7 +21,7 @@ class SessionDrawerBody extends ConsumerWidget {
           Expanded(
             child: Container(
                 padding: const EdgeInsets.fromLTRB(
-                    kSpacingSmall, 0, kSpacingSmall, 0),
+                    kSpacingSmall - 5, 0, kSpacingSmall, 0), // 左边减去5, 减掉split view 多出来的空间
                 child: switch (sessionDrawer.drawerPage) {
                   DrawerPage.sqlResult => const SessionDrawerSqlResult(),
                   _ => const SessionDrawerMetadata(),
@@ -92,7 +92,7 @@ class SessionDrawerBar extends ConsumerWidget {
                       .read(sessionDrawerNotifierProvider.notifier)
                       .showRightPage();
             },
-          )
+          ),
         ],
       ),
     );
