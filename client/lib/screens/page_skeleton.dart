@@ -45,12 +45,12 @@ class PageSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldWithNavRail(
       child: Material(
-        color: Theme.of(context).colorScheme.surfaceContainer, // 全局背景色
+        color: Theme.of(context).colorScheme.surfaceContainerLow, // 全局背景色
         child: Column(children: [
           Container(
             color: Theme.of(context)
                 .colorScheme
-                .surfaceContainerHighest, // header 背景色
+                .surfaceContainerHigh, // header 背景色
             height: tabbarHeight,
             child: Row(
               children: [
@@ -72,7 +72,7 @@ class PageSkeleton extends StatelessWidget {
             height: tabbarHeight,
             color: Theme.of(context)
                 .colorScheme
-                .surfaceContainerHighest, // bottom 背景色
+                .surfaceContainerHigh, // bottom 背景色
             child: bottomBar,
           )
         ]),

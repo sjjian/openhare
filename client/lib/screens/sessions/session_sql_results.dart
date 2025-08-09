@@ -23,21 +23,22 @@ class SqlResultTables extends ConsumerWidget {
       maxWidth: 100,
       minWidth: 90,
       labelAlign: TextAlign.center,
-      selectedColor: Theme.of(context)
+      selectedColor:
+          Theme.of(context).colorScheme.surfaceBright, // sql result tab 的选中颜色
+      color: Theme.of(context)
           .colorScheme
-          .surfaceContainerLow, // sql result tab 的选中颜色
-      color:
-          Theme.of(context).colorScheme.surfaceContainer, // sql result tab 的背景色
-      hoverColor: Theme.of(context)
-          .colorScheme
-          .surfaceContainer, // sql result tab 的鼠标移入色
+          .surfaceContainerLow, // sql result tab 的背景色
+      hoverColor:
+          Theme.of(context).colorScheme.surfaceBright, // sql result tab 的鼠标移入色
     );
 
     Widget tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
       Expanded(
         child: CommonTabBar(
           height: 36,
-          color: Theme.of(context).colorScheme.surfaceContainer,
+          color: Theme.of(context)
+              .colorScheme
+              .surfaceContainerLow, // CommonTabBar 背景色
           tabStyle: style,
           onReorder: (oldIndex, newIndex) {
             final sqlResultsServices =
@@ -69,6 +70,7 @@ class SqlResultTables extends ConsumerWidget {
                               model.results[i].state == SQLExecuteState.init)
                           ? const Loading.small()
                           : const Icon(
+                              size: kIconSizeTiny,
                               Icons.grid_on,
                             ),
                     ),
@@ -85,7 +87,7 @@ class SqlResultTables extends ConsumerWidget {
             children: [
               Container(
                 alignment: Alignment.centerLeft,
-                constraints: const BoxConstraints(maxHeight: 36),
+                constraints: const BoxConstraints(maxHeight: 32),
                 child: tab,
               ),
               const Expanded(child: SqlResultTable())
@@ -113,8 +115,11 @@ class SqlResultTable extends ConsumerWidget {
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: DataTypeIcon(type: e.dataType(), size: 20),
+                    padding: const EdgeInsets.only(right: kSpacingTiny),
+                    child: DataTypeIcon(
+                      type: e.dataType(),
+                      size: kIconSizeSmall,
+                    ),
                   ),
                   Expanded(
                       child: Text(e.name, overflow: TextOverflow.ellipsis)),
@@ -135,9 +140,8 @@ class SqlResultTable extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final color = Theme.of(context)
-        .colorScheme
-        .surfaceContainerLow; // sql result body 的背景色
+    final color =
+        Theme.of(context).colorScheme.surfaceBright; // sql result body 的背景色
 
     final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
@@ -159,16 +163,21 @@ class SqlResultTable extends ConsumerWidget {
               );
         },
         configuration: PlutoGridConfiguration(
-          localeText: const PlutoGridLocaleText.china(),
+          localeText: AppLocalizations.of(context)!.localeName == "zh"
+              ? const PlutoGridLocaleText.china()
+              : const PlutoGridLocaleText(),
           style: PlutoGridStyleConfig(
-            rowHeight: 30,
-            columnHeight: 36,
+            rowHeight: 24,
+            columnHeight: 32,
             gridBorderColor: color,
             rowColor: color,
             activatedColor: Theme.of(context)
                 .colorScheme
                 .surfaceContainer, // sql result table 行选中的颜色
             gridBackgroundColor: color,
+            cellTextStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
         ),
         columns: buildColumns(model.data!.columns),

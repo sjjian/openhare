@@ -54,9 +54,8 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
             decoration: BoxDecoration(
               color: _isHovering
                   ? widget.hoverBackgroundColor ??
-                      Theme.of(context).colorScheme.surfaceContainerHighest
-                  : widget.backgroundColor ??
-                      Theme.of(context).colorScheme.surfaceContainer,
+                      Theme.of(context).colorScheme.surfaceContainer // icon button 鼠标悬浮的颜色
+                  : widget.backgroundColor, // icon button 背景色
             ),
             child: Icon(
               widget.icon,

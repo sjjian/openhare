@@ -4,6 +4,7 @@ import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_sql_results.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,26 +19,43 @@ class SessionBodyPage extends ConsumerWidget {
         ref.watch(sessionSplitViewNotifierProvider);
     SessionDrawerModel sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
 
-    final Widget left = Column(
+    final Widget left = Row(
       children: [
-        SessionOpBar(codeController: sessionEditor.code),
         Expanded(
-          child: SplitView(
-            controller: sessionSplitView.multiSplitViewCtrl,
-            axis: Axis.vertical,
-            first: SQLEditor(
-                key: ValueKey(sessionEditor.code),
-                codeController: sessionEditor.code),
-            second: const SqlResultTables(),
+          child: Column(
+            children: [
+              SessionOpBar(codeController: sessionEditor.code),
+              Divider(
+                height: kBlockDividerSize,
+                thickness: kBlockDividerThickness,
+                color: Theme.of(context).dividerColor,
+              ),
+              Expanded(
+                child: SplitView(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  controller: sessionSplitView.multiSplitViewCtrl,
+                  axis: Axis.vertical,
+                  first: SQLEditor(
+                      key: ValueKey(sessionEditor.code),
+                      codeController: sessionEditor.code),
+                  second: const SqlResultTables(),
+                ),
+              ),
+            ],
           ),
+        ),
+        VerticalDivider(
+          width: kBlockDividerSize,
+          thickness: kBlockDividerThickness,
+          color: Theme.of(context).dividerColor,
         ),
       ],
     );
     return Container(
       alignment: Alignment.topLeft,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: sessionDrawer.isRightPageOpen
           ? SplitView(
+              color: Theme.of(context).colorScheme.surfaceBright,
               axis: Axis.horizontal,
               controller: sessionSplitView.metaDataSplitViewCtrl,
               first: left,

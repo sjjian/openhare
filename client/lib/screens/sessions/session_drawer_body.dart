@@ -14,9 +14,7 @@ class SessionDrawerBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     return Container(
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerLow, // session drawer 背景色
+      color: Theme.of(context).colorScheme.surfaceBright, // session drawer 背景色
       child: Column(
         children: [
           const SessionDrawerBar(),
@@ -44,15 +42,16 @@ class SessionDrawerBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     return Container(
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainer, // session drawer bar 背景色
+      color:
+          Theme.of(context).colorScheme.surfaceBright, // session drawer bar 背景色
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           RectangleIconButton(
+              hoverBackgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainer,
               icon: (sessionDrawer.drawerPage == DrawerPage.metadataTree)
                   ? Icons.account_tree_rounded
                   : Icons.account_tree_outlined,
@@ -63,6 +62,8 @@ class SessionDrawerBar extends ConsumerWidget {
                 ref.read(sessionDrawerNotifierProvider.notifier).goToTree();
               }),
           RectangleIconButton(
+              hoverBackgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainer,
               icon: (sessionDrawer.drawerPage == DrawerPage.sqlResult)
                   ? Icons.article_rounded
                   : Icons.article_outlined,
@@ -76,6 +77,8 @@ class SessionDrawerBar extends ConsumerWidget {
               }),
           const Spacer(),
           RectangleIconButton(
+            hoverBackgroundColor:
+                Theme.of(context).colorScheme.surfaceContainer,
             icon: sessionDrawer.isRightPageOpen
                 ? Icons.format_indent_increase
                 : Icons.format_indent_decrease,

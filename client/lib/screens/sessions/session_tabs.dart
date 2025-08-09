@@ -61,13 +61,13 @@ class SessionTabs extends ConsumerWidget {
                 minWidth: 90,
                 color: Theme.of(context)
                     .colorScheme
-                    .surfaceContainerHighest, // session tab 背景色
+                    .surfaceContainerHigh, // session tab 背景色
                 selectedColor: Theme.of(context)
                     .colorScheme
-                    .surfaceContainer, // session tab 选择的颜色
+                    .surfaceContainerLow, // session tab 选择的颜色
                 hoverColor: Theme.of(context)
                     .colorScheme
-                    .surfaceDim, // session tab 鼠标移入的颜色
+                    .surfaceContainer, // session tab 鼠标移入的颜色
               ),
               addTab: () {
                 ref.read(sessionsServicesProvider.notifier).newSession();

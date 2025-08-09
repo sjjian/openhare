@@ -132,7 +132,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
         NavigationRail(
           minWidth: navigationRailWidth,
           backgroundColor:
-              Theme.of(context).colorScheme.surfaceDim, // navigation color
+              Theme.of(context).colorScheme.surfaceContainerHighest, // navigation color
           useIndicator: true,
           selectedIndex: _calculateSelectedIndex(context),
           onDestinationSelected: (value) {
