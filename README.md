@@ -19,40 +19,37 @@ openhare is a professional, cross-platform desktop SQL query tool built with Flu
 
 ---
 
-## Technology Stack
+## Roadmap
+1. AI editor;
+2. Support more database;
 
+## Technology Stack
 ### Application Framework
 - [Flutter](https://flutter.dev/)
 - [Dart](https://dart.dev/)
+- [flutter_rust_bridge] (https://github.com/fzyzcjy/flutter_rust_bridge)
 
 ### State Management & Routing
 - [Riverpod](https://riverpod.dev/)
 - [GoRouter](https://pub.dev/packages/go_router)
 
 ### UI & UX
-- [PlutoGrid](https://pub.dev/packages/pluto_grid) (Data grid)
-- [HugeIcons](https://pub.dev/packages/hugeicons) (Icon library)
-- [Google Fonts](https://pub.dev/packages/google_fonts)
-- [Multi Split View](https://pub.dev/packages/multi_split_view)
-- [Flutter Fancy Tree View](https://pub.dev/packages/flutter_fancy_tree_view)
-- [Flutter Breadcrumb](https://pub.dev/packages/flutter_breadcrumb)
-- [Bitsdojo Window](https://pub.dev/packages/bitsdojo_window)
-- [Window Manager](https://pub.dev/packages/window_manager)
+- [SQL Editor](https://github.com/reqable/re-editor)
+- [PlutoGrid](https://github.com/bosskmk/pluto_grid) (Data grid)
+- [HugeIcons](https://github.com/hugeicons/hugeicons-flutter)
+- [Bitsdojo Window](https://github.com/bitsdojo/bitsdojo_window)
+- [Window Manager](https://github.com/leanflutter/window_manager)
 
-### Database & Data Handling
-- [MySQL Client](https://pub.dev/packages/mysql_client)
-- [MySQL1](https://pub.dev/packages/mysql1)
+### Storage
 - [ObjectBox](https://objectbox.io/)
-- [File Picker](https://pub.dev/packages/file_picker)
-- [Excel](https://pub.dev/packages/excel)
 
+### DB Driver
+- [MySQL](https://github.com/blackbeam/mysql_async) rust with flutter_rust_bridge
+- [Postgresql](https://github.com/isoos/postgresql-dart)
 ---
 
 ## Getting Started
-
-1. **Download** the latest release for your operating system (coming soon).
-2. **Install** and launch openhare.
-3. **Connect** to your database and start managing your data with ease.
+Coming soon.
 
 ## License
 
