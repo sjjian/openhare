@@ -44,7 +44,7 @@ openhare is a professional, cross-platform desktop SQL query tool built with Flu
 - [ObjectBox](https://objectbox.io/)
 
 ### DB Driver
-- [MySQL](https://github.com/blackbeam/mysql_async) rust with flutter_rust_bridge
+- [MySQL](https://github.com/blackbeam/mysql_async)  rust with flutter_rust_bridge
 - [Postgresql](https://github.com/isoos/postgresql-dart)
 ---
 
