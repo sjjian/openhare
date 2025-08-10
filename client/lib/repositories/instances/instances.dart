@@ -43,11 +43,11 @@ class InstanceStorage {
 
   List<String> initQuerys;
 
-  @Property(type: PropertyType.date)
+  @Property(type: PropertyType.dateNano)
   DateTime createdAt;
 
-  @Property(type: PropertyType.date)
-  DateTime? latestOpenAt;
+  @Property(type: PropertyType.dateNano)
+  DateTime latestOpenAt;
 
   @Transient()
   ConnectValue get connectValue => ConnectValue(
@@ -84,7 +84,8 @@ class InstanceStorage {
     DateTime? latestOpenAt,
   })  : activeSchemas = activeSchemas ?? ActiveSet<String>(List.empty()),
         dbType = DatabaseType.values[stDbType],
-        createdAt = createdAt ?? DateTime.now();
+        createdAt = createdAt ?? DateTime.now(),
+        latestOpenAt = latestOpenAt ?? DateTime(1970, 1, 1); //latestOpenAt 默认值未很早之前的时间
 
   InstanceStorage.fromModel(InstanceModel model)
       : id = model.id.value,

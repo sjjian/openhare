@@ -74,7 +74,7 @@ class SessionsServices extends _$SessionsServices {
       selectedSessionId = state.selectedSession!.sessionId;
     }
 
-    ref
+    await ref
         .read(instancesServicesProvider.notifier)
         .addActiveInstance(instance.id, schema: schema);
 
@@ -136,12 +136,11 @@ class SessionsServices extends _$SessionsServices {
     // connect conn
     await connsServices.connect(connId,
         onSchemaChangedCallback: (schema) async {
-      print("onSchemaChangedCallback: $schema");
       await ref
           .read(sessionRepoProvider)
           .updateSession(sessionId, currentSchema: schema);
 
-      ref
+      await ref
           .read(instancesServicesProvider.notifier)
           .addActiveInstance(session.instanceId!, schema: schema);
 

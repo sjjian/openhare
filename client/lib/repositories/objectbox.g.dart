@@ -116,13 +116,13 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(9, 4690926171000995925),
         name: 'createdAt',
-        type: 10,
+        type: 12,
         flags: 0,
       ),
       obx_int.ModelProperty(
         id: const obx_int.IdUid(10, 5475873554467602001),
         name: 'latestOpenAt',
-        type: 10,
+        type: 12,
         flags: 0,
       ),
       obx_int.ModelProperty(
@@ -296,9 +296,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (SessionStorage object, fb.Builder fbb) {
-        final currentSchemaOffset = object.currentSchema == null
-            ? null
-            : fbb.writeString(object.currentSchema!);
+        final currentSchemaOffset =
+            object.currentSchema == null
+                ? null
+                : fbb.writeString(object.currentSchema!);
         fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.instance.targetId);
@@ -370,8 +371,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(5, passwordOffset);
         fbb.addOffset(6, descOffset);
         fbb.addOffset(7, initQuerysOffset);
-        fbb.addInt64(8, object.createdAt.millisecondsSinceEpoch);
-        fbb.addInt64(9, object.latestOpenAt?.millisecondsSinceEpoch);
+        fbb.addInt64(8, object.createdAt.microsecondsSinceEpoch * 1000);
+        fbb.addInt64(9, object.latestOpenAt.microsecondsSinceEpoch * 1000);
         fbb.addInt64(10, object.stDbType);
         fbb.addOffset(11, stCustomOffset);
         fbb.addOffset(12, stActiveSchemasOffset);
@@ -381,11 +382,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
       objectFromFB: (obx.Store store, ByteData fbData) {
         final buffer = fb.BufferContext(fbData);
         final rootOffset = buffer.derefObject(0);
-        final latestOpenAtValue = const fb.Int64Reader().vTableGetNullable(
-          buffer,
-          rootOffset,
-          22,
-        );
         final idParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
@@ -425,31 +421,32 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fb.StringReader(asciiOptimization: true),
           lazy: false,
         ).vTableGet(buffer, rootOffset, 18, []);
-        final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
-          const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0),
+        final createdAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0) / 1000)
+              .round(),
         );
-        final latestOpenAtParam = latestOpenAtValue == null
-            ? null
-            : DateTime.fromMillisecondsSinceEpoch(latestOpenAtValue);
-        final object =
-            InstanceStorage(
-                id: idParam,
-                stDbType: stDbTypeParam,
-                name: nameParam,
-                host: hostParam,
-                port: portParam,
-                user: userParam,
-                password: passwordParam,
-                desc: descParam,
-                stCustom: stCustomParam,
-                initQuerys: initQuerysParam,
-                createdAt: createdAtParam,
-                latestOpenAt: latestOpenAtParam,
-              )
-              ..stActiveSchemas = const fb.ListReader<String>(
-                fb.StringReader(asciiOptimization: true),
-                lazy: false,
-              ).vTableGet(buffer, rootOffset, 28, []);
+        final latestOpenAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0) / 1000)
+              .round(),
+        );
+        final object = InstanceStorage(
+            id: idParam,
+            stDbType: stDbTypeParam,
+            name: nameParam,
+            host: hostParam,
+            port: portParam,
+            user: userParam,
+            password: passwordParam,
+            desc: descParam,
+            stCustom: stCustomParam,
+            initQuerys: initQuerysParam,
+            createdAt: createdAtParam,
+            latestOpenAt: latestOpenAtParam,
+          )
+          ..stActiveSchemas = const fb.ListReader<String>(
+            fb.StringReader(asciiOptimization: true),
+            lazy: false,
+          ).vTableGet(buffer, rootOffset, 28, []);
 
         return object;
       },
@@ -505,9 +502,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (SessionCodeStorage object, fb.Builder fbb) {
-        final textOffset = object.text == null
-            ? null
-            : fbb.writeString(object.text!);
+        final textOffset =
+            object.text == null ? null : fbb.writeString(object.text!);
         fbb.startTable(3);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, textOffset);
@@ -604,12 +600,12 @@ class InstanceStorage_ {
   );
 
   /// See [InstanceStorage.createdAt].
-  static final createdAt = obx.QueryDateProperty<InstanceStorage>(
+  static final createdAt = obx.QueryDateNanoProperty<InstanceStorage>(
     _entities[1].properties[8],
   );
 
   /// See [InstanceStorage.latestOpenAt].
-  static final latestOpenAt = obx.QueryDateProperty<InstanceStorage>(
+  static final latestOpenAt = obx.QueryDateNanoProperty<InstanceStorage>(
     _entities[1].properties[9],
   );
 

@@ -55,10 +55,10 @@ class InstancesServices extends _$InstancesServices {
     );
   }
 
-  void addActiveInstance(InstanceId instanceId, {String? schema}) {
-    ref.read(instanceRepoProvider).addActiveInstance(instanceId);
+  Future<void> addActiveInstance(InstanceId instanceId, {String? schema}) async {
+    await ref.read(instanceRepoProvider).addActiveInstance(instanceId);
     if (schema != null) {
-      ref
+      await ref
           .read(instanceRepoProvider)
           .addInstanceActiveSchema(instanceId, schema);
     }

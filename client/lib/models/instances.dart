@@ -48,7 +48,7 @@ abstract class InstanceModel with _$InstanceModel {
     required List<String> initQuerys,
     required List<String> activeSchemas,
     required DateTime createdAt,
-    DateTime? latestOpenAt,
+    required DateTime latestOpenAt,
   }) = _InstanceModel;
 
   const InstanceModel._();
