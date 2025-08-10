@@ -1,4 +1,5 @@
 import 'package:pg/pg.dart';
+import 'package:uuid/uuid.dart';
 import 'db_driver_interface.dart';
 import 'db_driver_conn_meta.dart';
 import 'db_driver_metadata.dart';
@@ -116,6 +117,7 @@ class PGConnection extends BaseConnection {
 
   @override
   Future<BaseQueryResult> query(String sql) async {
+    final queryId = Uuid().v4(); // todo: 统一处理
     final qs = await _conn.query(query: sql);
     final columns = qs.schema.columns
         .map<PGQueryColumn>((qs) => PGQueryColumn(qs))
@@ -124,7 +126,8 @@ class PGConnection extends BaseConnection {
     for (final r in qs) {
       rows.add(QueryResultRow(columns, r.map((v) => PGQueryValue(v)).toList()));
     }
-    return BaseQueryResult(columns, rows, BigInt.from(qs.affectedRows));
+    return BaseQueryResult(
+        queryId, columns, rows, BigInt.from(qs.affectedRows));
   }
 
   @override

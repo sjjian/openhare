@@ -222,6 +222,7 @@ abstract class ResultId with _$ResultId {
 abstract class SQLResultModel with _$SQLResultModel {
   const factory SQLResultModel({
     required ResultId resultId,
+    required String queryId,
     required SQLExecuteState state,
   }) = _SQLResultModel;
 }
@@ -231,6 +232,7 @@ abstract class SQLResultDetailModel with _$SQLResultDetailModel {
   const factory SQLResultDetailModel({
     required ResultId resultId,
     required SQLExecuteState state,
+    String? queryId,
     String? query,
     Duration? executeTime,
     String? error,

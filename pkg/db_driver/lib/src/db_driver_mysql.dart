@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:uuid/uuid.dart';
 import 'package:mysql/mysql.dart';
 import 'db_driver_interface.dart';
 import 'db_driver_metadata.dart';
@@ -195,8 +196,9 @@ class MySQLConnection extends BaseConnection {
   }
 
   Future<BaseQueryResult> _query(String sql) async {
+    final queryId = Uuid().v4(); // todo: 统一处理
     // 加入注释. todo: 通用方法处理
-    sql = "/* call by snowhare */ $sql";
+    sql = "/* call by snowhare, uuid: $queryId */ $sql";
     final qs = await _conn.query(query: sql);
     final columns =
         qs.columns.map<BaseQueryColumn>((qs) => MysqlQueryColumn(qs)).toList();
@@ -205,7 +207,7 @@ class MySQLConnection extends BaseConnection {
       rows.add(QueryResultRow(
           columns, r.values.map((v) => MysqlQueryValue(v)).toList()));
     }
-    return BaseQueryResult(columns, rows, qs.affectedRows);
+    return BaseQueryResult(queryId, columns, rows, qs.affectedRows);
   }
 
   @override

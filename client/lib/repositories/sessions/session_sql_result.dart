@@ -37,6 +37,7 @@ class SQLResultRepoImpl extends SQLResultRepo {
       resultId: ResultId(
           sessionId: SessionId(value: result.sessionId), value: result.id),
       query: result.query,
+      queryId: result.queryId ?? "",
       state: result.state,
       executeTime: result.executeTime,
       error: result.error,
@@ -49,6 +50,7 @@ class SQLResultRepoImpl extends SQLResultRepo {
       resultId: ResultId(
           sessionId: SessionId(value: result.sessionId), value: result.id),
       state: result.state,
+      queryId: result.queryId ?? "",
     );
   }
 
@@ -105,6 +107,7 @@ class SQLResultRepoImpl extends SQLResultRepo {
   void updateSQLResult(ResultId resultId, SQLResultDetailModel result) {
     final orginResult = _getSQLResult(resultId.sessionId.value, resultId.value);
     orginResult.query = result.query;
+    orginResult.queryId = result.queryId ?? "";
     orginResult.data = result.data;
     orginResult.error = result.error;
     orginResult.executeTime = result.executeTime;
@@ -130,6 +133,7 @@ class SQLResultRepoImpl extends SQLResultRepo {
 class SQLResult {
   int sessionId;
   int id;
+  String? queryId;
   String? query;
   SQLExecuteState state = SQLExecuteState.executing;
   String? error;
