@@ -198,7 +198,7 @@ class MySQLConnection extends BaseConnection {
   Future<BaseQueryResult> _query(String sql) async {
     final queryId = Uuid().v4(); // todo: 统一处理
     // 加入注释. todo: 通用方法处理
-    sql = "/* call by snowhare, uuid: $queryId */ $sql";
+    sql = "/* call by openhare, uuid: $queryId */ $sql";
     final qs = await _conn.query(query: sql);
     final columns =
         qs.columns.map<BaseQueryColumn>((qs) => MysqlQueryColumn(qs)).toList();

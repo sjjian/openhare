@@ -87,10 +87,10 @@ class _AboutPageState extends State<AboutPage> {
                 const SizedBox(height: kSpacingSmall),
                 InkWell(
                   onTap: () => _launchUrl(
-                    Uri.parse('https://github.com/sjjian/snowhare'),
+                    Uri.parse('https://github.com/sjjian/openhare'),
                   ),
                   child: Text(
-                    'https://github.com/sjjian/snowhare',
+                    'https://github.com/sjjian/openhare',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                         ),
