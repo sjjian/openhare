@@ -130,7 +130,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
       );
 
       return Container(
-        constraints: BoxConstraints(maxHeight: widget.height ?? 40),
+        constraints: BoxConstraints(maxHeight: widget.height ?? 36),
         decoration: BoxDecoration(
           color: widget.color,
         ),
@@ -155,10 +155,11 @@ class _CommonTabBarState extends State<CommonTabBar> {
                   index: i - start,
                   key: ValueKey(i - start),
                   child: CommonTab.fromWarp(
-                      warp: widget.tabs[i],
-                      width: width,
-                      height: widget.height,
-                      style: style),
+                    warp: widget.tabs[i],
+                    width: width,
+                    height: widget.height,
+                    style: style,
+                  ),
                 )
             ],
           ),

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';
@@ -34,8 +35,7 @@ class SessionStatusTab extends ConsumerWidget {
     String shortQueryDisplay = model.query?.trimLeft().split("\n")[0] ?? "-";
 
     return Container(
-      padding: const EdgeInsets.only(left: 10),
-      // height: 30,
+      padding: const EdgeInsets.only(left: kSpacingSmall),
       child: Row(
         children: [
           Tooltip(
@@ -87,28 +87,28 @@ class SessionStatusTab extends ConsumerWidget {
                 tooltip: model.query ??
                     AppLocalizations.of(context)!.no_query_executed),
             if (model.state == SQLExecuteState.done && model.resultId != null)
-              IconButton(
-                  onPressed: () async {
-                    //todo: 下载失效了，需要测试。
-                    String? outputFile = await FilePicker.platform.saveFile(
-                      dialogTitle:
-                          AppLocalizations.of(context)!.display_msg_downlaod,
-                      fileName:
-                          '${model.instanceName}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
-                    );
-                    if (outputFile == null) {
-                      return;
-                    }
-                    File file = File(outputFile);
-                    await file.writeAsBytes(ref
-                        .read(selectedSQLResultNotifierProvider.notifier)
-                        .toExcel()
-                        .save()!);
-                  },
-                  icon: const Icon(
-                    Icons.download_rounded,
-                    color: Colors.green,
-                  ))
+              RectangleIconButton(
+                icon: Icons.download_rounded,
+                iconColor: Colors.green,
+                iconSize: kIconSizeSmall,
+                onPressed: () async {
+                  //todo: 下载失效了，需要测试。
+                  String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle:
+                        AppLocalizations.of(context)!.display_msg_downlaod,
+                    fileName:
+                        '${model.instanceName}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+                  );
+                  if (outputFile == null) {
+                    return;
+                  }
+                  File file = File(outputFile);
+                  await file.writeAsBytes(ref
+                      .read(selectedSQLResultNotifierProvider.notifier)
+                      .toExcel()
+                      .save()!);
+                },
+              ),
           ],
           const Spacer(),
         ],

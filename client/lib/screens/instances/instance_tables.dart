@@ -112,6 +112,7 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
 
     final searchTextController = TextEditingController(text: model.key);
     return BodyPageSkeleton(
+      bottomSpaceSize: kSpacingSmall,
       header: Row(
         children: [
           Text(
@@ -164,6 +165,7 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                 scrollDirection: Axis.vertical,
                 child: DataTable(
                   checkboxHorizontalMargin: 0,
+                  dividerThickness: kDividerThickness,
                   showBottomBorder: true,
                   columns: column,
                   rows: model.instances.map((instance) {

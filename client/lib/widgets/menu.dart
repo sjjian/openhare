@@ -50,7 +50,7 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
     return Container(
       constraints: const BoxConstraints(minWidth: 120, maxWidth: 220),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        color: Theme.of(context).colorScheme.surfaceBright,
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
           BoxShadow(
@@ -172,8 +172,8 @@ class _MoreTabMenuItemWidgetState extends State<MoreTabMenuItemWidget> {
         height: widget.height ?? 35,
         child: Container(
           color: _hovering
-              ? Theme.of(context).colorScheme.surfaceContainerHighest
-              : Theme.of(context).colorScheme.surfaceContainerHigh,
+              ? Theme.of(context).colorScheme.surfaceContainer
+              : Theme.of(context).colorScheme.surfaceBright,
           child: widget.child,
         ),
       ),

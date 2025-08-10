@@ -18,14 +18,16 @@ class SplitView extends StatelessWidget {
   final Widget first;
   final Widget second;
   final Axis axis;
+  final Color? color;
 
-  const SplitView(
-      {Key? key,
-      this.axis = MultiSplitView.defaultAxis,
-      required this.first,
-      required this.second,
-      required this.controller})
-      : super(key: key);
+  const SplitView({
+    Key? key,
+    this.axis = MultiSplitView.defaultAxis,
+    required this.first,
+    required this.second,
+    required this.controller,
+    this.color,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +48,9 @@ class SplitView extends StatelessWidget {
 
     MultiSplitViewTheme theme = MultiSplitViewTheme(
       data: MultiSplitViewThemeData(
+        dividerThickness: 5,
         dividerPainter: DividerPainters.background(
-          color:
-              Theme.of(context).colorScheme.surfaceContainer, // split view 的背景色
+          color: color, // split view 的背景色
         ),
       ),
       child: mv,

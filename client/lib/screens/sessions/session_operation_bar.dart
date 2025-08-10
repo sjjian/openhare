@@ -4,7 +4,7 @@ import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
-import 'package:client/widgets/icon_button.dart';
+import 'package:client/widgets/button.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_parser/parser.dart';
@@ -251,11 +251,13 @@ class SessionOpBar extends ConsumerWidget {
 
     if (model == null) {
       return Container(
+        color: Theme.of(context).colorScheme.surfaceContainerLow, // op bar 背景色
         constraints: BoxConstraints(maxHeight: height),
         child: const Spacer(),
       );
     }
     return Container(
+      color: Theme.of(context).colorScheme.surfaceContainerLow, // op bar 背景色
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -355,7 +357,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                           .read(sessionConnsServicesProvider.notifier)
                           .setCurrentSchema(widget.connId!, schema);
                     },
-                    child: Text(schema));
+                    child: Text(schema, overflow: TextOverflow.ellipsis));
               }).toList());
         },
         child: Container(
@@ -363,7 +365,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
             color: (isEnter && !widget.disable)
                 ? Theme.of(context)
                     .colorScheme
-                    .surfaceContainerHigh // schema 鼠标移入的颜色
+                    .surfaceContainer // schema 鼠标移入的颜色
                 : null,
             child: Row(
               children: [

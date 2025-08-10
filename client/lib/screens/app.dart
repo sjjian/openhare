@@ -7,6 +7,7 @@ import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -96,14 +97,11 @@ class App extends HookConsumerWidget {
     return MaterialApp.router(
       title: 'snowhare',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness:
-              model.theme == "dark" ? Brightness.dark : Brightness.light,
-        ),
         useMaterial3: true,
+        colorScheme: model.theme == "dark"
+            ? MaterialTheme.darkMediumContrastScheme()
+            : MaterialTheme.lightMediumContrastScheme(),
       ),
-      themeMode: (model.theme == "dark") ? ThemeMode.dark : ThemeMode.light,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -134,7 +132,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
         NavigationRail(
           minWidth: navigationRailWidth,
           backgroundColor:
-              Theme.of(context).colorScheme.surfaceDim, // navigation color
+              Theme.of(context).colorScheme.surfaceContainerHighest, // navigation color
           useIndicator: true,
           selectedIndex: _calculateSelectedIndex(context),
           onDestinationSelected: (value) {
