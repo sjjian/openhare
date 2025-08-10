@@ -2,13 +2,9 @@
 
 openhare is a professional, cross-platform desktop SQL query tool built with Flutter. Designed for database administrators, developers, and data analysts, openhare delivers a powerful yet intuitive experience for managing and querying databases.
 
----
-
 <p align="center">
   <img src="./product.png" alt="openhare product screenshot" width="800"/>
 </p>
-
----
 
 ## Key Features
 
@@ -16,8 +12,6 @@ openhare is a professional, cross-platform desktop SQL query tool built with Flu
 - **Fully Open Source**: Licensed under the [Apache License 2.0](./LICENSE), openhare is transparent and community-driven.
 - **Simple & Intuitive UI**: Modern interface focused on ease of use and productivity.
 - **Multi-Database Support**: Effortlessly connect to and manage various SQL databases.
-
----
 
 ## Roadmap
 1. AI editor;
@@ -44,9 +38,8 @@ openhare is a professional, cross-platform desktop SQL query tool built with Flu
 - [ObjectBox](https://objectbox.io/)
 
 ### DB Driver
-- [MySQL](https://github.com/blackbeam/mysql_async)  rust with flutter_rust_bridge
+- [MySQL](https://github.com/blackbeam/mysql_async) 
 - [Postgresql](https://github.com/isoos/postgresql-dart)
----
 
 ## Getting Started
 Coming soon.
@@ -54,7 +47,3 @@ Coming soon.
 ## License
 
 openhare is licensed under the [Apache License 2.0](./LICENSE).
-
----
-
-Empowering data professionals with modern, open-source tools.
