@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
-import 'package:client/widgets/icon_button.dart';
+import 'package:client/widgets/button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';

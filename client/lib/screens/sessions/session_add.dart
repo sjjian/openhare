@@ -2,6 +2,7 @@ import 'package:client/screens/page_skeleton.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/screens/instances/instance_tables.dart';
+import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
@@ -55,27 +56,24 @@ class AddSession extends HookConsumerWidget {
                         connectionMetaMap[inst.dbType]!.logoAssertPath,
                         height: 24,
                       ),
-                      TextButton(
+                      LinkButton(
                           onPressed: () {
                             ref
                                 .read(sessionsServicesProvider.notifier)
                                 .addSession(inst);
                           },
-                          child: Text(
-                            inst.connectValue.name,
-                            overflow: TextOverflow.ellipsis,
-                          )),
+                          text: inst.connectValue.name),
                     ],
                   ),
                 ),
                 for (final schema in inst.activeSchemas.toList())
-                  TextButton(
+                  LinkButton(
+                    text: schema,
                     onPressed: () {
                       ref
                           .read(sessionsServicesProvider.notifier)
                           .addSession(inst, schema: schema);
                     },
-                    child: Text(schema, overflow: TextOverflow.ellipsis),
                   )
               ],
             ),
@@ -149,14 +147,14 @@ class AddSession extends HookConsumerWidget {
                         connectionMetaMap[inst.dbType]!.logoAssertPath,
                         height: kIconSizeMedium,
                       ),
-                      TextButton(
-                          onPressed: () {
-                            ref
-                                .read(sessionsServicesProvider.notifier)
-                                .addSession(inst);
-                          },
-                          child: Text(inst.connectValue.name,
-                              overflow: TextOverflow.ellipsis)),
+                      LinkButton(
+                        text: inst.connectValue.name,
+                        onPressed: () {
+                          ref
+                              .read(sessionsServicesProvider.notifier)
+                              .addSession(inst);
+                        },
+                      ),
                     ],
                   ),
                 ),

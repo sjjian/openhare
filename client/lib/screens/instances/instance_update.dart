@@ -2,7 +2,7 @@ import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/widgets/const.dart';
-import 'package:client/widgets/icon_button.dart';
+import 'package:client/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
