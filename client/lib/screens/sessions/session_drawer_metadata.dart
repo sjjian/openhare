@@ -1,6 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/const.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:db_driver/db_driver.dart';
@@ -25,22 +26,25 @@ class RootNode implements DataNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
+      size: kIconSizeTiny,
       icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
+      size: kIconSizeTiny,
       icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 
   @override
   Widget builder(context) {
     return Text(
+      style: Theme.of(context).textTheme.bodySmall,
       children.isNotEmpty ? "$name  [${_children.length}]" : name,
       overflow: TextOverflow.ellipsis,
     );
@@ -53,16 +57,18 @@ class SchemaNode extends RootNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
+      size: kIconSizeTiny,
       icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
+      size: kIconSizeTiny,
       icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 }
@@ -73,16 +79,18 @@ class TableNode extends RootNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
+      size: kIconSizeTiny,
       icon: HugeIcons.strokeRoundedTable,
-      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
+      size: kIconSizeTiny,
       icon: HugeIcons.strokeRoundedTable,
-      color: Theme.of(context).iconTheme.color ?? Colors.black87,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 }
