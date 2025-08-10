@@ -95,7 +95,7 @@ class App extends HookConsumerWidget {
     final model = ref.watch(settingNotifierProvider);
 
     return MaterialApp.router(
-      title: 'snowhare',
+      title: 'openhare',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: model.theme == "dark"
