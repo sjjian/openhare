@@ -168,7 +168,7 @@ mixin _$InstanceModel implements DiagnosticableTreeMixin {
   List<String> get initQuerys;
   List<String> get activeSchemas;
   DateTime get createdAt;
-  DateTime? get latestOpenAt;
+  DateTime get latestOpenAt;
 
   /// Create a copy of InstanceModel
   /// with the given fields replaced by the non-null parameter values.
@@ -264,7 +264,7 @@ abstract mixin class $InstanceModelCopyWith<$Res> {
       List<String> initQuerys,
       List<String> activeSchemas,
       DateTime createdAt,
-      DateTime? latestOpenAt});
+      DateTime latestOpenAt});
 
   $InstanceIdCopyWith<$Res> get id;
 }
@@ -294,7 +294,7 @@ class _$InstanceModelCopyWithImpl<$Res>
     Object? initQuerys = null,
     Object? activeSchemas = null,
     Object? createdAt = null,
-    Object? latestOpenAt = freezed,
+    Object? latestOpenAt = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -345,10 +345,10 @@ class _$InstanceModelCopyWithImpl<$Res>
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      latestOpenAt: freezed == latestOpenAt
+      latestOpenAt: null == latestOpenAt
           ? _self.latestOpenAt
           : latestOpenAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+              as DateTime,
     ));
   }
 
@@ -379,7 +379,7 @@ class _InstanceModel extends InstanceModel with DiagnosticableTreeMixin {
       required final List<String> initQuerys,
       required final List<String> activeSchemas,
       required this.createdAt,
-      this.latestOpenAt})
+      required this.latestOpenAt})
       : _custom = custom,
         _initQuerys = initQuerys,
         _activeSchemas = activeSchemas,
@@ -428,7 +428,7 @@ class _InstanceModel extends InstanceModel with DiagnosticableTreeMixin {
   @override
   final DateTime createdAt;
   @override
-  final DateTime? latestOpenAt;
+  final DateTime latestOpenAt;
 
   /// Create a copy of InstanceModel
   /// with the given fields replaced by the non-null parameter values.
@@ -526,7 +526,7 @@ abstract mixin class _$InstanceModelCopyWith<$Res>
       List<String> initQuerys,
       List<String> activeSchemas,
       DateTime createdAt,
-      DateTime? latestOpenAt});
+      DateTime latestOpenAt});
 
   @override
   $InstanceIdCopyWith<$Res> get id;
@@ -557,7 +557,7 @@ class __$InstanceModelCopyWithImpl<$Res>
     Object? initQuerys = null,
     Object? activeSchemas = null,
     Object? createdAt = null,
-    Object? latestOpenAt = freezed,
+    Object? latestOpenAt = null,
   }) {
     return _then(_InstanceModel(
       id: null == id
@@ -608,10 +608,10 @@ class __$InstanceModelCopyWithImpl<$Res>
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      latestOpenAt: freezed == latestOpenAt
+      latestOpenAt: null == latestOpenAt
           ? _self.latestOpenAt
           : latestOpenAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+              as DateTime,
     ));
   }
 
