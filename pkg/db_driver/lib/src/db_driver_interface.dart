@@ -64,11 +64,12 @@ class QueryResultRow {
 }
 
 class BaseQueryResult {
+  String queryId;
   List<BaseQueryColumn> columns;
   List<QueryResultRow> rows;
   BigInt affectedRows;
 
-  BaseQueryResult(this.columns, this.rows, this.affectedRows);
+  BaseQueryResult(this.queryId, this.columns, this.rows, this.affectedRows);
 }
 
 abstract class BaseConnection {

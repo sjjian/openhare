@@ -3080,6 +3080,7 @@ class __$ResultIdCopyWithImpl<$Res> implements _$ResultIdCopyWith<$Res> {
 /// @nodoc
 mixin _$SQLResultModel {
   ResultId get resultId;
+  String get queryId;
   SQLExecuteState get state;
 
   /// Create a copy of SQLResultModel
@@ -3097,15 +3098,16 @@ mixin _$SQLResultModel {
             other is SQLResultModel &&
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
+            (identical(other.queryId, queryId) || other.queryId == queryId) &&
             (identical(other.state, state) || other.state == state));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, resultId, state);
+  int get hashCode => Object.hash(runtimeType, resultId, queryId, state);
 
   @override
   String toString() {
-    return 'SQLResultModel(resultId: $resultId, state: $state)';
+    return 'SQLResultModel(resultId: $resultId, queryId: $queryId, state: $state)';
   }
 }
 
@@ -3115,7 +3117,7 @@ abstract mixin class $SQLResultModelCopyWith<$Res> {
           SQLResultModel value, $Res Function(SQLResultModel) _then) =
       _$SQLResultModelCopyWithImpl;
   @useResult
-  $Res call({ResultId resultId, SQLExecuteState state});
+  $Res call({ResultId resultId, String queryId, SQLExecuteState state});
 
   $ResultIdCopyWith<$Res> get resultId;
 }
@@ -3134,6 +3136,7 @@ class _$SQLResultModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? resultId = null,
+    Object? queryId = null,
     Object? state = null,
   }) {
     return _then(_self.copyWith(
@@ -3141,6 +3144,10 @@ class _$SQLResultModelCopyWithImpl<$Res>
           ? _self.resultId
           : resultId // ignore: cast_nullable_to_non_nullable
               as ResultId,
+      queryId: null == queryId
+          ? _self.queryId
+          : queryId // ignore: cast_nullable_to_non_nullable
+              as String,
       state: null == state
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -3162,10 +3169,13 @@ class _$SQLResultModelCopyWithImpl<$Res>
 /// @nodoc
 
 class _SQLResultModel implements SQLResultModel {
-  const _SQLResultModel({required this.resultId, required this.state});
+  const _SQLResultModel(
+      {required this.resultId, required this.queryId, required this.state});
 
   @override
   final ResultId resultId;
+  @override
+  final String queryId;
   @override
   final SQLExecuteState state;
 
@@ -3184,15 +3194,16 @@ class _SQLResultModel implements SQLResultModel {
             other is _SQLResultModel &&
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
+            (identical(other.queryId, queryId) || other.queryId == queryId) &&
             (identical(other.state, state) || other.state == state));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, resultId, state);
+  int get hashCode => Object.hash(runtimeType, resultId, queryId, state);
 
   @override
   String toString() {
-    return 'SQLResultModel(resultId: $resultId, state: $state)';
+    return 'SQLResultModel(resultId: $resultId, queryId: $queryId, state: $state)';
   }
 }
 
@@ -3204,7 +3215,7 @@ abstract mixin class _$SQLResultModelCopyWith<$Res>
       __$SQLResultModelCopyWithImpl;
   @override
   @useResult
-  $Res call({ResultId resultId, SQLExecuteState state});
+  $Res call({ResultId resultId, String queryId, SQLExecuteState state});
 
   @override
   $ResultIdCopyWith<$Res> get resultId;
@@ -3224,6 +3235,7 @@ class __$SQLResultModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? resultId = null,
+    Object? queryId = null,
     Object? state = null,
   }) {
     return _then(_SQLResultModel(
@@ -3231,6 +3243,10 @@ class __$SQLResultModelCopyWithImpl<$Res>
           ? _self.resultId
           : resultId // ignore: cast_nullable_to_non_nullable
               as ResultId,
+      queryId: null == queryId
+          ? _self.queryId
+          : queryId // ignore: cast_nullable_to_non_nullable
+              as String,
       state: null == state
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -3253,6 +3269,7 @@ class __$SQLResultModelCopyWithImpl<$Res>
 mixin _$SQLResultDetailModel {
   ResultId get resultId;
   SQLExecuteState get state;
+  String? get queryId;
   String? get query;
   Duration? get executeTime;
   String? get error;
@@ -3274,6 +3291,7 @@ mixin _$SQLResultDetailModel {
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
             (identical(other.state, state) || other.state == state) &&
+            (identical(other.queryId, queryId) || other.queryId == queryId) &&
             (identical(other.query, query) || other.query == query) &&
             (identical(other.executeTime, executeTime) ||
                 other.executeTime == executeTime) &&
@@ -3283,11 +3301,11 @@ mixin _$SQLResultDetailModel {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, resultId, state, query, executeTime, error, data);
+      runtimeType, resultId, state, queryId, query, executeTime, error, data);
 
   @override
   String toString() {
-    return 'SQLResultDetailModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
+    return 'SQLResultDetailModel(resultId: $resultId, state: $state, queryId: $queryId, query: $query, executeTime: $executeTime, error: $error, data: $data)';
   }
 }
 
@@ -3300,6 +3318,7 @@ abstract mixin class $SQLResultDetailModelCopyWith<$Res> {
   $Res call(
       {ResultId resultId,
       SQLExecuteState state,
+      String? queryId,
       String? query,
       Duration? executeTime,
       String? error,
@@ -3323,6 +3342,7 @@ class _$SQLResultDetailModelCopyWithImpl<$Res>
   $Res call({
     Object? resultId = null,
     Object? state = null,
+    Object? queryId = freezed,
     Object? query = freezed,
     Object? executeTime = freezed,
     Object? error = freezed,
@@ -3337,6 +3357,10 @@ class _$SQLResultDetailModelCopyWithImpl<$Res>
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
               as SQLExecuteState,
+      queryId: freezed == queryId
+          ? _self.queryId
+          : queryId // ignore: cast_nullable_to_non_nullable
+              as String?,
       query: freezed == query
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable
@@ -3373,6 +3397,7 @@ class _SQLResultDetailModel implements SQLResultDetailModel {
   const _SQLResultDetailModel(
       {required this.resultId,
       required this.state,
+      this.queryId,
       this.query,
       this.executeTime,
       this.error,
@@ -3382,6 +3407,8 @@ class _SQLResultDetailModel implements SQLResultDetailModel {
   final ResultId resultId;
   @override
   final SQLExecuteState state;
+  @override
+  final String? queryId;
   @override
   final String? query;
   @override
@@ -3408,6 +3435,7 @@ class _SQLResultDetailModel implements SQLResultDetailModel {
             (identical(other.resultId, resultId) ||
                 other.resultId == resultId) &&
             (identical(other.state, state) || other.state == state) &&
+            (identical(other.queryId, queryId) || other.queryId == queryId) &&
             (identical(other.query, query) || other.query == query) &&
             (identical(other.executeTime, executeTime) ||
                 other.executeTime == executeTime) &&
@@ -3417,11 +3445,11 @@ class _SQLResultDetailModel implements SQLResultDetailModel {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, resultId, state, query, executeTime, error, data);
+      runtimeType, resultId, state, queryId, query, executeTime, error, data);
 
   @override
   String toString() {
-    return 'SQLResultDetailModel(resultId: $resultId, state: $state, query: $query, executeTime: $executeTime, error: $error, data: $data)';
+    return 'SQLResultDetailModel(resultId: $resultId, state: $state, queryId: $queryId, query: $query, executeTime: $executeTime, error: $error, data: $data)';
   }
 }
 
@@ -3436,6 +3464,7 @@ abstract mixin class _$SQLResultDetailModelCopyWith<$Res>
   $Res call(
       {ResultId resultId,
       SQLExecuteState state,
+      String? queryId,
       String? query,
       Duration? executeTime,
       String? error,
@@ -3460,6 +3489,7 @@ class __$SQLResultDetailModelCopyWithImpl<$Res>
   $Res call({
     Object? resultId = null,
     Object? state = null,
+    Object? queryId = freezed,
     Object? query = freezed,
     Object? executeTime = freezed,
     Object? error = freezed,
@@ -3474,6 +3504,10 @@ class __$SQLResultDetailModelCopyWithImpl<$Res>
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
               as SQLExecuteState,
+      queryId: freezed == queryId
+          ? _self.queryId
+          : queryId // ignore: cast_nullable_to_non_nullable
+              as String?,
       query: freezed == query
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable
