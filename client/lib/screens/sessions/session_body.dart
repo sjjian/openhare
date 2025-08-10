@@ -55,7 +55,7 @@ class SessionBodyPage extends ConsumerWidget {
       alignment: Alignment.topLeft,
       child: sessionDrawer.isRightPageOpen
           ? SplitView(
-              color: Theme.of(context).colorScheme.surfaceBright,
+              color: Theme.of(context).colorScheme.surfaceContainerLowest,
               axis: Axis.horizontal,
               controller: sessionSplitView.metaDataSplitViewCtrl,
               first: left,

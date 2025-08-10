@@ -74,7 +74,7 @@ class _MyTreeTileState extends State<MyTreeTile> {
               : null,
           child: TreeIndentation(
             entry: widget.entry,
-            guide: const IndentGuide.connectingLines(indent: 32),
+            guide: const IndentGuide.connectingLines(indent: 20),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: Row(

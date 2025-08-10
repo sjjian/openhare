@@ -99,8 +99,8 @@ class App extends HookConsumerWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: model.theme == "dark"
-            ? MaterialTheme.darkMediumContrastScheme()
-            : MaterialTheme.lightMediumContrastScheme(),
+            ? MaterialTheme.darkScheme()
+            : MaterialTheme.lightScheme(),
       ),
       routerConfig: _router,
       debugShowCheckedModeBanner: false,

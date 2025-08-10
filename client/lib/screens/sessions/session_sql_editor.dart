@@ -79,7 +79,7 @@ class SQLEditor extends ConsumerWidget {
               wordWrap: false,
               style: CodeEditorStyle(
                 backgroundColor:
-                    Theme.of(context).colorScheme.surfaceBright, // SQL 编辑器背景色
+                    Theme.of(context).colorScheme.surfaceContainerLowest, // SQL 编辑器背景色
                 textStyle: GoogleFonts.robotoMono(
                   textStyle: Theme.of(context).textTheme.bodyMedium,
                   color: Theme.of(context).colorScheme.onSurface,

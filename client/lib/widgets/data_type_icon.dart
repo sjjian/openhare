@@ -29,7 +29,7 @@ class DataTypeIcon extends StatelessWidget {
         ),
       DataType.blob => Icon(
           Icons.insert_drive_file_outlined,
-          color: Colors.black87,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
           size: size,
         ),
       DataType.json => Icon(

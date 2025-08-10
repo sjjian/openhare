@@ -14,7 +14,7 @@ class SessionDrawerBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     return Container(
-      color: Theme.of(context).colorScheme.surfaceBright, // session drawer 背景色
+      color: Theme.of(context).colorScheme.surfaceContainerLowest, // session drawer 背景色
       child: Column(
         children: [
           const SessionDrawerBar(),
@@ -43,7 +43,7 @@ class SessionDrawerBar extends ConsumerWidget {
     final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     return Container(
       color:
-          Theme.of(context).colorScheme.surfaceBright, // session drawer bar 背景色
+          Theme.of(context).colorScheme.surfaceContainerLowest, // session drawer bar 背景色
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
