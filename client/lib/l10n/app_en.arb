@@ -1,7 +1,23 @@
 {
-  "sys_settings": "System settings",
-  "@sys_settings": {
-    "description": "System settings"
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings"
+  },
+  "preferences": "Preferences",
+  "@preferences": {
+    "description": "Preferences"
+  },
+  "llm_api": "LLM API",
+  "@llm_api": {
+    "description": "LLM API"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Create"
   },
   "language": "Language",
   "@language": {

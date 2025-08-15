@@ -1,5 +1,9 @@
 {
-    "sys_settings": "系统设置",
+    "settings": "设置",
+    "preferences": "偏好",
+    "llm_api": "大模型API",
+    "update": "更新",
+    "create": "创建",
     "language": "语言",
     "theme": "主题",
     "theme_dark": "深色",

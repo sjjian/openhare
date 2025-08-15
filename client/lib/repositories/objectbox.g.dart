@@ -197,6 +197,46 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(8, 4878459101642556312),
+    name: 'LLMApiSettingStorage',
+    lastPropertyId: const obx_int.IdUid(5, 5004092012514136342),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 2867928284948435721),
+        name: 'id',
+        type: 6,
+        flags: 129,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 316294158491986384),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 2136203430287790623),
+        name: 'baseUrl',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 1641090997426995821),
+        name: 'apiKey',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 5004092012514136342),
+        name: 'modelName',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -237,7 +277,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(7, 634128806298847270),
+    lastEntityId: const obx_int.IdUid(8, 4878459101642556312),
     lastIndexId: const obx_int.IdUid(3, 6583598154122015850),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -527,6 +567,60 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    LLMApiSettingStorage: obx_int.EntityDefinition<LLMApiSettingStorage>(
+      model: _entities[4],
+      toOneRelations: (LLMApiSettingStorage object) => [],
+      toManyRelations: (LLMApiSettingStorage object) => {},
+      getId: (LLMApiSettingStorage object) => object.id,
+      setId: (LLMApiSettingStorage object, int id) {
+        object.id = id;
+      },
+      objectToFB: (LLMApiSettingStorage object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final baseUrlOffset = fbb.writeString(object.baseUrl);
+        final apiKeyOffset = fbb.writeString(object.apiKey);
+        final modelNameOffset = fbb.writeString(object.modelName);
+        fbb.startTable(6);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, baseUrlOffset);
+        fbb.addOffset(3, apiKeyOffset);
+        fbb.addOffset(4, modelNameOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final baseUrlParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final apiKeyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final modelNameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final object = LLMApiSettingStorage(
+          id: idParam,
+          name: nameParam,
+          baseUrl: baseUrlParam,
+          apiKey: apiKeyParam,
+          modelName: modelNameParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -653,5 +747,33 @@ class SessionCodeStorage_ {
   /// See [SessionCodeStorage.text].
   static final text = obx.QueryStringProperty<SessionCodeStorage>(
     _entities[3].properties[1],
+  );
+}
+
+/// [LLMApiSettingStorage] entity fields to define ObjectBox queries.
+class LLMApiSettingStorage_ {
+  /// See [LLMApiSettingStorage.id].
+  static final id = obx.QueryIntegerProperty<LLMApiSettingStorage>(
+    _entities[4].properties[0],
+  );
+
+  /// See [LLMApiSettingStorage.name].
+  static final name = obx.QueryStringProperty<LLMApiSettingStorage>(
+    _entities[4].properties[1],
+  );
+
+  /// See [LLMApiSettingStorage.baseUrl].
+  static final baseUrl = obx.QueryStringProperty<LLMApiSettingStorage>(
+    _entities[4].properties[2],
+  );
+
+  /// See [LLMApiSettingStorage.apiKey].
+  static final apiKey = obx.QueryStringProperty<LLMApiSettingStorage>(
+    _entities[4].properties[3],
+  );
+
+  /// See [LLMApiSettingStorage.modelName].
+  static final modelName = obx.QueryStringProperty<LLMApiSettingStorage>(
+    _entities[4].properties[4],
   );
 }

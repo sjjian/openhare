@@ -6,6 +6,7 @@ import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/theme.dart';
 import 'package:flutter/material.dart';
@@ -92,7 +93,7 @@ class App extends HookConsumerWidget {
       return null;
     }, []);
 
-    final model = ref.watch(settingNotifierProvider);
+    final model = ref.watch(systemSettingNotifierProvider);
 
     return MaterialApp.router(
       title: 'openhare',
@@ -150,8 +151,8 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                   });
                 },
                 child: extended
-                    ? const Icon(Icons.menu_open)
-                    : const Icon(Icons.menu),
+                    ? const Icon(Icons.menu_open, size: kIconSizeSmall)
+                    : const Icon(Icons.menu, size: kIconSizeSmall),
               ),
             ],
           ),
@@ -179,7 +180,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               icon: const Icon(Icons.settings),
               label: Center(
                 child: Text(
-                  AppLocalizations.of(context)!.sys_settings,
+                  AppLocalizations.of(context)!.settings,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),

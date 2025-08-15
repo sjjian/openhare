@@ -1,3 +1,4 @@
+import 'package:client/models/ai.dart';
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -137,11 +138,13 @@ enum SQLExecuteState { init, executing, done, error }
 enum DrawerPage {
   metadataTree,
   sqlResult,
+  aiChat,
 }
 
 @freezed
 abstract class SessionDrawerModel with _$SessionDrawerModel {
   const factory SessionDrawerModel({
+    required SessionId sessionId,
     required DrawerPage drawerPage,
     required BaseQueryValue? sqlResult,
     required BaseQueryColumn? sqlColumn,
@@ -254,4 +257,14 @@ abstract class SQLResultsModel with _$SQLResultsModel {
   const factory SQLResultsModel({
     required Map<SessionId, SessionSQLResultsModel> cache,
   }) = _SQLResultsModel;
+}
+
+@freezed
+abstract class SessionAIChatModel with _$SessionAIChatModel {
+  const factory SessionAIChatModel({
+    required SessionId sessionId,
+    required ConnId? connId,
+    required SQLConnectState? state,
+    required AIChatModel chatModel,
+  }) = _SessionAIChatModel;
 }

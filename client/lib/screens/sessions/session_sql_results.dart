@@ -23,13 +23,15 @@ class SqlResultTables extends ConsumerWidget {
       maxWidth: 100,
       minWidth: 90,
       labelAlign: TextAlign.center,
-      selectedColor:
-          Theme.of(context).colorScheme.surfaceContainerLowest, // sql result tab 的选中颜色
+      selectedColor: Theme.of(context)
+          .colorScheme
+          .surfaceContainerLowest, // sql result tab 的选中颜色
       color: Theme.of(context)
           .colorScheme
           .surfaceContainerLow, // sql result tab 的背景色
-      hoverColor:
-          Theme.of(context).colorScheme.surfaceContainerLowest, // sql result tab 的鼠标移入色
+      hoverColor: Theme.of(context)
+          .colorScheme
+          .surfaceContainerLowest, // sql result tab 的鼠标移入色
     );
 
     Widget tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -140,8 +142,9 @@ class SqlResultTable extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final color =
-        Theme.of(context).colorScheme.surfaceContainerLowest; // sql result body 的背景色
+    final color = Theme.of(context)
+        .colorScheme
+        .surfaceContainerLowest; // sql result body 的背景色
 
     final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
@@ -155,7 +158,10 @@ class SqlResultTable extends ConsumerWidget {
         key: ObjectKey(model),
         mode: PlutoGridMode.selectWithOneTap,
         onSelected: (event) {
-          ref.read(sessionDrawerNotifierProvider.notifier).showSQLResult(
+          ref
+              .read(sessionDrawerServicesProvider(model.resultId.sessionId)
+                  .notifier)
+              .showSQLResult(
                 result: model.data!.rows[event.rowIdx!]
                     .getValue(event.cell!.column.title),
                 column: model.data!.rows[event.rowIdx!]

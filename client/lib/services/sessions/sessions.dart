@@ -1,7 +1,9 @@
+import 'package:client/models/ai.dart';
 import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/repositories/sessions/sessions.dart';
+import 'package:client/services/ai/ai_chat.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/session_conn.dart';
@@ -108,7 +110,7 @@ class SessionsServices extends _$SessionsServices {
     // 4. delete provider status
     ref.invalidate(sessionSQLEditorServiceProvider(session.sessionId));
     ref.invalidate(sessionSplitViewStateProvider(session.sessionId));
-    ref.invalidate(sessionDrawerStateProvider(session.sessionId));
+    ref.invalidate(sessionDrawerServicesProvider(session.sessionId));
 
     ref.invalidateSelf();
   }
@@ -200,13 +202,41 @@ class SessionSQLEditorService extends _$SessionSQLEditorService {
 }
 
 @Riverpod(keepAlive: true)
-SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
-  return const SessionDrawerModel(
-      drawerPage: DrawerPage.metadataTree,
-      sqlResult: null,
-      sqlColumn: null,
-      showRecord: false,
-      isRightPageOpen: true);
+class SessionDrawerServices extends _$SessionDrawerServices {
+  @override
+  SessionDrawerModel build(SessionId sessionId) {
+    return SessionDrawerModel(
+        sessionId: sessionId,
+        drawerPage: DrawerPage.metadataTree,
+        sqlResult: null,
+        sqlColumn: null,
+        showRecord: false,
+        isRightPageOpen: true);
+  }
+
+  void showRightPage() {
+    state = state.copyWith(isRightPageOpen: true);
+  }
+
+  void hideRightPage() {
+    state = state.copyWith(isRightPageOpen: false);
+  }
+
+  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
+    state = state.copyWith(
+      drawerPage: DrawerPage.sqlResult,
+      sqlColumn: column ?? state.sqlColumn,
+      sqlResult: result ?? state.sqlResult,
+    );
+  }
+
+  void goToTree() {
+    state = state.copyWith(drawerPage: DrawerPage.metadataTree);
+  }
+
+  void showChat() {
+    state = state.copyWith(drawerPage: DrawerPage.aiChat);
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -297,33 +327,9 @@ class SessionDrawerNotifier extends _$SessionDrawerNotifier {
     SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
-      return ref.watch(sessionDrawerStateProvider(const SessionId(value: 0)));
+      return ref.watch(sessionDrawerServicesProvider(const SessionId(value: 0)));
     }
-    return ref.watch(sessionDrawerStateProvider(sessionModel.sessionId));
-  }
-
-  void showRightPage() {
-    state = state.copyWith(isRightPageOpen: true);
-  }
-
-  void hideRightPage() {
-    state = state.copyWith(isRightPageOpen: false);
-  }
-
-  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
-    state = state.copyWith(
-      drawerPage: DrawerPage.sqlResult,
-      sqlColumn: column ?? state.sqlColumn,
-      sqlResult: result ?? state.sqlResult,
-    );
-  }
-
-  void goToTree() {
-    state = state.copyWith(
-      drawerPage: DrawerPage.metadataTree,
-      sqlColumn: null,
-      sqlResult: null,
-    );
+    return ref.watch(sessionDrawerServicesProvider(sessionModel.sessionId));
   }
 }
 
@@ -475,5 +481,23 @@ class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
       executeTime: sqlResultModel?.executeTime,
       affectedRows: sqlResultModel?.data?.affectedRows,
     );
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SessionAIChatNotifier extends _$SessionAIChatNotifier {
+  @override
+  SessionAIChatModel? build() {
+    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
+    if (session == null) {
+      return null;
+    }
+    AIChatModel aiChatModel = ref.watch(aIChatServiceProvider(
+        AIChatId(value: session.sessionId.value))); // 暂时用session id 替代chatId
+    return SessionAIChatModel(
+        chatModel: aiChatModel,
+        sessionId: session.sessionId,
+        connId: session.connId,
+        state: session.connState);
   }
 }

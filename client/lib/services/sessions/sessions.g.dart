@@ -6,8 +6,8 @@ part of 'sessions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionDrawerStateHash() =>
-    r'e8954f01db2960aebb5987624ffdc25084b99e3d';
+String _$sessionSplitViewStateHash() =>
+    r'1f3e904a48dd3977623cf68c07a8fcefddd5ca05';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,137 +29,6 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
-
-/// See also [sessionDrawerState].
-@ProviderFor(sessionDrawerState)
-const sessionDrawerStateProvider = SessionDrawerStateFamily();
-
-/// See also [sessionDrawerState].
-class SessionDrawerStateFamily extends Family<SessionDrawerModel> {
-  /// See also [sessionDrawerState].
-  const SessionDrawerStateFamily();
-
-  /// See also [sessionDrawerState].
-  SessionDrawerStateProvider call(
-    SessionId sessionId,
-  ) {
-    return SessionDrawerStateProvider(
-      sessionId,
-    );
-  }
-
-  @override
-  SessionDrawerStateProvider getProviderOverride(
-    covariant SessionDrawerStateProvider provider,
-  ) {
-    return call(
-      provider.sessionId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'sessionDrawerStateProvider';
-}
-
-/// See also [sessionDrawerState].
-class SessionDrawerStateProvider extends Provider<SessionDrawerModel> {
-  /// See also [sessionDrawerState].
-  SessionDrawerStateProvider(
-    SessionId sessionId,
-  ) : this._internal(
-          (ref) => sessionDrawerState(
-            ref as SessionDrawerStateRef,
-            sessionId,
-          ),
-          from: sessionDrawerStateProvider,
-          name: r'sessionDrawerStateProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$sessionDrawerStateHash,
-          dependencies: SessionDrawerStateFamily._dependencies,
-          allTransitiveDependencies:
-              SessionDrawerStateFamily._allTransitiveDependencies,
-          sessionId: sessionId,
-        );
-
-  SessionDrawerStateProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.sessionId,
-  }) : super.internal();
-
-  final SessionId sessionId;
-
-  @override
-  Override overrideWith(
-    SessionDrawerModel Function(SessionDrawerStateRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: SessionDrawerStateProvider._internal(
-        (ref) => create(ref as SessionDrawerStateRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        sessionId: sessionId,
-      ),
-    );
-  }
-
-  @override
-  ProviderElement<SessionDrawerModel> createElement() {
-    return _SessionDrawerStateProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is SessionDrawerStateProvider && other.sessionId == sessionId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, sessionId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin SessionDrawerStateRef on ProviderRef<SessionDrawerModel> {
-  /// The parameter `sessionId` of this provider.
-  SessionId get sessionId;
-}
-
-class _SessionDrawerStateProviderElement
-    extends ProviderElement<SessionDrawerModel> with SessionDrawerStateRef {
-  _SessionDrawerStateProviderElement(super.provider);
-
-  @override
-  SessionId get sessionId => (origin as SessionDrawerStateProvider).sessionId;
-}
-
-String _$sessionSplitViewStateHash() =>
-    r'1f3e904a48dd3977623cf68c07a8fcefddd5ca05';
 
 /// See also [sessionSplitViewState].
 @ProviderFor(sessionSplitViewState)
@@ -292,7 +161,7 @@ class _SessionSplitViewStateProviderElement
       (origin as SessionSplitViewStateProvider).sessionId;
 }
 
-String _$sessionsServicesHash() => r'254c99d6341f20fef4668a8f5dfcaa5208cadfa9';
+String _$sessionsServicesHash() => r'a435bb1118de18fc1a79c81b3af40c0007626317';
 
 /// See also [SessionsServices].
 @ProviderFor(SessionsServices)
@@ -457,6 +326,155 @@ class _SessionSQLEditorServiceProviderElement
       (origin as SessionSQLEditorServiceProvider).sessionId;
 }
 
+String _$sessionDrawerServicesHash() =>
+    r'58338e9d1e863dbe2cc2b3daddd852ef108ed707';
+
+abstract class _$SessionDrawerServices
+    extends BuildlessNotifier<SessionDrawerModel> {
+  late final SessionId sessionId;
+
+  SessionDrawerModel build(
+    SessionId sessionId,
+  );
+}
+
+/// See also [SessionDrawerServices].
+@ProviderFor(SessionDrawerServices)
+const sessionDrawerServicesProvider = SessionDrawerServicesFamily();
+
+/// See also [SessionDrawerServices].
+class SessionDrawerServicesFamily extends Family<SessionDrawerModel> {
+  /// See also [SessionDrawerServices].
+  const SessionDrawerServicesFamily();
+
+  /// See also [SessionDrawerServices].
+  SessionDrawerServicesProvider call(
+    SessionId sessionId,
+  ) {
+    return SessionDrawerServicesProvider(
+      sessionId,
+    );
+  }
+
+  @override
+  SessionDrawerServicesProvider getProviderOverride(
+    covariant SessionDrawerServicesProvider provider,
+  ) {
+    return call(
+      provider.sessionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'sessionDrawerServicesProvider';
+}
+
+/// See also [SessionDrawerServices].
+class SessionDrawerServicesProvider
+    extends NotifierProviderImpl<SessionDrawerServices, SessionDrawerModel> {
+  /// See also [SessionDrawerServices].
+  SessionDrawerServicesProvider(
+    SessionId sessionId,
+  ) : this._internal(
+          () => SessionDrawerServices()..sessionId = sessionId,
+          from: sessionDrawerServicesProvider,
+          name: r'sessionDrawerServicesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sessionDrawerServicesHash,
+          dependencies: SessionDrawerServicesFamily._dependencies,
+          allTransitiveDependencies:
+              SessionDrawerServicesFamily._allTransitiveDependencies,
+          sessionId: sessionId,
+        );
+
+  SessionDrawerServicesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.sessionId,
+  }) : super.internal();
+
+  final SessionId sessionId;
+
+  @override
+  SessionDrawerModel runNotifierBuild(
+    covariant SessionDrawerServices notifier,
+  ) {
+    return notifier.build(
+      sessionId,
+    );
+  }
+
+  @override
+  Override overrideWith(SessionDrawerServices Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: SessionDrawerServicesProvider._internal(
+        () => create()..sessionId = sessionId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        sessionId: sessionId,
+      ),
+    );
+  }
+
+  @override
+  NotifierProviderElement<SessionDrawerServices, SessionDrawerModel>
+      createElement() {
+    return _SessionDrawerServicesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SessionDrawerServicesProvider &&
+        other.sessionId == sessionId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, sessionId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SessionDrawerServicesRef on NotifierProviderRef<SessionDrawerModel> {
+  /// The parameter `sessionId` of this provider.
+  SessionId get sessionId;
+}
+
+class _SessionDrawerServicesProviderElement
+    extends NotifierProviderElement<SessionDrawerServices, SessionDrawerModel>
+    with SessionDrawerServicesRef {
+  _SessionDrawerServicesProviderElement(super.provider);
+
+  @override
+  SessionId get sessionId =>
+      (origin as SessionDrawerServicesProvider).sessionId;
+}
+
 String _$sessionsNotifierHash() => r'212cae0abe875e854818233fea3f558b4f4937e1';
 
 /// See also [SessionsNotifier].
@@ -508,7 +526,7 @@ final sessionSplitViewNotifierProvider =
 
 typedef _$SessionSplitViewNotifier = Notifier<SessionSplitViewModel>;
 String _$sessionDrawerNotifierHash() =>
-    r'7c1c14fa6cbc919e104508e305985e00d3542f86';
+    r'7b54f771fba9160ed2869cb44557b9f4e5f7beb5';
 
 /// See also [SessionDrawerNotifier].
 @ProviderFor(SessionDrawerNotifier)
@@ -643,5 +661,22 @@ final selectedSessionStatusNotifierProvider = NotifierProvider<
 );
 
 typedef _$SelectedSessionStatusNotifier = Notifier<SessionStatusModel?>;
+String _$sessionAIChatNotifierHash() =>
+    r'5d290cbc738e8c341c1dfdce1b87bab8ee0f3a1e';
+
+/// See also [SessionAIChatNotifier].
+@ProviderFor(SessionAIChatNotifier)
+final sessionAIChatNotifierProvider =
+    NotifierProvider<SessionAIChatNotifier, SessionAIChatModel?>.internal(
+  SessionAIChatNotifier.new,
+  name: r'sessionAIChatNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionAIChatNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SessionAIChatNotifier = Notifier<SessionAIChatModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -22,11 +22,33 @@ class SettingsStorage {
   });
 }
 
+@Entity()
+class LLMApiSettingStorage {
+  @Id(assignable: true)
+  int id;
+
+  String name;
+  String baseUrl;
+  String apiKey;
+  String modelName;
+
+  LLMApiSettingStorage({
+    this.id = 0,
+    required this.name,
+    required this.baseUrl,
+    required this.apiKey,
+    required this.modelName,
+  });
+}
+
 class SettingsRepoImpl implements SettingsRepo {
   final ObjectBox ob;
   final Box<SettingsStorage> _settingBox;
+  final Box<LLMApiSettingStorage> _llmApiSettingBox;
 
-  SettingsRepoImpl(this.ob) : _settingBox = ob.store.box();
+  SettingsRepoImpl(this.ob)
+      : _settingBox = ob.store.box(),
+        _llmApiSettingBox = ob.store.box();
 
   SettingsStorage _getSettings() {
     final settings = _settingBox.get(1);
@@ -38,9 +60,10 @@ class SettingsRepoImpl implements SettingsRepo {
   }
 
   @override
-  SettingModel getSettings() {
+  SystemSettingModel getSettings() {
     final settings = _getSettings();
-    return SettingModel(theme: settings.theme, language: settings.language);
+    return SystemSettingModel(
+        theme: settings.theme, language: settings.language);
   }
 
   @override
@@ -55,6 +78,50 @@ class SettingsRepoImpl implements SettingsRepo {
     final settings = _getSettings();
     settings.theme = theme;
     _settingBox.put(settings);
+  }
+
+  @override
+  void addLLMApiSetting(LLMApiSettingModel setting) {
+    final llmApiSetting = LLMApiSettingStorage(
+      name: setting.name,
+      baseUrl: setting.baseUrl,
+      apiKey: setting.apiKey,
+      modelName: setting.modelName,
+    );
+    _llmApiSettingBox.put(llmApiSetting);
+  }
+
+  @override
+  void updateLLMApiSetting(LLMApiSettingModel model) {
+    final llmApiSetting = _llmApiSettingBox.get(model.id.value);
+    if (llmApiSetting == null) {
+      return;
+    }
+    llmApiSetting.name = model.name;
+    llmApiSetting.baseUrl = model.baseUrl;
+    llmApiSetting.apiKey = model.apiKey;
+    llmApiSetting.modelName = model.modelName;
+
+    _llmApiSettingBox.put(llmApiSetting);
+  }
+
+  @override
+  List<LLMApiSettingModel> getLLMApiSettings() {
+    final llmApiSettings = _llmApiSettingBox.getAll();
+    return llmApiSettings
+        .map((e) => LLMApiSettingModel(
+              id: LLMApiSettingId(value: e.id),
+              name: e.name,
+              baseUrl: e.baseUrl,
+              apiKey: e.apiKey,
+              modelName: e.modelName,
+            ))
+        .toList();
+  }
+
+  @override
+  void removeLLMApiSetting(LLMApiSettingId id) {
+    _llmApiSettingBox.remove(id.value);
   }
 }
 

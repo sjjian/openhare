@@ -22,26 +22,14 @@ class SessionBodyPage extends ConsumerWidget {
     final Widget left = Row(
       children: [
         Expanded(
-          child: Column(
-            children: [
-              SessionOpBar(codeController: sessionEditor.code),
-              Divider(
-                height: kBlockDividerSize,
-                thickness: kBlockDividerThickness,
-                color: Theme.of(context).dividerColor,
-              ),
-              Expanded(
-                child: SplitView(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  controller: sessionSplitView.multiSplitViewCtrl,
-                  axis: Axis.vertical,
-                  first: SQLEditor(
-                      key: ValueKey(sessionEditor.code),
-                      codeController: sessionEditor.code),
-                  second: const SqlResultTables(),
-                ),
-              ),
-            ],
+          child: SplitView(
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            controller: sessionSplitView.multiSplitViewCtrl,
+            axis: Axis.vertical,
+            first: SQLEditor(
+                key: ValueKey(sessionEditor.code),
+                codeController: sessionEditor.code),
+            second: const SqlResultTables(),
           ),
         ),
         VerticalDivider(
@@ -51,17 +39,29 @@ class SessionBodyPage extends ConsumerWidget {
         ),
       ],
     );
-    return Container(
-      alignment: Alignment.topLeft,
-      child: sessionDrawer.isRightPageOpen
-          ? SplitView(
-              color: Theme.of(context).colorScheme.surfaceContainerLowest,
-              axis: Axis.horizontal,
-              controller: sessionSplitView.metaDataSplitViewCtrl,
-              first: left,
-              second: const SessionDrawerBody(),
-            )
-          : left,
+    return Column(
+      children: [
+        SessionOpBar(codeController: sessionEditor.code),
+        Divider(
+          height: kBlockDividerSize,
+          thickness: kBlockDividerThickness,
+          color: Theme.of(context).dividerColor,
+        ),
+        Expanded(
+          child: Container(
+            alignment: Alignment.topLeft,
+            child: sessionDrawer.isRightPageOpen
+                ? SplitView(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    axis: Axis.horizontal,
+                    controller: sessionSplitView.metaDataSplitViewCtrl,
+                    first: left,
+                    second: const SessionDrawerBody(),
+                  )
+                : left,
+          ),
+        ),
+      ],
     );
   }
 }

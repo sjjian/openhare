@@ -154,9 +154,43 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "8:4878459101642556312",
+      "lastPropertyId": "5:5004092012514136342",
+      "name": "LLMApiSettingStorage",
+      "properties": [
+        {
+          "id": "1:2867928284948435721",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:316294158491986384",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:2136203430287790623",
+          "name": "baseUrl",
+          "type": 9
+        },
+        {
+          "id": "4:1641090997426995821",
+          "name": "apiKey",
+          "type": 9
+        },
+        {
+          "id": "5:5004092012514136342",
+          "name": "modelName",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "7:634128806298847270",
+  "lastEntityId": "8:4878459101642556312",
   "lastIndexId": "3:6583598154122015850",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

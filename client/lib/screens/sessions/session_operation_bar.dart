@@ -275,17 +275,7 @@ class SessionOpBar extends ConsumerWidget {
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
-          const Spacer(),
-          if (model.isRightPageOpen == false)
-            RectangleIconButton(
-              icon: Icons.format_indent_decrease,
-              iconColor: Theme.of(context).colorScheme.onSurface,
-              onPressed: () {
-                ref
-                    .read(sessionDrawerNotifierProvider.notifier)
-                    .showRightPage();
-              },
-            )
+          const Expanded(child: SessionDrawerBar()),
         ],
       ),
     );
@@ -387,6 +377,80 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
               ],
             )),
       ),
+    );
+  }
+}
+
+class SessionDrawerBar extends ConsumerWidget {
+  final double height;
+
+  const SessionDrawerBar({Key? key, this.height = 36}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final model = ref.watch(sessionDrawerNotifierProvider);
+    final services =
+        ref.read(sessionDrawerServicesProvider(model.sessionId).notifier);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Spacer(),
+        if (model.isRightPageOpen) ...[
+          RectangleIconButton(
+              hoverBackgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainer,
+              backgroundColor: (model.drawerPage == DrawerPage.metadataTree)
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : null,
+              icon: Icons.account_tree_outlined,
+              iconSize: kIconSizeSmall,
+              onPressed: () {
+                services.goToTree();
+              }),
+          RectangleIconButton(
+              hoverBackgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainer,
+              backgroundColor: (model.drawerPage == DrawerPage.sqlResult)
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : null,
+              icon: Icons.article_outlined,
+              iconSize: kIconSizeSmall,
+              onPressed: () {
+                services.showSQLResult();
+              }),
+          // AI chat
+          RectangleIconButton(
+              hoverBackgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainer,
+              backgroundColor: (model.drawerPage == DrawerPage.aiChat)
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : null,
+              icon: Icons.auto_awesome,
+              iconSize: kIconSizeSmall,
+              onPressed: () {
+                services.showChat();
+              }),
+          const SizedBox(width: kSpacingSmall),
+          RectangleIconButton(
+            hoverBackgroundColor:
+                Theme.of(context).colorScheme.surfaceContainer,
+            icon: model.isRightPageOpen ? Icons.menu : Icons.menu_open,
+            iconColor: Theme.of(context).colorScheme.onSurface,
+            iconSize: kIconSizeSmall,
+            onPressed: () => services.hideRightPage(),
+          ),
+        ],
+        if (!model.isRightPageOpen)
+          RectangleIconButton(
+            hoverBackgroundColor:
+                Theme.of(context).colorScheme.surfaceContainer,
+            icon: model.isRightPageOpen ? Icons.menu : Icons.menu_open,
+            iconColor: Theme.of(context).colorScheme.onSurface,
+            iconSize: kIconSizeSmall,
+            onPressed: () => services.showRightPage(),
+          )
+      ],
     );
   }
 }
