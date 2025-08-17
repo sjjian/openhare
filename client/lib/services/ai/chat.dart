@@ -99,4 +99,12 @@ class AIChatService extends _$AIChatService {
       }
     }
   }
+
+  void updateAgent(LLMAgentId agentId) {
+    final agent = ref.read(lLMAgentServiceProvider).agents[agentId];
+    if (agent == null) {
+      return;
+    }
+    state = state.copyWith(llmAgent: agent);
+  }
 }

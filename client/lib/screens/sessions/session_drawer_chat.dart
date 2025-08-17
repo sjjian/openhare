@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:client/models/sessions.dart';
+import 'package:client/services/ai/agent.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/services/ai/chat.dart';
@@ -171,7 +173,7 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
         _scrollToBottom();
       });
     }
-
+    final llmAgents = ref.read(lLMAgentNotifierProvider);
     return Column(
       children: [
         // 聊天内容
@@ -191,7 +193,8 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
           padding:
               const EdgeInsets.fromLTRB(kSpacingMedium, 0, kSpacingMedium, 0),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingTiny),
+            padding: const EdgeInsets.fromLTRB(
+                kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingTiny),
             // 设置一个圆角
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -214,22 +217,68 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.symmetric(
-                              vertical: kSpacingSmall, horizontal: kSpacingTiny),
+                              vertical: kSpacingSmall,
+                              horizontal: kSpacingTiny),
                         ),
                         onSubmitted: (_) => _sendMessage(model.chatModel.id),
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: kSpacingSmall),
                 Row(
                   children: [
                     const SizedBox(width: kSpacingTiny),
-                    // 下拉菜单button 可以选择agent
-                    Text(
-                      model.chatModel.llmAgent.setting.name,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    OverlayMenu(
+                      isAbove: true,
+                      tabs: [
+                        for (var agent in llmAgents.agents.values)
+                          OverlayMenuItem(
+                            height: 24,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  kSpacingSmall, 0, kSpacingSmall, 0),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  agent.setting.name,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                            ),
+                            onTabSelected: () {
+                              ref
+                                  .read(
+                                      aIChatServiceProvider(model.chatModel.id)
+                                          .notifier)
+                                  .updateAgent(agent.id);
+                            },
                           ),
+                      ],
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          maxWidth: 120,
+                        ),
+                        padding: const EdgeInsets.fromLTRB(kSpacingSmall,
+                            kSpacingTiny, kSpacingSmall, kSpacingTiny),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerLowest,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            width: 1,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHigh,
+                          ),
+                        ),
+                        child: Text(
+                          model.chatModel.llmAgent.setting.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
                     ),
                     const Spacer(),
                     IconButton(
