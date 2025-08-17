@@ -23,23 +23,6 @@ final systemSettingServiceProvider =
 );
 
 typedef _$SystemSettingService = Notifier<SystemSettingModel>;
-String _$lLMApiSettingServiceHash() =>
-    r'36f05f441c7e24f775dffb23afa8d8719e044d1d';
-
-/// See also [LLMApiSettingService].
-@ProviderFor(LLMApiSettingService)
-final lLMApiSettingServiceProvider =
-    NotifierProvider<LLMApiSettingService, List<LLMApiSettingModel>>.internal(
-  LLMApiSettingService.new,
-  name: r'lLMApiSettingServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$lLMApiSettingServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$LLMApiSettingService = Notifier<List<LLMApiSettingModel>>;
 String _$settingTabServiceHash() => r'2396b5551f21e0f3995f0b6711f2242b6cde4d4f';
 
 /// See also [SettingTabService].
@@ -73,7 +56,7 @@ final systemSettingNotifierProvider =
 );
 
 typedef _$SystemSettingNotifier = Notifier<SystemSettingModel>;
-String _$settingNotifierHash() => r'0e9cd73814132c7d03e6489dd7f313fe507b8f66';
+String _$settingNotifierHash() => r'fa485abdef0436ac57884521a55113c7f88d3163';
 
 /// See also [SettingNotifier].
 @ProviderFor(SettingNotifier)

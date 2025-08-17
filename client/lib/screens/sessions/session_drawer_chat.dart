@@ -7,7 +7,7 @@ import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:client/services/ai/ai_chat.dart';
+import 'package:client/services/ai/chat.dart';
 import 'package:client/models/ai.dart';
 import 'package:gpt_markdown/custom_widgets/code_field.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
@@ -203,6 +203,7 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                   children: [
                     Expanded(
                       child: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium,
                         controller: _controller,
                         minLines: 1,
                         maxLines: 5,
@@ -222,6 +223,14 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                 ),
                 Row(
                   children: [
+                    // 下拉菜单button 可以选择agent
+                    Text(
+                      model.chatModel.llmAgent.setting.name,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                    ),
+                    const Spacer(),
                     IconButton(
                       iconSize: kIconSizeTiny,
                       icon: const Icon(Icons.send),

@@ -1,5 +1,6 @@
 import 'package:client/models/settings.dart';
 import 'package:client/repositories/settings/settings.dart';
+import 'package:client/services/ai/chat.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings.g.dart';
@@ -21,30 +22,6 @@ class SystemSettingService extends _$SystemSettingService {
     ref.invalidateSelf();
   }
 }
-
-@Riverpod(keepAlive: true)
-class LLMApiSettingService extends _$LLMApiSettingService {
-  @override
-  List<LLMApiSettingModel> build() {
-    return ref.watch(settingsRepoProvider).getLLMApiSettings();
-  }
-
-  void createLLMApiSetting(LLMApiSettingModel model) {
-    ref.watch(settingsRepoProvider).addLLMApiSetting(model);
-    ref.invalidateSelf();
-  }
-
-  void updateLLMApiSetting(LLMApiSettingModel model) {
-    ref.watch(settingsRepoProvider).updateLLMApiSetting(model);
-    ref.invalidateSelf();
-  }
-  
-  void deleteLLMApiSetting(LLMApiSettingId id) {
-    ref.watch(settingsRepoProvider).removeLLMApiSetting(id);
-    ref.invalidateSelf();
-  }
-}
-
 
 @Riverpod(keepAlive: true)
 class SettingTabService extends _$SettingTabService {
@@ -73,7 +50,6 @@ class SettingNotifier extends _$SettingNotifier {
     return SettingModel(
       settingTab: ref.watch(settingTabServiceProvider),
       systemSetting: ref.watch(systemSettingServiceProvider),
-      llmApiSettings: ref.watch(lLMApiSettingServiceProvider),
     );
   }
 }

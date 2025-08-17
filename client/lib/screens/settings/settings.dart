@@ -1,7 +1,10 @@
+import 'package:client/models/ai.dart';
 import 'package:client/models/settings.dart';
 import 'package:client/screens/page_skeleton.dart';
+import 'package:client/services/ai/agent.dart';
 import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,7 +65,7 @@ class SettingsPage extends ConsumerWidget {
                 index: model.settingTab.selectedSettingType.index,
                 children: [
                   SystemSettingPage(model: model.systemSetting),
-                  LLMApiSettingPage(models: model.llmApiSettings),
+                  const LLMApiSettingPage(),
                 ],
               ),
             ),
@@ -189,47 +192,119 @@ class SystemSettingPage extends ConsumerWidget {
 }
 
 class LLMApiSettingPage extends ConsumerWidget {
-  final List<LLMApiSettingModel> models;
-  const LLMApiSettingPage({super.key, required this.models});
+  const LLMApiSettingPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final models = ref.watch(lLMAgentNotifierProvider);
+
     return GridView.extent(
       maxCrossAxisExtent: 350,
       mainAxisSpacing: 10,
       crossAxisSpacing: 10,
       childAspectRatio: 1.5,
       children: [
-        for (var model in models)
+        for (var id in models.agents.keys)
           LLMApiSettingItem(
-            key: Key(model.name),
-            model: model,
+            key: Key(id.value.toString()),
+            model: models.agents[id]!,
             onUpdate: (m) {
-              ref
-                  .read(lLMApiSettingServiceProvider.notifier)
-                  .updateLLMApiSetting(m);
+              ref.read(lLMAgentServiceProvider.notifier).updateSetting(id, m);
             },
             onDelete: (m) {
-              ref
-                  .read(lLMApiSettingServiceProvider.notifier)
-                  .deleteLLMApiSetting(m.id);
+              ref.read(lLMAgentServiceProvider.notifier).delete(m);
             },
           ),
         AddLLMApiSettingItem(onAdd: (m) {
-          ref
-              .read(lLMApiSettingServiceProvider.notifier)
-              .createLLMApiSetting(m);
+          ref.read(lLMAgentServiceProvider.notifier).create(m);
         }),
       ],
     );
   }
 }
 
-// 使用卡片Card的形式展示，在右上角有删除按钮，下方有测试，和更新按钮，点击后弹窗编辑，内容包括名称、baseUrl, apiKey, modelName，删除按钮。
+void showLLMApiSettingDialog(BuildContext context, String title,
+    LLMAgentModel? model, Function(LLMAgentSettingModel) onSubmit) {
+  final nameController = TextEditingController(text: model?.setting.name);
+  final baseUrlController = TextEditingController(text: model?.setting.baseUrl);
+  final apiKeyController = TextEditingController(text: model?.setting.apiKey);
+  final modelNameController =
+      TextEditingController(text: model?.setting.modelName);
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        child: Container(
+          width: 400,
+          height: 400,
+          padding: const EdgeInsets.fromLTRB(
+              kSpacingMedium, kSpacingLarge, kSpacingMedium, kSpacingMedium),
+          child: Column(
+            // mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: kSpacingMedium),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Description'),
+              ),
+              const SizedBox(height: kSpacingSmall),
+              TextField(
+                controller: baseUrlController,
+                decoration: const InputDecoration(labelText: 'Base URL'),
+              ),
+              const SizedBox(height: kSpacingSmall),
+              TextField(
+                controller: apiKeyController,
+                decoration: const InputDecoration(labelText: 'API Key'),
+              ),
+              const SizedBox(height: kSpacingSmall),
+              TextField(
+                controller: modelNameController,
+                decoration: const InputDecoration(labelText: 'Model'),
+              ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      AppLocalizations.of(context)!.cancel,
+                    ),
+                  ),
+                  const SizedBox(width: kSpacingSmall),
+                  TextButton(
+                    onPressed: () {
+                      onSubmit(LLMAgentSettingModel(
+                        name: nameController.text,
+                        baseUrl: baseUrlController.text,
+                        apiKey: apiKeyController.text,
+                        modelName: modelNameController.text,
+                      ));
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(AppLocalizations.of(context)!.submit),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 class LLMApiSettingItem extends ConsumerWidget {
-  final LLMApiSettingModel model;
-  final Function(LLMApiSettingModel) onUpdate;
-  final Function(LLMApiSettingModel) onDelete;
+  final LLMAgentModel model;
+  final Function(LLMAgentSettingModel) onUpdate;
+  final Function(LLMAgentId) onDelete;
 
   const LLMApiSettingItem({
     super.key,
@@ -238,86 +313,10 @@ class LLMApiSettingItem extends ConsumerWidget {
     required this.onDelete,
   });
 
-  void _showEditDialog(BuildContext context) {
-    final nameController = TextEditingController(text: model.name);
-    final baseUrlController = TextEditingController(text: model.baseUrl);
-    final apiKeyController = TextEditingController(text: model.apiKey);
-    final modelNameController = TextEditingController(text: model.modelName);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          child: Container(
-            width: 400,
-            height: 400,
-            padding: const EdgeInsets.fromLTRB(
-                kSpacingMedium, kSpacingLarge, kSpacingMedium, kSpacingMedium),
-            child: Column(
-              // mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${AppLocalizations.of(context)!.update} ${model.name}',
-                    style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: kSpacingMedium),
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                const SizedBox(height: kSpacingSmall),
-                TextField(
-                  controller: baseUrlController,
-                  decoration: const InputDecoration(labelText: 'Base URL'),
-                ),
-                const SizedBox(height: kSpacingSmall),
-                TextField(
-                  controller: apiKeyController,
-                  decoration: const InputDecoration(labelText: 'API Key'),
-                ),
-                const SizedBox(height: kSpacingSmall),
-                TextField(
-                  controller: modelNameController,
-                  decoration: const InputDecoration(labelText: 'Model'),
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.cancel,
-                      ),
-                    ),
-                    const SizedBox(width: kSpacingSmall),
-                    TextButton(
-                      onPressed: () {
-                        onUpdate(LLMApiSettingModel(
-                          id: model.id,
-                          name: nameController.text,
-                          baseUrl: baseUrlController.text,
-                          apiKey: apiKeyController.text,
-                          modelName: modelNameController.text,
-                        ));
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(AppLocalizations.of(context)!.submit),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(lLMAgentNotifierProvider).agents[model.id]!.status;
+
     return Container(
       constraints: const BoxConstraints(),
       decoration: BoxDecoration(
@@ -328,7 +327,8 @@ class LLMApiSettingItem extends ConsumerWidget {
             width: 1),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(
+            kSpacingMedium, kSpacingSmall, kSpacingMedium, kSpacingSmall),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -339,7 +339,7 @@ class LLMApiSettingItem extends ConsumerWidget {
                 const SizedBox(width: kSpacingTiny),
                 Expanded(
                   child: Text(
-                    model.name,
+                    model.setting.name,
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -348,41 +348,75 @@ class LLMApiSettingItem extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
+                  iconSize: kIconSizeSmall,
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    onDelete(model); // todo: 需要二次确认
+                    onDelete(model.id); // todo: 需要二次确认
                   },
                 )
               ],
             ),
             const SizedBox(height: kSpacingTiny),
-            _InfoRow(label: "Base URL", value: model.baseUrl),
+            _InfoRow(label: "Base URL", value: model.setting.baseUrl),
             const SizedBox(height: kSpacingTiny),
             _InfoRow(
               label: "API Key",
-              value: model.apiKey.length > 10
-                  ? model.apiKey.replaceRange(4, model.apiKey.length - 4,
-                      '*' * (model.apiKey.length - 8))
-                  : model.apiKey,
+              value: model.setting.apiKey.length > 10
+                  ? model.setting.apiKey.replaceRange(
+                      4,
+                      model.setting.apiKey.length - 4,
+                      '*' * (model.setting.apiKey.length - 8))
+                  : model.setting.apiKey,
             ),
             const SizedBox(height: kSpacingTiny),
-            _InfoRow(label: "Model", value: model.modelName),
-            // const SizedBox(height: kSpacingTiny),
+            _InfoRow(label: "Model", value: model.setting.modelName),
+            const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconButton(
-                  icon: Icon(Icons.check_circle_outline,
-                      color: Theme.of(context).colorScheme.primary),
-                  onPressed: () {
-                    // TODO: 测试逻辑
-                  },
-                ),
+                const Spacer(),
+                switch (status.state) {
+                  LLMAgentState.testing => const Loading(),
+                  LLMAgentState.available => IconButton(
+                      iconSize: kIconSizeSmall,
+                      icon: const Icon(Icons.check_circle_outline,
+                          color: Colors.green),
+                      onPressed: () {
+                        ref
+                            .read(lLMAgentServiceProvider.notifier)
+                            .ping(model.id);
+                      },
+                    ),
+                  LLMAgentState.unavailable => IconButton(
+                      iconSize: kIconSizeSmall,
+                      icon: const Icon(Icons.error_outline, color: Colors.red),
+                      onPressed: () {
+                        ref
+                            .read(lLMAgentServiceProvider.notifier)
+                            .ping(model.id);
+                      },
+                    ),
+                  LLMAgentState.unknown => IconButton(
+                      iconSize: kIconSizeSmall,
+                      icon: const Icon(Icons.flash_on),
+                      onPressed: () {
+                        ref
+                            .read(lLMAgentServiceProvider.notifier)
+                            .ping(model.id);
+                      },
+                    ),
+                },
                 const SizedBox(width: kSpacingTiny),
                 IconButton(
+                  iconSize: kIconSizeSmall,
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    _showEditDialog(context);
+                    showLLMApiSettingDialog(
+                      context,
+                      '${AppLocalizations.of(context)!.update}: ${model.setting.name}',
+                      model,
+                      onUpdate,
+                    );
                   },
                 ),
               ],
@@ -395,83 +429,8 @@ class LLMApiSettingItem extends ConsumerWidget {
 }
 
 class AddLLMApiSettingItem extends StatelessWidget {
-  final Function(LLMApiSettingModel) onAdd;
+  final Function(LLMAgentSettingModel) onAdd;
   const AddLLMApiSettingItem({super.key, required this.onAdd});
-
-  void _addLLMApiSettingDialog(BuildContext context) {
-    final nameController = TextEditingController(text: "");
-    final baseUrlController = TextEditingController(text: "");
-    final apiKeyController = TextEditingController(text: "");
-    final modelNameController = TextEditingController(text: "");
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          child: Container(
-            width: 400,
-            height: 400,
-            padding: const EdgeInsets.fromLTRB(
-                kSpacingMedium, kSpacingLarge, kSpacingMedium, kSpacingMedium),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(AppLocalizations.of(context)!.create,
-                    style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: kSpacingMedium),
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                const SizedBox(height: kSpacingSmall),
-                TextField(
-                  controller: baseUrlController,
-                  decoration: const InputDecoration(labelText: 'Base URL'),
-                ),
-                const SizedBox(height: kSpacingSmall),
-                TextField(
-                  controller: apiKeyController,
-                  decoration: const InputDecoration(labelText: 'API Key'),
-                ),
-                const SizedBox(height: kSpacingSmall),
-                TextField(
-                  controller: modelNameController,
-                  decoration: const InputDecoration(labelText: 'Model Name'),
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(AppLocalizations.of(context)!.cancel),
-                    ),
-                    const SizedBox(width: kSpacingSmall),
-                    TextButton(
-                      onPressed: () {
-                        onAdd(LLMApiSettingModel(
-                          id: const LLMApiSettingId(value: 0),
-                          name: nameController.text,
-                          baseUrl: baseUrlController.text,
-                          apiKey: apiKeyController.text,
-                          modelName: modelNameController.text,
-                        ));
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(AppLocalizations.of(context)!.submit),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -486,12 +445,18 @@ class AddLLMApiSettingItem extends StatelessWidget {
       ),
       child: Center(
         child: IconButton(
-            onPressed: () {
-              _addLLMApiSettingDialog(context);
-            },
-            icon: Icon(Icons.add,
-                size: kIconSizeLarge,
-                color: Theme.of(context).colorScheme.surfaceDim)),
+          onPressed: () {
+            showLLMApiSettingDialog(
+              context,
+              AppLocalizations.of(context)!.create,
+              null,
+              onAdd,
+            );
+          },
+          icon: Icon(Icons.add,
+              size: kIconSizeLarge,
+              color: Theme.of(context).colorScheme.surfaceDim),
+        ),
       ),
     );
   }

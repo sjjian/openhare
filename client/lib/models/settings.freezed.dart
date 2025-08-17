@@ -161,370 +161,6 @@ class __$SystemSettingModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$LLMApiSettingId {
-  int get value;
-
-  /// Create a copy of LLMApiSettingId
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $LLMApiSettingIdCopyWith<LLMApiSettingId> get copyWith =>
-      _$LLMApiSettingIdCopyWithImpl<LLMApiSettingId>(
-          this as LLMApiSettingId, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is LLMApiSettingId &&
-            (identical(other.value, value) || other.value == value));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, value);
-
-  @override
-  String toString() {
-    return 'LLMApiSettingId(value: $value)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $LLMApiSettingIdCopyWith<$Res> {
-  factory $LLMApiSettingIdCopyWith(
-          LLMApiSettingId value, $Res Function(LLMApiSettingId) _then) =
-      _$LLMApiSettingIdCopyWithImpl;
-  @useResult
-  $Res call({int value});
-}
-
-/// @nodoc
-class _$LLMApiSettingIdCopyWithImpl<$Res>
-    implements $LLMApiSettingIdCopyWith<$Res> {
-  _$LLMApiSettingIdCopyWithImpl(this._self, this._then);
-
-  final LLMApiSettingId _self;
-  final $Res Function(LLMApiSettingId) _then;
-
-  /// Create a copy of LLMApiSettingId
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? value = null,
-  }) {
-    return _then(_self.copyWith(
-      value: null == value
-          ? _self.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _LLMApiSettingId implements LLMApiSettingId {
-  const _LLMApiSettingId({required this.value});
-
-  @override
-  final int value;
-
-  /// Create a copy of LLMApiSettingId
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$LLMApiSettingIdCopyWith<_LLMApiSettingId> get copyWith =>
-      __$LLMApiSettingIdCopyWithImpl<_LLMApiSettingId>(this, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _LLMApiSettingId &&
-            (identical(other.value, value) || other.value == value));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, value);
-
-  @override
-  String toString() {
-    return 'LLMApiSettingId(value: $value)';
-  }
-}
-
-/// @nodoc
-abstract mixin class _$LLMApiSettingIdCopyWith<$Res>
-    implements $LLMApiSettingIdCopyWith<$Res> {
-  factory _$LLMApiSettingIdCopyWith(
-          _LLMApiSettingId value, $Res Function(_LLMApiSettingId) _then) =
-      __$LLMApiSettingIdCopyWithImpl;
-  @override
-  @useResult
-  $Res call({int value});
-}
-
-/// @nodoc
-class __$LLMApiSettingIdCopyWithImpl<$Res>
-    implements _$LLMApiSettingIdCopyWith<$Res> {
-  __$LLMApiSettingIdCopyWithImpl(this._self, this._then);
-
-  final _LLMApiSettingId _self;
-  final $Res Function(_LLMApiSettingId) _then;
-
-  /// Create a copy of LLMApiSettingId
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? value = null,
-  }) {
-    return _then(_LLMApiSettingId(
-      value: null == value
-          ? _self.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-mixin _$LLMApiSettingModel {
-  LLMApiSettingId get id;
-  String get name;
-  String get baseUrl;
-  String get apiKey;
-  String get modelName;
-
-  /// Create a copy of LLMApiSettingModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $LLMApiSettingModelCopyWith<LLMApiSettingModel> get copyWith =>
-      _$LLMApiSettingModelCopyWithImpl<LLMApiSettingModel>(
-          this as LLMApiSettingModel, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is LLMApiSettingModel &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl) &&
-            (identical(other.apiKey, apiKey) || other.apiKey == apiKey) &&
-            (identical(other.modelName, modelName) ||
-                other.modelName == modelName));
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, baseUrl, apiKey, modelName);
-
-  @override
-  String toString() {
-    return 'LLMApiSettingModel(id: $id, name: $name, baseUrl: $baseUrl, apiKey: $apiKey, modelName: $modelName)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $LLMApiSettingModelCopyWith<$Res> {
-  factory $LLMApiSettingModelCopyWith(
-          LLMApiSettingModel value, $Res Function(LLMApiSettingModel) _then) =
-      _$LLMApiSettingModelCopyWithImpl;
-  @useResult
-  $Res call(
-      {LLMApiSettingId id,
-      String name,
-      String baseUrl,
-      String apiKey,
-      String modelName});
-
-  $LLMApiSettingIdCopyWith<$Res> get id;
-}
-
-/// @nodoc
-class _$LLMApiSettingModelCopyWithImpl<$Res>
-    implements $LLMApiSettingModelCopyWith<$Res> {
-  _$LLMApiSettingModelCopyWithImpl(this._self, this._then);
-
-  final LLMApiSettingModel _self;
-  final $Res Function(LLMApiSettingModel) _then;
-
-  /// Create a copy of LLMApiSettingModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? baseUrl = null,
-    Object? apiKey = null,
-    Object? modelName = null,
-  }) {
-    return _then(_self.copyWith(
-      id: null == id
-          ? _self.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as LLMApiSettingId,
-      name: null == name
-          ? _self.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      baseUrl: null == baseUrl
-          ? _self.baseUrl
-          : baseUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      apiKey: null == apiKey
-          ? _self.apiKey
-          : apiKey // ignore: cast_nullable_to_non_nullable
-              as String,
-      modelName: null == modelName
-          ? _self.modelName
-          : modelName // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-
-  /// Create a copy of LLMApiSettingModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $LLMApiSettingIdCopyWith<$Res> get id {
-    return $LLMApiSettingIdCopyWith<$Res>(_self.id, (value) {
-      return _then(_self.copyWith(id: value));
-    });
-  }
-}
-
-/// @nodoc
-
-class _LLMApiSettingModel implements LLMApiSettingModel {
-  const _LLMApiSettingModel(
-      {required this.id,
-      required this.name,
-      required this.baseUrl,
-      required this.apiKey,
-      required this.modelName});
-
-  @override
-  final LLMApiSettingId id;
-  @override
-  final String name;
-  @override
-  final String baseUrl;
-  @override
-  final String apiKey;
-  @override
-  final String modelName;
-
-  /// Create a copy of LLMApiSettingModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$LLMApiSettingModelCopyWith<_LLMApiSettingModel> get copyWith =>
-      __$LLMApiSettingModelCopyWithImpl<_LLMApiSettingModel>(this, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _LLMApiSettingModel &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl) &&
-            (identical(other.apiKey, apiKey) || other.apiKey == apiKey) &&
-            (identical(other.modelName, modelName) ||
-                other.modelName == modelName));
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, baseUrl, apiKey, modelName);
-
-  @override
-  String toString() {
-    return 'LLMApiSettingModel(id: $id, name: $name, baseUrl: $baseUrl, apiKey: $apiKey, modelName: $modelName)';
-  }
-}
-
-/// @nodoc
-abstract mixin class _$LLMApiSettingModelCopyWith<$Res>
-    implements $LLMApiSettingModelCopyWith<$Res> {
-  factory _$LLMApiSettingModelCopyWith(
-          _LLMApiSettingModel value, $Res Function(_LLMApiSettingModel) _then) =
-      __$LLMApiSettingModelCopyWithImpl;
-  @override
-  @useResult
-  $Res call(
-      {LLMApiSettingId id,
-      String name,
-      String baseUrl,
-      String apiKey,
-      String modelName});
-
-  @override
-  $LLMApiSettingIdCopyWith<$Res> get id;
-}
-
-/// @nodoc
-class __$LLMApiSettingModelCopyWithImpl<$Res>
-    implements _$LLMApiSettingModelCopyWith<$Res> {
-  __$LLMApiSettingModelCopyWithImpl(this._self, this._then);
-
-  final _LLMApiSettingModel _self;
-  final $Res Function(_LLMApiSettingModel) _then;
-
-  /// Create a copy of LLMApiSettingModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? baseUrl = null,
-    Object? apiKey = null,
-    Object? modelName = null,
-  }) {
-    return _then(_LLMApiSettingModel(
-      id: null == id
-          ? _self.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as LLMApiSettingId,
-      name: null == name
-          ? _self.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      baseUrl: null == baseUrl
-          ? _self.baseUrl
-          : baseUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      apiKey: null == apiKey
-          ? _self.apiKey
-          : apiKey // ignore: cast_nullable_to_non_nullable
-              as String,
-      modelName: null == modelName
-          ? _self.modelName
-          : modelName // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-
-  /// Create a copy of LLMApiSettingModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $LLMApiSettingIdCopyWith<$Res> get id {
-    return $LLMApiSettingIdCopyWith<$Res>(_self.id, (value) {
-      return _then(_self.copyWith(id: value));
-    });
-  }
-}
-
-/// @nodoc
 mixin _$SettingTabModel {
   SettingType get selectedSettingType;
 
@@ -660,7 +296,6 @@ class __$SettingTabModelCopyWithImpl<$Res>
 mixin _$SettingModel {
   SettingTabModel get settingTab;
   SystemSettingModel get systemSetting;
-  List<LLMApiSettingModel> get llmApiSettings;
 
   /// Create a copy of SettingModel
   /// with the given fields replaced by the non-null parameter values.
@@ -678,18 +313,15 @@ mixin _$SettingModel {
             (identical(other.settingTab, settingTab) ||
                 other.settingTab == settingTab) &&
             (identical(other.systemSetting, systemSetting) ||
-                other.systemSetting == systemSetting) &&
-            const DeepCollectionEquality()
-                .equals(other.llmApiSettings, llmApiSettings));
+                other.systemSetting == systemSetting));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, settingTab, systemSetting,
-      const DeepCollectionEquality().hash(llmApiSettings));
+  int get hashCode => Object.hash(runtimeType, settingTab, systemSetting);
 
   @override
   String toString() {
-    return 'SettingModel(settingTab: $settingTab, systemSetting: $systemSetting, llmApiSettings: $llmApiSettings)';
+    return 'SettingModel(settingTab: $settingTab, systemSetting: $systemSetting)';
   }
 }
 
@@ -699,10 +331,7 @@ abstract mixin class $SettingModelCopyWith<$Res> {
           SettingModel value, $Res Function(SettingModel) _then) =
       _$SettingModelCopyWithImpl;
   @useResult
-  $Res call(
-      {SettingTabModel settingTab,
-      SystemSettingModel systemSetting,
-      List<LLMApiSettingModel> llmApiSettings});
+  $Res call({SettingTabModel settingTab, SystemSettingModel systemSetting});
 
   $SettingTabModelCopyWith<$Res> get settingTab;
   $SystemSettingModelCopyWith<$Res> get systemSetting;
@@ -722,7 +351,6 @@ class _$SettingModelCopyWithImpl<$Res> implements $SettingModelCopyWith<$Res> {
   $Res call({
     Object? settingTab = null,
     Object? systemSetting = null,
-    Object? llmApiSettings = null,
   }) {
     return _then(_self.copyWith(
       settingTab: null == settingTab
@@ -733,10 +361,6 @@ class _$SettingModelCopyWithImpl<$Res> implements $SettingModelCopyWith<$Res> {
           ? _self.systemSetting
           : systemSetting // ignore: cast_nullable_to_non_nullable
               as SystemSettingModel,
-      llmApiSettings: null == llmApiSettings
-          ? _self.llmApiSettings
-          : llmApiSettings // ignore: cast_nullable_to_non_nullable
-              as List<LLMApiSettingModel>,
     ));
   }
 
@@ -764,23 +388,12 @@ class _$SettingModelCopyWithImpl<$Res> implements $SettingModelCopyWith<$Res> {
 /// @nodoc
 
 class _SettingModel implements SettingModel {
-  const _SettingModel(
-      {required this.settingTab,
-      required this.systemSetting,
-      required final List<LLMApiSettingModel> llmApiSettings})
-      : _llmApiSettings = llmApiSettings;
+  const _SettingModel({required this.settingTab, required this.systemSetting});
 
   @override
   final SettingTabModel settingTab;
   @override
   final SystemSettingModel systemSetting;
-  final List<LLMApiSettingModel> _llmApiSettings;
-  @override
-  List<LLMApiSettingModel> get llmApiSettings {
-    if (_llmApiSettings is EqualUnmodifiableListView) return _llmApiSettings;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_llmApiSettings);
-  }
 
   /// Create a copy of SettingModel
   /// with the given fields replaced by the non-null parameter values.
@@ -798,18 +411,15 @@ class _SettingModel implements SettingModel {
             (identical(other.settingTab, settingTab) ||
                 other.settingTab == settingTab) &&
             (identical(other.systemSetting, systemSetting) ||
-                other.systemSetting == systemSetting) &&
-            const DeepCollectionEquality()
-                .equals(other._llmApiSettings, _llmApiSettings));
+                other.systemSetting == systemSetting));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, settingTab, systemSetting,
-      const DeepCollectionEquality().hash(_llmApiSettings));
+  int get hashCode => Object.hash(runtimeType, settingTab, systemSetting);
 
   @override
   String toString() {
-    return 'SettingModel(settingTab: $settingTab, systemSetting: $systemSetting, llmApiSettings: $llmApiSettings)';
+    return 'SettingModel(settingTab: $settingTab, systemSetting: $systemSetting)';
   }
 }
 
@@ -821,10 +431,7 @@ abstract mixin class _$SettingModelCopyWith<$Res>
       __$SettingModelCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {SettingTabModel settingTab,
-      SystemSettingModel systemSetting,
-      List<LLMApiSettingModel> llmApiSettings});
+  $Res call({SettingTabModel settingTab, SystemSettingModel systemSetting});
 
   @override
   $SettingTabModelCopyWith<$Res> get settingTab;
@@ -847,7 +454,6 @@ class __$SettingModelCopyWithImpl<$Res>
   $Res call({
     Object? settingTab = null,
     Object? systemSetting = null,
-    Object? llmApiSettings = null,
   }) {
     return _then(_SettingModel(
       settingTab: null == settingTab
@@ -858,10 +464,6 @@ class __$SettingModelCopyWithImpl<$Res>
           ? _self.systemSetting
           : systemSetting // ignore: cast_nullable_to_non_nullable
               as SystemSettingModel,
-      llmApiSettings: null == llmApiSettings
-          ? _self._llmApiSettings
-          : llmApiSettings // ignore: cast_nullable_to_non_nullable
-              as List<LLMApiSettingModel>,
     ));
   }
 

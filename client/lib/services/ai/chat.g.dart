@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ai_chat.dart';
+part of 'chat.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$aIChatServiceHash() => r'd9c71d1b8e8c04a850ebb65efa5adfb5a0d87757';
+String _$aIChatServiceHash() => r'878841e7749fbd3313b16e62c6e0513e65979fce';
 
 /// Copied from Dart SDK
 class _SystemHash {

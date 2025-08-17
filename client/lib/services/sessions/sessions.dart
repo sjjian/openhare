@@ -3,7 +3,7 @@ import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/repositories/sessions/sessions.dart';
-import 'package:client/services/ai/ai_chat.dart';
+import 'package:client/services/ai/chat.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/session_conn.dart';

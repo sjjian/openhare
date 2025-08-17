@@ -6,10 +6,10 @@ abstract class SettingsRepo {
   SystemSettingModel getSettings();
   void setLanguage(String language);
   void setTheme(String theme);
-  void addLLMApiSetting(LLMApiSettingModel setting);
-  void updateLLMApiSetting(LLMApiSettingModel setting);
-  List<LLMApiSettingModel> getLLMApiSettings();
-  void removeLLMApiSetting(LLMApiSettingId id);
+  // void addLLMApiSetting(LLMApiSettingModel setting);
+  // void updateLLMApiSetting(LLMApiSettingModel setting);
+  // List<LLMApiSettingModel> getLLMApiSettings();
+  // void removeLLMApiSetting(LLMApiSettingId id);
 }
 
 @freezed
@@ -18,24 +18,6 @@ abstract class SystemSettingModel with _$SystemSettingModel {
     required String theme,
     required String language,
   }) = _SystemSettingModel;
-}
-
-@freezed
-abstract class LLMApiSettingId with _$LLMApiSettingId {
-  const factory LLMApiSettingId({
-    required int value,
-  }) = _LLMApiSettingId;
-}
-
-@freezed
-abstract class LLMApiSettingModel with _$LLMApiSettingModel {
-  const factory LLMApiSettingModel({
-    required LLMApiSettingId id,
-    required String name,
-    required String baseUrl,
-    required String apiKey,
-    required String modelName,
-  }) = _LLMApiSettingModel;
 }
 
 enum SettingType {
@@ -55,6 +37,6 @@ abstract class SettingModel with _$SettingModel {
   const factory SettingModel({
     required SettingTabModel settingTab,
     required SystemSettingModel systemSetting,
-    required List<LLMApiSettingModel> llmApiSettings,
+    // required List<LLMApiSettingModel> llmApiSettings,
   }) = _SettingModel;
 }

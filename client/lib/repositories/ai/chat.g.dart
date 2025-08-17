@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ai.dart';
+part of 'chat.dart';
 
 // **************************************************************************
 // RiverpodGenerator
