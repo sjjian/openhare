@@ -191,7 +191,7 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
           padding:
               const EdgeInsets.fromLTRB(kSpacingMedium, 0, kSpacingMedium, 0),
           child: Container(
-            padding: const EdgeInsets.all(kSpacingSmall),
+            padding: const EdgeInsets.fromLTRB(kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingTiny),
             // 设置一个圆角
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -214,7 +214,7 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 12),
+                              vertical: kSpacingSmall, horizontal: kSpacingTiny),
                         ),
                         onSubmitted: (_) => _sendMessage(model.chatModel.id),
                       ),
@@ -223,6 +223,7 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                 ),
                 Row(
                   children: [
+                    const SizedBox(width: kSpacingTiny),
                     // 下拉菜单button 可以选择agent
                     Text(
                       model.chatModel.llmAgent.setting.name,
