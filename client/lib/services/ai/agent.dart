@@ -11,7 +11,6 @@ class LLMAgentService extends _$LLMAgentService {
   @override
   LLMAgentsModel build() {
     final repo = ref.watch(lLMAgentRepoProvider);
-    // todo: setting refresh agent repo
     return repo.getLLMAgents();
   }
 

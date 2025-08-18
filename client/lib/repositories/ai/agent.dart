@@ -112,6 +112,8 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
         baseUrl: setting.baseUrl,
         apiKey: setting.apiKey,
         modelName: setting.modelName));
+
+    // 更新setting后，状态重置为unknown
     _status[id] = const LLMAgentStatusModel(state: LLMAgentState.unknown);
   }
 }

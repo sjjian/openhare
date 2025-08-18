@@ -1,6 +1,5 @@
 import 'package:client/models/settings.dart';
 import 'package:client/repositories/settings/settings.dart';
-import 'package:client/services/ai/chat.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings.g.dart';

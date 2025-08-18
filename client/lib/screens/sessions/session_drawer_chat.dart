@@ -283,8 +283,17 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                     const Spacer(),
                     IconButton(
                       iconSize: kIconSizeTiny,
+                      icon: const Icon(Icons.cleaning_services),
+                      onPressed: () {
+                        ref
+                            .read(aIChatServiceProvider(model.chatModel.id)
+                                .notifier)
+                            .cleanMessages();
+                      },
+                    ),
+                    IconButton(
+                      iconSize: kIconSizeTiny,
                       icon: const Icon(Icons.send),
-                      color: Theme.of(context).colorScheme.primary,
                       onPressed: model.chatModel.state == AIChatState.waiting
                           ? null
                           : () => _sendMessage(model.chatModel.id),

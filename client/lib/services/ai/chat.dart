@@ -107,4 +107,10 @@ class AIChatService extends _$AIChatService {
     }
     state = state.copyWith(llmAgent: agent);
   }
+
+  void cleanMessages() {
+    final List<AIChatMessageModel> messages = [];
+    ref.read(aiChatRepoProvider).updateMessages(state.id, messages);
+    state = state.copyWith(messages: messages);
+  }
 }
