@@ -11,7 +11,7 @@ import 'package:sql_parser/parser.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/l10n/app_localizations.dart';
 
 class SessionOpBar extends ConsumerWidget {
   final CodeLineEditingController codeController;

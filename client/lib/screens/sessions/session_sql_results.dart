@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:client/widgets/tab_widget.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/l10n/app_localizations.dart';
 
 class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);

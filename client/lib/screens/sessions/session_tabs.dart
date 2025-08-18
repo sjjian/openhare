@@ -7,7 +7,7 @@ import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/l10n/app_localizations.dart';
 
 class SessionTabs extends ConsumerWidget {
   const SessionTabs({Key? key}) : super(key: key);
