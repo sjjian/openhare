@@ -41,19 +41,21 @@ class LLMAgentService extends _$LLMAgentService {
       return;
     }
     final provider = await ai()
-        .deepseek()
+        .openai()
         .baseUrl(model.setting.baseUrl)
         .apiKey(model.setting.apiKey)
         .model(model.setting.modelName)
         .temperature(0.7)
         .build();
 
-    final chatMessages = [
+    // 构造初始消息
+    List<ChatMessage> chatMessages = [
       ChatMessage.system(systemMessage),
       for (var message in messages)
-        message.role == AIRole.user
-            ? ChatMessage.user(message.content)
-            : ChatMessage.assistant(message.content)
+        switch (message.role) {
+          AIRole.user => ChatMessage.user(message.content),
+          AIRole.assistant => ChatMessage.assistant(message.content),
+        }
     ];
 
     yield* provider.chatStream(chatMessages);

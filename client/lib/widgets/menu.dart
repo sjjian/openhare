@@ -6,6 +6,8 @@ class OverlayMenu extends StatefulWidget {
   final Widget child;
   // 支持设置弹窗的位置。在上方或者下方。默认在下方
   final bool isAbove;
+  // 支持设置弹窗的间距。默认0
+  final double spacing;
 
   const OverlayMenu({
     Key? key,
@@ -13,6 +15,7 @@ class OverlayMenu extends StatefulWidget {
     required this.tabs,
     required this.child,
     this.isAbove = false,
+    this.spacing = 0,
   }) : super(key: key);
 
   @override
@@ -121,9 +124,9 @@ class _OverlayMenuState extends State<OverlayMenu> {
                 menuHeight = (menuHeight > widget.maxHeight)
                     ? widget.maxHeight
                     : menuHeight;
-                top = position.dy - menuHeight;
+                top = position.dy - menuHeight - widget.spacing;
               } else {
-                top = position.dy + childSize.height;
+                top = position.dy + childSize.height + widget.spacing;
               }
 
               // 限制菜单不超出屏幕

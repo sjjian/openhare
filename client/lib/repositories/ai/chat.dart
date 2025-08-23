@@ -10,6 +10,11 @@ class AIChatRepoImpl extends AIChatRepo {
   AIChatRepoImpl();
 
   @override
+  AIChatListModel getAIChatList() {
+    return AIChatListModel(chats: _aiChats);
+  }
+
+  @override
   AIChatModel create(AIChatModel model) {
     if (_aiChats.containsKey(model.id)) {
       return _aiChats[model.id]!;
@@ -23,19 +28,14 @@ class AIChatRepoImpl extends AIChatRepo {
     _aiChats[id] = _aiChats[id]!.copyWith(messages: messages);
   }
 
-  @override
-  void updateLLMAgent(AIChatId id, LLMAgentModel llmAgent) {
-    _aiChats[id] = _aiChats[id]!.copyWith(llmAgent: llmAgent);
+  @override 
+  void updateLLMAgent(AIChatId id, LLMAgentId llmAgentId) {
+    _aiChats[id] = _aiChats[id]!.copyWith(llmAgentId: llmAgentId);
   }
 
   @override
   void updateState(AIChatId id, AIChatState state) {
     _aiChats[id] = _aiChats[id]!.copyWith(state: state);
-  }
-
-  @override
-  void updateTables(AIChatId id, List<String> tables) {
-    _aiChats[id] = _aiChats[id]!.copyWith(tables: tables);
   }
 
   @override
@@ -46,6 +46,14 @@ class AIChatRepoImpl extends AIChatRepo {
   @override
   AIChatModel? getAIChatById(AIChatId id) {
     return _aiChats[id];
+  }
+
+  @override
+  void updateTables(AIChatId id, String schema, Map<String, String> tables) {
+    final allTables = _aiChats[id]!.tables;
+    final newTables = Map<String, Map<String, String>>.from(allTables);
+    newTables[schema] = tables;
+    _aiChats[id] = _aiChats[id]!.copyWith(tables: newTables);
   }
 }
 

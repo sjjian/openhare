@@ -662,7 +662,7 @@ final selectedSessionStatusNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSessionStatusNotifier = Notifier<SessionStatusModel?>;
 String _$sessionAIChatNotifierHash() =>
-    r'5d290cbc738e8c341c1dfdce1b87bab8ee0f3a1e';
+    r'360293ed0be7d5eb4ea3d3ae50830307cc738302';
 
 /// See also [SessionAIChatNotifier].
 @ProviderFor(SessionAIChatNotifier)

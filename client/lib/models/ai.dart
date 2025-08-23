@@ -12,13 +12,14 @@ abstract class LLMAgentRepo {
 }
 
 abstract class AIChatRepo {
+  AIChatListModel getAIChatList();
   AIChatModel create(AIChatModel model);
   void delete(AIChatId id);
-  void updateLLMAgent(AIChatId id, LLMAgentModel llmAgent);
+  void updateLLMAgent(AIChatId id, LLMAgentId llmAgent);
   void updateMessages(AIChatId id, List<AIChatMessageModel> messages);
   void updateState(AIChatId id, AIChatState state);
-  void updateTables(AIChatId id, List<String> tables);
   AIChatModel? getAIChatById(AIChatId id);
+  void updateTables(AIChatId id, String schema, Map<String, String> tables);
 }
 
 enum LLMAgentState {
@@ -90,8 +91,8 @@ abstract class AIChatId with _$AIChatId {
 abstract class AIChatModel with _$AIChatModel {
   const factory AIChatModel({
     required AIChatId id,
-    required LLMAgentModel llmAgent,
-    required List<String> tables,
+    required LLMAgentId llmAgentId,
+    required Map<String, Map<String, String>> tables,
     required List<AIChatMessageModel> messages,
     required AIChatState state,
   }) = _AIChatModel;
@@ -103,4 +104,11 @@ abstract class AIChatMessageModel with _$AIChatMessageModel {
     required AIRole role,
     required String content,
   }) = _AIChatMessageModel;
+}
+
+@freezed
+abstract class AIChatListModel with _$AIChatListModel {
+  const factory AIChatListModel({
+    required Map<AIChatId, AIChatModel> chats,
+  }) = _AIChatListModel;
 }

@@ -730,13 +730,8 @@ class AddInstanceController extends ChangeNotifier {
 
   final CodeLineEditingController code = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
-    return TextSpan(
-        children: Lexer(codeLines.asString(TextLineBreak.lf))
-            .tokens()
-            .map<TextSpan>((tok) => TextSpan(
-                text: tok.content,
-                style: style.merge(getStyle(tok.id) ?? style)))
-            .toList());
+    return getSQLHighlightTextSpan(codeLines.asString(TextLineBreak.lf),
+        defalutStyle: style);
   });
 
   DatabaseType selectedDatabaseType = DatabaseType.mysql;

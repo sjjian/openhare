@@ -6,7 +6,7 @@ part of 'agent.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lLMAgentServiceHash() => r'9e91cf1cd0b872c769c6576ee079ffa288a7ad5c';
+String _$lLMAgentServiceHash() => r'5b34425b56b3f61abd76da2c225c50b93ab2b7f0';
 
 /// See also [LLMAgentService].
 @ProviderFor(LLMAgentService)

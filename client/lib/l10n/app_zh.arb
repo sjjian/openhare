@@ -53,5 +53,6 @@
     "tip_connect_busy_desc": "当前连接正在执行语句，请稍后再试。",
     "short_conn": "连接",
     "tip_close_session": "关闭活跃会话",
-    "tip_close_session_desc": "此操作将终止查询并关闭连接, 确定关闭活跃会话吗? "
+    "tip_close_session_desc": "此操作将终止查询并关闭连接, 确定关闭活跃会话吗? ",
+    "ai_chat_input_tip": "请输入你的问题..."
 }

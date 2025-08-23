@@ -3,6 +3,7 @@ import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/repositories/sessions/sessions.dart';
+import 'package:client/services/ai/agent.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/instances/metadata.dart';
@@ -11,12 +12,10 @@ import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
-import 'package:sql_parser/parser.dart';
 import 'package:excel/excel.dart' as excel;
 
 part 'sessions.g.dart';
@@ -107,7 +106,12 @@ class SessionsServices extends _$SessionsServices {
     // 3. delete result
     ref.read(sqlResultsRepoProvider).deleteSQLResults(session.sessionId);
 
-    // 4. delete provider status
+    // 4. delete ai chat
+    ref
+        .read(aIChatServiceProvider.notifier)
+        .delete(AIChatId(value: session.sessionId.value));
+
+    // 5. delete provider status
     ref.invalidate(sessionSQLEditorServiceProvider(session.sessionId));
     ref.invalidate(sessionSplitViewStateProvider(session.sessionId));
     ref.invalidate(sessionDrawerServicesProvider(session.sessionId));
@@ -180,14 +184,8 @@ class SessionSQLEditorService extends _$SessionSQLEditorService {
   SessionEditorModel build(SessionId sessionId) {
     final controller = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
-        return TextSpan(
-          children: Lexer(codeLines.asString(TextLineBreak.lf))
-              .tokens()
-              .map<TextSpan>((tok) => TextSpan(
-                  text: tok.content,
-                  style: style.merge(getStyle(tok.id) ?? style)))
-              .toList(),
-        );
+        return getSQLHighlightTextSpan(codeLines.asString(TextLineBreak.lf),
+            defalutStyle: style);
       },
     );
 
@@ -327,7 +325,8 @@ class SessionDrawerNotifier extends _$SessionDrawerNotifier {
     SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
-      return ref.watch(sessionDrawerServicesProvider(const SessionId(value: 0)));
+      return ref
+          .watch(sessionDrawerServicesProvider(const SessionId(value: 0)));
     }
     return ref.watch(sessionDrawerServicesProvider(sessionModel.sessionId));
   }
@@ -492,12 +491,40 @@ class SessionAIChatNotifier extends _$SessionAIChatNotifier {
     if (session == null) {
       return null;
     }
-    AIChatModel aiChatModel = ref.watch(aIChatServiceProvider(
-        AIChatId(value: session.sessionId.value))); // 暂时用session id 替代chatId
+    LLMAgentsModel llmAgents = ref.watch(lLMAgentServiceProvider);
+
+    AIChatModel? aiChatModel = ref.watch(aIChatServiceProvider.select((m) {
+      return m.chats[AIChatId(value: session.sessionId.value)];
+    }));
+
+    if (aiChatModel == null) {
+      aiChatModel = AIChatModel(
+        id: AIChatId(
+            value: session.sessionId.value), // todo: 暂时用session id 替代chatId
+        messages: [],
+        state: AIChatState.idle,
+        llmAgentId: llmAgents.agents.values.first.id, // todo: 暂时默认使用第一个。
+        tables: {},
+      );
+
+      ref.read(aIChatServiceProvider.notifier).create(aiChatModel);
+    }
+
+    InstanceMetadataModel? metadata;
+    if (session.instanceId != null) {
+      metadata =
+          ref.watch(instanceMetadataServicesProvider(session.instanceId!));
+    }
+
     return SessionAIChatModel(
-        chatModel: aiChatModel,
-        sessionId: session.sessionId,
-        connId: session.connId,
-        state: session.connState);
+      chatModel: aiChatModel,
+      sessionId: session.sessionId,
+      currentSchema: session.currentSchema,
+      dbType: session.dbType,
+      metadata: metadata?.metadata,
+      connId: session.connId,
+      state: session.connState,
+      llmAgents: llmAgents,
+    );
   }
 }

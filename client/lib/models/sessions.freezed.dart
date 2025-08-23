@@ -3964,9 +3964,13 @@ class __$SQLResultsModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$SessionAIChatModel {
   SessionId get sessionId;
+  String? get currentSchema;
+  DatabaseType? get dbType;
+  MetaDataNode? get metadata;
   ConnId? get connId;
   SQLConnectState? get state;
   AIChatModel get chatModel;
+  LLMAgentsModel get llmAgents;
 
   /// Create a copy of SessionAIChatModel
   /// with the given fields replaced by the non-null parameter values.
@@ -3983,19 +3987,26 @@ mixin _$SessionAIChatModel {
             other is SessionAIChatModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
+            (identical(other.currentSchema, currentSchema) ||
+                other.currentSchema == currentSchema) &&
+            (identical(other.dbType, dbType) || other.dbType == dbType) &&
+            (identical(other.metadata, metadata) ||
+                other.metadata == metadata) &&
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.chatModel, chatModel) ||
-                other.chatModel == chatModel));
+                other.chatModel == chatModel) &&
+            (identical(other.llmAgents, llmAgents) ||
+                other.llmAgents == llmAgents));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, sessionId, connId, state, chatModel);
+  int get hashCode => Object.hash(runtimeType, sessionId, currentSchema, dbType,
+      metadata, connId, state, chatModel, llmAgents);
 
   @override
   String toString() {
-    return 'SessionAIChatModel(sessionId: $sessionId, connId: $connId, state: $state, chatModel: $chatModel)';
+    return 'SessionAIChatModel(sessionId: $sessionId, currentSchema: $currentSchema, dbType: $dbType, metadata: $metadata, connId: $connId, state: $state, chatModel: $chatModel, llmAgents: $llmAgents)';
   }
 }
 
@@ -4007,13 +4018,18 @@ abstract mixin class $SessionAIChatModelCopyWith<$Res> {
   @useResult
   $Res call(
       {SessionId sessionId,
+      String? currentSchema,
+      DatabaseType? dbType,
+      MetaDataNode? metadata,
       ConnId? connId,
       SQLConnectState? state,
-      AIChatModel chatModel});
+      AIChatModel chatModel,
+      LLMAgentsModel llmAgents});
 
   $SessionIdCopyWith<$Res> get sessionId;
   $ConnIdCopyWith<$Res>? get connId;
   $AIChatModelCopyWith<$Res> get chatModel;
+  $LLMAgentsModelCopyWith<$Res> get llmAgents;
 }
 
 /// @nodoc
@@ -4030,15 +4046,31 @@ class _$SessionAIChatModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? sessionId = null,
+    Object? currentSchema = freezed,
+    Object? dbType = freezed,
+    Object? metadata = freezed,
     Object? connId = freezed,
     Object? state = freezed,
     Object? chatModel = null,
+    Object? llmAgents = null,
   }) {
     return _then(_self.copyWith(
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
               as SessionId,
+      currentSchema: freezed == currentSchema
+          ? _self.currentSchema
+          : currentSchema // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dbType: freezed == dbType
+          ? _self.dbType
+          : dbType // ignore: cast_nullable_to_non_nullable
+              as DatabaseType?,
+      metadata: freezed == metadata
+          ? _self.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as MetaDataNode?,
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
@@ -4051,6 +4083,10 @@ class _$SessionAIChatModelCopyWithImpl<$Res>
           ? _self.chatModel
           : chatModel // ignore: cast_nullable_to_non_nullable
               as AIChatModel,
+      llmAgents: null == llmAgents
+          ? _self.llmAgents
+          : llmAgents // ignore: cast_nullable_to_non_nullable
+              as LLMAgentsModel,
     ));
   }
 
@@ -4087,6 +4123,16 @@ class _$SessionAIChatModelCopyWithImpl<$Res>
       return _then(_self.copyWith(chatModel: value));
     });
   }
+
+  /// Create a copy of SessionAIChatModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LLMAgentsModelCopyWith<$Res> get llmAgents {
+    return $LLMAgentsModelCopyWith<$Res>(_self.llmAgents, (value) {
+      return _then(_self.copyWith(llmAgents: value));
+    });
+  }
 }
 
 /// @nodoc
@@ -4094,18 +4140,30 @@ class _$SessionAIChatModelCopyWithImpl<$Res>
 class _SessionAIChatModel implements SessionAIChatModel {
   const _SessionAIChatModel(
       {required this.sessionId,
+      required this.currentSchema,
+      required this.dbType,
+      required this.metadata,
       required this.connId,
       required this.state,
-      required this.chatModel});
+      required this.chatModel,
+      required this.llmAgents});
 
   @override
   final SessionId sessionId;
+  @override
+  final String? currentSchema;
+  @override
+  final DatabaseType? dbType;
+  @override
+  final MetaDataNode? metadata;
   @override
   final ConnId? connId;
   @override
   final SQLConnectState? state;
   @override
   final AIChatModel chatModel;
+  @override
+  final LLMAgentsModel llmAgents;
 
   /// Create a copy of SessionAIChatModel
   /// with the given fields replaced by the non-null parameter values.
@@ -4122,19 +4180,26 @@ class _SessionAIChatModel implements SessionAIChatModel {
             other is _SessionAIChatModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
+            (identical(other.currentSchema, currentSchema) ||
+                other.currentSchema == currentSchema) &&
+            (identical(other.dbType, dbType) || other.dbType == dbType) &&
+            (identical(other.metadata, metadata) ||
+                other.metadata == metadata) &&
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.chatModel, chatModel) ||
-                other.chatModel == chatModel));
+                other.chatModel == chatModel) &&
+            (identical(other.llmAgents, llmAgents) ||
+                other.llmAgents == llmAgents));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, sessionId, connId, state, chatModel);
+  int get hashCode => Object.hash(runtimeType, sessionId, currentSchema, dbType,
+      metadata, connId, state, chatModel, llmAgents);
 
   @override
   String toString() {
-    return 'SessionAIChatModel(sessionId: $sessionId, connId: $connId, state: $state, chatModel: $chatModel)';
+    return 'SessionAIChatModel(sessionId: $sessionId, currentSchema: $currentSchema, dbType: $dbType, metadata: $metadata, connId: $connId, state: $state, chatModel: $chatModel, llmAgents: $llmAgents)';
   }
 }
 
@@ -4148,9 +4213,13 @@ abstract mixin class _$SessionAIChatModelCopyWith<$Res>
   @useResult
   $Res call(
       {SessionId sessionId,
+      String? currentSchema,
+      DatabaseType? dbType,
+      MetaDataNode? metadata,
       ConnId? connId,
       SQLConnectState? state,
-      AIChatModel chatModel});
+      AIChatModel chatModel,
+      LLMAgentsModel llmAgents});
 
   @override
   $SessionIdCopyWith<$Res> get sessionId;
@@ -4158,6 +4227,8 @@ abstract mixin class _$SessionAIChatModelCopyWith<$Res>
   $ConnIdCopyWith<$Res>? get connId;
   @override
   $AIChatModelCopyWith<$Res> get chatModel;
+  @override
+  $LLMAgentsModelCopyWith<$Res> get llmAgents;
 }
 
 /// @nodoc
@@ -4174,15 +4245,31 @@ class __$SessionAIChatModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? sessionId = null,
+    Object? currentSchema = freezed,
+    Object? dbType = freezed,
+    Object? metadata = freezed,
     Object? connId = freezed,
     Object? state = freezed,
     Object? chatModel = null,
+    Object? llmAgents = null,
   }) {
     return _then(_SessionAIChatModel(
       sessionId: null == sessionId
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
               as SessionId,
+      currentSchema: freezed == currentSchema
+          ? _self.currentSchema
+          : currentSchema // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dbType: freezed == dbType
+          ? _self.dbType
+          : dbType // ignore: cast_nullable_to_non_nullable
+              as DatabaseType?,
+      metadata: freezed == metadata
+          ? _self.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as MetaDataNode?,
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
@@ -4195,6 +4282,10 @@ class __$SessionAIChatModelCopyWithImpl<$Res>
           ? _self.chatModel
           : chatModel // ignore: cast_nullable_to_non_nullable
               as AIChatModel,
+      llmAgents: null == llmAgents
+          ? _self.llmAgents
+          : llmAgents // ignore: cast_nullable_to_non_nullable
+              as LLMAgentsModel,
     ));
   }
 
@@ -4229,6 +4320,16 @@ class __$SessionAIChatModelCopyWithImpl<$Res>
   $AIChatModelCopyWith<$Res> get chatModel {
     return $AIChatModelCopyWith<$Res>(_self.chatModel, (value) {
       return _then(_self.copyWith(chatModel: value));
+    });
+  }
+
+  /// Create a copy of SessionAIChatModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LLMAgentsModelCopyWith<$Res> get llmAgents {
+    return $LLMAgentsModelCopyWith<$Res>(_self.llmAgents, (value) {
+      return _then(_self.copyWith(llmAgents: value));
     });
   }
 }

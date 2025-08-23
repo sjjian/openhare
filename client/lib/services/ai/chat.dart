@@ -1,7 +1,6 @@
 import 'package:client/models/ai.dart';
 import 'package:client/repositories/ai/chat.dart';
 import 'package:client/services/ai/agent.dart';
-import 'package:client/services/ai/prompt.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:llm_dart/llm_dart.dart';
 
@@ -10,107 +9,111 @@ part 'chat.g.dart';
 @Riverpod(keepAlive: true)
 class AIChatService extends _$AIChatService {
   @override
-  AIChatModel build(AIChatId id) {
-    // 获取第一个agent
-    final agent = ref.watch(lLMAgentServiceProvider).agents.values.first;
-    // 先创建一个空的AIChatModel
-    final model = AIChatModel(
-        id: id,
-        messages: [],
-        state: AIChatState.idle,
-        llmAgent: agent,
-        tables: []);
-    // 如果不存在则创建一个
-    if (ref.watch(aiChatRepoProvider).getAIChatById(id) == null) {
-      ref.watch(aiChatRepoProvider).create(model);
+  AIChatListModel build() {
+    return ref.watch(aiChatRepoProvider).getAIChatList();
+  }
+
+  void create(AIChatModel model) {
+    ref.read(aiChatRepoProvider).create(model);
+    // ref.invalidateSelf();
+  }
+
+  List<AIChatMessageModel> _getChatMessage(AIChatId id) {
+    return state.chats[id]!.messages;
+  }
+
+  void _updateLastMessage(AIChatId id, String content) {
+    final repo = ref.read(aiChatRepoProvider);
+    final model = repo.getAIChatById(id);
+    if (model == null) {
+      return;
     }
-    return ref.watch(aiChatRepoProvider).getAIChatById(id)!;
+    List<AIChatMessageModel> messages;
+    // 先移除最后一条assistant消息（如果有）
+    if (model.messages.isNotEmpty &&
+        model.messages.last.role == AIRole.assistant) {
+      messages = model.messages.sublist(0, model.messages.length - 1);
+    } else {
+      messages = List.from(model.messages);
+    }
+    // 添加新的assistant消息
+    messages.add(AIChatMessageModel(role: AIRole.assistant, content: content));
+    ref.read(aiChatRepoProvider).updateMessages(id, messages);
+    // 刷新state
+    ref.invalidateSelf();
   }
 
   /// 进行AI对话，请求接口，存储消息并刷新
   /// 不再返回流，直接通过provider刷新state，UI通过监听state变化获取最新消息
-  Future<void> chat(AIChatId id, String message) async {
-    // 先用第一个
-    final agent = ref.read(lLMAgentServiceProvider.notifier);
-
-    final currentMessages = [
-      ...state.messages,
+  Future<void> chat(AIChatId id, String systemPrompt, String message) async {
+    final repo = ref.read(aiChatRepoProvider);
+    final model = repo.getAIChatById(id);
+    if (model == null) {
+      return;
+    }
+    // 1.更新用户提问的消息
+    ref.read(aiChatRepoProvider).updateMessages(id, [
+      ..._getChatMessage(id),
       AIChatMessageModel(role: AIRole.user, content: message)
-    ];
-
-    state =
-        state.copyWith(messages: currentMessages, state: AIChatState.waiting);
-
+    ]);
     ref.read(aiChatRepoProvider).updateState(id, AIChatState.waiting);
-    ref.read(aiChatRepoProvider).updateMessages(id, currentMessages);
+
+    ref.invalidateSelf();
 
     // 2. 构造OpenAI请求
+    final agent = ref.read(lLMAgentServiceProvider.notifier);
     final chatStream = agent.callStream(
-        state.llmAgent.id,
-        chatTemplate.replaceAll('{tables}', state.tables.join('\n')),
-        currentMessages);
+        model.llmAgentId,
+        systemPrompt,
+        _getChatMessage(id));
 
     String tmpReply = '';
     await for (final event in chatStream) {
       switch (event) {
         case TextDeltaEvent(delta: final delta):
           tmpReply += delta;
-          // 先移除最后一条assistant消息（如果有）
-          if (state.messages.isNotEmpty &&
-              state.messages.last.role == AIRole.assistant) {
-            state = state.copyWith(
-                messages: state.messages.sublist(0, state.messages.length - 1));
-          }
-          // 添加新的assistant消息
-          final aiMsg =
-              AIChatMessageModel(role: AIRole.assistant, content: tmpReply);
-          state = state.copyWith(messages: [...state.messages, aiMsg]);
-
-          print('delta: $delta');
+          _updateLastMessage(id, tmpReply);
           break;
+
         case ThinkingDeltaEvent(delta: final delta):
-          print('thinking delta: $delta');
+          print('thinking delta: $delta'); // todo: 支持thinking
           break;
-        case CompletionEvent(response: final response):
-          print('\n✅ Completed');
 
-          if (state.messages.isNotEmpty &&
-              state.messages.last.role == AIRole.assistant) {
-            state = state.copyWith(
-                messages: state.messages.sublist(0, state.messages.length - 1));
-          }
-          // 添加正式assistant消息
-          final aiMsg =
-              AIChatMessageModel(role: AIRole.assistant, content: tmpReply);
-          state = state.copyWith(
-              messages: [...state.messages, aiMsg], state: AIChatState.idle);
-
-          ref.read(aiChatRepoProvider).updateMessages(id, state.messages);
-          ref.read(aiChatRepoProvider).updateState(id, state.state);
-
+        case CompletionEvent():
+          ref.read(aiChatRepoProvider).updateState(id, AIChatState.idle);
+          ref.invalidateSelf();
           break;
+
         case ErrorEvent(error: final error):
-          print('Error: $error');
+          print('Error: $error'); // todo: 支持错误处理
           break;
-        case ToolCallDeltaEvent():
-          // TODO: Handle this case.
-          print('ToolCallDeltaEvent: $event');
+
+        case ToolCallDeltaEvent(toolCall: final toolCall):
+          print('ToolCallDeltaEvent: $toolCall');
+          // toolCalls.add(toolCall);
           break;
       }
     }
   }
 
-  void updateAgent(LLMAgentId agentId) {
-    final agent = ref.read(lLMAgentServiceProvider).agents[agentId];
-    if (agent == null) {
-      return;
-    }
-    state = state.copyWith(llmAgent: agent);
+  void updateAgent(AIChatId id, LLMAgentId agentId) {
+    ref.read(aiChatRepoProvider).updateLLMAgent(id, agentId);
+    ref.invalidateSelf();
   }
 
-  void cleanMessages() {
+  void cleanMessages(AIChatId id) {
     final List<AIChatMessageModel> messages = [];
-    ref.read(aiChatRepoProvider).updateMessages(state.id, messages);
-    state = state.copyWith(messages: messages);
+    ref.read(aiChatRepoProvider).updateMessages(id, messages);
+    ref.invalidateSelf();
+  }
+
+  void updateTables(AIChatId id, String schema, Map<String, String> tables) {
+    ref.read(aiChatRepoProvider).updateTables(id, schema, tables);
+    ref.invalidateSelf();
+  }
+
+  void delete(AIChatId id) {
+    ref.read(aiChatRepoProvider).delete(id);
+    ref.invalidateSelf();
   }
 }

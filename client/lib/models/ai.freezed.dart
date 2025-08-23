@@ -959,8 +959,8 @@ class __$AIChatIdCopyWithImpl<$Res> implements _$AIChatIdCopyWith<$Res> {
 /// @nodoc
 mixin _$AIChatModel {
   AIChatId get id;
-  LLMAgentModel get llmAgent;
-  List<String> get tables;
+  LLMAgentId get llmAgentId;
+  Map<String, Map<String, String>> get tables;
   List<AIChatMessageModel> get messages;
   AIChatState get state;
 
@@ -977,8 +977,8 @@ mixin _$AIChatModel {
         (other.runtimeType == runtimeType &&
             other is AIChatModel &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.llmAgent, llmAgent) ||
-                other.llmAgent == llmAgent) &&
+            (identical(other.llmAgentId, llmAgentId) ||
+                other.llmAgentId == llmAgentId) &&
             const DeepCollectionEquality().equals(other.tables, tables) &&
             const DeepCollectionEquality().equals(other.messages, messages) &&
             (identical(other.state, state) || other.state == state));
@@ -988,14 +988,14 @@ mixin _$AIChatModel {
   int get hashCode => Object.hash(
       runtimeType,
       id,
-      llmAgent,
+      llmAgentId,
       const DeepCollectionEquality().hash(tables),
       const DeepCollectionEquality().hash(messages),
       state);
 
   @override
   String toString() {
-    return 'AIChatModel(id: $id, llmAgent: $llmAgent, tables: $tables, messages: $messages, state: $state)';
+    return 'AIChatModel(id: $id, llmAgentId: $llmAgentId, tables: $tables, messages: $messages, state: $state)';
   }
 }
 
@@ -1007,13 +1007,13 @@ abstract mixin class $AIChatModelCopyWith<$Res> {
   @useResult
   $Res call(
       {AIChatId id,
-      LLMAgentModel llmAgent,
-      List<String> tables,
+      LLMAgentId llmAgentId,
+      Map<String, Map<String, String>> tables,
       List<AIChatMessageModel> messages,
       AIChatState state});
 
   $AIChatIdCopyWith<$Res> get id;
-  $LLMAgentModelCopyWith<$Res> get llmAgent;
+  $LLMAgentIdCopyWith<$Res> get llmAgentId;
 }
 
 /// @nodoc
@@ -1029,7 +1029,7 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? llmAgent = null,
+    Object? llmAgentId = null,
     Object? tables = null,
     Object? messages = null,
     Object? state = null,
@@ -1039,14 +1039,14 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as AIChatId,
-      llmAgent: null == llmAgent
-          ? _self.llmAgent
-          : llmAgent // ignore: cast_nullable_to_non_nullable
-              as LLMAgentModel,
+      llmAgentId: null == llmAgentId
+          ? _self.llmAgentId
+          : llmAgentId // ignore: cast_nullable_to_non_nullable
+              as LLMAgentId,
       tables: null == tables
           ? _self.tables
           : tables // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Map<String, Map<String, String>>,
       messages: null == messages
           ? _self.messages
           : messages // ignore: cast_nullable_to_non_nullable
@@ -1072,9 +1072,9 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $LLMAgentModelCopyWith<$Res> get llmAgent {
-    return $LLMAgentModelCopyWith<$Res>(_self.llmAgent, (value) {
-      return _then(_self.copyWith(llmAgent: value));
+  $LLMAgentIdCopyWith<$Res> get llmAgentId {
+    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId, (value) {
+      return _then(_self.copyWith(llmAgentId: value));
     });
   }
 }
@@ -1084,8 +1084,8 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
 class _AIChatModel implements AIChatModel {
   const _AIChatModel(
       {required this.id,
-      required this.llmAgent,
-      required final List<String> tables,
+      required this.llmAgentId,
+      required final Map<String, Map<String, String>> tables,
       required final List<AIChatMessageModel> messages,
       required this.state})
       : _tables = tables,
@@ -1094,13 +1094,13 @@ class _AIChatModel implements AIChatModel {
   @override
   final AIChatId id;
   @override
-  final LLMAgentModel llmAgent;
-  final List<String> _tables;
+  final LLMAgentId llmAgentId;
+  final Map<String, Map<String, String>> _tables;
   @override
-  List<String> get tables {
-    if (_tables is EqualUnmodifiableListView) return _tables;
+  Map<String, Map<String, String>> get tables {
+    if (_tables is EqualUnmodifiableMapView) return _tables;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_tables);
+    return EqualUnmodifiableMapView(_tables);
   }
 
   final List<AIChatMessageModel> _messages;
@@ -1128,8 +1128,8 @@ class _AIChatModel implements AIChatModel {
         (other.runtimeType == runtimeType &&
             other is _AIChatModel &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.llmAgent, llmAgent) ||
-                other.llmAgent == llmAgent) &&
+            (identical(other.llmAgentId, llmAgentId) ||
+                other.llmAgentId == llmAgentId) &&
             const DeepCollectionEquality().equals(other._tables, _tables) &&
             const DeepCollectionEquality().equals(other._messages, _messages) &&
             (identical(other.state, state) || other.state == state));
@@ -1139,14 +1139,14 @@ class _AIChatModel implements AIChatModel {
   int get hashCode => Object.hash(
       runtimeType,
       id,
-      llmAgent,
+      llmAgentId,
       const DeepCollectionEquality().hash(_tables),
       const DeepCollectionEquality().hash(_messages),
       state);
 
   @override
   String toString() {
-    return 'AIChatModel(id: $id, llmAgent: $llmAgent, tables: $tables, messages: $messages, state: $state)';
+    return 'AIChatModel(id: $id, llmAgentId: $llmAgentId, tables: $tables, messages: $messages, state: $state)';
   }
 }
 
@@ -1160,15 +1160,15 @@ abstract mixin class _$AIChatModelCopyWith<$Res>
   @useResult
   $Res call(
       {AIChatId id,
-      LLMAgentModel llmAgent,
-      List<String> tables,
+      LLMAgentId llmAgentId,
+      Map<String, Map<String, String>> tables,
       List<AIChatMessageModel> messages,
       AIChatState state});
 
   @override
   $AIChatIdCopyWith<$Res> get id;
   @override
-  $LLMAgentModelCopyWith<$Res> get llmAgent;
+  $LLMAgentIdCopyWith<$Res> get llmAgentId;
 }
 
 /// @nodoc
@@ -1184,7 +1184,7 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? llmAgent = null,
+    Object? llmAgentId = null,
     Object? tables = null,
     Object? messages = null,
     Object? state = null,
@@ -1194,14 +1194,14 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as AIChatId,
-      llmAgent: null == llmAgent
-          ? _self.llmAgent
-          : llmAgent // ignore: cast_nullable_to_non_nullable
-              as LLMAgentModel,
+      llmAgentId: null == llmAgentId
+          ? _self.llmAgentId
+          : llmAgentId // ignore: cast_nullable_to_non_nullable
+              as LLMAgentId,
       tables: null == tables
           ? _self._tables
           : tables // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Map<String, Map<String, String>>,
       messages: null == messages
           ? _self._messages
           : messages // ignore: cast_nullable_to_non_nullable
@@ -1227,9 +1227,9 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $LLMAgentModelCopyWith<$Res> get llmAgent {
-    return $LLMAgentModelCopyWith<$Res>(_self.llmAgent, (value) {
-      return _then(_self.copyWith(llmAgent: value));
+  $LLMAgentIdCopyWith<$Res> get llmAgentId {
+    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId, (value) {
+      return _then(_self.copyWith(llmAgentId: value));
     });
   }
 }
@@ -1375,6 +1375,144 @@ class __$AIChatMessageModelCopyWithImpl<$Res>
           ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$AIChatListModel {
+  Map<AIChatId, AIChatModel> get chats;
+
+  /// Create a copy of AIChatListModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $AIChatListModelCopyWith<AIChatListModel> get copyWith =>
+      _$AIChatListModelCopyWithImpl<AIChatListModel>(
+          this as AIChatListModel, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is AIChatListModel &&
+            const DeepCollectionEquality().equals(other.chats, chats));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(chats));
+
+  @override
+  String toString() {
+    return 'AIChatListModel(chats: $chats)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $AIChatListModelCopyWith<$Res> {
+  factory $AIChatListModelCopyWith(
+          AIChatListModel value, $Res Function(AIChatListModel) _then) =
+      _$AIChatListModelCopyWithImpl;
+  @useResult
+  $Res call({Map<AIChatId, AIChatModel> chats});
+}
+
+/// @nodoc
+class _$AIChatListModelCopyWithImpl<$Res>
+    implements $AIChatListModelCopyWith<$Res> {
+  _$AIChatListModelCopyWithImpl(this._self, this._then);
+
+  final AIChatListModel _self;
+  final $Res Function(AIChatListModel) _then;
+
+  /// Create a copy of AIChatListModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? chats = null,
+  }) {
+    return _then(_self.copyWith(
+      chats: null == chats
+          ? _self.chats
+          : chats // ignore: cast_nullable_to_non_nullable
+              as Map<AIChatId, AIChatModel>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _AIChatListModel implements AIChatListModel {
+  const _AIChatListModel({required final Map<AIChatId, AIChatModel> chats})
+      : _chats = chats;
+
+  final Map<AIChatId, AIChatModel> _chats;
+  @override
+  Map<AIChatId, AIChatModel> get chats {
+    if (_chats is EqualUnmodifiableMapView) return _chats;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_chats);
+  }
+
+  /// Create a copy of AIChatListModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$AIChatListModelCopyWith<_AIChatListModel> get copyWith =>
+      __$AIChatListModelCopyWithImpl<_AIChatListModel>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _AIChatListModel &&
+            const DeepCollectionEquality().equals(other._chats, _chats));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_chats));
+
+  @override
+  String toString() {
+    return 'AIChatListModel(chats: $chats)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$AIChatListModelCopyWith<$Res>
+    implements $AIChatListModelCopyWith<$Res> {
+  factory _$AIChatListModelCopyWith(
+          _AIChatListModel value, $Res Function(_AIChatListModel) _then) =
+      __$AIChatListModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({Map<AIChatId, AIChatModel> chats});
+}
+
+/// @nodoc
+class __$AIChatListModelCopyWithImpl<$Res>
+    implements _$AIChatListModelCopyWith<$Res> {
+  __$AIChatListModelCopyWithImpl(this._self, this._then);
+
+  final _AIChatListModel _self;
+  final $Res Function(_AIChatListModel) _then;
+
+  /// Create a copy of AIChatListModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? chats = null,
+  }) {
+    return _then(_AIChatListModel(
+      chats: null == chats
+          ? _self._chats
+          : chats // ignore: cast_nullable_to_non_nullable
+              as Map<AIChatId, AIChatModel>,
     ));
   }
 }

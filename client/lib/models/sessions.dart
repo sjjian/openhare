@@ -130,7 +130,27 @@ enum SQLConnectState {
   connected,
   executing,
   unHealth,
-  failed
+  failed;
+
+  static bool isConnected(SQLConnectState? state) {
+    return state != null && (state == connected || state == executing);
+  }
+
+  static bool isDisconnected(SQLConnectState? state) {
+    return state == null || state == disconnected || state == failed;
+  }
+
+  static bool isIdle(SQLConnectState? state) {
+    return state != null && state == connected;
+  }
+
+  static bool isBusy(SQLConnectState? state) {
+    return state != null && (state == connecting || state == executing);
+  }
+
+  static bool isConnecting(SQLConnectState? state) {
+    return state != null && state == connecting;
+  }
 }
 
 enum SQLExecuteState { init, executing, done, error }
@@ -263,8 +283,12 @@ abstract class SQLResultsModel with _$SQLResultsModel {
 abstract class SessionAIChatModel with _$SessionAIChatModel {
   const factory SessionAIChatModel({
     required SessionId sessionId,
+    required String? currentSchema,
+    required DatabaseType? dbType,
+    required MetaDataNode? metadata,
     required ConnId? connId,
     required SQLConnectState? state,
     required AIChatModel chatModel,
+    required LLMAgentsModel llmAgents,
   }) = _SessionAIChatModel;
 }

@@ -1,10 +1,15 @@
-// 帮我写一个llm prompt模板，用于查看我当前连的ai接口是不是可用的
+// 下面的prompt 都用英文
 const testTemplate = """
-为了确认你是可用的, 仅返回一个数字1给我即可
+To confirm that you are available, please only return a number 1 to me.
 """;
 
 const chatTemplate = """
 You are a helpful assistant. You are talking to a user who is using a database tool. You are helping the user to answer questions about the database.
+db type: {dbType}
+current schema table info:
+```
+{tables}
+```
 tips: 
-- 返回的信息中，如果包含SQL则每个SQL都独立使用```sql```包裹。
+- If the reply contains SQL, each SQL should be wrapped in one ```sql``` block.
 """;

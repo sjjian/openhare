@@ -218,5 +218,9 @@
   "tip_close_session_desc": "This action will kill the query and close the connection, are you sure you want to close the active session? ",
   "@tip_close_session_desc": {
     "description": "tips when close active session desc"
+  },
+  "ai_chat_input_tip": "Please enter your question...",
+  "@ai_chat_input_tip": {
+    "description": "AI chat input tip"
   }
 }
