@@ -9,11 +9,10 @@ import 'package:client/services/instances/instances.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
+import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/utils/sql_highlight.dart';
-import 'package:client/widgets/split_view.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:multi_split_view/multi_split_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:excel/excel.dart' as excel;
@@ -113,8 +112,8 @@ class SessionsServices extends _$SessionsServices {
 
     // 5. delete provider status
     ref.invalidate(sessionSQLEditorServiceProvider(session.sessionId));
-    ref.invalidate(sessionSplitViewStateProvider(session.sessionId));
     ref.invalidate(sessionDrawerServicesProvider(session.sessionId));
+    SessionController.removeSessionController(session.sessionId);
 
     ref.invalidateSelf();
   }
@@ -237,13 +236,13 @@ class SessionDrawerServices extends _$SessionDrawerServices {
   }
 }
 
-@Riverpod(keepAlive: true)
-SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
-  return SessionSplitViewModel(
-      multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
-      metaDataSplitViewCtrl:
-          SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
-}
+// @Riverpod(keepAlive: true)
+// SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
+//   return SessionSplitViewModel(
+//       multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
+//       metaDataSplitViewCtrl:
+//           SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
+// }
 
 @Riverpod(keepAlive: true)
 class SessionsNotifier extends _$SessionsNotifier {
@@ -301,20 +300,6 @@ class SelectedSessionNotifier extends _$SelectedSessionNotifier {
     return ref.watch(sessionsNotifierProvider.select((s) {
       return s.selectedSession;
     }));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionSplitViewNotifier extends _$SessionSplitViewNotifier {
-  @override
-  SessionSplitViewModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return ref.watch(sessionSplitViewStateProvider(
-          const SessionId(value: 0))); // todo: 空值处理
-    }
-    return ref.watch(sessionSplitViewStateProvider(sessionModel.sessionId));
   }
 }
 

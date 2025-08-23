@@ -4,6 +4,7 @@ import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_sql_results.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/split_view.dart';
@@ -15,16 +16,16 @@ class SessionBodyPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionEditorModel sessionEditor = ref.watch(sessionEditorNotifierProvider);
-    SessionSplitViewModel sessionSplitView =
-        ref.watch(sessionSplitViewNotifierProvider);
     SessionDrawerModel sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
+    SessionController sessionController =
+        SessionController.sessionController(sessionDrawer.sessionId);
 
     final Widget left = Row(
       children: [
         Expanded(
           child: SplitView(
             color: Theme.of(context).colorScheme.surfaceContainerLow,
-            controller: sessionSplitView.multiSplitViewCtrl,
+            controller: sessionController.multiSplitViewCtrl,
             axis: Axis.vertical,
             first: SQLEditor(
                 key: ValueKey(sessionEditor.code),
@@ -54,7 +55,7 @@ class SessionBodyPage extends ConsumerWidget {
                 ? SplitView(
                     color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     axis: Axis.horizontal,
-                    controller: sessionSplitView.metaDataSplitViewCtrl,
+                    controller: sessionController.metaDataSplitViewCtrl,
                     first: left,
                     second: const SessionDrawerBody(),
                   )
