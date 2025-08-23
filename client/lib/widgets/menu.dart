@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class OverlayMenu extends StatefulWidget {
   final double maxHeight;
   final List<OverlayMenuItem> tabs;
+  final OverlayMenuFooter? footer;
   final Widget child;
   // 支持设置弹窗的位置。在上方或者下方。默认在下方
   final bool isAbove;
@@ -14,6 +15,7 @@ class OverlayMenu extends StatefulWidget {
     this.maxHeight = 400,
     required this.tabs,
     required this.child,
+    this.footer,
     this.isAbove = false,
     this.spacing = 0,
   }) : super(key: key);
@@ -68,25 +70,29 @@ class _OverlayMenuState extends State<OverlayMenu> {
         ],
       ),
       // 上面设置的圆角没作用，被下面的widget覆盖了
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          children: [
-            for (int i = 0; i < widget.tabs.length; i++)
-              InkWell(
-                onTap: () {
-                  widget.tabs[i].onTabSelected();
-                  setState(() {
-                    _showingMenu = false;
-                  });
-                  _portalController.hide();
-                },
-                child: widget.tabs[i],
-              )
-          ],
-        ),
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              children: [
+                for (int i = 0; i < widget.tabs.length; i++)
+                  InkWell(
+                    onTap: () {
+                      widget.tabs[i].onTabSelected();
+                      setState(() {
+                        _showingMenu = false;
+                      });
+                      _portalController.hide();
+                    },
+                    child: widget.tabs[i],
+                  )
+              ],
+            ),
+          ),
+          if (widget.footer != null) widget.footer!,
+        ],
       ),
     );
   }
@@ -114,16 +120,20 @@ class _OverlayMenuState extends State<OverlayMenu> {
               double top = 0;
               double left = position.dx;
 
-              if (widget.isAbove) {
-                // 计算弹窗的总height
-                double menuHeight = 0;
-                for (int i = 0; i < widget.tabs.length; i++) {
-                  menuHeight += widget.tabs[i].height ?? 35;
-                }
+              // 计算弹窗的总height
+              double menuHeight = 0;
+              for (int i = 0; i < widget.tabs.length; i++) {
+                menuHeight += widget.tabs[i].height;
+              }
+              if (widget.footer != null) {
+                menuHeight += widget.footer!.height;
+              }
+              // 限制菜单高度
+              menuHeight = (menuHeight > widget.maxHeight)
+                  ? widget.maxHeight
+                  : menuHeight;
 
-                menuHeight = (menuHeight > widget.maxHeight)
-                    ? widget.maxHeight
-                    : menuHeight;
+              if (widget.isAbove) {
                 top = position.dy - menuHeight - widget.spacing;
               } else {
                 top = position.dy + childSize.height + widget.spacing;
@@ -155,7 +165,7 @@ class _OverlayMenuState extends State<OverlayMenu> {
                     top: top,
                     child: Material(
                       color: Colors.transparent,
-                      child: _buildMenu(context, widget.maxHeight),
+                      child: _buildMenu(context, menuHeight),
                     ),
                   ),
                 ],
@@ -169,7 +179,7 @@ class _OverlayMenuState extends State<OverlayMenu> {
 }
 
 class OverlayMenuItem extends StatefulWidget {
-  final double? height;
+  final double height;
   final Widget child;
   final void Function() onTabSelected;
 
@@ -193,13 +203,28 @@ class _OverlayMenuItemState extends State<OverlayMenuItem> {
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
       child: SizedBox(
-        height: widget.height ?? 35,
+        height: widget.height,
         child: Container(
           color:
               _hovering ? Theme.of(context).colorScheme.surfaceContainer : null,
           child: widget.child,
         ),
       ),
+    );
+  }
+}
+
+class OverlayMenuFooter extends StatelessWidget {
+  final double height;
+  final Widget child;
+  const OverlayMenuFooter({Key? key, required this.height, required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: child,
     );
   }
 }

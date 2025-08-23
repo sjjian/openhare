@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:client/models/sessions.dart';
 import 'package:client/services/ai/prompt.dart';
@@ -8,6 +9,7 @@ import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/menu.dart';
+import 'package:client/widgets/tooltip.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +31,11 @@ class SessionDrawerChat extends ConsumerStatefulWidget {
 class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final searchTextController = TextEditingController(text: "");
+
+  void _searchTable() {
+    setState(() {});
+  }
 
   String systemPrompt(SessionAIChatModel model) {
     String prompt = chatTemplate;
@@ -203,6 +210,22 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
             .containsKey(tableName);
   }
 
+  bool _isAllTableSelected(SessionAIChatModel model) {
+    return model.chatModel.tables.containsKey(model.currentSchema ?? "") &&
+        model.chatModel.tables[model.currentSchema ?? ""]!.length ==
+            model.metadata
+                ?.getChildren(MetaType.schema, model.currentSchema ?? "")
+                .where((e) => e.type == MetaType.table)
+                .length;
+  }
+
+  Map<String, String> _allTableSelected(SessionAIChatModel model) {
+    return model.metadata!
+        .getChildren(MetaType.schema, model.currentSchema ?? "")
+        .where((e) => e.type == MetaType.table)
+        .fold({}, (acc, e) => {...acc, e.value: e.value});
+  }
+
   @override
   Widget build(BuildContext context) {
     SessionAIChatModel? model = ref.watch(sessionAIChatNotifierProvider);
@@ -232,7 +255,7 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
           ),
         ),
         const SizedBox(height: kSpacingMedium),
-        // 输入框
+        // 下方的输入框区域
         Padding(
           padding:
               const EdgeInsets.fromLTRB(kSpacingMedium, 0, kSpacingMedium, 0),
@@ -246,35 +269,31 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
             ),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        controller: _controller,
-                        minLines: 1,
-                        maxLines: 5,
-                        enabled: model.chatModel.state != AIChatState.waiting,
-                        textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(
-                          hintText:
-                              AppLocalizations.of(context)!.ai_chat_input_tip,
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: kSpacingSmall,
-                              horizontal: kSpacingTiny),
-                        ),
-                        onSubmitted: (_) =>
-                            _sendMessage(model.chatModel.id, model),
-                      ),
-                    ),
-                  ],
+                // 输入框
+                TextField(
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  controller: _controller,
+                  minLines: 1,
+                  maxLines: 5,
+                  enabled: model.chatModel.state != AIChatState.waiting,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.ai_chat_input_tip,
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: kSpacingSmall, horizontal: kSpacingTiny),
+                  ),
+                  onSubmitted: (_) => _sendMessage(model.chatModel.id, model),
                 ),
+
                 const SizedBox(height: kSpacingSmall),
+
+                // 工具栏
                 Row(
                   children: [
                     const SizedBox(width: kSpacingTiny),
+                    // 模型选择
                     OverlayMenu(
                       isAbove: true,
                       spacing: kSpacingTiny,
@@ -327,12 +346,17 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                       ),
                     ),
                     const SizedBox(width: kSpacingTiny),
+
+                    // 表选择
                     OverlayMenu(
                       isAbove: true,
                       spacing: kSpacingTiny,
                       tabs: [
-                        for (MetaDataNode table in model.metadata?.getChildren(
-                                MetaType.schema, model.currentSchema ?? "") ??
+                        for (MetaDataNode table in model.metadata
+                                ?.getChildren(
+                                    MetaType.schema, model.currentSchema ?? "")
+                                .where((e) => e.value
+                                    .contains(searchTextController.text)) ??
                             [])
                           OverlayMenuItem(
                             height: 36,
@@ -355,10 +379,12 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                                             size: kIconSizeTiny,
                                           ),
                                     const SizedBox(width: kSpacingTiny),
-                                    Text(
-                                      table.value,
-                                      style:
-                                          Theme.of(context).textTheme.bodySmall,
+                                    Expanded(
+                                      child: TooltipText(
+                                          text: table.value,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall),
                                     ),
                                   ],
                                 ),
@@ -385,6 +411,70 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                             },
                           ),
                       ],
+                      footer: OverlayMenuFooter(
+                        height: 36,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(kSpacingSmall,
+                              kSpacingTiny, kSpacingSmall, kSpacingTiny),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  // 全选或者全取消操作
+                                  if (_isAllTableSelected(model)) {
+                                    // 全取消
+                                    services.updateTables(model.chatModel.id,
+                                        model.currentSchema ?? "", {});
+                                  } else {
+                                    // 全选
+                                    services.updateTables(
+                                      model.chatModel.id,
+                                      model.currentSchema ?? "",
+                                      _allTableSelected(model),
+                                    );
+                                  }
+                                },
+                                child: Icon(
+                                  _isAllTableSelected(model)
+                                      ? Icons.check_circle
+                                      : Icons.circle_outlined,
+                                  size: kIconSizeTiny,
+                                  color: _isAllTableSelected(model)
+                                      ? Colors.green
+                                      : Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(width: kSpacingTiny),
+                              Expanded(
+                                child: SearchBarTheme(
+                                  data: SearchBarThemeData(
+                                      textStyle: WidgetStatePropertyAll(
+                                          Theme.of(context)
+                                              .textTheme
+                                              .bodySmall),
+                                      backgroundColor: WidgetStatePropertyAll(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .surfaceContainer),
+                                      elevation:
+                                          const WidgetStatePropertyAll(0),
+                                      constraints: const BoxConstraints(
+                                        minHeight: 24,
+                                      )),
+                                  child: SearchBar(
+                                      controller: searchTextController,
+                                      onSubmitted: (value) {
+                                        _searchTable();
+                                      },
+                                      trailing: const [
+                                        Icon(Icons.search, size: kIconSizeTiny),
+                                      ]),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       child: IntrinsicWidth(
                         child: Container(
                           constraints: const BoxConstraints(
@@ -426,6 +516,8 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                       ),
                     ),
                     const Spacer(),
+
+                    // 清空聊天记录
                     IconButton(
                       iconSize: kIconSizeTiny,
                       icon: const Icon(Icons.cleaning_services),
@@ -433,6 +525,8 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
                         services.cleanMessages(model.chatModel.id);
                       },
                     ),
+
+                    // 发送消息
                     IconButton(
                       iconSize: kIconSizeTiny,
                       icon: const Icon(Icons.send),

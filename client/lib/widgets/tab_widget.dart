@@ -46,7 +46,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
     return [
       for (var i = start - 1; i >= 0; i--)
         OverlayMenuItem(
-          height: widget.height,
+          height: widget.height ?? 35,
           child: Row(
             children: [
               if (widget.tabs[i].avatar != null)
