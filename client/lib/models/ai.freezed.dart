@@ -959,7 +959,7 @@ class __$AIChatIdCopyWithImpl<$Res> implements _$AIChatIdCopyWith<$Res> {
 /// @nodoc
 mixin _$AIChatModel {
   AIChatId get id;
-  LLMAgentId get llmAgentId;
+  LLMAgentId? get llmAgentId;
   Map<String, Map<String, String>> get tables;
   List<AIChatMessageModel> get messages;
   AIChatState get state;
@@ -1007,13 +1007,13 @@ abstract mixin class $AIChatModelCopyWith<$Res> {
   @useResult
   $Res call(
       {AIChatId id,
-      LLMAgentId llmAgentId,
+      LLMAgentId? llmAgentId,
       Map<String, Map<String, String>> tables,
       List<AIChatMessageModel> messages,
       AIChatState state});
 
   $AIChatIdCopyWith<$Res> get id;
-  $LLMAgentIdCopyWith<$Res> get llmAgentId;
+  $LLMAgentIdCopyWith<$Res>? get llmAgentId;
 }
 
 /// @nodoc
@@ -1029,7 +1029,7 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? llmAgentId = null,
+    Object? llmAgentId = freezed,
     Object? tables = null,
     Object? messages = null,
     Object? state = null,
@@ -1039,10 +1039,10 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as AIChatId,
-      llmAgentId: null == llmAgentId
+      llmAgentId: freezed == llmAgentId
           ? _self.llmAgentId
           : llmAgentId // ignore: cast_nullable_to_non_nullable
-              as LLMAgentId,
+              as LLMAgentId?,
       tables: null == tables
           ? _self.tables
           : tables // ignore: cast_nullable_to_non_nullable
@@ -1072,8 +1072,12 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $LLMAgentIdCopyWith<$Res> get llmAgentId {
-    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId, (value) {
+  $LLMAgentIdCopyWith<$Res>? get llmAgentId {
+    if (_self.llmAgentId == null) {
+      return null;
+    }
+
+    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId!, (value) {
       return _then(_self.copyWith(llmAgentId: value));
     });
   }
@@ -1094,7 +1098,7 @@ class _AIChatModel implements AIChatModel {
   @override
   final AIChatId id;
   @override
-  final LLMAgentId llmAgentId;
+  final LLMAgentId? llmAgentId;
   final Map<String, Map<String, String>> _tables;
   @override
   Map<String, Map<String, String>> get tables {
@@ -1160,7 +1164,7 @@ abstract mixin class _$AIChatModelCopyWith<$Res>
   @useResult
   $Res call(
       {AIChatId id,
-      LLMAgentId llmAgentId,
+      LLMAgentId? llmAgentId,
       Map<String, Map<String, String>> tables,
       List<AIChatMessageModel> messages,
       AIChatState state});
@@ -1168,7 +1172,7 @@ abstract mixin class _$AIChatModelCopyWith<$Res>
   @override
   $AIChatIdCopyWith<$Res> get id;
   @override
-  $LLMAgentIdCopyWith<$Res> get llmAgentId;
+  $LLMAgentIdCopyWith<$Res>? get llmAgentId;
 }
 
 /// @nodoc
@@ -1184,7 +1188,7 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? llmAgentId = null,
+    Object? llmAgentId = freezed,
     Object? tables = null,
     Object? messages = null,
     Object? state = null,
@@ -1194,10 +1198,10 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as AIChatId,
-      llmAgentId: null == llmAgentId
+      llmAgentId: freezed == llmAgentId
           ? _self.llmAgentId
           : llmAgentId // ignore: cast_nullable_to_non_nullable
-              as LLMAgentId,
+              as LLMAgentId?,
       tables: null == tables
           ? _self._tables
           : tables // ignore: cast_nullable_to_non_nullable
@@ -1227,8 +1231,12 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $LLMAgentIdCopyWith<$Res> get llmAgentId {
-    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId, (value) {
+  $LLMAgentIdCopyWith<$Res>? get llmAgentId {
+    if (_self.llmAgentId == null) {
+      return null;
+    }
+
+    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId!, (value) {
       return _then(_self.copyWith(llmAgentId: value));
     });
   }

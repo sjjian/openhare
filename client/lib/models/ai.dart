@@ -91,7 +91,7 @@ abstract class AIChatId with _$AIChatId {
 abstract class AIChatModel with _$AIChatModel {
   const factory AIChatModel({
     required AIChatId id,
-    required LLMAgentId llmAgentId,
+    required LLMAgentId? llmAgentId,
     required Map<String, Map<String, String>> tables,
     required List<AIChatMessageModel> messages,
     required AIChatState state,

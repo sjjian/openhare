@@ -51,6 +51,10 @@ class AIChatService extends _$AIChatService {
     if (model == null) {
       return;
     }
+    // 没有指定模型，无法对话
+    if (model.llmAgentId == null) {
+      return;
+    }
     // 1.更新用户提问的消息
     ref.read(aiChatRepoProvider).updateMessages(id, [
       ..._getChatMessage(id),
@@ -63,7 +67,7 @@ class AIChatService extends _$AIChatService {
     // 2. 构造OpenAI请求
     final agent = ref.read(lLMAgentServiceProvider.notifier);
     final chatStream = agent.callStream(
-        model.llmAgentId,
+        model.llmAgentId!,
         systemPrompt,
         _getChatMessage(id));
 

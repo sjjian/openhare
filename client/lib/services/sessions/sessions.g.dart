@@ -6,7 +6,7 @@ part of 'sessions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionsServicesHash() => r'b905b07c97e7fa6b200c98c45a26188cbaca4af9';
+String _$sessionsServicesHash() => r'95f44abe8a951abc367c442f31524784c7673966';
 
 /// See also [SessionsServices].
 @ProviderFor(SessionsServices)
@@ -511,7 +511,7 @@ final selectedSessionStatusNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSessionStatusNotifier = Notifier<SessionStatusModel?>;
 String _$sessionAIChatNotifierHash() =>
-    r'25aac63d739cae2c692574ffde0e98c21b10e964';
+    r'0f3eb764f49ae9646543c93762801c7d3497eaca';
 
 /// See also [SessionAIChatNotifier].
 @ProviderFor(SessionAIChatNotifier)

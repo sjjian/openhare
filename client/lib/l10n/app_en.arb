@@ -226,5 +226,13 @@
   "ai_chat_table_tip": "Please select a schema in the top left corner first",
   "@ai_chat_table_tip": {
     "description": "AI chat table tip"
+  },
+  "ai_chat_guide_tip": "No model added, cannot use AI chat",
+  "@ai_chat_guide_tip": {
+    "description": "AI chat guide tip"
+  },
+  "ai_chat_guide_tip_add_model": "Add now",
+  "@ai_chat_guide_tip_add_model": {
+    "description": "AI chat guide tip add model"
   }
 }

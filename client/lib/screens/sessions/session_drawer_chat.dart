@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:client/models/sessions.dart';
+import 'package:client/models/settings.dart';
 import 'package:client/services/ai/prompt.dart';
 import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/settings/settings.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
@@ -15,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/models/ai.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gpt_markdown/custom_widgets/code_field.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:flutter/services.dart';
@@ -29,148 +32,20 @@ class SessionDrawerChat extends ConsumerStatefulWidget {
 }
 
 class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
-  Widget _buildMessage(
-      WidgetRef ref, SessionAIChatModel model, AIChatMessageModel message) {
-    switch (message.role) {
-      case AIRole.user:
-        return userMessageWidget(content: message.content);
-      case AIRole.assistant:
-        return assistantMessageWidget(ref, model, content: message.content);
-    }
-  }
-
-  // 用户消息组件
-  Widget userMessageWidget({required String content}) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            content,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // AI助手消息组件
-  Widget assistantMessageWidget(WidgetRef ref, SessionAIChatModel model,
-      {required String content}) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: GptMarkdownTheme(
-            gptThemeData: GptMarkdownThemeData(
-              brightness: Theme.of(context).brightness,
-              h1: Theme.of(context).textTheme.titleLarge,
-              h2: Theme.of(context).textTheme.titleMedium,
-              h3: Theme.of(context).textTheme.titleSmall,
-              h4: Theme.of(context).textTheme.bodyLarge,
-              h5: Theme.of(context).textTheme.bodyMedium,
-              h6: Theme.of(context).textTheme.bodySmall,
-              hrLineThickness: 0.2,
-              highlightColor:
-                  Theme.of(context).colorScheme.surfaceContainerLowest,
-            ),
-            child: GptMarkdown(
-              key: ValueKey(model),
-              content,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              codeBuilder: (context, name, code, closed) {
-                if (name == "sql") {
-                  return SqlChatField(
-                      codes: code,
-                      onRun: SQLConnectState.isIdle(model.state)
-                          ? (code) {
-                              // todo: 重复代码
-                              final sqlResultsServices =
-                                  ref.read(sQLResultsServicesProvider.notifier);
-
-                              SQLResultModel? resultModel = sqlResultsServices
-                                  .selectedSQLResult(model.sessionId);
-
-                              resultModel ??= sqlResultsServices
-                                  .addSQLResult(model.sessionId);
-
-                              sqlResultsServices.loadFromQuery(
-                                  resultModel.resultId, code);
-                            }
-                          : null);
-                } else {
-                  return CodeField(name: name, codes: code);
-                }
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _scrollToBottom(SessionAIChatModel model) {
-    final scrollController =
-        SessionController.sessionController(model.sessionId)
-            .aiChatScrollController;
-    if (scrollController.hasClients) {
-      final position = scrollController.position;
-      final target = position.maxScrollExtent;
-      // 如果已经很接近底部，直接跳转，避免多次动画导致抖动
-      if ((position.pixels - target).abs() < 20) {
-        scrollController.jumpTo(target);
-      } else {
-        scrollController.animateTo(
-          target,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeInOutCubic,
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     SessionAIChatModel? model = ref.watch(sessionAIChatNotifierProvider);
     if (model == null) {
       return const Spacer();
     }
-    final messages = model.chatModel.messages;
-    // 简单实现：AIChatState.waiting时每帧都滚动到底部
-    if (model.chatModel.state == AIChatState.waiting) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottom(model);
-      });
-    }
+
     return Column(
       children: [
         // 聊天内容
         Expanded(
-          child: ListView.builder(
-            controller: SessionController.sessionController(model.sessionId)
-                .aiChatScrollController,
-            itemCount: messages.length,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemBuilder: (context, index) {
-              return _buildMessage(ref, model, messages[index]);
-            },
-          ),
+          child: (model.llmAgents.agents.isEmpty)
+              ? const SessionChatGuide()
+              : const SessionChatMessages(),
         ),
         const SizedBox(height: kSpacingMedium),
         // 下方的输入框区域
@@ -192,6 +67,17 @@ class SessionChatInputCard extends ConsumerStatefulWidget {
 class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
   void _onSearchChanged() {
     setState(() {});
+  }
+
+  bool canSendMessage(SessionAIChatModel model) {
+    return model.chatModel.llmAgentId != null &&
+        model.llmAgents.agents.containsKey(model.chatModel.llmAgentId!) &&
+        model.chatModel.state != AIChatState.waiting;
+  }
+
+  bool canClearMessage(SessionAIChatModel model) {
+    return model.chatModel.state != AIChatState.waiting &&
+        model.chatModel.messages.isNotEmpty;
   }
 
   String systemPrompt(SessionAIChatModel model) {
@@ -371,7 +257,9 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 contentPadding: const EdgeInsets.symmetric(
                     vertical: kSpacingSmall, horizontal: kSpacingTiny),
               ),
-              onSubmitted: (_) => _sendMessage(model.chatModel.id, model),
+              onSubmitted: (_) => canSendMessage(model)
+                  ? _sendMessage(model.chatModel.id, model)
+                  : null,
             ),
 
             const SizedBox(height: kSpacingSmall),
@@ -576,18 +464,18 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 IconButton(
                   iconSize: kIconSizeTiny,
                   icon: const Icon(Icons.cleaning_services),
-                  onPressed: () {
-                    services.cleanMessages(model.chatModel.id);
-                  },
+                  onPressed: canClearMessage(model)
+                      ? () => services.cleanMessages(model.chatModel.id)
+                      : null,
                 ),
 
                 // 发送消息
                 IconButton(
                   iconSize: kIconSizeTiny,
                   icon: const Icon(Icons.send),
-                  onPressed: model.chatModel.state == AIChatState.waiting
-                      ? null
-                      : () => _sendMessage(model.chatModel.id, model),
+                  onPressed: canSendMessage(model)
+                      ? () => _sendMessage(model.chatModel.id, model)
+                      : null,
                 ),
               ],
             ),
@@ -668,5 +556,179 @@ class _SqlChatFieldState extends State<SqlChatField> {
         ],
       ),
     );
+  }
+}
+
+class SessionChatMessages extends ConsumerStatefulWidget {
+  const SessionChatMessages({super.key});
+
+  @override
+  ConsumerState<SessionChatMessages> createState() =>
+      _SessionChatMessagesState();
+}
+
+class _SessionChatMessagesState extends ConsumerState<SessionChatMessages> {
+  Widget _buildMessage(
+      WidgetRef ref, SessionAIChatModel model, AIChatMessageModel message) {
+    switch (message.role) {
+      case AIRole.user:
+        return userMessageWidget(content: message.content);
+      case AIRole.assistant:
+        return assistantMessageWidget(ref, model, content: message.content);
+    }
+  }
+
+  // 用户消息组件
+  Widget userMessageWidget({required String content}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            content,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // AI助手消息组件
+  Widget assistantMessageWidget(WidgetRef ref, SessionAIChatModel model,
+      {required String content}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: GptMarkdownTheme(
+            gptThemeData: GptMarkdownThemeData(
+              brightness: Theme.of(context).brightness,
+              h1: Theme.of(context).textTheme.titleLarge,
+              h2: Theme.of(context).textTheme.titleMedium,
+              h3: Theme.of(context).textTheme.titleSmall,
+              h4: Theme.of(context).textTheme.bodyLarge,
+              h5: Theme.of(context).textTheme.bodyMedium,
+              h6: Theme.of(context).textTheme.bodySmall,
+              hrLineThickness: 0.2,
+              highlightColor:
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
+            ),
+            child: GptMarkdown(
+              key: ValueKey(model),
+              content,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              codeBuilder: (context, name, code, closed) {
+                if (name == "sql") {
+                  return SqlChatField(
+                      codes: code,
+                      onRun: SQLConnectState.isIdle(model.state)
+                          ? (code) {
+                              // todo: 重复代码
+                              final sqlResultsServices =
+                                  ref.read(sQLResultsServicesProvider.notifier);
+
+                              SQLResultModel? resultModel = sqlResultsServices
+                                  .selectedSQLResult(model.sessionId);
+
+                              resultModel ??= sqlResultsServices
+                                  .addSQLResult(model.sessionId);
+
+                              sqlResultsServices.loadFromQuery(
+                                  resultModel.resultId, code);
+                            }
+                          : null);
+                } else {
+                  return CodeField(name: name, codes: code);
+                }
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _scrollToBottom(SessionAIChatModel model) {
+    final scrollController =
+        SessionController.sessionController(model.sessionId)
+            .aiChatScrollController;
+    if (scrollController.hasClients) {
+      final position = scrollController.position;
+      final target = position.maxScrollExtent;
+      // 如果已经很接近底部，直接跳转，避免多次动画导致抖动
+      if ((position.pixels - target).abs() < 20) {
+        scrollController.jumpTo(target);
+      } else {
+        scrollController.animateTo(
+          target,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOutCubic,
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SessionAIChatModel? model = ref.watch(sessionAIChatNotifierProvider);
+    if (model == null) {
+      return const Spacer();
+    }
+    final messages = model.chatModel.messages;
+    // 简单实现：AIChatState.waiting时每帧都滚动到底部
+    if (model.chatModel.state == AIChatState.waiting) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom(model);
+      });
+    }
+    return ListView.builder(
+      controller: SessionController.sessionController(model.sessionId)
+          .aiChatScrollController,
+      itemCount: messages.length,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemBuilder: (context, index) {
+        return _buildMessage(ref, model, messages[index]);
+      },
+    );
+  }
+}
+
+// 未配置模型的引导页面
+class SessionChatGuide extends ConsumerWidget {
+  const SessionChatGuide({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Text(AppLocalizations.of(context)!.ai_chat_guide_tip),
+      const SizedBox(height: kSpacingSmall),
+      LinkButton(
+        text: AppLocalizations.of(context)!.ai_chat_guide_tip_add_model,
+        onPressed: () {
+          // 切换到模型设置tab
+          ref
+              .read(settingTabServiceProvider.notifier)
+              .setSelectedSettingType(SettingType.llmApi);
+          GoRouter.of(context).go('/settings');
+        },
+      ),
+    ]));
   }
 }
