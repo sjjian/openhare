@@ -222,5 +222,9 @@
   "ai_chat_input_tip": "Please enter your question...",
   "@ai_chat_input_tip": {
     "description": "AI chat input tip"
+  },
+  "ai_chat_table_tip": "Please select a schema in the top left corner first",
+  "@ai_chat_table_tip": {
+    "description": "AI chat table tip"
   }
 }

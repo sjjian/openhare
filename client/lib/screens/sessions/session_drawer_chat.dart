@@ -283,6 +283,66 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
     final searchTextController =
         SessionController.sessionController(model.sessionId)
             .aiChatSearchTextController;
+
+    // 模型选择工具栏
+    final modelToolWidget = Container(
+      constraints: const BoxConstraints(
+        maxWidth: 120,
+      ),
+      padding: const EdgeInsets.fromLTRB(
+          kSpacingSmall, kSpacingTiny, kSpacingSmall, kSpacingTiny),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          width: 1,
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        ),
+      ),
+      child: Text(
+        model.llmAgents.agents[model.chatModel.llmAgentId]?.setting.name ?? "-",
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+    );
+
+    // 表选择工具栏
+    final tableToolWidget = IntrinsicWidth(
+      child: Container(
+        constraints: const BoxConstraints(
+          maxWidth: 80,
+        ),
+        padding: const EdgeInsets.fromLTRB(
+            kSpacingSmall, kSpacingTiny, kSpacingSmall, kSpacingTiny),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            width: 1,
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            HugeIcon(
+              icon: HugeIcons.strokeRoundedTable,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: kIconSizeTiny,
+            ),
+            const SizedBox(width: kSpacingTiny),
+            Expanded(
+              child: Text(
+                "+${model.chatModel.tables[model.currentSchema ?? ""]?.length ?? 0}",
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(kSpacingMedium, 0, kSpacingMedium, 0),
       child: Container(
@@ -344,198 +404,172 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                         },
                       ),
                   ],
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      maxWidth: 120,
-                    ),
-                    padding: const EdgeInsets.fromLTRB(kSpacingSmall,
-                        kSpacingTiny, kSpacingSmall, kSpacingTiny),
-                    decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).colorScheme.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        width: 1,
-                        color:
-                            Theme.of(context).colorScheme.surfaceContainerHigh,
-                      ),
-                    ),
-                    child: Text(
-                      model.llmAgents.agents[model.chatModel.llmAgentId]
-                              ?.setting.name ??
-                          "-",
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
+                  child: modelToolWidget,
                 ),
                 const SizedBox(width: kSpacingTiny),
 
                 // 表选择
-                OverlayMenu(
-                  isAbove: true,
-                  spacing: kSpacingTiny,
-                  tabs: [
-                    for (MetaDataNode table in model.metadata
-                            ?.getChildren(
-                                MetaType.schema, model.currentSchema ?? "")
-                            .where((e) =>
-                                e.value.contains(searchTextController.text)) ??
-                        [])
-                      OverlayMenuItem(
-                        height: 36,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                              kSpacingSmall, 0, kSpacingSmall, 0),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
+                (model.currentSchema != null && model.currentSchema != "")
+                    ? OverlayMenu(
+                        isAbove: true,
+                        spacing: kSpacingTiny,
+                        tabs: [
+                          for (MetaDataNode table in model.metadata
+                                  ?.getChildren(MetaType.schema,
+                                      model.currentSchema ?? "")
+                                  .where((e) => e.value
+                                      .contains(searchTextController.text)) ??
+                              [])
+                            OverlayMenuItem(
+                              height: 36,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    kSpacingSmall, 0, kSpacingSmall, 0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    children: [
+                                      // 如果table 在aichatmodel.tables 中，则显示选中状态
+                                      _isTableSelected(model, table.value)
+                                          ? const Icon(
+                                              Icons.check_circle,
+                                              size: kIconSizeTiny,
+                                              color: Colors.green,
+                                            )
+                                          : const Icon(
+                                              Icons.circle_outlined,
+                                              size: kIconSizeTiny,
+                                            ),
+                                      const SizedBox(width: kSpacingTiny),
+                                      Expanded(
+                                        child: TooltipText(
+                                            text: table.value,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              onTabSelected: () {
+                                final newTables = Map<String, String>.from(model
+                                        .chatModel
+                                        .tables[model.currentSchema ?? ""] ??
+                                    {});
+
+                                if (_isTableSelected(model, table.value)) {
+                                  // delete it
+                                  newTables.remove(table.value);
+                                  services.updateTables(model.chatModel.id,
+                                      model.currentSchema ?? "", newTables);
+                                  return;
+                                } else {
+                                  // 如果table 不在aichatmodel.tables 中，则添加
+                                  newTables[table.value] = table.value;
+                                  services.updateTables(model.chatModel.id,
+                                      model.currentSchema ?? "", newTables);
+                                }
+                              },
+                            ),
+                        ],
+                        footer: OverlayMenuFooter(
+                          height: 36,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(kSpacingSmall,
+                                kSpacingTiny, kSpacingSmall, kSpacingTiny),
                             child: Row(
                               children: [
-                                // 如果table 在aichatmodel.tables 中，则显示选中状态
-                                _isTableSelected(model, table.value)
-                                    ? const Icon(
-                                        Icons.check_circle,
-                                        size: kIconSizeTiny,
-                                        color: Colors.green,
-                                      )
-                                    : const Icon(
-                                        Icons.circle_outlined,
-                                        size: kIconSizeTiny,
-                                      ),
+                                GestureDetector(
+                                  onTap: () {
+                                    // 全选或者全取消操作
+                                    if (_isAllTableSelected(model)) {
+                                      // 全取消
+                                      services.updateTables(model.chatModel.id,
+                                          model.currentSchema ?? "", {});
+                                    } else {
+                                      // 全选
+                                      services.updateTables(
+                                        model.chatModel.id,
+                                        model.currentSchema ?? "",
+                                        _allTableSelected(model),
+                                      );
+                                    }
+                                  },
+                                  child: Icon(
+                                    _isAllTableSelected(model)
+                                        ? Icons.check_circle
+                                        : Icons.circle_outlined,
+                                    size: kIconSizeTiny,
+                                    color: _isAllTableSelected(model)
+                                        ? Colors.green
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                  ),
+                                ),
                                 const SizedBox(width: kSpacingTiny),
                                 Expanded(
-                                  child: TooltipText(
-                                      text: table.value,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall),
+                                  child: SearchBarTheme(
+                                    data: SearchBarThemeData(
+                                        textStyle: WidgetStatePropertyAll(
+                                            Theme.of(context)
+                                                .textTheme
+                                                .bodySmall),
+                                        backgroundColor: WidgetStatePropertyAll(
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .surfaceContainer),
+                                        elevation:
+                                            const WidgetStatePropertyAll(0),
+                                        constraints: const BoxConstraints(
+                                          minHeight: 24,
+                                        )),
+                                    child: SearchBar(
+                                        controller: searchTextController,
+                                        onChanged: (value) {
+                                          _onSearchChanged();
+                                        },
+                                        trailing: const [
+                                          Icon(Icons.search,
+                                              size: kIconSizeTiny),
+                                        ]),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        onTabSelected: () {
-                          final newTables = Map<String, String>.from(model
-                                  .chatModel
-                                  .tables[model.currentSchema ?? ""] ??
-                              {});
-
-                          if (_isTableSelected(model, table.value)) {
-                            // delete it
-                            newTables.remove(table.value);
-                            services.updateTables(model.chatModel.id,
-                                model.currentSchema ?? "", newTables);
-                            return;
-                          } else {
-                            // 如果table 不在aichatmodel.tables 中，则添加
-                            newTables[table.value] = table.value;
-                            services.updateTables(model.chatModel.id,
-                                model.currentSchema ?? "", newTables);
-                          }
-                        },
-                      ),
-                  ],
-                  footer: OverlayMenuFooter(
-                    height: 36,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(kSpacingSmall,
-                          kSpacingTiny, kSpacingSmall, kSpacingTiny),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              // 全选或者全取消操作
-                              if (_isAllTableSelected(model)) {
-                                // 全取消
-                                services.updateTables(model.chatModel.id,
-                                    model.currentSchema ?? "", {});
-                              } else {
-                                // 全选
-                                services.updateTables(
-                                  model.chatModel.id,
-                                  model.currentSchema ?? "",
-                                  _allTableSelected(model),
-                                );
-                              }
-                            },
-                            child: Icon(
-                              _isAllTableSelected(model)
-                                  ? Icons.check_circle
-                                  : Icons.circle_outlined,
-                              size: kIconSizeTiny,
-                              color: _isAllTableSelected(model)
-                                  ? Colors.green
-                                  : Theme.of(context).colorScheme.onSurface,
+                        child: tableToolWidget,
+                      )
+                    : OverlayMenu(
+                        isAbove: true,
+                        spacing: kSpacingTiny,
+                        tabs: const [],
+                        footer: OverlayMenuFooter(
+                          height: 200,
+                          child: Padding(
+                            padding: const EdgeInsets.all(kSpacingSmall),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.info_outline,
+                                    size: kIconSizeMedium,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                                const SizedBox(height: kSpacingSmall),
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .ai_chat_table_tip,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: kSpacingTiny),
-                          Expanded(
-                            child: SearchBarTheme(
-                              data: SearchBarThemeData(
-                                  textStyle: WidgetStatePropertyAll(
-                                      Theme.of(context).textTheme.bodySmall),
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Theme.of(context)
-                                          .colorScheme
-                                          .surfaceContainer),
-                                  elevation: const WidgetStatePropertyAll(0),
-                                  constraints: const BoxConstraints(
-                                    minHeight: 24,
-                                  )),
-                              child: SearchBar(
-                                  controller: searchTextController,
-                                  onChanged: (value) {
-                                    _onSearchChanged();
-                                  },
-                                  trailing: const [
-                                    Icon(Icons.search, size: kIconSizeTiny),
-                                  ]),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  child: IntrinsicWidth(
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        maxWidth: 80,
-                      ),
-                      padding: const EdgeInsets.fromLTRB(kSpacingSmall,
-                          kSpacingTiny, kSpacingSmall, kSpacingTiny),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerLowest,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          width: 1,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHigh,
                         ),
+                        child: tableToolWidget,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          HugeIcon(
-                            icon: HugeIcons.strokeRoundedTable,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            size: kIconSizeTiny,
-                          ),
-                          const SizedBox(width: kSpacingTiny),
-                          Expanded(
-                            child: Text(
-                              "+${model.chatModel.tables[model.currentSchema ?? ""]?.length ?? 0}",
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
                 const Spacer(),
 
                 // 清空聊天记录
