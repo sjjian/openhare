@@ -291,4 +291,16 @@ abstract class SessionAIChatModel with _$SessionAIChatModel {
     required AIChatModel chatModel,
     required LLMAgentsModel llmAgents,
   }) = _SessionAIChatModel;
+
+  const SessionAIChatModel._();
+
+  bool canSendMessage() {
+    return llmAgents.lastUsedLLMAgent != null &&
+        chatModel.state != AIChatState.waiting;
+  }
+
+  bool canClearMessage() {
+    return chatModel.state != AIChatState.waiting &&
+        chatModel.messages.isNotEmpty;
+  }
 }

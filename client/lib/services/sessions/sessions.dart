@@ -3,7 +3,6 @@ import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/repositories/sessions/sessions.dart';
-import 'package:client/services/ai/agent.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/instances/metadata.dart';
@@ -236,14 +235,6 @@ class SessionDrawerServices extends _$SessionDrawerServices {
   }
 }
 
-// @Riverpod(keepAlive: true)
-// SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
-//   return SessionSplitViewModel(
-//       multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
-//       metaDataSplitViewCtrl:
-//           SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
-// }
-
 @Riverpod(keepAlive: true)
 class SessionsNotifier extends _$SessionsNotifier {
   @override
@@ -464,51 +455,6 @@ class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
       query: sqlResultModel?.query,
       executeTime: sqlResultModel?.executeTime,
       affectedRows: sqlResultModel?.data?.affectedRows,
-    );
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionAIChatNotifier extends _$SessionAIChatNotifier {
-  @override
-  SessionAIChatModel? build() {
-    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
-    if (session == null) {
-      return null;
-    }
-    LLMAgentsModel llmAgents = ref.watch(lLMAgentServiceProvider);
-
-    AIChatModel? aiChatModel = ref.watch(aIChatServiceProvider.select((m) {
-      return m.chats[AIChatId(value: session.sessionId.value)];
-    }));
-
-    if (aiChatModel == null) {
-      aiChatModel = AIChatModel(
-        id: AIChatId(
-            value: session.sessionId.value), // todo: 暂时用session id 替代chatId
-        messages: [],
-        state: AIChatState.idle,
-        tables: {},
-      );
-
-      ref.read(aIChatServiceProvider.notifier).create(aiChatModel);
-    }
-
-    InstanceMetadataModel? metadata;
-    if (session.instanceId != null) {
-      metadata =
-          ref.watch(instanceMetadataServicesProvider(session.instanceId!));
-    }
-
-    return SessionAIChatModel(
-      chatModel: aiChatModel,
-      sessionId: session.sessionId,
-      currentSchema: session.currentSchema,
-      dbType: session.dbType,
-      metadata: metadata?.metadata,
-      connId: session.connId,
-      state: session.connState,
-      llmAgents: llmAgents,
     );
   }
 }

@@ -105,6 +105,7 @@ abstract class AIChatMessageModel with _$AIChatMessageModel {
     required AIRole role,
     required String content,
     String? thinking,
+    String? error,
   }) = _AIChatMessageModel;
 }
 

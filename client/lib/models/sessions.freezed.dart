@@ -4137,7 +4137,7 @@ class _$SessionAIChatModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SessionAIChatModel implements SessionAIChatModel {
+class _SessionAIChatModel extends SessionAIChatModel {
   const _SessionAIChatModel(
       {required this.sessionId,
       required this.currentSchema,
@@ -4146,7 +4146,8 @@ class _SessionAIChatModel implements SessionAIChatModel {
       required this.connId,
       required this.state,
       required this.chatModel,
-      required this.llmAgents});
+      required this.llmAgents})
+      : super._();
 
   @override
   final SessionId sessionId;

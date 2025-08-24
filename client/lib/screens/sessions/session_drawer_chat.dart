@@ -4,9 +4,9 @@ import 'package:client/models/sessions.dart';
 import 'package:client/models/settings.dart';
 import 'package:client/services/ai/agent.dart';
 import 'package:client/services/ai/prompt.dart';
+import 'package:client/services/sessions/session_chat.dart';
 import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
-import 'package:client/services/sessions/sessions.dart';
 import 'package:client/services/settings/settings.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
@@ -70,74 +70,6 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
     setState(() {});
   }
 
-  bool canSendMessage(SessionAIChatModel model) {
-    return model.llmAgents.lastUsedLLMAgent != null &&
-        model.chatModel.state != AIChatState.waiting;
-  }
-
-  bool canClearMessage(SessionAIChatModel model) {
-    return model.chatModel.state != AIChatState.waiting &&
-        model.chatModel.messages.isNotEmpty;
-  }
-
-  String systemPrompt(SessionAIChatModel model) {
-    String prompt = chatTemplate;
-    if (model.dbType != null) {
-      prompt = prompt.replaceAll("{dbType}", model.dbType!.name);
-    }
-    final tables = model.chatModel.tables[model.currentSchema ?? ""];
-    // 通过metadata build table 信息
-    final schema =
-        model.metadata?.getChildren(MetaType.schema, model.currentSchema ?? "");
-
-    if (tables == null || tables.isEmpty || schema == null) {
-      return prompt.replaceAll("{tables}", "");
-    }
-
-    final tableInfos = schema.where((e) {
-      if (e.type == MetaType.table && tables.containsKey(e.value)) {
-        return true;
-      }
-      return false;
-    });
-
-    return prompt.replaceAll(
-        "{tables}", tableInfos.map((e) => e.toString()).join("\n"));
-  }
-
-  Future<void> _sendMessage(
-      AIChatId chatId, SessionAIChatModel chatModel) async {
-    final text = SessionController.sessionController(chatModel.sessionId)
-        .chatInputController
-        .text
-        .trim();
-    SessionController.sessionController(chatModel.sessionId)
-        .chatInputController
-        .clear();
-
-    // 调用AIChatService的chat方法
-    await ref.read(aIChatServiceProvider.notifier).chat(
-        chatId,
-        chatModel.llmAgents.lastUsedLLMAgent!.id,
-        systemPrompt(chatModel),
-        text);
-
-    final scrollController =
-        SessionController.sessionController(chatModel.sessionId)
-            .aiChatScrollController;
-
-    // 滚动到底部
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
   bool _isTableSelected(SessionAIChatModel model, String tableName) {
     return model.chatModel.tables.containsKey(model.currentSchema ?? "") &&
         model.chatModel.tables[model.currentSchema ?? ""]!
@@ -160,6 +92,39 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
         .fold({}, (acc, e) => {...acc, e.value: e.value});
   }
 
+  Future<void> _sendMessage(
+      AIChatId chatId, SessionAIChatModel chatModel) async {
+    final text = SessionController.sessionController(chatModel.sessionId)
+        .chatInputController
+        .text
+        .trim();
+    SessionController.sessionController(chatModel.sessionId)
+        .chatInputController
+        .clear();
+
+    // 调用AIChatService的chat方法
+    await ref.read(aIChatServiceProvider.notifier).chat(
+        chatId,
+        chatModel.llmAgents.lastUsedLLMAgent!.id,
+        genChatSystemPrompt(chatModel),
+        message: text);
+
+    final scrollController =
+        SessionController.sessionController(chatModel.sessionId)
+            .aiChatScrollController;
+
+    // 滚动到底部
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     SessionAIChatModel? model = ref.watch(sessionAIChatNotifierProvider);
@@ -168,6 +133,9 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
     }
     final services = ref.read(aIChatServiceProvider.notifier);
 
+    final chatInputController =
+        SessionController.sessionController(model.sessionId)
+            .chatInputController;
     final searchTextController =
         SessionController.sessionController(model.sessionId)
             .aiChatSearchTextController;
@@ -246,8 +214,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
             // 输入框
             TextField(
               style: Theme.of(context).textTheme.bodyMedium,
-              controller: SessionController.sessionController(model.sessionId)
-                  .chatInputController,
+              controller: chatInputController,
               minLines: 1,
               maxLines: 5,
               enabled: model.chatModel.state != AIChatState.waiting,
@@ -259,7 +226,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 contentPadding: const EdgeInsets.symmetric(
                     vertical: kSpacingSmall, horizontal: kSpacingTiny),
               ),
-              onSubmitted: (_) => canSendMessage(model)
+              onSubmitted: (_) => model.canSendMessage()
                   ? _sendMessage(model.chatModel.id, model)
                   : null,
             ),
@@ -468,7 +435,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 IconButton(
                   iconSize: kIconSizeTiny,
                   icon: const Icon(Icons.cleaning_services),
-                  onPressed: canClearMessage(model)
+                  onPressed: model.canClearMessage()
                       ? () => services.cleanMessages(model.chatModel.id)
                       : null,
                 ),
@@ -477,7 +444,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 IconButton(
                   iconSize: kIconSizeTiny,
                   icon: const Icon(Icons.send),
-                  onPressed: canSendMessage(model)
+                  onPressed: model.canSendMessage()
                       ? () => _sendMessage(model.chatModel.id, model)
                       : null,
                 ),
@@ -566,6 +533,31 @@ class _SqlChatFieldState extends State<SqlChatField> {
 class SessionChatMessages extends ConsumerWidget {
   const SessionChatMessages({super.key});
 
+  void _retryMessage(BuildContext context, WidgetRef ref,
+      SessionAIChatModel model, AIChatMessageModel message) {
+    // 调用AIChatService的chat方法
+    ref.read(aIChatServiceProvider.notifier).retryChat(
+        model.chatModel.id,
+        model.llmAgents.lastUsedLLMAgent!.id,
+        genChatSystemPrompt(model),
+        message);
+
+    final scrollController =
+        SessionController.sessionController(model.sessionId)
+            .aiChatScrollController;
+
+    // 滚动到底部
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   Widget _buildMessage(BuildContext context, WidgetRef ref,
       SessionAIChatModel model, AIChatMessageModel message) {
     switch (message.role) {
@@ -614,12 +606,20 @@ class SessionChatMessages extends ConsumerWidget {
           ),
           child: Column(
             children: [
+              if (message.error != null)
+                Text(
+                  message.error ?? "",
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                ),
               if (message.thinking != null)
                 RichText(
                   text: TextSpan(
                       text: message.thinking ?? "",
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             fontStyle: FontStyle.italic,
                           )),
                 ),
@@ -669,6 +669,21 @@ class SessionChatMessages extends ConsumerWidget {
                   },
                 ),
               ),
+              if (model.canSendMessage()) ...[
+                const SizedBox(height: kSpacingTiny),
+                Row(
+                  children: [
+                    RectangleIconButton(
+                      size: kIconSizeSmall,
+                      iconSize: kIconSizeTiny,
+                      icon: Icons.refresh,
+                      onPressed: () {
+                        _retryMessage(context, ref, model, message);
+                      },
+                    ),
+                  ],
+                ),
+              ]
             ],
           ),
         ),

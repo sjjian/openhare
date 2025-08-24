@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat.dart';
+part of 'session_chat.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$aIChatServiceHash() => r'fded0fc548243c351b15bf28ab9dd24e401b6100';
+String _$sessionAIChatNotifierHash() =>
+    r'55df10bf2101383ae656c8a04549e22a632b68e1';
 
-/// See also [AIChatService].
-@ProviderFor(AIChatService)
-final aIChatServiceProvider =
-    NotifierProvider<AIChatService, AIChatListModel>.internal(
-  AIChatService.new,
-  name: r'aIChatServiceProvider',
+/// See also [SessionAIChatNotifier].
+@ProviderFor(SessionAIChatNotifier)
+final sessionAIChatNotifierProvider =
+    NotifierProvider<SessionAIChatNotifier, SessionAIChatModel?>.internal(
+  SessionAIChatNotifier.new,
+  name: r'sessionAIChatNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$aIChatServiceHash,
+      : _$sessionAIChatNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$AIChatService = Notifier<AIChatListModel>;
+typedef _$SessionAIChatNotifier = Notifier<SessionAIChatModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
