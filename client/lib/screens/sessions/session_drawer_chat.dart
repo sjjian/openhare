@@ -205,7 +205,8 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
             Expanded(
               child: (tableCount > 10)
                   ? Tooltip(
-                      message: AppLocalizations.of(context)!.ai_chat_table_tip_more_than_10,
+                      message: AppLocalizations.of(context)!
+                          .ai_chat_table_tip_more_than_10,
                       child: Text(
                         "+$tableCount",
                         overflow: TextOverflow.ellipsis,
@@ -518,7 +519,7 @@ class _SqlChatFieldState extends State<SqlChatField> {
               const Spacer(),
               RectangleIconButton(
                 iconSize: kIconSizeSmall,
-                icon: Icons.play_circle_outline_rounded,
+                icon: Icons.not_started_outlined,
                 iconColor: (widget.onRun != null) ? Colors.green : Colors.grey,
                 onPressed: () {
                   widget.onRun?.call(widget.codes);
@@ -562,6 +563,14 @@ class _SqlChatFieldState extends State<SqlChatField> {
 
 class SessionChatMessages extends ConsumerWidget {
   const SessionChatMessages({super.key});
+
+  // todo: 重复代码
+  void _runSQL(BuildContext context, WidgetRef ref, SessionAIChatModel model,
+      String code) {
+    final sqlResultsServices = ref.read(sQLResultsServicesProvider.notifier);
+    final resultModel = sqlResultsServices.addSQLResult(model.sessionId);
+    sqlResultsServices.loadFromQuery(resultModel.resultId, code);
+  }
 
   void _retryMessage(BuildContext context, WidgetRef ref,
       SessionAIChatModel model, AIChatMessageModel message) {
@@ -677,21 +686,7 @@ class SessionChatMessages extends ConsumerWidget {
                       return SqlChatField(
                           codes: code,
                           onRun: SQLConnectState.isIdle(model.state)
-                              ? (code) {
-                                  // todo: 重复代码
-                                  final sqlResultsServices = ref.read(
-                                      sQLResultsServicesProvider.notifier);
-
-                                  SQLResultModel? resultModel =
-                                      sqlResultsServices
-                                          .selectedSQLResult(model.sessionId);
-
-                                  resultModel ??= sqlResultsServices
-                                      .addSQLResult(model.sessionId);
-
-                                  sqlResultsServices.loadFromQuery(
-                                      resultModel.resultId, code);
-                                }
+                              ? (code) => _runSQL(context, ref, model, code)
                               : null);
                     } else {
                       return CodeField(name: name, codes: code);
