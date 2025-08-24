@@ -77,20 +77,31 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
             .containsKey(tableName);
   }
 
-  bool _isAllTableSelected(SessionAIChatModel model) {
-    return model.chatModel.tables.containsKey(model.currentSchema ?? "") &&
-        model.chatModel.tables[model.currentSchema ?? ""]!.length ==
-            model.metadata
-                ?.getChildren(MetaType.schema, model.currentSchema ?? "")
-                .where((e) => e.type == MetaType.table)
-                .length;
+  Map<String, String> _allTable(SessionAIChatModel model, String searchText) {
+    if (model.metadata == null || model.currentSchema == null) {
+      return {};
+    }
+    return model.metadata!
+        .getChildren(MetaType.schema, model.currentSchema!)
+        .where((e) => e.type == MetaType.table && e.value.contains(searchText))
+        .fold({}, (acc, e) => {...acc, e.value: e.value});
   }
 
-  Map<String, String> _allTableSelected(SessionAIChatModel model) {
-    return model.metadata!
-        .getChildren(MetaType.schema, model.currentSchema ?? "")
-        .where((e) => e.type == MetaType.table)
-        .fold({}, (acc, e) => {...acc, e.value: e.value});
+  bool _isAllTableSelected(SessionAIChatModel model, String searchText) {
+    final allTable = _allTable(model, searchText);
+
+    if (!model.chatModel.tables.containsKey(model.currentSchema ?? "")) {
+      return false;
+    }
+
+    for (var table in allTable.keys) {
+      if (!model.chatModel.tables[model.currentSchema ?? ""]!
+          .containsKey(table)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   Future<void> _sendMessage(
@@ -274,12 +285,9 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                         isAbove: true,
                         spacing: kSpacingTiny,
                         tabs: [
-                          for (MetaDataNode table in model.metadata
-                                  ?.getChildren(MetaType.schema,
-                                      model.currentSchema ?? "")
-                                  .where((e) => e.value
-                                      .contains(searchTextController.text)) ??
-                              [])
+                          for (var table
+                              in _allTable(model, searchTextController.text)
+                                  .keys)
                             OverlayMenuItem(
                               height: 36,
                               child: Padding(
@@ -290,7 +298,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                   child: Row(
                                     children: [
                                       // 如果table 在aichatmodel.tables 中，则显示选中状态
-                                      _isTableSelected(model, table.value)
+                                      _isTableSelected(model, table)
                                           ? const Icon(
                                               Icons.check_circle,
                                               size: kIconSizeTiny,
@@ -303,7 +311,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                       const SizedBox(width: kSpacingTiny),
                                       Expanded(
                                         child: TooltipText(
-                                            text: table.value,
+                                            text: table,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodySmall),
@@ -318,15 +326,15 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                         .tables[model.currentSchema ?? ""] ??
                                     {});
 
-                                if (_isTableSelected(model, table.value)) {
+                                if (_isTableSelected(model, table)) {
                                   // delete it
-                                  newTables.remove(table.value);
+                                  newTables.remove(table);
                                   services.updateTables(model.chatModel.id,
                                       model.currentSchema ?? "", newTables);
                                   return;
                                 } else {
                                   // 如果table 不在aichatmodel.tables 中，则添加
-                                  newTables[table.value] = table.value;
+                                  newTables[table] = table;
                                   services.updateTables(model.chatModel.id,
                                       model.currentSchema ?? "", newTables);
                                 }
@@ -343,7 +351,8 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                 GestureDetector(
                                   onTap: () {
                                     // 全选或者全取消操作
-                                    if (_isAllTableSelected(model)) {
+                                    if (_isAllTableSelected(
+                                        model, searchTextController.text)) {
                                       // 全取消
                                       services.updateTables(model.chatModel.id,
                                           model.currentSchema ?? "", {});
@@ -352,16 +361,19 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                       services.updateTables(
                                         model.chatModel.id,
                                         model.currentSchema ?? "",
-                                        _allTableSelected(model),
+                                        _allTable(
+                                            model, searchTextController.text),
                                       );
                                     }
                                   },
                                   child: Icon(
-                                    _isAllTableSelected(model)
+                                    _isAllTableSelected(
+                                            model, searchTextController.text)
                                         ? Icons.check_circle
                                         : Icons.circle_outlined,
                                     size: kIconSizeTiny,
-                                    color: _isAllTableSelected(model)
+                                    color: _isAllTableSelected(
+                                            model, searchTextController.text)
                                         ? Colors.green
                                         : Theme.of(context)
                                             .colorScheme
