@@ -104,6 +104,7 @@ abstract class AIChatMessageModel with _$AIChatMessageModel {
   const factory AIChatMessageModel({
     required AIRole role,
     required String content,
+    String? thinking,
   }) = _AIChatMessageModel;
 }
 

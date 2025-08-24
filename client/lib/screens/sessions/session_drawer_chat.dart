@@ -563,27 +563,21 @@ class _SqlChatFieldState extends State<SqlChatField> {
   }
 }
 
-class SessionChatMessages extends ConsumerStatefulWidget {
+class SessionChatMessages extends ConsumerWidget {
   const SessionChatMessages({super.key});
 
-  @override
-  ConsumerState<SessionChatMessages> createState() =>
-      _SessionChatMessagesState();
-}
-
-class _SessionChatMessagesState extends ConsumerState<SessionChatMessages> {
-  Widget _buildMessage(
-      WidgetRef ref, SessionAIChatModel model, AIChatMessageModel message) {
+  Widget _buildMessage(BuildContext context, WidgetRef ref,
+      SessionAIChatModel model, AIChatMessageModel message) {
     switch (message.role) {
       case AIRole.user:
-        return userMessageWidget(content: message.content);
+        return userMessageWidget(context, message);
       case AIRole.assistant:
-        return assistantMessageWidget(ref, model, content: message.content);
+        return assistantMessageWidget(context, ref, model, message);
     }
   }
 
   // 用户消息组件
-  Widget userMessageWidget({required String content}) {
+  Widget userMessageWidget(BuildContext context, AIChatMessageModel message) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       child: Align(
@@ -595,7 +589,7 @@ class _SessionChatMessagesState extends ConsumerState<SessionChatMessages> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
-            content,
+            message.content,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
             ),
@@ -606,8 +600,8 @@ class _SessionChatMessagesState extends ConsumerState<SessionChatMessages> {
   }
 
   // AI助手消息组件
-  Widget assistantMessageWidget(WidgetRef ref, SessionAIChatModel model,
-      {required String content}) {
+  Widget assistantMessageWidget(BuildContext context, WidgetRef ref,
+      SessionAIChatModel model, AIChatMessageModel message) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       child: Align(
@@ -618,50 +612,64 @@ class _SessionChatMessagesState extends ConsumerState<SessionChatMessages> {
             color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: GptMarkdownTheme(
-            gptThemeData: GptMarkdownThemeData(
-              brightness: Theme.of(context).brightness,
-              h1: Theme.of(context).textTheme.titleLarge,
-              h2: Theme.of(context).textTheme.titleMedium,
-              h3: Theme.of(context).textTheme.titleSmall,
-              h4: Theme.of(context).textTheme.bodyLarge,
-              h5: Theme.of(context).textTheme.bodyMedium,
-              h6: Theme.of(context).textTheme.bodySmall,
-              hrLineThickness: 0.2,
-              highlightColor:
-                  Theme.of(context).colorScheme.surfaceContainerLowest,
-            ),
-            child: GptMarkdown(
-              key: ValueKey(model),
-              content,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+          child: Column(
+            children: [
+              if (message.thinking != null)
+                RichText(
+                  text: TextSpan(
+                      text: message.thinking ?? "",
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
+                          )),
+                ),
+              GptMarkdownTheme(
+                gptThemeData: GptMarkdownThemeData(
+                  brightness: Theme.of(context).brightness,
+                  h1: Theme.of(context).textTheme.titleLarge,
+                  h2: Theme.of(context).textTheme.titleMedium,
+                  h3: Theme.of(context).textTheme.titleSmall,
+                  h4: Theme.of(context).textTheme.bodyLarge,
+                  h5: Theme.of(context).textTheme.bodyMedium,
+                  h6: Theme.of(context).textTheme.bodySmall,
+                  hrLineThickness: 0.2,
+                  highlightColor:
+                      Theme.of(context).colorScheme.surfaceContainerLowest,
+                ),
+                child: GptMarkdown(
+                  key: ValueKey(model),
+                  message.content,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  codeBuilder: (context, name, code, closed) {
+                    if (name == "sql") {
+                      return SqlChatField(
+                          codes: code,
+                          onRun: SQLConnectState.isIdle(model.state)
+                              ? (code) {
+                                  // todo: 重复代码
+                                  final sqlResultsServices = ref.read(
+                                      sQLResultsServicesProvider.notifier);
+
+                                  SQLResultModel? resultModel =
+                                      sqlResultsServices
+                                          .selectedSQLResult(model.sessionId);
+
+                                  resultModel ??= sqlResultsServices
+                                      .addSQLResult(model.sessionId);
+
+                                  sqlResultsServices.loadFromQuery(
+                                      resultModel.resultId, code);
+                                }
+                              : null);
+                    } else {
+                      return CodeField(name: name, codes: code);
+                    }
+                  },
+                ),
               ),
-              codeBuilder: (context, name, code, closed) {
-                if (name == "sql") {
-                  return SqlChatField(
-                      codes: code,
-                      onRun: SQLConnectState.isIdle(model.state)
-                          ? (code) {
-                              // todo: 重复代码
-                              final sqlResultsServices =
-                                  ref.read(sQLResultsServicesProvider.notifier);
-
-                              SQLResultModel? resultModel = sqlResultsServices
-                                  .selectedSQLResult(model.sessionId);
-
-                              resultModel ??= sqlResultsServices
-                                  .addSQLResult(model.sessionId);
-
-                              sqlResultsServices.loadFromQuery(
-                                  resultModel.resultId, code);
-                            }
-                          : null);
-                } else {
-                  return CodeField(name: name, codes: code);
-                }
-              },
-            ),
+            ],
           ),
         ),
       ),
@@ -689,7 +697,7 @@ class _SessionChatMessagesState extends ConsumerState<SessionChatMessages> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     SessionAIChatModel? model = ref.watch(sessionAIChatNotifierProvider);
     if (model == null) {
       return const Spacer();
@@ -707,7 +715,7 @@ class _SessionChatMessagesState extends ConsumerState<SessionChatMessages> {
       itemCount: messages.length,
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemBuilder: (context, index) {
-        return _buildMessage(ref, model, messages[index]);
+        return _buildMessage(context, ref, model, messages[index]);
       },
     );
   }

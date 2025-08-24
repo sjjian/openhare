@@ -1013,7 +1013,7 @@ class __$AIChatIdCopyWithImpl<$Res> implements _$AIChatIdCopyWith<$Res> {
 
 /// @nodoc
 mixin _$AIChatModel {
-  AIChatId get id; // required LLMAgentId? llmAgentId,
+  AIChatId get id;
   Map<String, Map<String, String>> get tables;
   List<AIChatMessageModel> get messages;
   AIChatState get state;
@@ -1126,9 +1126,7 @@ class _AIChatModel implements AIChatModel {
 
   @override
   final AIChatId id;
-// required LLMAgentId? llmAgentId,
   final Map<String, Map<String, String>> _tables;
-// required LLMAgentId? llmAgentId,
   @override
   Map<String, Map<String, String>> get tables {
     if (_tables is EqualUnmodifiableMapView) return _tables;
@@ -1250,6 +1248,7 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
 mixin _$AIChatMessageModel {
   AIRole get role;
   String get content;
+  String? get thinking;
 
   /// Create a copy of AIChatMessageModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1265,15 +1264,17 @@ mixin _$AIChatMessageModel {
         (other.runtimeType == runtimeType &&
             other is AIChatMessageModel &&
             (identical(other.role, role) || other.role == role) &&
-            (identical(other.content, content) || other.content == content));
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.thinking, thinking) ||
+                other.thinking == thinking));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, role, content);
+  int get hashCode => Object.hash(runtimeType, role, content, thinking);
 
   @override
   String toString() {
-    return 'AIChatMessageModel(role: $role, content: $content)';
+    return 'AIChatMessageModel(role: $role, content: $content, thinking: $thinking)';
   }
 }
 
@@ -1283,7 +1284,7 @@ abstract mixin class $AIChatMessageModelCopyWith<$Res> {
           AIChatMessageModel value, $Res Function(AIChatMessageModel) _then) =
       _$AIChatMessageModelCopyWithImpl;
   @useResult
-  $Res call({AIRole role, String content});
+  $Res call({AIRole role, String content, String? thinking});
 }
 
 /// @nodoc
@@ -1301,6 +1302,7 @@ class _$AIChatMessageModelCopyWithImpl<$Res>
   $Res call({
     Object? role = null,
     Object? content = null,
+    Object? thinking = freezed,
   }) {
     return _then(_self.copyWith(
       role: null == role
@@ -1311,6 +1313,10 @@ class _$AIChatMessageModelCopyWithImpl<$Res>
           ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      thinking: freezed == thinking
+          ? _self.thinking
+          : thinking // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1318,12 +1324,15 @@ class _$AIChatMessageModelCopyWithImpl<$Res>
 /// @nodoc
 
 class _AIChatMessageModel implements AIChatMessageModel {
-  const _AIChatMessageModel({required this.role, required this.content});
+  const _AIChatMessageModel(
+      {required this.role, required this.content, this.thinking});
 
   @override
   final AIRole role;
   @override
   final String content;
+  @override
+  final String? thinking;
 
   /// Create a copy of AIChatMessageModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1339,15 +1348,17 @@ class _AIChatMessageModel implements AIChatMessageModel {
         (other.runtimeType == runtimeType &&
             other is _AIChatMessageModel &&
             (identical(other.role, role) || other.role == role) &&
-            (identical(other.content, content) || other.content == content));
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.thinking, thinking) ||
+                other.thinking == thinking));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, role, content);
+  int get hashCode => Object.hash(runtimeType, role, content, thinking);
 
   @override
   String toString() {
-    return 'AIChatMessageModel(role: $role, content: $content)';
+    return 'AIChatMessageModel(role: $role, content: $content, thinking: $thinking)';
   }
 }
 
@@ -1359,7 +1370,7 @@ abstract mixin class _$AIChatMessageModelCopyWith<$Res>
       __$AIChatMessageModelCopyWithImpl;
   @override
   @useResult
-  $Res call({AIRole role, String content});
+  $Res call({AIRole role, String content, String? thinking});
 }
 
 /// @nodoc
@@ -1377,6 +1388,7 @@ class __$AIChatMessageModelCopyWithImpl<$Res>
   $Res call({
     Object? role = null,
     Object? content = null,
+    Object? thinking = freezed,
   }) {
     return _then(_AIChatMessageModel(
       role: null == role
@@ -1387,6 +1399,10 @@ class __$AIChatMessageModelCopyWithImpl<$Res>
           ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      thinking: freezed == thinking
+          ? _self.thinking
+          : thinking // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

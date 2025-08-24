@@ -22,12 +22,13 @@ class AIChatService extends _$AIChatService {
     return state.chats[id]!.messages;
   }
 
-  void _updateLastMessage(AIChatId id, String content) {
+  void _updateLastMessage(AIChatId id, AIChatMessageModel message) {
     final repo = ref.read(aiChatRepoProvider);
     final model = repo.getAIChatById(id);
     if (model == null) {
       return;
     }
+    // todo: 感觉替换的方式有点重，不太优雅。
     List<AIChatMessageModel> messages;
     // 先移除最后一条assistant消息（如果有）
     if (model.messages.isNotEmpty &&
@@ -37,7 +38,7 @@ class AIChatService extends _$AIChatService {
       messages = List.from(model.messages);
     }
     // 添加新的assistant消息
-    messages.add(AIChatMessageModel(role: AIRole.assistant, content: content));
+    messages.add(message);
     ref.read(aiChatRepoProvider).updateMessages(id, messages);
     // 刷新state
     ref.invalidateSelf();
@@ -61,21 +62,30 @@ class AIChatService extends _$AIChatService {
 
     ref.invalidateSelf();
 
-    // 2. 构造OpenAI请求
+    // 2. 调用LLM接口
     final agent = ref.read(lLMAgentServiceProvider.notifier);
     final chatStream =
         agent.callStream(agentId, systemPrompt, _getChatMessage(id));
 
-    String tmpReply = '';
+    // 3. 更新消息
+    AIChatMessageModel? lastMessage = const AIChatMessageModel(
+      role: AIRole.assistant,
+      content: '',
+      thinking: null,
+    );
+
     await for (final event in chatStream) {
       switch (event) {
         case TextDeltaEvent(delta: final delta):
-          tmpReply += delta;
-          _updateLastMessage(id, tmpReply);
+          lastMessage =
+              lastMessage!.copyWith(content: lastMessage.content + delta);
+          _updateLastMessage(id, lastMessage);
           break;
 
         case ThinkingDeltaEvent(delta: final delta):
-          print('thinking delta: $delta'); // todo: 支持thinking
+          lastMessage = lastMessage!
+              .copyWith(thinking: (lastMessage.thinking ?? "") + delta);
+          _updateLastMessage(id, lastMessage);
           break;
 
         case CompletionEvent():
@@ -89,7 +99,6 @@ class AIChatService extends _$AIChatService {
 
         case ToolCallDeltaEvent(toolCall: final toolCall):
           print('ToolCallDeltaEvent: $toolCall');
-          // toolCalls.add(toolCall);
           break;
       }
     }
