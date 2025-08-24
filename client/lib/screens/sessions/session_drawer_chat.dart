@@ -11,6 +11,7 @@ import 'package:client/services/settings/settings.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/menu.dart';
 import 'package:client/widgets/tooltip.dart';
 import 'package:db_driver/db_driver.dart';
@@ -441,13 +442,15 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 ),
 
                 // 发送消息
-                IconButton(
-                  iconSize: kIconSizeTiny,
-                  icon: const Icon(Icons.send),
-                  onPressed: model.canSendMessage()
-                      ? () => _sendMessage(model.chatModel.id, model)
-                      : null,
-                ),
+                (model.chatModel.state == AIChatState.waiting)
+                    ? const Loading.small()
+                    : IconButton(
+                        iconSize: kIconSizeTiny,
+                        icon: const Icon(Icons.send),
+                        onPressed: model.canSendMessage()
+                            ? () => _sendMessage(model.chatModel.id, model)
+                            : null,
+                      ),
               ],
             ),
           ],
