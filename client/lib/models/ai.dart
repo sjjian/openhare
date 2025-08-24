@@ -4,6 +4,8 @@ part 'ai.freezed.dart';
 
 abstract class LLMAgentRepo {
   LLMAgentsModel getLLMAgents();
+  LLMAgentModel? getLastUsedLLMAgent();
+  void updateLastUsedLLMAgent(LLMAgentId id);
   void create(LLMAgentSettingModel setting);
   void delete(LLMAgentId id);
   LLMAgentModel? getLLMAgentById(LLMAgentId id);
@@ -15,7 +17,6 @@ abstract class AIChatRepo {
   AIChatListModel getAIChatList();
   AIChatModel create(AIChatModel model);
   void delete(AIChatId id);
-  void updateLLMAgent(AIChatId id, LLMAgentId llmAgent);
   void updateMessages(AIChatId id, List<AIChatMessageModel> messages);
   void updateState(AIChatId id, AIChatState state);
   AIChatModel? getAIChatById(AIChatId id);
@@ -66,6 +67,7 @@ abstract class LLMAgentModel with _$LLMAgentModel {
 abstract class LLMAgentsModel with _$LLMAgentsModel {
   const factory LLMAgentsModel({
     required Map<LLMAgentId, LLMAgentModel> agents,
+    required LLMAgentModel? lastUsedLLMAgent,
   }) = _LLMAgentsModel;
 }
 
@@ -91,7 +93,6 @@ abstract class AIChatId with _$AIChatId {
 abstract class AIChatModel with _$AIChatModel {
   const factory AIChatModel({
     required AIChatId id,
-    required LLMAgentId? llmAgentId,
     required Map<String, Map<String, String>> tables,
     required List<AIChatMessageModel> messages,
     required AIChatState state,

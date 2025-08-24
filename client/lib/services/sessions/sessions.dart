@@ -488,7 +488,6 @@ class SessionAIChatNotifier extends _$SessionAIChatNotifier {
             value: session.sessionId.value), // todo: 暂时用session id 替代chatId
         messages: [],
         state: AIChatState.idle,
-        llmAgentId: llmAgents.agents.keys.firstOrNull,
         tables: {},
       );
 

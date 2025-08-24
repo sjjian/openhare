@@ -28,11 +28,6 @@ class AIChatRepoImpl extends AIChatRepo {
     _aiChats[id] = _aiChats[id]!.copyWith(messages: messages);
   }
 
-  @override 
-  void updateLLMAgent(AIChatId id, LLMAgentId llmAgentId) {
-    _aiChats[id] = _aiChats[id]!.copyWith(llmAgentId: llmAgentId);
-  }
-
   @override
   void updateState(AIChatId id, AIChatState state) {
     _aiChats[id] = _aiChats[id]!.copyWith(state: state);

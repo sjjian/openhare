@@ -173,7 +173,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(8, 4878459101642556312),
     name: 'LLMApiSettingStorage',
-    lastPropertyId: const obx_int.IdUid(6, 5430508038195053466),
+    lastPropertyId: const obx_int.IdUid(8, 6847589771080526330),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -204,6 +204,18 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(5, 5004092012514136342),
         name: 'modelName',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 5646502539571106321),
+        name: 'createdAt',
+        type: 12,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 6847589771080526330),
+        name: 'lastChatUsedAt',
+        type: 12,
         flags: 0,
       ),
     ],
@@ -544,12 +556,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final baseUrlOffset = fbb.writeString(object.baseUrl);
         final apiKeyOffset = fbb.writeString(object.apiKey);
         final modelNameOffset = fbb.writeString(object.modelName);
-        fbb.startTable(7);
+        fbb.startTable(9);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, baseUrlOffset);
         fbb.addOffset(3, apiKeyOffset);
         fbb.addOffset(4, modelNameOffset);
+        fbb.addInt64(6, object.createdAt.microsecondsSinceEpoch * 1000);
+        fbb.addInt64(7, object.lastChatUsedAt.microsecondsSinceEpoch * 1000);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -574,12 +588,22 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final modelNameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 12, '');
+        final createdAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0) / 1000)
+              .round(),
+        );
+        final lastChatUsedAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0) / 1000)
+              .round(),
+        );
         final object = LLMApiSettingStorage(
           id: idParam,
           name: nameParam,
           baseUrl: baseUrlParam,
           apiKey: apiKeyParam,
           modelName: modelNameParam,
+          createdAt: createdAtParam,
+          lastChatUsedAt: lastChatUsedAtParam,
         );
 
         return object;
@@ -763,6 +787,16 @@ class LLMApiSettingStorage_ {
   /// See [LLMApiSettingStorage.modelName].
   static final modelName = obx.QueryStringProperty<LLMApiSettingStorage>(
     _entities[3].properties[4],
+  );
+
+  /// See [LLMApiSettingStorage.createdAt].
+  static final createdAt = obx.QueryDateNanoProperty<LLMApiSettingStorage>(
+    _entities[3].properties[5],
+  );
+
+  /// See [LLMApiSettingStorage.lastChatUsedAt].
+  static final lastChatUsedAt = obx.QueryDateNanoProperty<LLMApiSettingStorage>(
+    _entities[3].properties[6],
   );
 }
 

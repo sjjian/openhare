@@ -696,6 +696,7 @@ class __$LLMAgentModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$LLMAgentsModel {
   Map<LLMAgentId, LLMAgentModel> get agents;
+  LLMAgentModel? get lastUsedLLMAgent;
 
   /// Create a copy of LLMAgentsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -710,16 +711,18 @@ mixin _$LLMAgentsModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is LLMAgentsModel &&
-            const DeepCollectionEquality().equals(other.agents, agents));
+            const DeepCollectionEquality().equals(other.agents, agents) &&
+            (identical(other.lastUsedLLMAgent, lastUsedLLMAgent) ||
+                other.lastUsedLLMAgent == lastUsedLLMAgent));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(agents));
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(agents), lastUsedLLMAgent);
 
   @override
   String toString() {
-    return 'LLMAgentsModel(agents: $agents)';
+    return 'LLMAgentsModel(agents: $agents, lastUsedLLMAgent: $lastUsedLLMAgent)';
   }
 }
 
@@ -729,7 +732,10 @@ abstract mixin class $LLMAgentsModelCopyWith<$Res> {
           LLMAgentsModel value, $Res Function(LLMAgentsModel) _then) =
       _$LLMAgentsModelCopyWithImpl;
   @useResult
-  $Res call({Map<LLMAgentId, LLMAgentModel> agents});
+  $Res call(
+      {Map<LLMAgentId, LLMAgentModel> agents, LLMAgentModel? lastUsedLLMAgent});
+
+  $LLMAgentModelCopyWith<$Res>? get lastUsedLLMAgent;
 }
 
 /// @nodoc
@@ -746,20 +752,41 @@ class _$LLMAgentsModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? agents = null,
+    Object? lastUsedLLMAgent = freezed,
   }) {
     return _then(_self.copyWith(
       agents: null == agents
           ? _self.agents
           : agents // ignore: cast_nullable_to_non_nullable
               as Map<LLMAgentId, LLMAgentModel>,
+      lastUsedLLMAgent: freezed == lastUsedLLMAgent
+          ? _self.lastUsedLLMAgent
+          : lastUsedLLMAgent // ignore: cast_nullable_to_non_nullable
+              as LLMAgentModel?,
     ));
+  }
+
+  /// Create a copy of LLMAgentsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LLMAgentModelCopyWith<$Res>? get lastUsedLLMAgent {
+    if (_self.lastUsedLLMAgent == null) {
+      return null;
+    }
+
+    return $LLMAgentModelCopyWith<$Res>(_self.lastUsedLLMAgent!, (value) {
+      return _then(_self.copyWith(lastUsedLLMAgent: value));
+    });
   }
 }
 
 /// @nodoc
 
 class _LLMAgentsModel implements LLMAgentsModel {
-  const _LLMAgentsModel({required final Map<LLMAgentId, LLMAgentModel> agents})
+  const _LLMAgentsModel(
+      {required final Map<LLMAgentId, LLMAgentModel> agents,
+      required this.lastUsedLLMAgent})
       : _agents = agents;
 
   final Map<LLMAgentId, LLMAgentModel> _agents;
@@ -769,6 +796,9 @@ class _LLMAgentsModel implements LLMAgentsModel {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableMapView(_agents);
   }
+
+  @override
+  final LLMAgentModel? lastUsedLLMAgent;
 
   /// Create a copy of LLMAgentsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -783,16 +813,18 @@ class _LLMAgentsModel implements LLMAgentsModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _LLMAgentsModel &&
-            const DeepCollectionEquality().equals(other._agents, _agents));
+            const DeepCollectionEquality().equals(other._agents, _agents) &&
+            (identical(other.lastUsedLLMAgent, lastUsedLLMAgent) ||
+                other.lastUsedLLMAgent == lastUsedLLMAgent));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_agents));
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(_agents), lastUsedLLMAgent);
 
   @override
   String toString() {
-    return 'LLMAgentsModel(agents: $agents)';
+    return 'LLMAgentsModel(agents: $agents, lastUsedLLMAgent: $lastUsedLLMAgent)';
   }
 }
 
@@ -804,7 +836,11 @@ abstract mixin class _$LLMAgentsModelCopyWith<$Res>
       __$LLMAgentsModelCopyWithImpl;
   @override
   @useResult
-  $Res call({Map<LLMAgentId, LLMAgentModel> agents});
+  $Res call(
+      {Map<LLMAgentId, LLMAgentModel> agents, LLMAgentModel? lastUsedLLMAgent});
+
+  @override
+  $LLMAgentModelCopyWith<$Res>? get lastUsedLLMAgent;
 }
 
 /// @nodoc
@@ -821,13 +857,32 @@ class __$LLMAgentsModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? agents = null,
+    Object? lastUsedLLMAgent = freezed,
   }) {
     return _then(_LLMAgentsModel(
       agents: null == agents
           ? _self._agents
           : agents // ignore: cast_nullable_to_non_nullable
               as Map<LLMAgentId, LLMAgentModel>,
+      lastUsedLLMAgent: freezed == lastUsedLLMAgent
+          ? _self.lastUsedLLMAgent
+          : lastUsedLLMAgent // ignore: cast_nullable_to_non_nullable
+              as LLMAgentModel?,
     ));
+  }
+
+  /// Create a copy of LLMAgentsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LLMAgentModelCopyWith<$Res>? get lastUsedLLMAgent {
+    if (_self.lastUsedLLMAgent == null) {
+      return null;
+    }
+
+    return $LLMAgentModelCopyWith<$Res>(_self.lastUsedLLMAgent!, (value) {
+      return _then(_self.copyWith(lastUsedLLMAgent: value));
+    });
   }
 }
 
@@ -958,8 +1013,7 @@ class __$AIChatIdCopyWithImpl<$Res> implements _$AIChatIdCopyWith<$Res> {
 
 /// @nodoc
 mixin _$AIChatModel {
-  AIChatId get id;
-  LLMAgentId? get llmAgentId;
+  AIChatId get id; // required LLMAgentId? llmAgentId,
   Map<String, Map<String, String>> get tables;
   List<AIChatMessageModel> get messages;
   AIChatState get state;
@@ -977,8 +1031,6 @@ mixin _$AIChatModel {
         (other.runtimeType == runtimeType &&
             other is AIChatModel &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.llmAgentId, llmAgentId) ||
-                other.llmAgentId == llmAgentId) &&
             const DeepCollectionEquality().equals(other.tables, tables) &&
             const DeepCollectionEquality().equals(other.messages, messages) &&
             (identical(other.state, state) || other.state == state));
@@ -988,14 +1040,13 @@ mixin _$AIChatModel {
   int get hashCode => Object.hash(
       runtimeType,
       id,
-      llmAgentId,
       const DeepCollectionEquality().hash(tables),
       const DeepCollectionEquality().hash(messages),
       state);
 
   @override
   String toString() {
-    return 'AIChatModel(id: $id, llmAgentId: $llmAgentId, tables: $tables, messages: $messages, state: $state)';
+    return 'AIChatModel(id: $id, tables: $tables, messages: $messages, state: $state)';
   }
 }
 
@@ -1007,13 +1058,11 @@ abstract mixin class $AIChatModelCopyWith<$Res> {
   @useResult
   $Res call(
       {AIChatId id,
-      LLMAgentId? llmAgentId,
       Map<String, Map<String, String>> tables,
       List<AIChatMessageModel> messages,
       AIChatState state});
 
   $AIChatIdCopyWith<$Res> get id;
-  $LLMAgentIdCopyWith<$Res>? get llmAgentId;
 }
 
 /// @nodoc
@@ -1029,7 +1078,6 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? llmAgentId = freezed,
     Object? tables = null,
     Object? messages = null,
     Object? state = null,
@@ -1039,10 +1087,6 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as AIChatId,
-      llmAgentId: freezed == llmAgentId
-          ? _self.llmAgentId
-          : llmAgentId // ignore: cast_nullable_to_non_nullable
-              as LLMAgentId?,
       tables: null == tables
           ? _self.tables
           : tables // ignore: cast_nullable_to_non_nullable
@@ -1067,20 +1111,6 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
       return _then(_self.copyWith(id: value));
     });
   }
-
-  /// Create a copy of AIChatModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $LLMAgentIdCopyWith<$Res>? get llmAgentId {
-    if (_self.llmAgentId == null) {
-      return null;
-    }
-
-    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId!, (value) {
-      return _then(_self.copyWith(llmAgentId: value));
-    });
-  }
 }
 
 /// @nodoc
@@ -1088,7 +1118,6 @@ class _$AIChatModelCopyWithImpl<$Res> implements $AIChatModelCopyWith<$Res> {
 class _AIChatModel implements AIChatModel {
   const _AIChatModel(
       {required this.id,
-      required this.llmAgentId,
       required final Map<String, Map<String, String>> tables,
       required final List<AIChatMessageModel> messages,
       required this.state})
@@ -1097,9 +1126,9 @@ class _AIChatModel implements AIChatModel {
 
   @override
   final AIChatId id;
-  @override
-  final LLMAgentId? llmAgentId;
+// required LLMAgentId? llmAgentId,
   final Map<String, Map<String, String>> _tables;
+// required LLMAgentId? llmAgentId,
   @override
   Map<String, Map<String, String>> get tables {
     if (_tables is EqualUnmodifiableMapView) return _tables;
@@ -1132,8 +1161,6 @@ class _AIChatModel implements AIChatModel {
         (other.runtimeType == runtimeType &&
             other is _AIChatModel &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.llmAgentId, llmAgentId) ||
-                other.llmAgentId == llmAgentId) &&
             const DeepCollectionEquality().equals(other._tables, _tables) &&
             const DeepCollectionEquality().equals(other._messages, _messages) &&
             (identical(other.state, state) || other.state == state));
@@ -1143,14 +1170,13 @@ class _AIChatModel implements AIChatModel {
   int get hashCode => Object.hash(
       runtimeType,
       id,
-      llmAgentId,
       const DeepCollectionEquality().hash(_tables),
       const DeepCollectionEquality().hash(_messages),
       state);
 
   @override
   String toString() {
-    return 'AIChatModel(id: $id, llmAgentId: $llmAgentId, tables: $tables, messages: $messages, state: $state)';
+    return 'AIChatModel(id: $id, tables: $tables, messages: $messages, state: $state)';
   }
 }
 
@@ -1164,15 +1190,12 @@ abstract mixin class _$AIChatModelCopyWith<$Res>
   @useResult
   $Res call(
       {AIChatId id,
-      LLMAgentId? llmAgentId,
       Map<String, Map<String, String>> tables,
       List<AIChatMessageModel> messages,
       AIChatState state});
 
   @override
   $AIChatIdCopyWith<$Res> get id;
-  @override
-  $LLMAgentIdCopyWith<$Res>? get llmAgentId;
 }
 
 /// @nodoc
@@ -1188,7 +1211,6 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? llmAgentId = freezed,
     Object? tables = null,
     Object? messages = null,
     Object? state = null,
@@ -1198,10 +1220,6 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as AIChatId,
-      llmAgentId: freezed == llmAgentId
-          ? _self.llmAgentId
-          : llmAgentId // ignore: cast_nullable_to_non_nullable
-              as LLMAgentId?,
       tables: null == tables
           ? _self._tables
           : tables // ignore: cast_nullable_to_non_nullable
@@ -1224,20 +1242,6 @@ class __$AIChatModelCopyWithImpl<$Res> implements _$AIChatModelCopyWith<$Res> {
   $AIChatIdCopyWith<$Res> get id {
     return $AIChatIdCopyWith<$Res>(_self.id, (value) {
       return _then(_self.copyWith(id: value));
-    });
-  }
-
-  /// Create a copy of AIChatModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $LLMAgentIdCopyWith<$Res>? get llmAgentId {
-    if (_self.llmAgentId == null) {
-      return null;
-    }
-
-    return $LLMAgentIdCopyWith<$Res>(_self.llmAgentId!, (value) {
-      return _then(_self.copyWith(llmAgentId: value));
     });
   }
 }

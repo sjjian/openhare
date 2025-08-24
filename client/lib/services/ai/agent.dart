@@ -24,6 +24,11 @@ class LLMAgentService extends _$LLMAgentService {
     ref.invalidateSelf();
   }
 
+  void updateLastUsedLLMAgent(LLMAgentId id) {
+    ref.read(lLMAgentRepoProvider).updateLastUsedLLMAgent(id);
+    ref.invalidateSelf();
+  }
+
   void updateSetting(LLMAgentId id, LLMAgentSettingModel setting) {
     ref.read(lLMAgentRepoProvider).updateSetting(id, setting);
     ref.invalidateSelf();

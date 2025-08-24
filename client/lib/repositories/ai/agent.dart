@@ -17,13 +17,22 @@ class LLMApiSettingStorage {
   String apiKey;
   String modelName;
 
+  @Property(type: PropertyType.dateNano)
+  DateTime createdAt;
+
+  @Property(type: PropertyType.dateNano)
+  DateTime lastChatUsedAt;
+
   LLMApiSettingStorage({
     this.id = 0,
     required this.name,
     required this.baseUrl,
     required this.apiKey,
     required this.modelName,
-  });
+    DateTime? createdAt,
+    DateTime? lastChatUsedAt,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        lastChatUsedAt = lastChatUsedAt ?? DateTime(1970, 1, 1);
 }
 
 class LLMAgentRepoImpl implements LLMAgentRepo {
@@ -58,10 +67,32 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
   LLMAgentsModel getLLMAgents() {
     final agents = _llmAgentSettingBox.getAll();
     return LLMAgentsModel(
-        agents: agents
-            .map((e) => _toModel(e))
-            .fold<Map<LLMAgentId, LLMAgentModel>>(
-                {}, (acc, e) => acc..[e.id] = e));
+      agents: agents
+          .map((e) => _toModel(e))
+          .fold<Map<LLMAgentId, LLMAgentModel>>(
+              {}, (acc, e) => acc..[e.id] = e),
+      lastUsedLLMAgent: getLastUsedLLMAgent(),
+    );
+  }
+
+  @override
+  LLMAgentModel? getLastUsedLLMAgent() {
+    final agent = _llmAgentSettingBox
+        .query()
+        .order(LLMApiSettingStorage_.lastChatUsedAt, flags: Order.descending)
+        .build()
+        .findFirst();
+    return agent != null ? _toModel(agent) : null;
+  }
+
+  @override
+  void updateLastUsedLLMAgent(LLMAgentId id) {
+    final agent = _llmAgentSettingBox.get(id.value);
+    if (agent == null) {
+      return;
+    }
+    agent.lastChatUsedAt = DateTime.now();
+    _llmAgentSettingBox.put(agent);
   }
 
   @override
@@ -88,15 +119,7 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
     if (setting == null) {
       return null;
     }
-    return LLMAgentModel(
-      id: id,
-      setting: LLMAgentSettingModel(
-          name: setting.name,
-          baseUrl: setting.baseUrl,
-          apiKey: setting.apiKey,
-          modelName: setting.modelName),
-      status: _status[id]!,
-    );
+    return _toModel(setting);
   }
 
   @override

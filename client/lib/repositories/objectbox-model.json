@@ -133,7 +133,7 @@
     },
     {
       "id": "8:4878459101642556312",
-      "lastPropertyId": "6:5430508038195053466",
+      "lastPropertyId": "8:6847589771080526330",
       "name": "LLMApiSettingStorage",
       "properties": [
         {
@@ -161,6 +161,16 @@
           "id": "5:5004092012514136342",
           "name": "modelName",
           "type": 9
+        },
+        {
+          "id": "7:5646502539571106321",
+          "name": "createdAt",
+          "type": 12
+        },
+        {
+          "id": "8:6847589771080526330",
+          "name": "lastChatUsedAt",
+          "type": 12
         }
       ],
       "relations": []

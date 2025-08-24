@@ -45,14 +45,11 @@ class AIChatService extends _$AIChatService {
 
   /// 进行AI对话，请求接口，存储消息并刷新
   /// 不再返回流，直接通过provider刷新state，UI通过监听state变化获取最新消息
-  Future<void> chat(AIChatId id, String systemPrompt, String message) async {
+  Future<void> chat(AIChatId id, LLMAgentId agentId, String systemPrompt,
+      String message) async {
     final repo = ref.read(aiChatRepoProvider);
     final model = repo.getAIChatById(id);
     if (model == null) {
-      return;
-    }
-    // 没有指定模型，无法对话
-    if (model.llmAgentId == null) {
       return;
     }
     // 1.更新用户提问的消息
@@ -66,10 +63,8 @@ class AIChatService extends _$AIChatService {
 
     // 2. 构造OpenAI请求
     final agent = ref.read(lLMAgentServiceProvider.notifier);
-    final chatStream = agent.callStream(
-        model.llmAgentId!,
-        systemPrompt,
-        _getChatMessage(id));
+    final chatStream =
+        agent.callStream(agentId, systemPrompt, _getChatMessage(id));
 
     String tmpReply = '';
     await for (final event in chatStream) {
@@ -98,11 +93,6 @@ class AIChatService extends _$AIChatService {
           break;
       }
     }
-  }
-
-  void updateAgent(AIChatId id, LLMAgentId agentId) {
-    ref.read(aiChatRepoProvider).updateLLMAgent(id, agentId);
-    ref.invalidateSelf();
   }
 
   void cleanMessages(AIChatId id) {

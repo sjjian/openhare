@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:client/models/sessions.dart';
 import 'package:client/models/settings.dart';
+import 'package:client/services/ai/agent.dart';
 import 'package:client/services/ai/prompt.dart';
 import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
@@ -70,8 +71,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
   }
 
   bool canSendMessage(SessionAIChatModel model) {
-    return model.chatModel.llmAgentId != null &&
-        model.llmAgents.agents.containsKey(model.chatModel.llmAgentId!) &&
+    return model.llmAgents.lastUsedLLMAgent != null &&
         model.chatModel.state != AIChatState.waiting;
   }
 
@@ -116,9 +116,11 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
         .clear();
 
     // 调用AIChatService的chat方法
-    await ref
-        .read(aIChatServiceProvider.notifier)
-        .chat(chatId, systemPrompt(chatModel), text);
+    await ref.read(aIChatServiceProvider.notifier).chat(
+        chatId,
+        chatModel.llmAgents.lastUsedLLMAgent!.id,
+        systemPrompt(chatModel),
+        text);
 
     final scrollController =
         SessionController.sessionController(chatModel.sessionId)
@@ -186,7 +188,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
         ),
       ),
       child: Text(
-        model.llmAgents.agents[model.chatModel.llmAgentId]?.setting.name ?? "-",
+        model.llmAgents.lastUsedLLMAgent?.setting.name ?? "-",
         overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.bodySmall,
       ),
@@ -288,7 +290,9 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                           ),
                         ),
                         onTabSelected: () {
-                          services.updateAgent(model.chatModel.id, agent.id);
+                          ref
+                              .read(lLMAgentServiceProvider.notifier)
+                              .updateLastUsedLLMAgent(agent.id);
                         },
                       ),
                   ],
