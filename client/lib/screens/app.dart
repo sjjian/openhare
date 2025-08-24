@@ -196,19 +196,19 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
               ),
             ),
           ],
-          trailing: Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
-                child: Image.asset(
-                  "assets/icons/logo.png",
-                  height: kIconSizeLarge,
-                  width: kIconSizeLarge,
-                ),
-              ),
-            ),
-          ),
+          // trailing: Expanded(
+          //   child: Align(
+          //     alignment: Alignment.bottomCenter,
+          //     child: Padding(
+          //       padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
+          //       child: Image.asset(
+          //         "assets/icons/logo.png",
+          //         height: kIconSizeLarge,
+          //         width: kIconSizeLarge,
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ),
         Expanded(child: widget.child)
       ],
