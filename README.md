@@ -1,4 +1,6 @@
-![logo](./logo_full.png)
+<p align="center">
+  <img src="./logo_full.png" alt="logo"/>
+</p>
 
 openhare is a professional, cross-platform desktop SQL query tool built with Flutter. Designed for database administrators, developers, and data analysts, openhare delivers a powerful yet intuitive experience for managing and querying databases.
 

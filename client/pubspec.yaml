@@ -141,10 +141,10 @@ objectbox:
   output_dir: repositories
 
 flutter_launcher_icons:
-  image_path: "assets/icons/logo_win.png"
+  image_path: "assets/icons/logo.png"
   windows:
     generate: true
-    image_path: "assets/icons/logo_win.png"
+    image_path: "assets/icons/logo.png"
     icon_size: 256 # min:48, max:256, default: 48
   macos:
     generate: true
