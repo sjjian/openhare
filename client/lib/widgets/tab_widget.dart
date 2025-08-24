@@ -42,11 +42,11 @@ class _CommonTabBarState extends State<CommonTabBar> {
     );
   }
 
-  List<MoreTabMenuItemWidget> _buildItems(int start) {
+  List<OverlayMenuItem> _buildItems(int start) {
     return [
       for (var i = start - 1; i >= 0; i--)
-        MoreTabMenuItemWidget(
-          height: widget.height,
+        OverlayMenuItem(
+          height: widget.height ?? 35,
           child: Row(
             children: [
               if (widget.tabs[i].avatar != null)
@@ -137,8 +137,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
         child: SizedBox(
           child: ReorderableListView(
             header: start > 0
-                ? MoreTabMenuWidget(
-                    height: widget.height,
+                ? OverlayMenu(
                     tabs: _buildItems(start),
                     child: moreTabIcon,
                   )

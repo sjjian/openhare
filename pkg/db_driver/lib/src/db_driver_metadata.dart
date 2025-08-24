@@ -1,4 +1,15 @@
-enum MetaType { instance, database, schema, table, column }
+import 'dart:convert';
+
+enum MetaType {
+  instance,
+  database,
+  schema,
+  table,
+  column;
+
+  @override
+  String toString() => name;
+}
 
 class MetaDataNode {
   MetaType type;
@@ -19,7 +30,7 @@ class MetaDataNode {
     }
   }
 
-  MetaDataNode withProp(MetaDataPropType name, Object value){
+  MetaDataNode withProp(MetaDataPropType name, Object value) {
     props[name] = MetaDataProp(name, value);
     return this;
   }
@@ -27,9 +38,36 @@ class MetaDataNode {
   T? getProp<T>(MetaDataPropType name) {
     return props[name]?.value as T?;
   }
+
+  List<MetaDataNode> getChildren(MetaType type, String value) {
+    List<MetaDataNode> children = [];
+    visitor((node, parent) {
+      if (node.type == type && node.value == value) {
+        children.addAll(node.items?.map((e) => e) ?? []);
+      }
+      return true;
+    });
+    return children;
+  }
+
+  @override
+  String toString() {
+    return jsonEncode({
+      "type": type.toString(),
+      "value": value,
+      "props": props.map((key, value) => MapEntry(key.name, value.value.toString())),
+      "children": items?.map((e) => e.toString()).toList(),
+    });
+  }
 }
 
-enum MetaDataPropType { dataType, indexType }
+enum MetaDataPropType {
+  dataType,
+  indexType;
+
+  @override
+  String toString() => name;
+}
 
 class MetaDataProp {
   MetaDataPropType name;
@@ -37,4 +75,3 @@ class MetaDataProp {
 
   MetaDataProp(this.name, this.value);
 }
-

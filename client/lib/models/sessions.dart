@@ -1,3 +1,4 @@
+import 'package:client/models/ai.dart';
 import 'package:client/models/instances.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -129,7 +130,27 @@ enum SQLConnectState {
   connected,
   executing,
   unHealth,
-  failed
+  failed;
+
+  static bool isConnected(SQLConnectState? state) {
+    return state != null && (state == connected || state == executing);
+  }
+
+  static bool isDisconnected(SQLConnectState? state) {
+    return state == null || state == disconnected || state == failed;
+  }
+
+  static bool isIdle(SQLConnectState? state) {
+    return state != null && state == connected;
+  }
+
+  static bool isBusy(SQLConnectState? state) {
+    return state != null && (state == connecting || state == executing);
+  }
+
+  static bool isConnecting(SQLConnectState? state) {
+    return state != null && state == connecting;
+  }
 }
 
 enum SQLExecuteState { init, executing, done, error }
@@ -137,11 +158,13 @@ enum SQLExecuteState { init, executing, done, error }
 enum DrawerPage {
   metadataTree,
   sqlResult,
+  aiChat,
 }
 
 @freezed
 abstract class SessionDrawerModel with _$SessionDrawerModel {
   const factory SessionDrawerModel({
+    required SessionId sessionId,
     required DrawerPage drawerPage,
     required BaseQueryValue? sqlResult,
     required BaseQueryColumn? sqlColumn,
@@ -254,4 +277,30 @@ abstract class SQLResultsModel with _$SQLResultsModel {
   const factory SQLResultsModel({
     required Map<SessionId, SessionSQLResultsModel> cache,
   }) = _SQLResultsModel;
+}
+
+@freezed
+abstract class SessionAIChatModel with _$SessionAIChatModel {
+  const factory SessionAIChatModel({
+    required SessionId sessionId,
+    required String? currentSchema,
+    required DatabaseType? dbType,
+    required MetaDataNode? metadata,
+    required ConnId? connId,
+    required SQLConnectState? state,
+    required AIChatModel chatModel,
+    required LLMAgentsModel llmAgents,
+  }) = _SessionAIChatModel;
+
+  const SessionAIChatModel._();
+
+  bool canSendMessage() {
+    return llmAgents.lastUsedLLMAgent != null &&
+        chatModel.state != AIChatState.waiting;
+  }
+
+  bool canClearMessage() {
+    return chatModel.state != AIChatState.waiting &&
+        chatModel.messages.isNotEmpty;
+  }
 }

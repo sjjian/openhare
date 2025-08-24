@@ -1,3 +1,4 @@
+import 'package:client/widgets/tooltip.dart';
 import 'package:flutter/material.dart';
 import 'const.dart';
 
@@ -55,7 +56,9 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
             decoration: BoxDecoration(
               color: _isHovering
                   ? widget.hoverBackgroundColor ??
-                      Theme.of(context).colorScheme.surfaceContainer // icon button 鼠标悬浮的颜色
+                      Theme.of(context)
+                          .colorScheme
+                          .surfaceContainer // icon button 鼠标悬浮的颜色
                   : widget.backgroundColor, // icon button 背景色
             ),
             child: Icon(
@@ -87,15 +90,6 @@ class _LinkButtonState extends State<LinkButton> {
     final Color normalColor = Theme.of(context).colorScheme.primary;
     final Color hoverColor =
         Theme.of(context).colorScheme.primary.withOpacity(0.7);
-
-    final textWidget = Text(
-      widget.text,
-      style: TextStyle(
-        color: _hovering ? hoverColor : normalColor,
-        decoration: TextDecoration.underline,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovering = true),
@@ -109,30 +103,13 @@ class _LinkButtonState extends State<LinkButton> {
           padding:
               const EdgeInsets.fromLTRB(kSpacingSmall, 0, kSpacingSmall, 0),
           // 只有当TextOverflow.ellipsis实际发生时才显示tooltip
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final TextPainter textPainter = TextPainter(
-                text: TextSpan(
-                  text: widget.text,
-                  style: TextStyle(
-                    color: _hovering ? hoverColor : normalColor,
-                    decoration: TextDecoration.underline,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                maxLines: 1,
-                textDirection: TextDirection.ltr,
-              )..layout(maxWidth: constraints.maxWidth);
-
-              final bool isOverflowing = textPainter.didExceedMaxLines;
-
-              return isOverflowing
-                  ? Tooltip(
-                      message: widget.text,
-                      child: textWidget,
-                    )
-                  : textWidget;
-            },
+          child: TooltipText(
+            text: widget.text,
+            style: TextStyle(
+              color: _hovering ? hoverColor : normalColor,
+              decoration: TextDecoration.underline,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
       ),

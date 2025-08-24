@@ -9,7 +9,7 @@ import 'package:db_driver/db_driver.dart';
 import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/l10n/app_localizations.dart';
 
 class UpdateInstancePage extends StatefulWidget {
   const UpdateInstancePage({Key? key}) : super(key: key);

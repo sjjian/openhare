@@ -7,30 +7,16 @@ import 'package:client/widgets/tab_widget.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/l10n/app_localizations.dart';
 
 class SessionTabs extends ConsumerWidget {
   const SessionTabs({Key? key}) : super(key: key);
 
-  // todo: 重复代码
-  bool connIsBusy(SessionDetailModel model) {
-    return (model.connId != null &&
-        model.connState != null &&
-        (model.connState == SQLConnectState.executing ||
-            model.connState == SQLConnectState.connecting));
-  }
-
-  bool connIsConnected(SessionDetailModel model) {
-    return (model.connId != null &&
-        model.connState != null &&
-        (model.connState == SQLConnectState.connected));
-  }
-
   void closeSessionDialog(BuildContext context, WidgetRef ref,
       SessionDetailListModel model, int index) {
     // 如果正在执行语句，则提示连接繁忙，请稍后执行
-    if (connIsBusy(model.sessions[index]) ||
-        connIsConnected(model.sessions[index])) {
+    final state = model.sessions[index].connState;
+    if (SQLConnectState.isBusy(state) || SQLConnectState.isConnected(state)) {
       return doActionDialog(
         context,
         AppLocalizations.of(context)!.tip_close_session,
@@ -96,7 +82,8 @@ class SessionTabs extends ConsumerWidget {
                       : CommonTabWrap(
                           avatar: (model.sessions[i].sessionId !=
                                       model.selectedSession?.sessionId &&
-                                  connIsBusy(model.sessions[i]))
+                                  SQLConnectState.isBusy(
+                                      model.sessions[i].connState))
                               ? const Loading.small()
                               : Image.asset(
                                   connectionMetaMap[model.sessions[i].dbType!]!

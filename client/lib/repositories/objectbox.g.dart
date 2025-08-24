@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
+import '../repositories/ai/agent.dart';
 import '../repositories/instances/instances.dart';
 import '../repositories/sessions/sessions.dart';
 import '../repositories/settings/settings.dart';
@@ -148,34 +149,6 @@ final _entities = <obx_int.ModelEntity>[
     backlinks: <obx_int.ModelBacklink>[],
   ),
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(6, 7763174657391623643),
-    name: 'SettingsStorage',
-    lastPropertyId: const obx_int.IdUid(3, 5314647270738127679),
-    flags: 0,
-    properties: <obx_int.ModelProperty>[
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 390357101932384688),
-        name: 'id',
-        type: 6,
-        flags: 129,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 5521178418702823783),
-        name: 'theme',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 5314647270738127679),
-        name: 'language',
-        type: 9,
-        flags: 0,
-      ),
-    ],
-    relations: <obx_int.ModelRelation>[],
-    backlinks: <obx_int.ModelBacklink>[],
-  ),
-  obx_int.ModelEntity(
     id: const obx_int.IdUid(7, 634128806298847270),
     name: 'SessionCodeStorage',
     lastPropertyId: const obx_int.IdUid(2, 3148689854157331823),
@@ -190,6 +163,86 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(2, 3148689854157331823),
         name: 'text',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(8, 4878459101642556312),
+    name: 'LLMApiSettingStorage',
+    lastPropertyId: const obx_int.IdUid(8, 6847589771080526330),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 2867928284948435721),
+        name: 'id',
+        type: 6,
+        flags: 129,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 316294158491986384),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 2136203430287790623),
+        name: 'baseUrl',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 1641090997426995821),
+        name: 'apiKey',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 5004092012514136342),
+        name: 'modelName',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 5646502539571106321),
+        name: 'createdAt',
+        type: 12,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 6847589771080526330),
+        name: 'lastChatUsedAt',
+        type: 12,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(9, 6175978041610451837),
+    name: 'SettingsStorage',
+    lastPropertyId: const obx_int.IdUid(3, 5278775035755547316),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 7401234656650770609),
+        name: 'id',
+        type: 6,
+        flags: 129,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8178165267243336237),
+        name: 'theme',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 5278775035755547316),
+        name: 'language',
         type: 9,
         flags: 0,
       ),
@@ -237,7 +290,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(7, 634128806298847270),
+    lastEntityId: const obx_int.IdUid(9, 6175978041610451837),
     lastIndexId: const obx_int.IdUid(3, 6583598154122015850),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -245,6 +298,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       4777369979113529251,
       7771770525022327494,
       4128249689244104183,
+      7763174657391623643,
     ],
     retiredIndexUids: const [],
     retiredPropertyUids: const [
@@ -279,6 +333,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
       6403594309000127769,
       452695194295216491,
       4040787782661306959,
+      5430508038195053466,
+      390357101932384688,
+      5521178418702823783,
+      5314647270738127679,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -451,8 +509,108 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
-    SettingsStorage: obx_int.EntityDefinition<SettingsStorage>(
+    SessionCodeStorage: obx_int.EntityDefinition<SessionCodeStorage>(
       model: _entities[2],
+      toOneRelations: (SessionCodeStorage object) => [],
+      toManyRelations: (SessionCodeStorage object) => {},
+      getId: (SessionCodeStorage object) => object.id,
+      setId: (SessionCodeStorage object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SessionCodeStorage object, fb.Builder fbb) {
+        final textOffset =
+            object.text == null ? null : fbb.writeString(object.text!);
+        fbb.startTable(3);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, textOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final textParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 6);
+        final object = SessionCodeStorage(id: idParam, text: textParam);
+
+        return object;
+      },
+    ),
+    LLMApiSettingStorage: obx_int.EntityDefinition<LLMApiSettingStorage>(
+      model: _entities[3],
+      toOneRelations: (LLMApiSettingStorage object) => [],
+      toManyRelations: (LLMApiSettingStorage object) => {},
+      getId: (LLMApiSettingStorage object) => object.id,
+      setId: (LLMApiSettingStorage object, int id) {
+        object.id = id;
+      },
+      objectToFB: (LLMApiSettingStorage object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final baseUrlOffset = fbb.writeString(object.baseUrl);
+        final apiKeyOffset = fbb.writeString(object.apiKey);
+        final modelNameOffset = fbb.writeString(object.modelName);
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, baseUrlOffset);
+        fbb.addOffset(3, apiKeyOffset);
+        fbb.addOffset(4, modelNameOffset);
+        fbb.addInt64(6, object.createdAt.microsecondsSinceEpoch * 1000);
+        fbb.addInt64(7, object.lastChatUsedAt.microsecondsSinceEpoch * 1000);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final baseUrlParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final apiKeyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final modelNameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final createdAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0) / 1000)
+              .round(),
+        );
+        final lastChatUsedAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0) / 1000)
+              .round(),
+        );
+        final object = LLMApiSettingStorage(
+          id: idParam,
+          name: nameParam,
+          baseUrl: baseUrlParam,
+          apiKey: apiKeyParam,
+          modelName: modelNameParam,
+          createdAt: createdAtParam,
+          lastChatUsedAt: lastChatUsedAtParam,
+        );
+
+        return object;
+      },
+    ),
+    SettingsStorage: obx_int.EntityDefinition<SettingsStorage>(
+      model: _entities[4],
       toOneRelations: (SettingsStorage object) => [],
       toManyRelations: (SettingsStorage object) => {},
       getId: (SettingsStorage object) => object.id,
@@ -489,40 +647,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           theme: themeParam,
           language: languageParam,
         );
-
-        return object;
-      },
-    ),
-    SessionCodeStorage: obx_int.EntityDefinition<SessionCodeStorage>(
-      model: _entities[3],
-      toOneRelations: (SessionCodeStorage object) => [],
-      toManyRelations: (SessionCodeStorage object) => {},
-      getId: (SessionCodeStorage object) => object.id,
-      setId: (SessionCodeStorage object, int id) {
-        object.id = id;
-      },
-      objectToFB: (SessionCodeStorage object, fb.Builder fbb) {
-        final textOffset =
-            object.text == null ? null : fbb.writeString(object.text!);
-        fbb.startTable(3);
-        fbb.addInt64(0, object.id);
-        fbb.addOffset(1, textOffset);
-        fbb.finish(fbb.endTable());
-        return object.id;
-      },
-      objectFromFB: (obx.Store store, ByteData fbData) {
-        final buffer = fb.BufferContext(fbData);
-        final rootOffset = buffer.derefObject(0);
-        final idParam = const fb.Int64Reader().vTableGet(
-          buffer,
-          rootOffset,
-          4,
-          0,
-        );
-        final textParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 6);
-        final object = SessionCodeStorage(id: idParam, text: textParam);
 
         return object;
       },
@@ -625,33 +749,71 @@ class InstanceStorage_ {
   );
 }
 
-/// [SettingsStorage] entity fields to define ObjectBox queries.
-class SettingsStorage_ {
-  /// See [SettingsStorage.id].
-  static final id = obx.QueryIntegerProperty<SettingsStorage>(
-    _entities[2].properties[0],
-  );
-
-  /// See [SettingsStorage.theme].
-  static final theme = obx.QueryStringProperty<SettingsStorage>(
-    _entities[2].properties[1],
-  );
-
-  /// See [SettingsStorage.language].
-  static final language = obx.QueryStringProperty<SettingsStorage>(
-    _entities[2].properties[2],
-  );
-}
-
 /// [SessionCodeStorage] entity fields to define ObjectBox queries.
 class SessionCodeStorage_ {
   /// See [SessionCodeStorage.id].
   static final id = obx.QueryIntegerProperty<SessionCodeStorage>(
-    _entities[3].properties[0],
+    _entities[2].properties[0],
   );
 
   /// See [SessionCodeStorage.text].
   static final text = obx.QueryStringProperty<SessionCodeStorage>(
+    _entities[2].properties[1],
+  );
+}
+
+/// [LLMApiSettingStorage] entity fields to define ObjectBox queries.
+class LLMApiSettingStorage_ {
+  /// See [LLMApiSettingStorage.id].
+  static final id = obx.QueryIntegerProperty<LLMApiSettingStorage>(
+    _entities[3].properties[0],
+  );
+
+  /// See [LLMApiSettingStorage.name].
+  static final name = obx.QueryStringProperty<LLMApiSettingStorage>(
     _entities[3].properties[1],
+  );
+
+  /// See [LLMApiSettingStorage.baseUrl].
+  static final baseUrl = obx.QueryStringProperty<LLMApiSettingStorage>(
+    _entities[3].properties[2],
+  );
+
+  /// See [LLMApiSettingStorage.apiKey].
+  static final apiKey = obx.QueryStringProperty<LLMApiSettingStorage>(
+    _entities[3].properties[3],
+  );
+
+  /// See [LLMApiSettingStorage.modelName].
+  static final modelName = obx.QueryStringProperty<LLMApiSettingStorage>(
+    _entities[3].properties[4],
+  );
+
+  /// See [LLMApiSettingStorage.createdAt].
+  static final createdAt = obx.QueryDateNanoProperty<LLMApiSettingStorage>(
+    _entities[3].properties[5],
+  );
+
+  /// See [LLMApiSettingStorage.lastChatUsedAt].
+  static final lastChatUsedAt = obx.QueryDateNanoProperty<LLMApiSettingStorage>(
+    _entities[3].properties[6],
+  );
+}
+
+/// [SettingsStorage] entity fields to define ObjectBox queries.
+class SettingsStorage_ {
+  /// See [SettingsStorage.id].
+  static final id = obx.QueryIntegerProperty<SettingsStorage>(
+    _entities[4].properties[0],
+  );
+
+  /// See [SettingsStorage.theme].
+  static final theme = obx.QueryStringProperty<SettingsStorage>(
+    _entities[4].properties[1],
+  );
+
+  /// See [SettingsStorage.language].
+  static final language = obx.QueryStringProperty<SettingsStorage>(
+    _entities[4].properties[2],
   );
 }

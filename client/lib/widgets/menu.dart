@@ -1,25 +1,37 @@
 import 'package:flutter/material.dart';
 
-class MoreTabMenuWidget extends StatefulWidget {
-  final double? height;
-  final List<MoreTabMenuItemWidget> tabs;
+class OverlayMenu extends StatefulWidget {
+  final double maxHeight;
+  final List<OverlayMenuItem> tabs;
+  final OverlayMenuFooter? footer;
   final Widget child;
+  // 支持设置弹窗的位置。在上方或者下方。默认在下方
+  final bool isAbove;
+  // 支持设置弹窗的间距。默认0
+  final double spacing;
 
-  const MoreTabMenuWidget({
+  // 支持设置点击菜单项后是否关闭菜单。默认关闭
+  final bool closeOnSelectItem;
+
+  const OverlayMenu({
     Key? key,
-    required this.height,
+    this.maxHeight = 400,
     required this.tabs,
     required this.child,
+    this.footer,
+    this.isAbove = false,
+    this.spacing = 0,
+    this.closeOnSelectItem = true,
   }) : super(key: key);
 
   @override
-  State<MoreTabMenuWidget> createState() => _MoreTabMenuWidgetState();
+  State<OverlayMenu> createState() => _OverlayMenuState();
 }
 
-class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
+class _OverlayMenuState extends State<OverlayMenu> {
   bool _showingMenu = false;
-  Offset? _buttonPosition;
-  Size? _buttonSize;
+  Offset? _childPosition;
+  Size? _childSize;
 
   final LayerLink _layerLink = LayerLink();
   final OverlayPortalController _portalController = OverlayPortalController();
@@ -32,13 +44,13 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
       _portalController.hide();
     } else {
       // 这里需要获取宿主widget的全局位置和大小
-      final RenderBox? button = context.findRenderObject() as RenderBox?;
-      if (button != null) {
-        final Offset position = button.localToGlobal(Offset.zero);
-        final Size size = button.size;
+      final RenderBox? child = context.findRenderObject() as RenderBox?;
+      if (child != null) {
+        final Offset position = child.localToGlobal(Offset.zero);
+        final Size size = child.size;
         setState(() {
-          _buttonPosition = position;
-          _buttonSize = size;
+          _childPosition = position;
+          _childSize = size;
           _showingMenu = true;
         });
         _portalController.show();
@@ -46,12 +58,13 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
     }
   }
 
-  Widget _buildMenu(BuildContext context) {
+  Widget _buildMenu(BuildContext context, double maxHeight) {
     return Container(
-      constraints: const BoxConstraints(minWidth: 120, maxWidth: 220),
+      constraints:
+          BoxConstraints(minWidth: 120, maxWidth: 220, maxHeight: maxHeight),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceBright,
-        borderRadius: BorderRadius.circular(6),
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).colorScheme.surfaceContainerHigh,
@@ -60,21 +73,31 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
           ),
         ],
       ),
-      child: ListView(
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
+      // 上面设置的圆角没作用，被下面的widget覆盖了
+      child: Column(
         children: [
-          for (int i = 0; i < widget.tabs.length; i++)
-            InkWell(
-              onTap: () {
-                widget.tabs[i].onTabSelected();
-                setState(() {
-                  _showingMenu = false;
-                });
-                _portalController.hide();
-              },
-              child: widget.tabs[i],
-            )
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              children: [
+                for (int i = 0; i < widget.tabs.length; i++)
+                  InkWell(
+                    onTap: () {
+                      widget.tabs[i].onTabSelected();
+                      if (widget.closeOnSelectItem) {
+                        setState(() {
+                          _showingMenu = false;
+                        });
+                        _portalController.hide();
+                      }
+                    },
+                    child: widget.tabs[i],
+                  )
+              ],
+            ),
+          ),
+          if (widget.footer != null) widget.footer!,
         ],
       ),
     );
@@ -96,14 +119,31 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
             controller: _portalController,
             overlayChildBuilder: (context) {
               // 计算弹出菜单的位置
-              final Size screenSize = MediaQuery.of(context).size;
-              final Offset position = _buttonPosition ?? Offset.zero;
-              final Size buttonSize =
-                  _buttonSize ?? Size(40, widget.height ?? 35);
+              final Size screenSize = MediaQuery.of(context).size; // 屏幕大小
+              final Offset position = _childPosition ?? Offset.zero; // 按钮位置
+              final Size childSize = _childSize ?? const Size(40, 40);
 
-              // 菜单默认在按钮下方
+              double top = 0;
               double left = position.dx;
-              double top = position.dy + buttonSize.height;
+
+              // 计算弹窗的总height
+              double menuHeight = 0;
+              for (int i = 0; i < widget.tabs.length; i++) {
+                menuHeight += widget.tabs[i].height;
+              }
+              if (widget.footer != null) {
+                menuHeight += widget.footer!.height;
+              }
+              // 限制菜单高度
+              menuHeight = (menuHeight > widget.maxHeight)
+                  ? widget.maxHeight
+                  : menuHeight;
+
+              if (widget.isAbove) {
+                top = position.dy - menuHeight - widget.spacing;
+              } else {
+                top = position.dy + childSize.height + widget.spacing;
+              }
 
               // 限制菜单不超出屏幕
               const double menuWidth = 220;
@@ -131,7 +171,7 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
                     top: top,
                     child: Material(
                       color: Colors.transparent,
-                      child: _buildMenu(context),
+                      child: _buildMenu(context, menuHeight),
                     ),
                   ),
                 ],
@@ -144,12 +184,12 @@ class _MoreTabMenuWidgetState extends State<MoreTabMenuWidget> {
   }
 }
 
-class MoreTabMenuItemWidget extends StatefulWidget {
-  final double? height;
+class OverlayMenuItem extends StatefulWidget {
+  final double height;
   final Widget child;
   final void Function() onTabSelected;
 
-  const MoreTabMenuItemWidget({
+  const OverlayMenuItem({
     Key? key,
     required this.height,
     required this.child,
@@ -157,10 +197,10 @@ class MoreTabMenuItemWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MoreTabMenuItemWidget> createState() => _MoreTabMenuItemWidgetState();
+  State<OverlayMenuItem> createState() => _OverlayMenuItemState();
 }
 
-class _MoreTabMenuItemWidgetState extends State<MoreTabMenuItemWidget> {
+class _OverlayMenuItemState extends State<OverlayMenuItem> {
   bool _hovering = false;
 
   @override
@@ -169,14 +209,28 @@ class _MoreTabMenuItemWidgetState extends State<MoreTabMenuItemWidget> {
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
       child: SizedBox(
-        height: widget.height ?? 35,
+        height: widget.height,
         child: Container(
-          color: _hovering
-              ? Theme.of(context).colorScheme.surfaceContainer
-              : Theme.of(context).colorScheme.surfaceBright,
+          color:
+              _hovering ? Theme.of(context).colorScheme.surfaceContainer : null,
           child: widget.child,
         ),
       ),
+    );
+  }
+}
+
+class OverlayMenuFooter extends StatelessWidget {
+  final double height;
+  final Widget child;
+  const OverlayMenuFooter({Key? key, required this.height, required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: child,
     );
   }
 }

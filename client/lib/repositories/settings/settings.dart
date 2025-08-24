@@ -38,9 +38,10 @@ class SettingsRepoImpl implements SettingsRepo {
   }
 
   @override
-  SettingModel getSettings() {
+  SystemSettingModel getSettings() {
     final settings = _getSettings();
-    return SettingModel(theme: settings.theme, language: settings.language);
+    return SystemSettingModel(
+        theme: settings.theme, language: settings.language);
   }
 
   @override

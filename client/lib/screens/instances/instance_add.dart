@@ -13,7 +13,7 @@ import 'package:sql_editor/re_editor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sql_parser/parser.dart';
 import 'package:client/utils/sql_highlight.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/widgets/loading.dart';
 
 class AddInstancePage extends StatefulWidget {
@@ -730,13 +730,8 @@ class AddInstanceController extends ChangeNotifier {
 
   final CodeLineEditingController code = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
-    return TextSpan(
-        children: Lexer(codeLines.asString(TextLineBreak.lf))
-            .tokens()
-            .map<TextSpan>((tok) => TextSpan(
-                text: tok.content,
-                style: style.merge(getStyle(tok.id) ?? style)))
-            .toList());
+    return getSQLHighlightTextSpan(codeLines.asString(TextLineBreak.lf),
+        defalutStyle: style);
   });
 
   DatabaseType selectedDatabaseType = DatabaseType.mysql;

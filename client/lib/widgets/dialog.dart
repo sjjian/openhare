@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:client/l10n/app_localizations.dart';
 
 // 二次确认的对话框，确认后执行onConfirm, 点击取消或关闭对话框则不执行
 void doActionDialog(

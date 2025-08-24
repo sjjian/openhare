@@ -1,20 +1,19 @@
+import 'package:client/models/ai.dart';
 import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/repositories/sessions/sessions.dart';
+import 'package:client/services/ai/chat.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
+import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/utils/sql_highlight.dart';
-import 'package:client/widgets/split_view.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:multi_split_view/multi_split_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
-import 'package:sql_parser/parser.dart';
 import 'package:excel/excel.dart' as excel;
 
 part 'sessions.g.dart';
@@ -105,10 +104,15 @@ class SessionsServices extends _$SessionsServices {
     // 3. delete result
     ref.read(sqlResultsRepoProvider).deleteSQLResults(session.sessionId);
 
-    // 4. delete provider status
+    // 4. delete ai chat
+    ref
+        .read(aIChatServiceProvider.notifier)
+        .delete(AIChatId(value: session.sessionId.value));
+
+    // 5. delete provider status
     ref.invalidate(sessionSQLEditorServiceProvider(session.sessionId));
-    ref.invalidate(sessionSplitViewStateProvider(session.sessionId));
-    ref.invalidate(sessionDrawerStateProvider(session.sessionId));
+    ref.invalidate(sessionDrawerServicesProvider(session.sessionId));
+    SessionController.removeSessionController(session.sessionId);
 
     ref.invalidateSelf();
   }
@@ -178,14 +182,8 @@ class SessionSQLEditorService extends _$SessionSQLEditorService {
   SessionEditorModel build(SessionId sessionId) {
     final controller = CodeLineEditingController(
       spanBuilder: ({required codeLines, required context, required style}) {
-        return TextSpan(
-          children: Lexer(codeLines.asString(TextLineBreak.lf))
-              .tokens()
-              .map<TextSpan>((tok) => TextSpan(
-                  text: tok.content,
-                  style: style.merge(getStyle(tok.id) ?? style)))
-              .toList(),
-        );
+        return getSQLHighlightTextSpan(codeLines.asString(TextLineBreak.lf),
+            defalutStyle: style);
       },
     );
 
@@ -200,21 +198,41 @@ class SessionSQLEditorService extends _$SessionSQLEditorService {
 }
 
 @Riverpod(keepAlive: true)
-SessionDrawerModel sessionDrawerState(Ref ref, SessionId sessionId) {
-  return const SessionDrawerModel(
-      drawerPage: DrawerPage.metadataTree,
-      sqlResult: null,
-      sqlColumn: null,
-      showRecord: false,
-      isRightPageOpen: true);
-}
+class SessionDrawerServices extends _$SessionDrawerServices {
+  @override
+  SessionDrawerModel build(SessionId sessionId) {
+    return SessionDrawerModel(
+        sessionId: sessionId,
+        drawerPage: DrawerPage.metadataTree,
+        sqlResult: null,
+        sqlColumn: null,
+        showRecord: false,
+        isRightPageOpen: true);
+  }
 
-@Riverpod(keepAlive: true)
-SessionSplitViewModel sessionSplitViewState(Ref ref, SessionId sessionId) {
-  return SessionSplitViewModel(
-      multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
-      metaDataSplitViewCtrl:
-          SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)));
+  void showRightPage() {
+    state = state.copyWith(isRightPageOpen: true);
+  }
+
+  void hideRightPage() {
+    state = state.copyWith(isRightPageOpen: false);
+  }
+
+  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
+    state = state.copyWith(
+      drawerPage: DrawerPage.sqlResult,
+      sqlColumn: column ?? state.sqlColumn,
+      sqlResult: result ?? state.sqlResult,
+    );
+  }
+
+  void goToTree() {
+    state = state.copyWith(drawerPage: DrawerPage.metadataTree);
+  }
+
+  void showChat() {
+    state = state.copyWith(drawerPage: DrawerPage.aiChat);
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -277,53 +295,16 @@ class SelectedSessionNotifier extends _$SelectedSessionNotifier {
 }
 
 @Riverpod(keepAlive: true)
-class SessionSplitViewNotifier extends _$SessionSplitViewNotifier {
-  @override
-  SessionSplitViewModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return ref.watch(sessionSplitViewStateProvider(
-          const SessionId(value: 0))); // todo: 空值处理
-    }
-    return ref.watch(sessionSplitViewStateProvider(sessionModel.sessionId));
-  }
-}
-
-@Riverpod(keepAlive: true)
 class SessionDrawerNotifier extends _$SessionDrawerNotifier {
   @override
   SessionDrawerModel build() {
     SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
-      return ref.watch(sessionDrawerStateProvider(const SessionId(value: 0)));
+      return ref
+          .watch(sessionDrawerServicesProvider(const SessionId(value: 0)));
     }
-    return ref.watch(sessionDrawerStateProvider(sessionModel.sessionId));
-  }
-
-  void showRightPage() {
-    state = state.copyWith(isRightPageOpen: true);
-  }
-
-  void hideRightPage() {
-    state = state.copyWith(isRightPageOpen: false);
-  }
-
-  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
-    state = state.copyWith(
-      drawerPage: DrawerPage.sqlResult,
-      sqlColumn: column ?? state.sqlColumn,
-      sqlResult: result ?? state.sqlResult,
-    );
-  }
-
-  void goToTree() {
-    state = state.copyWith(
-      drawerPage: DrawerPage.metadataTree,
-      sqlColumn: null,
-      sqlResult: null,
-    );
+    return ref.watch(sessionDrawerServicesProvider(sessionModel.sessionId));
   }
 }
 

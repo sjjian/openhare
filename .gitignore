@@ -2,3 +2,4 @@
 .idea
 test.sql
 .DS_Store
+client/lib/l10n/*.dart

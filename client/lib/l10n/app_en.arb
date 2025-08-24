@@ -1,7 +1,23 @@
 {
-  "sys_settings": "System settings",
-  "@sys_settings": {
-    "description": "System settings"
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings"
+  },
+  "preferences": "Preferences",
+  "@preferences": {
+    "description": "Preferences"
+  },
+  "llm_api": "LLM API",
+  "@llm_api": {
+    "description": "LLM API"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Create"
   },
   "language": "Language",
   "@language": {
@@ -202,5 +218,25 @@
   "tip_close_session_desc": "This action will kill the query and close the connection, are you sure you want to close the active session? ",
   "@tip_close_session_desc": {
     "description": "tips when close active session desc"
+  },
+  "ai_chat_input_tip": "Please enter your question...",
+  "@ai_chat_input_tip": {
+    "description": "AI chat input tip"
+  },
+  "ai_chat_table_tip": "Please select a schema in the top left corner first",
+  "@ai_chat_table_tip": {
+    "description": "AI chat table tip"
+  },
+  "ai_chat_guide_tip": "No model added, cannot use AI chat",
+  "@ai_chat_guide_tip": {
+    "description": "AI chat guide tip"
+  },
+  "ai_chat_guide_tip_add_model": "Add now",
+  "@ai_chat_guide_tip_add_model": {
+    "description": "AI chat guide tip add model"
+  },
+  "ai_chat_table_tip_more_than_10": "Too many tables (more than 10) may affect performance and use too many tokens",
+  "@ai_chat_table_tip_more_than_10": {
+    "description": "AI chat table tip more than 10"
   }
 }

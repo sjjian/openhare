@@ -67,6 +67,8 @@ dependencies:
   intl: any
   url_launcher: ^6.1.12
   package_info_plus: ^8.3.0
+  gpt_markdown: ^1.1.2
+  llm_dart: ^0.9.0
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +91,8 @@ dev_dependencies:
 
 dependency_overrides:
   analyzer_plugin: ^0.13.1
+  flutter_math_fork: 0.7.4
+  intl: 0.20.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
