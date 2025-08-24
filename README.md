@@ -15,7 +15,9 @@ openhare is a professional, cross-platform desktop SQL query tool built with Flu
 
 ## Roadmap
 1. [x] AI editor;
-2. [] Support more database;
+2. [ ] Support more database;
+3. [ ] AI code completion;
+4. [ ] Data import/export.
 
 ## Framework
 ### Application
