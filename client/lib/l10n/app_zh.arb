@@ -57,5 +57,6 @@
     "ai_chat_input_tip": "请输入你的问题...",
     "ai_chat_table_tip": "请在左上角选择一个 schema 后才可以使用表进行AI问答",
     "ai_chat_guide_tip": "没有添加模型，无法使用对话问答功能",
-    "ai_chat_guide_tip_add_model": "添加模型"
+    "ai_chat_guide_tip_add_model": "添加模型",
+    "ai_chat_table_tip_more_than_10": "表过多，超过10，可能影响性能并消耗过多token"
 }

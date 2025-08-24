@@ -234,5 +234,9 @@
   "ai_chat_guide_tip_add_model": "Add now",
   "@ai_chat_guide_tip_add_model": {
     "description": "AI chat guide tip add model"
+  },
+  "ai_chat_table_tip_more_than_10": "Too many tables (more than 10) may affect performance and use too many tokens",
+  "@ai_chat_table_tip_more_than_10": {
+    "description": "AI chat table tip more than 10"
   }
 }

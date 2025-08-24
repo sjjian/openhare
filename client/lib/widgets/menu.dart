@@ -10,6 +10,9 @@ class OverlayMenu extends StatefulWidget {
   // 支持设置弹窗的间距。默认0
   final double spacing;
 
+  // 支持设置点击菜单项后是否关闭菜单。默认关闭
+  final bool closeOnSelectItem;
+
   const OverlayMenu({
     Key? key,
     this.maxHeight = 400,
@@ -18,6 +21,7 @@ class OverlayMenu extends StatefulWidget {
     this.footer,
     this.isAbove = false,
     this.spacing = 0,
+    this.closeOnSelectItem = true,
   }) : super(key: key);
 
   @override
@@ -81,10 +85,12 @@ class _OverlayMenuState extends State<OverlayMenu> {
                   InkWell(
                     onTap: () {
                       widget.tabs[i].onTabSelected();
-                      setState(() {
-                        _showingMenu = false;
-                      });
-                      _portalController.hide();
+                      if (widget.closeOnSelectItem) {
+                        setState(() {
+                          _showingMenu = false;
+                        });
+                        _portalController.hide();
+                      }
                     },
                     child: widget.tabs[i],
                   )

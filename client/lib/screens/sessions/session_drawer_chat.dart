@@ -174,6 +174,9 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
       ),
     );
 
+    final tableCount =
+        model.chatModel.tables[model.currentSchema ?? ""]?.length ?? 0;
+
     // 表选择工具栏
     final tableToolWidget = IntrinsicWidth(
       child: Container(
@@ -200,11 +203,22 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
             ),
             const SizedBox(width: kSpacingTiny),
             Expanded(
-              child: Text(
-                "+${model.chatModel.tables[model.currentSchema ?? ""]?.length ?? 0}",
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              child: (tableCount > 10)
+                  ? Tooltip(
+                      message: AppLocalizations.of(context)!.ai_chat_table_tip_more_than_10,
+                      child: Text(
+                        "+$tableCount",
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                      ),
+                    )
+                  : Text(
+                      "+$tableCount",
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
             ),
           ],
         ),
@@ -283,6 +297,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 (model.currentSchema != null && model.currentSchema != "")
                     ? OverlayMenu(
                         isAbove: true,
+                        closeOnSelectItem: false,
                         spacing: kSpacingTiny,
                         tabs: [
                           for (var table
