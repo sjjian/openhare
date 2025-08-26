@@ -79,7 +79,11 @@ class SessionsServices extends _$SessionsServices {
 
     await ref.read(sessionRepoProvider).updateSession(selectedSessionId,
         instance: instance, currentSchema: schema);
+
     ref.invalidateSelf();
+    
+    // auto connect when new session.
+    connectSession(selectedSessionId);
   }
 
   Future<void> newSession() async {
