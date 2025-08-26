@@ -106,7 +106,7 @@ class SessionOpBar extends ConsumerWidget {
   Widget connectWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     if (SQLConnectState.isDisconnected(model.state)) {
-      return RectangleIconButton(
+      return RectangleIconButton.medium(
         icon: Icons.link_rounded,
         iconColor: Theme.of(context).primaryColor,
         onPressed: () async {
@@ -119,7 +119,7 @@ class SessionOpBar extends ConsumerWidget {
       return const Loading();
     } else {
       // disconnect
-      return RectangleIconButton(
+      return RectangleIconButton.medium(
         icon: Icons.link_off_rounded,
         iconColor: Theme.of(context).primaryColor,
         onPressed: () async {
@@ -131,9 +131,10 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget executeWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    return RectangleIconButton(
+    return RectangleIconButton.medium(
       icon: Icons.play_circle_outline_rounded,
-      iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
+      iconColor:
+          SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
       onPressed: SQLConnectState.isIdle(model.state)
           ? () {
               String query = getQuery();
@@ -156,9 +157,10 @@ class SessionOpBar extends ConsumerWidget {
   Widget executeAddWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return Stack(alignment: Alignment.center, children: [
-      RectangleIconButton(
+      RectangleIconButton.medium(
         icon: Icons.not_started_outlined,
-        iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
+        iconColor:
+            SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
         onPressed: SQLConnectState.isIdle(model.state)
             ? () {
                 String query = getQuery();
@@ -180,6 +182,7 @@ class SessionOpBar extends ConsumerWidget {
   Widget explainWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton(
+      size: kIconSizeLarge,
       iconSize: kIconSizeLarge,
       icon: Icons.e_mobiledata,
       iconColor: SQLConnectState.isIdle(model.state)
@@ -364,57 +367,42 @@ class SessionDrawerBar extends ConsumerWidget {
       children: [
         const Spacer(),
         if (model.isRightPageOpen) ...[
-          RectangleIconButton(
-              hoverBackgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainer,
+          RectangleIconButton.medium(
+              icon: Icons.account_tree_outlined,
               backgroundColor: (model.drawerPage == DrawerPage.metadataTree)
                   ? Theme.of(context).colorScheme.primaryContainer
                   : null,
-              icon: Icons.account_tree_outlined,
-              iconSize: kIconSizeSmall,
               onPressed: () {
                 services.goToTree();
               }),
-          RectangleIconButton(
-              hoverBackgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainer,
+          RectangleIconButton.medium(
+              icon: Icons.article_outlined,
               backgroundColor: (model.drawerPage == DrawerPage.sqlResult)
                   ? Theme.of(context).colorScheme.primaryContainer
                   : null,
-              icon: Icons.article_outlined,
-              iconSize: kIconSizeSmall,
               onPressed: () {
                 services.showSQLResult();
               }),
           // AI chat
-          RectangleIconButton(
-              hoverBackgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainer,
+          RectangleIconButton.medium(
+              icon: Icons.auto_awesome,
               backgroundColor: (model.drawerPage == DrawerPage.aiChat)
                   ? Theme.of(context).colorScheme.primaryContainer
                   : null,
-              icon: Icons.auto_awesome,
-              iconSize: kIconSizeSmall,
               onPressed: () {
                 services.showChat();
               }),
           const SizedBox(width: kSpacingSmall),
-          RectangleIconButton(
-            hoverBackgroundColor:
-                Theme.of(context).colorScheme.surfaceContainer,
+          RectangleIconButton.medium(
             icon: model.isRightPageOpen ? Icons.menu : Icons.menu_open,
             iconColor: Theme.of(context).colorScheme.onSurface,
-            iconSize: kIconSizeSmall,
             onPressed: () => services.hideRightPage(),
           ),
         ],
         if (!model.isRightPageOpen)
-          RectangleIconButton(
-            hoverBackgroundColor:
-                Theme.of(context).colorScheme.surfaceContainer,
+          RectangleIconButton.medium(
             icon: model.isRightPageOpen ? Icons.menu : Icons.menu_open,
             iconColor: Theme.of(context).colorScheme.onSurface,
-            iconSize: kIconSizeSmall,
             onPressed: () => services.showRightPage(),
           )
       ],

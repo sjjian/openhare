@@ -87,10 +87,9 @@ class SessionStatusTab extends ConsumerWidget {
                 tooltip: model.query ??
                     AppLocalizations.of(context)!.no_query_executed),
             if (model.state == SQLExecuteState.done && model.resultId != null)
-              RectangleIconButton(
+              RectangleIconButton.medium(
                 icon: Icons.download_rounded,
                 iconColor: Colors.green,
-                iconSize: kIconSizeSmall,
                 onPressed: () async {
                   //todo: 下载失效了，需要测试。
                   String? outputFile = await FilePicker.platform.saveFile(

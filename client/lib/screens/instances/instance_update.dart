@@ -37,9 +37,7 @@ class _UpdateInstancePageState extends State<UpdateInstancePage> {
     return PageSkeleton(
       topBar: Row(
         children: [
-          RectangleIconButton(
-            iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
-            iconSize: kIconSizeSmall,
+          RectangleIconButton.medium(
             icon: Icons.arrow_back,
             onPressed: () => GoRouter.of(context).go('/instances/list'),
           )

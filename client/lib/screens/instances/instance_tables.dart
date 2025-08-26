@@ -1,6 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
@@ -71,14 +72,15 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
       DataCell(Text(instance.connectValue.user)),
       DataCell(Row(
         children: [
-          IconButton(
+          RectangleIconButton.small(
+            icon: Icons.edit,
             onPressed: () {
               updateInstanceController.tryUpdateInstance(instance);
               GoRouter.of(context).go('/instances/update');
             },
-            icon: const Icon(Icons.edit),
           ),
-          IconButton(
+          RectangleIconButton.small(
+            icon: Icons.delete,
             onPressed: () async {
               await ref
                   .read(instancesServicesProvider.notifier)
@@ -86,11 +88,10 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
 
               ref.read(instancesNotifierProvider.notifier).refresh();
             },
-            icon: const Icon(Icons.delete),
           ),
-          IconButton(
+          RectangleIconButton.small(
+            icon: Icons.more_vert_outlined,
             onPressed: () {},
-            icon: const Icon(Icons.more_vert_outlined),
           )
         ],
       ))

@@ -3,6 +3,7 @@ import 'package:client/models/settings.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:client/services/ai/agent.dart';
 import 'package:client/services/settings/settings.dart';
+import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
@@ -347,9 +348,8 @@ class LLMApiSettingItem extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                IconButton(
-                  iconSize: kIconSizeSmall,
-                  icon: const Icon(Icons.close),
+                RectangleIconButton.small(
+                  icon: Icons.close,
                   onPressed: () {
                     onDelete(model.id); // todo: 需要二次确认
                   },
@@ -377,28 +377,26 @@ class LLMApiSettingItem extends ConsumerWidget {
                 const Spacer(),
                 switch (status.state) {
                   LLMAgentState.testing => const Loading(),
-                  LLMAgentState.available => IconButton(
-                      iconSize: kIconSizeSmall,
-                      icon: const Icon(Icons.check_circle_outline,
-                          color: Colors.green),
+                  LLMAgentState.available => RectangleIconButton.small(
+                      icon: Icons.check_circle_outline,
+                      iconColor: Colors.green,
                       onPressed: () {
                         ref
                             .read(lLMAgentServiceProvider.notifier)
                             .ping(model.id);
                       },
                     ),
-                  LLMAgentState.unavailable => IconButton(
-                      iconSize: kIconSizeSmall,
-                      icon: const Icon(Icons.error_outline, color: Colors.red),
+                  LLMAgentState.unavailable => RectangleIconButton.small(
+                      icon: Icons.error_outline,
+                      iconColor: Colors.red,
                       onPressed: () {
                         ref
                             .read(lLMAgentServiceProvider.notifier)
                             .ping(model.id);
                       },
                     ),
-                  LLMAgentState.unknown => IconButton(
-                      iconSize: kIconSizeSmall,
-                      icon: const Icon(Icons.flash_on),
+                  LLMAgentState.unknown => RectangleIconButton.small(
+                      icon: Icons.flash_on,
                       onPressed: () {
                         ref
                             .read(lLMAgentServiceProvider.notifier)
@@ -406,10 +404,8 @@ class LLMApiSettingItem extends ConsumerWidget {
                       },
                     ),
                 },
-                const SizedBox(width: kSpacingTiny),
-                IconButton(
-                  iconSize: kIconSizeSmall,
-                  icon: const Icon(Icons.edit),
+                RectangleIconButton.small(
+                  icon: Icons.edit,
                   onPressed: () {
                     showLLMApiSettingDialog(
                       context,
@@ -453,9 +449,11 @@ class AddLLMApiSettingItem extends StatelessWidget {
               onAdd,
             );
           },
-          icon: Icon(Icons.add,
-              size: kIconSizeLarge,
-              color: Theme.of(context).colorScheme.surfaceDim),
+          icon: Icon(
+            Icons.add,
+            size: kIconSizeLarge,
+            color: Theme.of(context).colorScheme.primary, // 添加模型的按钮颜色
+          ),
         ),
       ),
     );

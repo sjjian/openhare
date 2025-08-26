@@ -4,8 +4,8 @@ import 'const.dart';
 
 class RectangleIconButton extends StatefulWidget {
   final IconData icon;
-  final double? size;
-  final double? iconSize;
+  final double size;
+  final double iconSize;
   final Color? iconColor;
   final Color? backgroundColor;
   final Color? hoverBackgroundColor;
@@ -15,12 +15,45 @@ class RectangleIconButton extends StatefulWidget {
       {Key? key,
       required this.icon,
       this.onPressed,
-      this.size = 36,
-      this.iconSize = 24,
+      required this.size,
+      required this.iconSize,
       this.iconColor,
       this.backgroundColor,
       this.hoverBackgroundColor})
       : super(key: key);
+
+  const RectangleIconButton.medium({
+    Key? key,
+    required this.icon,
+    this.onPressed,
+    this.iconColor,
+    this.backgroundColor,
+    this.hoverBackgroundColor,
+  })  : size = kIconSizeMedium * 1.5,
+        iconSize = kIconSizeMedium,
+        super(key: key);
+
+  const RectangleIconButton.small(
+      {Key? key,
+      required this.icon,
+      this.onPressed,
+      this.iconColor,
+      this.backgroundColor,
+      this.hoverBackgroundColor})
+      : size = kIconSizeSmall * 1.5,
+        iconSize = kIconSizeSmall,
+        super(key: key);
+
+  const RectangleIconButton.tiny(
+      {Key? key,
+      required this.icon,
+      this.onPressed,
+      this.iconColor,
+      this.backgroundColor,
+      this.hoverBackgroundColor})
+      : size = kIconSizeTiny * 1.5,
+        iconSize = kIconSizeTiny,
+        super(key: key);
 
   @override
   State<RectangleIconButton> createState() => _RectangleIconButtonState();
@@ -50,21 +83,25 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
         },
         child: GestureDetector(
           onTap: widget.onPressed,
-          child: Container(
-            width: widget.size,
-            height: widget.size,
-            decoration: BoxDecoration(
-              color: _isHovering
-                  ? widget.hoverBackgroundColor ??
-                      Theme.of(context)
-                          .colorScheme
-                          .surfaceContainer // icon button 鼠标悬浮的颜色
-                  : widget.backgroundColor, // icon button 背景色
-            ),
-            child: Icon(
-              widget.icon,
-              color: widget.iconColor,
-              size: widget.iconSize,
+          child: Padding(
+            padding: const EdgeInsets.all(2),
+            child: Container(
+              width: widget.size - 4,
+              height: widget.size - 4,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(widget.size * 0.2),
+                color: _isHovering
+                    ? widget.hoverBackgroundColor ??
+                        Theme.of(context)
+                            .colorScheme
+                            .primaryContainer // icon button 鼠标悬浮的颜色
+                    : widget.backgroundColor, // icon button 背景色
+              ),
+              child: Icon(
+                widget.icon,
+                color: widget.iconColor,
+                size: widget.iconSize - 4,
+              ),
             ),
           ),
         ));

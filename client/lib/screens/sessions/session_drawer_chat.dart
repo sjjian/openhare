@@ -461,9 +461,8 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 const Spacer(),
 
                 // 清空聊天记录
-                IconButton(
-                  iconSize: kIconSizeTiny,
-                  icon: const Icon(Icons.cleaning_services),
+                RectangleIconButton.small(
+                  icon: Icons.cleaning_services,
                   onPressed: model.canClearMessage()
                       ? () => services.cleanMessages(model.chatModel.id)
                       : null,
@@ -472,9 +471,8 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 // 发送消息
                 (model.chatModel.state == AIChatState.waiting)
                     ? const Loading.small()
-                    : IconButton(
-                        iconSize: kIconSizeTiny,
-                        icon: const Icon(Icons.send),
+                    : RectangleIconButton.small(
+                        icon: Icons.send,
                         onPressed: model.canSendMessage()
                             ? () => _sendMessage(model.chatModel.id, model)
                             : null,
@@ -517,16 +515,14 @@ class _SqlChatFieldState extends State<SqlChatField> {
                 child: Text("SQL"),
               ),
               const Spacer(),
-              RectangleIconButton(
-                iconSize: kIconSizeSmall,
+              RectangleIconButton.small(
                 icon: Icons.not_started_outlined,
                 iconColor: (widget.onRun != null) ? Colors.green : Colors.grey,
                 onPressed: () {
                   widget.onRun?.call(widget.codes);
                 },
               ),
-              RectangleIconButton(
-                iconSize: kIconSizeSmall,
+              RectangleIconButton.small(
                 icon: (_copied) ? Icons.done : Icons.content_paste,
                 onPressed: () async {
                   await Clipboard.setData(
@@ -698,9 +694,7 @@ class SessionChatMessages extends ConsumerWidget {
                 const SizedBox(height: kSpacingTiny),
                 Row(
                   children: [
-                    RectangleIconButton(
-                      size: kIconSizeSmall,
-                      iconSize: kIconSizeTiny,
+                    RectangleIconButton.tiny(
                       icon: Icons.refresh,
                       onPressed: () {
                         _retryMessage(context, ref, model, message);
