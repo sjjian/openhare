@@ -238,5 +238,61 @@
   "ai_chat_table_tip_more_than_10": "Too many tables (more than 10) may affect performance and use too many tokens",
   "@ai_chat_table_tip_more_than_10": {
     "description": "AI chat table tip more than 10"
+  },
+  "button_tooltip_clear_chat": "Clear chat history",
+  "@button_tooltip_clear_chat": {
+    "description": "Button tooltip clear chat history"
+  },
+  "button_tooltip_send_message": "Send message",
+  "@button_tooltip_send_message": {
+    "description": "Button tooltip send message"
+  },
+  "button_tooltip_run_sql": "Run SQL on current tab",
+  "@button_tooltip_run_sql": {
+    "description": "Button tooltip run SQL on current tab"
+  },
+  "button_tooltip_run_sql_new_tab": "Run SQL on new tab",
+  "@button_tooltip_run_sql_new_tab": {
+    "description": "Button tooltip run SQL on new tab"
+  },
+  "button_tooltip_copy_sql": "Copy SQL text",
+  "@button_tooltip_copy_sql": {
+    "description": "Button tooltip copy SQL text"
+  },
+  "button_tooltip_retry_message": "Retry from current message",
+  "@button_tooltip_retry_message": {
+    "description": "Button tooltip retry from current message"
+  },
+  "button_tooltip_connect": "Connect to database",
+  "@button_tooltip_connect": {
+    "description": "Button tooltip connect to database"
+  },
+  "button_tooltip_disconnect": "Disconnect from database",
+  "@button_tooltip_disconnect": {
+    "description": "Button tooltip disconnect from database"
+  },
+  "button_tooltip_explain_sql": "Explain SQL",
+  "@button_tooltip_explain_sql": {
+    "description": "Button tooltip explain SQL"
+  },
+  "button_tooltip_metadata_tree": "Database metadata",
+  "@button_tooltip_metadata_tree": {
+    "description": "Button tooltip database metadata"
+  },
+  "button_tooltip_sql_result": "SQL result view",
+  "@button_tooltip_sql_result": {
+    "description": "Button tooltip SQL result view"
+  },
+  "button_tooltip_ai_chat": "AI chat",
+  "@button_tooltip_ai_chat": {
+    "description": "Button tooltip AI chat"
+  },
+  "button_tooltip_sql_result_download": "Download SQL result",
+  "@button_tooltip_sql_result_download": {
+    "description": "Button tooltip download SQL result"
+  },
+  "button_tooltip_ai_test": "Test LLM API",
+  "@button_tooltip_ai_test": {
+    "description": "Button tooltip test LLM API"
   }
 }

@@ -107,6 +107,7 @@ class SessionOpBar extends ConsumerWidget {
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     if (SQLConnectState.isDisconnected(model.state)) {
       return RectangleIconButton.medium(
+        tooltip: AppLocalizations.of(context)!.button_tooltip_connect,
         icon: Icons.link_rounded,
         iconColor: Theme.of(context).primaryColor,
         onPressed: () async {
@@ -120,6 +121,7 @@ class SessionOpBar extends ConsumerWidget {
     } else {
       // disconnect
       return RectangleIconButton.medium(
+        tooltip: AppLocalizations.of(context)!.button_tooltip_disconnect,
         icon: Icons.link_off_rounded,
         iconColor: Theme.of(context).primaryColor,
         onPressed: () async {
@@ -132,6 +134,7 @@ class SessionOpBar extends ConsumerWidget {
   Widget executeWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
+      tooltip: AppLocalizations.of(context)!.button_tooltip_run_sql,
       icon: Icons.play_circle_outline_rounded,
       iconColor:
           SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
@@ -158,6 +161,7 @@ class SessionOpBar extends ConsumerWidget {
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return Stack(alignment: Alignment.center, children: [
       RectangleIconButton.medium(
+        tooltip: AppLocalizations.of(context)!.button_tooltip_run_sql_new_tab,
         icon: Icons.not_started_outlined,
         iconColor:
             SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
@@ -182,6 +186,7 @@ class SessionOpBar extends ConsumerWidget {
   Widget explainWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton(
+      tooltip: AppLocalizations.of(context)!.button_tooltip_explain_sql,
       size: kIconSizeLarge,
       iconSize: kIconSizeLarge,
       icon: Icons.e_mobiledata,
@@ -368,6 +373,7 @@ class SessionDrawerBar extends ConsumerWidget {
         const Spacer(),
         if (model.isRightPageOpen) ...[
           RectangleIconButton.medium(
+              tooltip: AppLocalizations.of(context)!.button_tooltip_metadata_tree,
               icon: Icons.account_tree_outlined,
               backgroundColor: (model.drawerPage == DrawerPage.metadataTree)
                   ? Theme.of(context).colorScheme.primaryContainer
@@ -376,6 +382,7 @@ class SessionDrawerBar extends ConsumerWidget {
                 services.goToTree();
               }),
           RectangleIconButton.medium(
+              tooltip: AppLocalizations.of(context)!.button_tooltip_sql_result,
               icon: Icons.article_outlined,
               backgroundColor: (model.drawerPage == DrawerPage.sqlResult)
                   ? Theme.of(context).colorScheme.primaryContainer
@@ -385,6 +392,7 @@ class SessionDrawerBar extends ConsumerWidget {
               }),
           // AI chat
           RectangleIconButton.medium(
+              tooltip: AppLocalizations.of(context)!.button_tooltip_ai_chat,
               icon: Icons.auto_awesome,
               backgroundColor: (model.drawerPage == DrawerPage.aiChat)
                   ? Theme.of(context).colorScheme.primaryContainer

@@ -378,6 +378,7 @@ class LLMApiSettingItem extends ConsumerWidget {
                 switch (status.state) {
                   LLMAgentState.testing => const Loading.small(),
                   LLMAgentState.available => RectangleIconButton.small(
+                      tooltip: AppLocalizations.of(context)!.button_tooltip_ai_test,
                       icon: Icons.check_circle_outline,
                       iconColor: Colors.green,
                       onPressed: () {
@@ -396,6 +397,7 @@ class LLMApiSettingItem extends ConsumerWidget {
                       },
                     ),
                   LLMAgentState.unknown => RectangleIconButton.small(
+                    tooltip: AppLocalizations.of(context)!.button_tooltip_ai_test,
                       icon: Icons.flash_on,
                       onPressed: () {
                         ref

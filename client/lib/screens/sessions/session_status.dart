@@ -88,6 +88,7 @@ class SessionStatusTab extends ConsumerWidget {
                     AppLocalizations.of(context)!.no_query_executed),
             if (model.state == SQLExecuteState.done && model.resultId != null)
               RectangleIconButton.medium(
+                tooltip: AppLocalizations.of(context)!.button_tooltip_sql_result_download,
                 icon: Icons.download_rounded,
                 iconColor: Colors.green,
                 onPressed: () async {

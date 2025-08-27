@@ -462,6 +462,8 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
 
                 // 清空聊天记录
                 RectangleIconButton.small(
+                  tooltip:
+                      AppLocalizations.of(context)!.button_tooltip_clear_chat,
                   icon: Icons.cleaning_services,
                   onPressed: model.canClearMessage()
                       ? () => services.cleanMessages(model.chatModel.id)
@@ -472,6 +474,8 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 (model.chatModel.state == AIChatState.waiting)
                     ? const Loading.small()
                     : RectangleIconButton.small(
+                        tooltip: AppLocalizations.of(context)!
+                            .button_tooltip_send_message,
                         icon: Icons.send,
                         onPressed: model.canSendMessage()
                             ? () => _sendMessage(model.chatModel.id, model)
@@ -516,6 +520,8 @@ class _SqlChatFieldState extends State<SqlChatField> {
               ),
               const Spacer(),
               RectangleIconButton.small(
+                tooltip: AppLocalizations.of(context)!
+                    .button_tooltip_run_sql_new_tab,
                 icon: Icons.not_started_outlined,
                 iconColor: (widget.onRun != null) ? Colors.green : Colors.grey,
                 onPressed: () {
@@ -523,6 +529,7 @@ class _SqlChatFieldState extends State<SqlChatField> {
                 },
               ),
               RectangleIconButton.small(
+                tooltip: AppLocalizations.of(context)!.button_tooltip_copy_sql,
                 icon: (_copied) ? Icons.done : Icons.content_paste,
                 onPressed: () async {
                   await Clipboard.setData(
@@ -695,6 +702,8 @@ class SessionChatMessages extends ConsumerWidget {
                 Row(
                   children: [
                     RectangleIconButton.small(
+                      tooltip: AppLocalizations.of(context)!
+                          .button_tooltip_retry_message,
                       icon: Icons.refresh,
                       onPressed: () {
                         _retryMessage(context, ref, model, message);

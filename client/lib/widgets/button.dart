@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'const.dart';
 
 class RectangleIconButton extends StatefulWidget {
+  final String? tooltip;
   final IconData icon;
   final double size;
   final double iconSize;
@@ -13,6 +14,7 @@ class RectangleIconButton extends StatefulWidget {
 
   const RectangleIconButton(
       {Key? key,
+      this.tooltip,
       required this.icon,
       this.onPressed,
       required this.size,
@@ -24,6 +26,7 @@ class RectangleIconButton extends StatefulWidget {
 
   const RectangleIconButton.medium({
     Key? key,
+    this.tooltip,
     required this.icon,
     this.onPressed,
     this.iconColor,
@@ -35,6 +38,7 @@ class RectangleIconButton extends StatefulWidget {
 
   const RectangleIconButton.small(
       {Key? key,
+      this.tooltip,
       required this.icon,
       this.onPressed,
       this.iconColor,
@@ -46,6 +50,7 @@ class RectangleIconButton extends StatefulWidget {
 
   const RectangleIconButton.tiny(
       {Key? key,
+      this.tooltip,
       required this.icon,
       this.onPressed,
       this.iconColor,
@@ -64,8 +69,7 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
 
   @override
   Widget build(BuildContext context) {
-    // 需要矩形的鼠标点击鼠标悬浮效果
-    return MouseRegion(
+    final button = MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (value) {
           if (!_isHovering) {
@@ -105,6 +109,14 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
             ),
           ),
         ));
+
+    if (widget.tooltip != null) {
+      return Tooltip(
+        message: widget.tooltip!,
+        child: button,
+      );
+    }
+    return button;
   }
 }
 
