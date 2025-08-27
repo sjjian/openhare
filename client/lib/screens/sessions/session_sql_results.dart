@@ -203,7 +203,7 @@ class SqlResultTable extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Loading.big(),
+              const Loading.large(),
               const SizedBox(height: kSpacingMedium),
               FilledButton(
                   onPressed: () async {

@@ -376,7 +376,7 @@ class LLMApiSettingItem extends ConsumerWidget {
               children: [
                 const Spacer(),
                 switch (status.state) {
-                  LLMAgentState.testing => const Loading(),
+                  LLMAgentState.testing => const Loading.small(),
                   LLMAgentState.available => RectangleIconButton.small(
                       icon: Icons.check_circle_outline,
                       iconColor: Colors.green,

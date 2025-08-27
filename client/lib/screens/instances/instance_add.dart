@@ -678,7 +678,7 @@ class AddInstanceBottomBar extends StatelessWidget {
 
     if (isDatabasePingDoing) {
       msg = Text(AppLocalizations.of(context)!.testing);
-      status = const Loading();
+      status = const Loading.medium();
     } else if (isDatabaseConnectable == null) {
       msg = const Text("");
       status = const Spacer();

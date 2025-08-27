@@ -1,37 +1,46 @@
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 
 class Loading extends StatelessWidget {
-  final double? size;
-  final double? strokeWidth;
-  final EdgeInsetsGeometry? padding;
-  const Loading(
-      {super.key,
-      this.size = 36,
-      this.strokeWidth = 2,
-      this.padding = const EdgeInsets.all(8)});
+  final double size;
+  final double strokeWidth;
+  final double paddingSize;
+  const Loading({
+    super.key,
+    required this.size,
+    required this.strokeWidth,
+    required this.paddingSize,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
-      padding: padding,
-      child: CircularProgressIndicator(
-        strokeWidth: strokeWidth,
+      child: Center(
+        child: SizedBox(
+          width: size - paddingSize * 2,
+          height: size - paddingSize * 2,
+          child: CircularProgressIndicator(
+            strokeWidth: strokeWidth,
+          ),
+        ),
       ),
     );
   }
 
-  // big loading widget
-  const Loading.big(
-      {super.key,
-      this.strokeWidth = 3,
-      this.size = 48,
-      this.padding = const EdgeInsets.all(8)});
+  const Loading.large({super.key})
+      : size = kIconButtonSizeLarge,
+        strokeWidth = 2.5,
+        paddingSize = (kIconButtonSizeLarge - kIconSizeLarge) / 2 + 4;
 
-  const Loading.small(
-      {super.key,
-      this.strokeWidth = 2,
-      this.size = 20,
-      this.padding = const EdgeInsets.all(2)});
+  const Loading.medium({super.key})
+      : strokeWidth = 2,
+        size = kIconButtonSizeMedium,
+        paddingSize = (kIconButtonSizeMedium - kIconSizeMedium) / 2 + 4;
+
+  const Loading.small({super.key})
+      : strokeWidth = 1.5,
+        size = kIconButtonSizeSmall,
+        paddingSize = (kIconButtonSizeSmall - kIconSizeSmall) / 2 + 2;
 }

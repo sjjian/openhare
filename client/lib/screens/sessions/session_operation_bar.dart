@@ -116,7 +116,7 @@ class SessionOpBar extends ConsumerWidget {
         },
       );
     } else if (SQLConnectState.isConnecting(model.state)) {
-      return const Loading();
+      return const Loading.medium();
     } else {
       // disconnect
       return RectangleIconButton.medium(

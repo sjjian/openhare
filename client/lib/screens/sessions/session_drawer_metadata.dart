@@ -142,7 +142,7 @@ class SessionDrawerMetadata extends ConsumerWidget {
     InstanceMetadataModel? model = ref.watch(sessionMetadataNotifierProvider);
     Widget body = const Align(
       alignment: Alignment.center,
-      child: Loading.big(),
+      child: Loading.large(),
     );
 
     RootNode root = RootNode();

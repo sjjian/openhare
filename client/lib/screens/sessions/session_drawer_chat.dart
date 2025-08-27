@@ -694,7 +694,7 @@ class SessionChatMessages extends ConsumerWidget {
                 const SizedBox(height: kSpacingTiny),
                 Row(
                   children: [
-                    RectangleIconButton.tiny(
+                    RectangleIconButton.small(
                       icon: Icons.refresh,
                       onPressed: () {
                         _retryMessage(context, ref, model, message);

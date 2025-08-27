@@ -29,7 +29,7 @@ class RectangleIconButton extends StatefulWidget {
     this.iconColor,
     this.backgroundColor,
     this.hoverBackgroundColor,
-  })  : size = kIconSizeMedium * 1.5,
+  })  : size = kIconButtonSizeMedium,
         iconSize = kIconSizeMedium,
         super(key: key);
 
@@ -40,7 +40,7 @@ class RectangleIconButton extends StatefulWidget {
       this.iconColor,
       this.backgroundColor,
       this.hoverBackgroundColor})
-      : size = kIconSizeSmall * 1.5,
+      : size = kIconButtonSizeSmall,
         iconSize = kIconSizeSmall,
         super(key: key);
 
@@ -51,7 +51,7 @@ class RectangleIconButton extends StatefulWidget {
       this.iconColor,
       this.backgroundColor,
       this.hoverBackgroundColor})
-      : size = kIconSizeTiny * 1.5,
+      : size = kIconButtonSizeTiny,
         iconSize = kIconSizeTiny,
         super(key: key);
 
