@@ -327,6 +327,7 @@ class __$LLMAgentSettingModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$LLMAgentStatusModel {
   LLMAgentState get state;
+  String? get error;
 
   /// Create a copy of LLMAgentStatusModel
   /// with the given fields replaced by the non-null parameter values.
@@ -341,15 +342,16 @@ mixin _$LLMAgentStatusModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is LLMAgentStatusModel &&
-            (identical(other.state, state) || other.state == state));
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.error, error) || other.error == error));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, state);
+  int get hashCode => Object.hash(runtimeType, state, error);
 
   @override
   String toString() {
-    return 'LLMAgentStatusModel(state: $state)';
+    return 'LLMAgentStatusModel(state: $state, error: $error)';
   }
 }
 
@@ -359,7 +361,7 @@ abstract mixin class $LLMAgentStatusModelCopyWith<$Res> {
           LLMAgentStatusModel value, $Res Function(LLMAgentStatusModel) _then) =
       _$LLMAgentStatusModelCopyWithImpl;
   @useResult
-  $Res call({LLMAgentState state});
+  $Res call({LLMAgentState state, String? error});
 }
 
 /// @nodoc
@@ -376,12 +378,17 @@ class _$LLMAgentStatusModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? state = null,
+    Object? error = freezed,
   }) {
     return _then(_self.copyWith(
       state: null == state
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
               as LLMAgentState,
+      error: freezed == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -389,10 +396,12 @@ class _$LLMAgentStatusModelCopyWithImpl<$Res>
 /// @nodoc
 
 class _LLMAgentStatusModel implements LLMAgentStatusModel {
-  const _LLMAgentStatusModel({required this.state});
+  const _LLMAgentStatusModel({required this.state, this.error});
 
   @override
   final LLMAgentState state;
+  @override
+  final String? error;
 
   /// Create a copy of LLMAgentStatusModel
   /// with the given fields replaced by the non-null parameter values.
@@ -408,15 +417,16 @@ class _LLMAgentStatusModel implements LLMAgentStatusModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _LLMAgentStatusModel &&
-            (identical(other.state, state) || other.state == state));
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.error, error) || other.error == error));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, state);
+  int get hashCode => Object.hash(runtimeType, state, error);
 
   @override
   String toString() {
-    return 'LLMAgentStatusModel(state: $state)';
+    return 'LLMAgentStatusModel(state: $state, error: $error)';
   }
 }
 
@@ -428,7 +438,7 @@ abstract mixin class _$LLMAgentStatusModelCopyWith<$Res>
       __$LLMAgentStatusModelCopyWithImpl;
   @override
   @useResult
-  $Res call({LLMAgentState state});
+  $Res call({LLMAgentState state, String? error});
 }
 
 /// @nodoc
@@ -445,12 +455,17 @@ class __$LLMAgentStatusModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? state = null,
+    Object? error = freezed,
   }) {
     return _then(_LLMAgentStatusModel(
       state: null == state
           ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
               as LLMAgentState,
+      error: freezed == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

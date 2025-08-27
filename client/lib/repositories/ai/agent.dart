@@ -123,8 +123,8 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
   }
 
   @override
-  void updateStatus(LLMAgentId id, LLMAgentState state) {
-    _status[id] = LLMAgentStatusModel(state: state);
+  void updateStatus(LLMAgentId id, LLMAgentStatusModel status) {
+    _status[id] = status;
   }
 
   @override

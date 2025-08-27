@@ -388,6 +388,7 @@ class LLMApiSettingItem extends ConsumerWidget {
                       },
                     ),
                   LLMAgentState.unavailable => RectangleIconButton.small(
+                      tooltip: status.error ?? "",
                       icon: Icons.error_outline,
                       iconColor: Colors.red,
                       onPressed: () {

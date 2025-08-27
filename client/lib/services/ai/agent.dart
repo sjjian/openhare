@@ -34,8 +34,8 @@ class LLMAgentService extends _$LLMAgentService {
     ref.invalidateSelf();
   }
 
-  void updateStatus(LLMAgentId id, LLMAgentState state) {
-    ref.read(lLMAgentRepoProvider).updateStatus(id, state);
+  void updateStatus(LLMAgentId id, LLMAgentStatusModel status) {
+    ref.read(lLMAgentRepoProvider).updateStatus(id, status);
     ref.invalidateSelf();
   }
 
@@ -98,7 +98,8 @@ class LLMAgentService extends _$LLMAgentService {
         return;
       }
       final repo = ref.read(lLMAgentRepoProvider);
-      repo.updateStatus(id, LLMAgentState.testing);
+      repo.updateStatus(
+          id, const LLMAgentStatusModel(state: LLMAgentState.testing));
       ref.invalidateSelf();
 
       final provider = await ai()
@@ -114,11 +115,17 @@ class LLMAgentService extends _$LLMAgentService {
       // 如果token为0，则认为接口不可用
       final available = (response.usage?.totalTokens ?? 0) > 0;
       repo.updateStatus(
-          id, available ? LLMAgentState.available : LLMAgentState.unavailable);
+          id,
+          available
+              ? const LLMAgentStatusModel(state: LLMAgentState.available)
+              : const LLMAgentStatusModel(
+                  state: LLMAgentState.unavailable,
+                  error: "api has return 0 tokens"));
     } catch (e) {
-      ref
-          .read(lLMAgentRepoProvider)
-          .updateStatus(id, LLMAgentState.unavailable);
+      ref.read(lLMAgentRepoProvider).updateStatus(
+          id,
+          LLMAgentStatusModel(
+              state: LLMAgentState.unavailable, error: e.toString()));
     } finally {
       ref.invalidateSelf();
     }

@@ -9,7 +9,7 @@ abstract class LLMAgentRepo {
   void create(LLMAgentSettingModel setting);
   void delete(LLMAgentId id);
   LLMAgentModel? getLLMAgentById(LLMAgentId id);
-  void updateStatus(LLMAgentId id, LLMAgentState state);
+  void updateStatus(LLMAgentId id, LLMAgentStatusModel status);
   void updateSetting(LLMAgentId id, LLMAgentSettingModel setting);
 }
 
@@ -51,6 +51,7 @@ abstract class LLMAgentSettingModel with _$LLMAgentSettingModel {
 abstract class LLMAgentStatusModel with _$LLMAgentStatusModel {
   const factory LLMAgentStatusModel({
     required LLMAgentState state,
+    String? error,
   }) = _LLMAgentStatusModel;
 }
 
