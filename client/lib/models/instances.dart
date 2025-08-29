@@ -20,8 +20,8 @@ abstract class InstanceRepo {
 
 abstract class InstanceMetadataRepo {
   InstanceMetadataModel getMetadata(InstanceId instanceId);
-  void updateMetadata(InstanceId instanceId, MetaDataNode metadata);
-  void addMetadata(InstanceId instanceId, MetaDataNode metadata);
+  void updateMetadata(InstanceId instanceId, List<MetaDataNode> metadata);
+  void addMetadata(InstanceId instanceId, List<MetaDataNode> metadata);
 }
 
 // instances model
@@ -81,6 +81,6 @@ abstract class PaginationInstanceListModel with _$PaginationInstanceListModel {
 abstract class InstanceMetadataModel with _$InstanceMetadataModel {
   const factory InstanceMetadataModel({
     required InstanceId instanceId,
-    MetaDataNode? metadata,
+    List<MetaDataNode>? metadata,
   }) = _InstanceMetadataModel;
 }

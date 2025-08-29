@@ -6,10 +6,6 @@ abstract class SettingsRepo {
   SystemSettingModel getSettings();
   void setLanguage(String language);
   void setTheme(String theme);
-  // void addLLMApiSetting(LLMApiSettingModel setting);
-  // void updateLLMApiSetting(LLMApiSettingModel setting);
-  // List<LLMApiSettingModel> getLLMApiSettings();
-  // void removeLLMApiSetting(LLMApiSettingId id);
 }
 
 @freezed

@@ -36,7 +36,7 @@ abstract class SessionConnRepo {
   Future<void> close(ConnId connId);
   Future<void> setCurrentSchema(ConnId connId, String schema);
   Future<List<String>> getSchemas(ConnId connId);
-  Future<MetaDataNode> getMetadata(ConnId connId);
+  Future<List<MetaDataNode>> getMetadata(ConnId connId);
   Future<BaseQueryResult?> query(ConnId connId, String query);
   Future<void> killQuery(ConnId connId);
 }
@@ -202,7 +202,7 @@ abstract class SessionStatusModel with _$SessionStatusModel {
 abstract class SessionSQLEditorModel with _$SessionSQLEditorModel {
   const factory SessionSQLEditorModel({
     String? currentSchema,
-    MetaDataNode? metadata,
+    List<MetaDataNode>? metadata,
   }) = _SessionSQLEditorModel;
 }
 
@@ -285,7 +285,7 @@ abstract class SessionAIChatModel with _$SessionAIChatModel {
     required SessionId sessionId,
     required String? currentSchema,
     required DatabaseType? dbType,
-    required MetaDataNode? metadata,
+    required List<MetaDataNode>? metadata,
     required ConnId? connId,
     required SQLConnectState? state,
     required AIChatModel chatModel,

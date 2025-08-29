@@ -81,7 +81,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
     if (model.metadata == null || model.currentSchema == null) {
       return {};
     }
-    return model.metadata!
+    return MetaDataNode(MetaType.instance, "", items: model.metadata!)
         .getChildren(MetaType.schema, model.currentSchema!)
         .where((e) => e.type == MetaType.table && e.value.contains(searchText))
         .fold({}, (acc, e) => {...acc, e.value: e.value});

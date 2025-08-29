@@ -294,5 +294,25 @@
   "button_tooltip_ai_test": "Test LLM API",
   "@button_tooltip_ai_test": {
     "description": "Button tooltip test LLM API"
+  },
+  "metadata_tree_database": "Database",
+  "@metadata_tree_database": {
+    "description": "Metadata tree database"
+  },
+  "metadata_tree_schema": "Schema",
+  "@metadata_tree_schema": {
+    "description": "Metadata tree schema"
+  },
+  "metadata_tree_table": "Table",
+  "@metadata_tree_table": {
+    "description": "Metadata tree table"
+  },
+  "metadata_tree_column": "Column",
+  "@metadata_tree_column": {
+    "description": "Metadata tree column"
+  },
+  "metadata_tree_instance": "Instance",
+  "@metadata_tree_instance": {
+    "description": "Metadata tree instance"
   }
 }

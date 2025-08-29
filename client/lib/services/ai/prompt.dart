@@ -18,26 +18,27 @@ tips:
 """;
 
 String genChatSystemPrompt(SessionAIChatModel model) {
-    String prompt = chatTemplate;
-    if (model.dbType != null) {
-      prompt = prompt.replaceAll("{dbType}", model.dbType!.name);
-    }
-    final tables = model.chatModel.tables[model.currentSchema ?? ""];
-    // 通过metadata build table 信息
-    final schema =
-        model.metadata?.getChildren(MetaType.schema, model.currentSchema ?? "");
-
-    if (tables == null || tables.isEmpty || schema == null) {
-      return prompt.replaceAll("{tables}", "");
-    }
-
-    final tableInfos = schema.where((e) {
-      if (e.type == MetaType.table && tables.containsKey(e.value)) {
-        return true;
-      }
-      return false;
-    });
-
-    return prompt.replaceAll(
-        "{tables}", tableInfos.map((e) => e.toString()).join("\n"));
+  String prompt = chatTemplate;
+  if (model.dbType != null) {
+    prompt = prompt.replaceAll("{dbType}", model.dbType!.name);
   }
+  final tables = model.chatModel.tables[model.currentSchema ?? ""];
+  // 通过metadata build table 信息
+  final schema = MetaDataNode(MetaType.instance, "", items: model.metadata);
+  final schemaNodes =
+      schema.getChildren(MetaType.schema, model.currentSchema ?? "");
+
+  if (tables == null || tables.isEmpty || schemaNodes.isEmpty) {
+    return prompt.replaceAll("{tables}", "");
+  }
+
+  final tableInfos = schemaNodes.where((e) {
+    if (e.type == MetaType.table && tables.containsKey(e.value)) {
+      return true;
+    }
+    return false;
+  });
+
+  return prompt.replaceAll(
+      "{tables}", tableInfos.map((e) => e.toString()).join("\n"));
+}

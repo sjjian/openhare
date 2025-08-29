@@ -1,9 +1,10 @@
+import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 
 abstract class DataNode {
   List<DataNode> get children;
-  Widget builder(BuildContext context);
+  Widget builder(BuildContext context, bool isOpen);
   Widget closeIcons(BuildContext context);
   Widget openIcons(BuildContext context);
 }
@@ -51,6 +52,8 @@ class MyTreeTile extends StatefulWidget {
 class _MyTreeTileState extends State<MyTreeTile> {
   bool isEnter = false;
 
+  bool get isOpen => widget.entry.hasChildren && widget.entry.isExpanded;
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -74,22 +77,26 @@ class _MyTreeTileState extends State<MyTreeTile> {
               : null,
           child: TreeIndentation(
             entry: widget.entry,
-            guide: const IndentGuide.connectingLines(indent: 20),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            guide: const IndentGuide.scopingLines(
+              indent: 20,
+              thickness: 0,
+            ),
+            child: SizedBox(
+              height: 25,
               child: Row(
                 children: [
-                  FolderButton(
-                    openedIcon: widget.entry.node.openIcons(context),
-                    closedIcon: widget.entry.node.closeIcons(context),
-                    icon: widget.entry.node.openIcons(context),
-                    isOpen: widget.entry.hasChildren
-                        ? widget.entry.isExpanded
-                        : null,
-                    onPressed: widget.entry.hasChildren ? widget.onTap : null,
-                  ),
+                  (widget.entry.hasChildren)
+                      ? (widget.entry.isExpanded)
+                          ? const Icon(Icons.expand_more, size: kIconSizeSmall)
+                          : const Icon(Icons.chevron_right,
+                              size: kIconSizeSmall)
+                      : const SizedBox(width: kIconSizeSmall),
+                  (isOpen)
+                      ? widget.entry.node.openIcons(context)
+                      : widget.entry.node.closeIcons(context),
+                  const SizedBox(width: kSpacingTiny),
                   Expanded(
-                    child: widget.entry.node.builder(context),
+                    child: widget.entry.node.builder(context, isOpen),
                   ),
                 ],
               ),

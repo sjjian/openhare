@@ -72,5 +72,10 @@
     "button_tooltip_sql_result": "SQL结果视图",
     "button_tooltip_ai_chat": "AI对话",
     "button_tooltip_sql_result_download": "下载SQL结果",
-    "button_tooltip_ai_test": "测试 LLM API"
+    "button_tooltip_ai_test": "测试 LLM API",
+    "metadata_tree_database": "数据库",
+    "metadata_tree_schema": "模式",
+    "metadata_tree_table": "表",
+    "metadata_tree_column": "列",
+    "metadata_tree_instance": "实例"
 }

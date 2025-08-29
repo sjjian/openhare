@@ -211,32 +211,21 @@ class MySQLConnection extends BaseConnection {
   }
 
   @override
-  Future<MetaDataNode> metadata() async {
-    MetaDataNode metadata = MetaDataNode(MetaType.instance, "");
+  Future<List<MetaDataNode>> metadata() async {
     List<String> schemas = await this.schemas();
-
-    List<MetaDataNode> schemaNodes = List.empty(growable: true);
-    metadata.items = schemaNodes;
+    List<MetaDataNode> schemaNodes = List.empty(growable: true); 
     for (var schema in schemas) {
       MetaDataNode schemaNode = MetaDataNode(MetaType.schema, schema);
-      // SchemaMeta schemaMeta = SchemaMeta(schema);
       schemaNodes.add(schemaNode);
       List<MetaDataNode> tables = await getTables(schema);
       schemaNode.items = tables;
       for (var table in tables) {
-        // TableMeta tableMeta = TableMeta(table);
-        // schemaMeta.tables.add(tableMeta);
         // todo: 一次性获取所有表信息
         List<MetaDataNode> columns = await getTableColumns(schema, table.value);
-
         table.items = columns;
-
-        // List<TableKeyMeta> keys =
-        //     await session!.conn!.getTableKeys(schema, table);
-        // tableMeta.keys = keys;
       }
     }
-    return metadata;
+    return schemaNodes;
   }
 
   @override

@@ -2356,7 +2356,7 @@ class __$SessionStatusModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$SessionSQLEditorModel {
   String? get currentSchema;
-  MetaDataNode? get metadata;
+  List<MetaDataNode>? get metadata;
 
   /// Create a copy of SessionSQLEditorModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2373,12 +2373,12 @@ mixin _$SessionSQLEditorModel {
             other is SessionSQLEditorModel &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
-            (identical(other.metadata, metadata) ||
-                other.metadata == metadata));
+            const DeepCollectionEquality().equals(other.metadata, metadata));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentSchema, metadata);
+  int get hashCode => Object.hash(runtimeType, currentSchema,
+      const DeepCollectionEquality().hash(metadata));
 
   @override
   String toString() {
@@ -2392,7 +2392,7 @@ abstract mixin class $SessionSQLEditorModelCopyWith<$Res> {
           $Res Function(SessionSQLEditorModel) _then) =
       _$SessionSQLEditorModelCopyWithImpl;
   @useResult
-  $Res call({String? currentSchema, MetaDataNode? metadata});
+  $Res call({String? currentSchema, List<MetaDataNode>? metadata});
 }
 
 /// @nodoc
@@ -2419,7 +2419,7 @@ class _$SessionSQLEditorModelCopyWithImpl<$Res>
       metadata: freezed == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as MetaDataNode?,
+              as List<MetaDataNode>?,
     ));
   }
 }
@@ -2427,12 +2427,21 @@ class _$SessionSQLEditorModelCopyWithImpl<$Res>
 /// @nodoc
 
 class _SessionSQLEditorModel implements SessionSQLEditorModel {
-  const _SessionSQLEditorModel({this.currentSchema, this.metadata});
+  const _SessionSQLEditorModel(
+      {this.currentSchema, final List<MetaDataNode>? metadata})
+      : _metadata = metadata;
 
   @override
   final String? currentSchema;
+  final List<MetaDataNode>? _metadata;
   @override
-  final MetaDataNode? metadata;
+  List<MetaDataNode>? get metadata {
+    final value = _metadata;
+    if (value == null) return null;
+    if (_metadata is EqualUnmodifiableListView) return _metadata;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   /// Create a copy of SessionSQLEditorModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2450,12 +2459,12 @@ class _SessionSQLEditorModel implements SessionSQLEditorModel {
             other is _SessionSQLEditorModel &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
-            (identical(other.metadata, metadata) ||
-                other.metadata == metadata));
+            const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentSchema, metadata);
+  int get hashCode => Object.hash(runtimeType, currentSchema,
+      const DeepCollectionEquality().hash(_metadata));
 
   @override
   String toString() {
@@ -2471,7 +2480,7 @@ abstract mixin class _$SessionSQLEditorModelCopyWith<$Res>
       __$SessionSQLEditorModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String? currentSchema, MetaDataNode? metadata});
+  $Res call({String? currentSchema, List<MetaDataNode>? metadata});
 }
 
 /// @nodoc
@@ -2496,9 +2505,9 @@ class __$SessionSQLEditorModelCopyWithImpl<$Res>
           : currentSchema // ignore: cast_nullable_to_non_nullable
               as String?,
       metadata: freezed == metadata
-          ? _self.metadata
+          ? _self._metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as MetaDataNode?,
+              as List<MetaDataNode>?,
     ));
   }
 }
@@ -3966,7 +3975,7 @@ mixin _$SessionAIChatModel {
   SessionId get sessionId;
   String? get currentSchema;
   DatabaseType? get dbType;
-  MetaDataNode? get metadata;
+  List<MetaDataNode>? get metadata;
   ConnId? get connId;
   SQLConnectState? get state;
   AIChatModel get chatModel;
@@ -3990,8 +3999,7 @@ mixin _$SessionAIChatModel {
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
             (identical(other.dbType, dbType) || other.dbType == dbType) &&
-            (identical(other.metadata, metadata) ||
-                other.metadata == metadata) &&
+            const DeepCollectionEquality().equals(other.metadata, metadata) &&
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.chatModel, chatModel) ||
@@ -4001,8 +4009,16 @@ mixin _$SessionAIChatModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, sessionId, currentSchema, dbType,
-      metadata, connId, state, chatModel, llmAgents);
+  int get hashCode => Object.hash(
+      runtimeType,
+      sessionId,
+      currentSchema,
+      dbType,
+      const DeepCollectionEquality().hash(metadata),
+      connId,
+      state,
+      chatModel,
+      llmAgents);
 
   @override
   String toString() {
@@ -4020,7 +4036,7 @@ abstract mixin class $SessionAIChatModelCopyWith<$Res> {
       {SessionId sessionId,
       String? currentSchema,
       DatabaseType? dbType,
-      MetaDataNode? metadata,
+      List<MetaDataNode>? metadata,
       ConnId? connId,
       SQLConnectState? state,
       AIChatModel chatModel,
@@ -4070,7 +4086,7 @@ class _$SessionAIChatModelCopyWithImpl<$Res>
       metadata: freezed == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as MetaDataNode?,
+              as List<MetaDataNode>?,
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
@@ -4142,12 +4158,13 @@ class _SessionAIChatModel extends SessionAIChatModel {
       {required this.sessionId,
       required this.currentSchema,
       required this.dbType,
-      required this.metadata,
+      required final List<MetaDataNode>? metadata,
       required this.connId,
       required this.state,
       required this.chatModel,
       required this.llmAgents})
-      : super._();
+      : _metadata = metadata,
+        super._();
 
   @override
   final SessionId sessionId;
@@ -4155,8 +4172,16 @@ class _SessionAIChatModel extends SessionAIChatModel {
   final String? currentSchema;
   @override
   final DatabaseType? dbType;
+  final List<MetaDataNode>? _metadata;
   @override
-  final MetaDataNode? metadata;
+  List<MetaDataNode>? get metadata {
+    final value = _metadata;
+    if (value == null) return null;
+    if (_metadata is EqualUnmodifiableListView) return _metadata;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   final ConnId? connId;
   @override
@@ -4184,8 +4209,7 @@ class _SessionAIChatModel extends SessionAIChatModel {
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
             (identical(other.dbType, dbType) || other.dbType == dbType) &&
-            (identical(other.metadata, metadata) ||
-                other.metadata == metadata) &&
+            const DeepCollectionEquality().equals(other._metadata, _metadata) &&
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.chatModel, chatModel) ||
@@ -4195,8 +4219,16 @@ class _SessionAIChatModel extends SessionAIChatModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, sessionId, currentSchema, dbType,
-      metadata, connId, state, chatModel, llmAgents);
+  int get hashCode => Object.hash(
+      runtimeType,
+      sessionId,
+      currentSchema,
+      dbType,
+      const DeepCollectionEquality().hash(_metadata),
+      connId,
+      state,
+      chatModel,
+      llmAgents);
 
   @override
   String toString() {
@@ -4216,7 +4248,7 @@ abstract mixin class _$SessionAIChatModelCopyWith<$Res>
       {SessionId sessionId,
       String? currentSchema,
       DatabaseType? dbType,
-      MetaDataNode? metadata,
+      List<MetaDataNode>? metadata,
       ConnId? connId,
       SQLConnectState? state,
       AIChatModel chatModel,
@@ -4268,9 +4300,9 @@ class __$SessionAIChatModelCopyWithImpl<$Res>
           : dbType // ignore: cast_nullable_to_non_nullable
               as DatabaseType?,
       metadata: freezed == metadata
-          ? _self.metadata
+          ? _self._metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as MetaDataNode?,
+              as List<MetaDataNode>?,
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable

@@ -81,7 +81,7 @@ abstract class BaseConnection {
   Future<BaseQueryResult> query(String sql);
   Future<void> killQuery();
   Future<void> close();
-  Future<MetaDataNode> metadata();
+  Future<List<MetaDataNode>> metadata();
   Future<List<String>> schemas();
   Future<String?> getCurrentSchema();
   Future<void> setCurrentSchema(String schema);
