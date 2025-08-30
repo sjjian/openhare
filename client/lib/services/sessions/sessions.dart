@@ -346,6 +346,26 @@ class SessionMetadataServices extends _$SessionMetadataServices {
       roots: buildMetadataTree(root, items).children,
       childrenProvider: (DataNode node) => node.children,
     );
+
+    root.visitor((node) {
+      // 默认打开 SchemaNode
+      if (node is SchemaNode) {
+        metadataController.setExpansionState(node, true);
+      }
+      // 默认打开 currentSchema 对应的节点
+      if (node is SchemaValueNode && node.name == sessionModel.currentSchema) {
+        metadataController.setExpansionState(node, true);
+      }
+      // 默认打开所有table 节点
+      if (node is TableNode) {
+        metadataController.setExpansionState(node, true);
+      }
+      // 默认打开所有column 节点
+      if (node is ColumnNode) {
+        metadataController.setExpansionState(node, true);
+      }
+      return true;
+    });
     return metadataController;
   }
 }

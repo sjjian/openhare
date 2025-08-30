@@ -12,6 +12,7 @@ abstract class DataNode {
   Widget builder(BuildContext context, bool isOpen);
   Widget closeIcons(BuildContext context);
   Widget openIcons(BuildContext context);
+  void visitor(bool Function(DataNode node) callback);
 }
 
 DataNode buildDataNode(MetaDataNode node) {
@@ -55,11 +56,10 @@ DataNode buildMetadataTree(DataNode parent, List<MetaDataNode>? nodes) {
 }
 
 class RootNode implements DataNode {
-  final String name;
 
   final List<DataNode> _children = List.empty(growable: true);
 
-  RootNode({this.name = ""});
+  RootNode();
 
   @override
   List<DataNode> get children {
@@ -86,26 +86,21 @@ class RootNode implements DataNode {
 
   @override
   Widget builder(context, isOpen) {
-    return Text(
-      children.isNotEmpty ? "$name  [${_children.length}]" : name,
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-    );
+    return const Spacer();
+  }
+
+  @override
+  void visitor(bool Function(DataNode node) callback) {
+    callback(this);
+    for (var node in children) {
+      node.visitor(callback);
+    }
   }
 }
 
 
-class FolderNode implements DataNode {
-  final List<DataNode> _children = List.empty(growable: true);
-
-  FolderNode();
-
-  @override
-  List<DataNode> get children {
-    return _children;
-  }
+class FolderNode extends RootNode {
+  FolderNode() : super();
 
   @override
   Widget openIcons(BuildContext context) {
@@ -180,8 +175,7 @@ class InstanceNode extends FolderNode {
       AppLocalizations.of(context)!.metadata_tree_instance;
 }
 
-class DataValueNode extends DataNode {
-  final List<DataNode> _children = List.empty(growable: true);
+class DataValueNode extends RootNode {
   final String name;
 
   DataValueNode(this.name);
