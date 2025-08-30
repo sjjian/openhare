@@ -10,8 +10,9 @@ import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/utils/sql_highlight.dart';
+import 'package:client/widgets/data_tree.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:excel/excel.dart' as excel;
@@ -81,7 +82,7 @@ class SessionsServices extends _$SessionsServices {
         instance: instance, currentSchema: schema);
 
     ref.invalidateSelf();
-    
+
     // auto connect when new session.
     connectSession(selectedSessionId);
   }
@@ -116,6 +117,7 @@ class SessionsServices extends _$SessionsServices {
     // 5. delete provider status
     ref.invalidate(sessionSQLEditorServiceProvider(session.sessionId));
     ref.invalidate(sessionDrawerServicesProvider(session.sessionId));
+    ref.invalidate(sessionMetadataServicesProvider(session.sessionId));
     SessionController.removeSessionController(session.sessionId);
 
     ref.invalidateSelf();
@@ -313,16 +315,51 @@ class SessionDrawerNotifier extends _$SessionDrawerNotifier {
 }
 
 @Riverpod(keepAlive: true)
+class SessionMetadataServices extends _$SessionMetadataServices {
+  @override
+  TreeController<DataNode>? build(SessionId sessionId) {
+    SessionModel? sessionModel = ref.watch(sessionsServicesProvider.select((s) {
+      for (final session in s.sessions) {
+        if (session.sessionId == sessionId) {
+          return session;
+        }
+      }
+      return null;
+    }));
+
+    if (sessionModel == null || sessionModel.instanceId == null) {
+      return null;
+    }
+    InstanceMetadataModel metadataModel =
+        ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
+    if (metadataModel.metadata == null) {
+      ref
+          .read(instanceMetadataServicesProvider(metadataModel.instanceId)
+              .notifier)
+          .refreshMetadata();
+      return null;
+    }
+
+    List<MetaDataNode> items = metadataModel.metadata!;
+    RootNode root = RootNode();
+    final metadataController = TreeController<DataNode>(
+      roots: buildMetadataTree(root, items).children,
+      childrenProvider: (DataNode node) => node.children,
+    );
+    return metadataController;
+  }
+}
+
+@Riverpod(keepAlive: true)
 class SessionMetadataNotifier extends _$SessionMetadataNotifier {
   @override
-  InstanceMetadataModel? build() {
+  TreeController<DataNode>? build() {
     SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null || sessionModel.instanceId == null) {
       return null;
     }
-    return ref
-        .watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
+    return ref.watch(sessionMetadataServicesProvider(sessionModel.sessionId));
   }
 }
 
@@ -361,12 +398,18 @@ class SelectedSessionSQLEditorNotifier
     if (sessionModel == null) {
       return const SessionSQLEditorModel();
     }
-    InstanceMetadataModel? sessionMeta =
-        ref.watch(sessionMetadataNotifierProvider);
+    if (sessionModel.instanceId != null) {
+      InstanceMetadataModel? sessionMeta =
+          ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
+      return SessionSQLEditorModel(
+        currentSchema: sessionModel.currentSchema,
+        metadata: sessionMeta?.metadata,
+      );
+    }
 
     return SessionSQLEditorModel(
       currentSchema: sessionModel.currentSchema,
-      metadata: sessionMeta?.metadata,
+      metadata: null,
     );
   }
 }
