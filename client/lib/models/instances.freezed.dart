@@ -886,7 +886,7 @@ class __$PaginationInstanceListModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
   InstanceId get instanceId;
-  List<MetaDataNode>? get metadata;
+  StateValue<List<MetaDataNode>> get metadata;
 
   /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -911,12 +911,12 @@ mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
             other is InstanceMetadataModel &&
             (identical(other.instanceId, instanceId) ||
                 other.instanceId == instanceId) &&
-            const DeepCollectionEquality().equals(other.metadata, metadata));
+            (identical(other.metadata, metadata) ||
+                other.metadata == metadata));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, instanceId, const DeepCollectionEquality().hash(metadata));
+  int get hashCode => Object.hash(runtimeType, instanceId, metadata);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -930,7 +930,7 @@ abstract mixin class $InstanceMetadataModelCopyWith<$Res> {
           $Res Function(InstanceMetadataModel) _then) =
       _$InstanceMetadataModelCopyWithImpl;
   @useResult
-  $Res call({InstanceId instanceId, List<MetaDataNode>? metadata});
+  $Res call({InstanceId instanceId, StateValue<List<MetaDataNode>> metadata});
 
   $InstanceIdCopyWith<$Res> get instanceId;
 }
@@ -949,17 +949,17 @@ class _$InstanceMetadataModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? instanceId = null,
-    Object? metadata = freezed,
+    Object? metadata = null,
   }) {
     return _then(_self.copyWith(
       instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      metadata: freezed == metadata
+      metadata: null == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as List<MetaDataNode>?,
+              as StateValue<List<MetaDataNode>>,
     ));
   }
 
@@ -980,20 +980,12 @@ class _InstanceMetadataModel
     with DiagnosticableTreeMixin
     implements InstanceMetadataModel {
   const _InstanceMetadataModel(
-      {required this.instanceId, final List<MetaDataNode>? metadata})
-      : _metadata = metadata;
+      {required this.instanceId, required this.metadata});
 
   @override
   final InstanceId instanceId;
-  final List<MetaDataNode>? _metadata;
   @override
-  List<MetaDataNode>? get metadata {
-    final value = _metadata;
-    if (value == null) return null;
-    if (_metadata is EqualUnmodifiableListView) return _metadata;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
+  final StateValue<List<MetaDataNode>> metadata;
 
   /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1019,12 +1011,12 @@ class _InstanceMetadataModel
             other is _InstanceMetadataModel &&
             (identical(other.instanceId, instanceId) ||
                 other.instanceId == instanceId) &&
-            const DeepCollectionEquality().equals(other._metadata, _metadata));
+            (identical(other.metadata, metadata) ||
+                other.metadata == metadata));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, instanceId, const DeepCollectionEquality().hash(_metadata));
+  int get hashCode => Object.hash(runtimeType, instanceId, metadata);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -1040,7 +1032,7 @@ abstract mixin class _$InstanceMetadataModelCopyWith<$Res>
       __$InstanceMetadataModelCopyWithImpl;
   @override
   @useResult
-  $Res call({InstanceId instanceId, List<MetaDataNode>? metadata});
+  $Res call({InstanceId instanceId, StateValue<List<MetaDataNode>> metadata});
 
   @override
   $InstanceIdCopyWith<$Res> get instanceId;
@@ -1060,17 +1052,17 @@ class __$InstanceMetadataModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? instanceId = null,
-    Object? metadata = freezed,
+    Object? metadata = null,
   }) {
     return _then(_InstanceMetadataModel(
       instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      metadata: freezed == metadata
-          ? _self._metadata
+      metadata: null == metadata
+          ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as List<MetaDataNode>?,
+              as StateValue<List<MetaDataNode>>,
     ));
   }
 

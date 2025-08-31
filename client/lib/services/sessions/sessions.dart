@@ -10,6 +10,7 @@ import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/utils/sql_highlight.dart';
+import 'package:client/utils/state_value.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
@@ -317,7 +318,8 @@ class SessionDrawerNotifier extends _$SessionDrawerNotifier {
 @Riverpod(keepAlive: true)
 class SessionMetadataServices extends _$SessionMetadataServices {
   @override
-  TreeController<DataNode>? build(SessionId sessionId) {
+  SessionMetadataTreeModel? build(SessionId sessionId) {
+    // todo: 感觉开销有点高
     SessionModel? sessionModel = ref.watch(sessionsServicesProvider.select((s) {
       for (final session in s.sessions) {
         if (session.sessionId == sessionId) {
@@ -326,54 +328,88 @@ class SessionMetadataServices extends _$SessionMetadataServices {
       }
       return null;
     }));
-
     if (sessionModel == null || sessionModel.instanceId == null) {
       return null;
     }
-    InstanceMetadataModel metadataModel =
+
+    InstanceMetadataModel? metadataModel =
         ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
-    if (metadataModel.metadata == null) {
+
+    // 如果 metadataModel 为空，则刷新
+    if (metadataModel == null) {
       ref
-          .read(instanceMetadataServicesProvider(metadataModel.instanceId)
+          .read(instanceMetadataServicesProvider(sessionModel.instanceId!)
               .notifier)
           .refreshMetadata();
+
       return null;
     }
 
-    List<MetaDataNode> items = metadataModel.metadata!;
-    RootNode root = RootNode();
-    final metadataController = TreeController<DataNode>(
-      roots: buildMetadataTree(root, items).children,
-      childrenProvider: (DataNode node) => node.children,
-    );
+    return metadataModel.metadata.match(
+      (value) {
+        List<MetaDataNode> items = value;
+        RootNode root = RootNode();
+        final metadataController = TreeController<DataNode>(
+          roots: buildMetadataTree(root, items).children,
+          childrenProvider: (DataNode node) => node.children,
+        );
 
-    root.visitor((node) {
-      // 默认打开 SchemaNode
-      if (node is SchemaNode) {
-        metadataController.setExpansionState(node, true);
-      }
-      // 默认打开 currentSchema 对应的节点
-      if (node is SchemaValueNode && node.name == sessionModel.currentSchema) {
-        metadataController.setExpansionState(node, true);
-      }
-      // 默认打开所有table 节点
-      if (node is TableNode) {
-        metadataController.setExpansionState(node, true);
-      }
-      // 默认打开所有column 节点
-      if (node is ColumnNode) {
-        metadataController.setExpansionState(node, true);
-      }
-      return true;
-    });
-    return metadataController;
+        root.visitor((node) {
+          // 默认打开 SchemaNode
+          if (node is SchemaNode) {
+            metadataController.setExpansionState(node, true);
+          }
+          // 默认打开 currentSchema 对应的节点
+          if (node is SchemaValueNode &&
+              node.name == sessionModel.currentSchema) {
+            metadataController.setExpansionState(node, true);
+          }
+          // 默认打开所有table 节点
+          if (node is TableNode) {
+            metadataController.setExpansionState(node, true);
+          }
+          // 默认打开所有column 节点
+          if (node is ColumnNode) {
+            metadataController.setExpansionState(node, true);
+          }
+          return true;
+        });
+        return SessionMetadataTreeModel(
+          sessionId: sessionId,
+          metadataTreeCtrl: StateValue.done(metadataController),
+        );
+      },
+      (error) {
+        return SessionMetadataTreeModel(
+          sessionId: sessionId,
+          metadataTreeCtrl: StateValue.error(error),
+        );
+      },
+      () {
+        return SessionMetadataTreeModel(
+          sessionId: sessionId,
+          metadataTreeCtrl: const StateValue.running(),
+        );
+      },
+    );
+  }
+
+  Future<void> refresh() async {
+    final model =
+        ref.read(sessionsServicesProvider.notifier).getSession(sessionId);
+    if (model == null || model.instanceId == null) {
+      return;
+    }
+    ref
+        .read(instanceMetadataServicesProvider(model.instanceId!).notifier)
+        .refreshMetadata();
   }
 }
 
 @Riverpod(keepAlive: true)
 class SessionMetadataNotifier extends _$SessionMetadataNotifier {
   @override
-  TreeController<DataNode>? build() {
+  SessionMetadataTreeModel? build() {
     SessionDetailModel? sessionModel =
         ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null || sessionModel.instanceId == null) {
@@ -423,7 +459,8 @@ class SelectedSessionSQLEditorNotifier
           ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
       return SessionSQLEditorModel(
         currentSchema: sessionModel.currentSchema,
-        metadata: sessionMeta?.metadata,
+        metadata: sessionMeta?.metadata
+            .match((value) => value, (error) => null, () => null),
       );
     }
 

@@ -1,3 +1,4 @@
+import 'package:client/utils/state_value.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
@@ -19,9 +20,8 @@ abstract class InstanceRepo {
 }
 
 abstract class InstanceMetadataRepo {
-  InstanceMetadataModel getMetadata(InstanceId instanceId);
-  void updateMetadata(InstanceId instanceId, List<MetaDataNode> metadata);
-  void addMetadata(InstanceId instanceId, List<MetaDataNode> metadata);
+  InstanceMetadataModel? getMetadata(InstanceId instanceId);
+  void updateMetadata(InstanceId instanceId, StateValue<List<MetaDataNode>> metadata);
 }
 
 // instances model
@@ -81,6 +81,6 @@ abstract class PaginationInstanceListModel with _$PaginationInstanceListModel {
 abstract class InstanceMetadataModel with _$InstanceMetadataModel {
   const factory InstanceMetadataModel({
     required InstanceId instanceId,
-    List<MetaDataNode>? metadata,
+    required StateValue<List<MetaDataNode>> metadata,
   }) = _InstanceMetadataModel;
 }

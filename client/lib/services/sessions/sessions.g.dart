@@ -6,7 +6,7 @@ part of 'sessions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionsServicesHash() => r'91f7c9def6d2d27bbd4796a84eb7d330e9825639';
+String _$sessionsServicesHash() => r'41e5b50ee48503cc3bfcff5bfca1a95f2888d925';
 
 /// See also [SessionsServices].
 @ProviderFor(SessionsServices)
@@ -392,13 +392,13 @@ final sessionDrawerNotifierProvider =
 
 typedef _$SessionDrawerNotifier = Notifier<SessionDrawerModel>;
 String _$sessionMetadataServicesHash() =>
-    r'a55f7ce67291c2a4d67611d153aeec8682f71463';
+    r'fb6e8446f4dc27839ef6268b8839763d45a805b6';
 
 abstract class _$SessionMetadataServices
-    extends BuildlessNotifier<TreeController<DataNode>?> {
+    extends BuildlessNotifier<SessionMetadataTreeModel?> {
   late final SessionId sessionId;
 
-  TreeController<DataNode>? build(
+  SessionMetadataTreeModel? build(
     SessionId sessionId,
   );
 }
@@ -408,7 +408,7 @@ abstract class _$SessionMetadataServices
 const sessionMetadataServicesProvider = SessionMetadataServicesFamily();
 
 /// See also [SessionMetadataServices].
-class SessionMetadataServicesFamily extends Family<TreeController<DataNode>?> {
+class SessionMetadataServicesFamily extends Family<SessionMetadataTreeModel?> {
   /// See also [SessionMetadataServices].
   const SessionMetadataServicesFamily();
 
@@ -447,7 +447,7 @@ class SessionMetadataServicesFamily extends Family<TreeController<DataNode>?> {
 
 /// See also [SessionMetadataServices].
 class SessionMetadataServicesProvider extends NotifierProviderImpl<
-    SessionMetadataServices, TreeController<DataNode>?> {
+    SessionMetadataServices, SessionMetadataTreeModel?> {
   /// See also [SessionMetadataServices].
   SessionMetadataServicesProvider(
     SessionId sessionId,
@@ -478,7 +478,7 @@ class SessionMetadataServicesProvider extends NotifierProviderImpl<
   final SessionId sessionId;
 
   @override
-  TreeController<DataNode>? runNotifierBuild(
+  SessionMetadataTreeModel? runNotifierBuild(
     covariant SessionMetadataServices notifier,
   ) {
     return notifier.build(
@@ -503,7 +503,7 @@ class SessionMetadataServicesProvider extends NotifierProviderImpl<
   }
 
   @override
-  NotifierProviderElement<SessionMetadataServices, TreeController<DataNode>?>
+  NotifierProviderElement<SessionMetadataServices, SessionMetadataTreeModel?>
       createElement() {
     return _SessionMetadataServicesProviderElement(this);
   }
@@ -526,14 +526,14 @@ class SessionMetadataServicesProvider extends NotifierProviderImpl<
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin SessionMetadataServicesRef
-    on NotifierProviderRef<TreeController<DataNode>?> {
+    on NotifierProviderRef<SessionMetadataTreeModel?> {
   /// The parameter `sessionId` of this provider.
   SessionId get sessionId;
 }
 
 class _SessionMetadataServicesProviderElement extends NotifierProviderElement<
     SessionMetadataServices,
-    TreeController<DataNode>?> with SessionMetadataServicesRef {
+    SessionMetadataTreeModel?> with SessionMetadataServicesRef {
   _SessionMetadataServicesProviderElement(super.provider);
 
   @override
@@ -542,12 +542,12 @@ class _SessionMetadataServicesProviderElement extends NotifierProviderElement<
 }
 
 String _$sessionMetadataNotifierHash() =>
-    r'f350853151a6d60c0e1485db25d82ab993c68b2c';
+    r'badddcdf7d92972525d7d3ef742b03a1d86f4ab3';
 
 /// See also [SessionMetadataNotifier].
 @ProviderFor(SessionMetadataNotifier)
 final sessionMetadataNotifierProvider = NotifierProvider<
-    SessionMetadataNotifier, TreeController<DataNode>?>.internal(
+    SessionMetadataNotifier, SessionMetadataTreeModel?>.internal(
   SessionMetadataNotifier.new,
   name: r'sessionMetadataNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -557,7 +557,7 @@ final sessionMetadataNotifierProvider = NotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionMetadataNotifier = Notifier<TreeController<DataNode>?>;
+typedef _$SessionMetadataNotifier = Notifier<SessionMetadataTreeModel?>;
 String _$sessionOpBarNotifierHash() =>
     r'dbb26e7ddc0617ce4dda534b460c1e9686eded9b';
 
