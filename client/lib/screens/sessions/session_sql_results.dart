@@ -149,7 +149,16 @@ class SqlResultTable extends ConsumerWidget {
 
     final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
-      return EmptyPage(message: AppLocalizations.of(context)!.display_msg_no_data);
+      return EmptyPage(
+        color: color,
+        child: Text(
+          AppLocalizations.of(context)!.display_msg_no_data,
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(color: Theme.of(context).colorScheme.surfaceDim),
+        ),
+      );
     }
     if (model.state == SQLExecuteState.done) {
       return PlutoGrid(

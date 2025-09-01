@@ -2,15 +2,15 @@ import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 
 class EmptyPage extends StatelessWidget {
-  final String message;
+  final Widget child;
   final Color? color;
 
-  const EmptyPage({super.key, required this.message, this.color});
+  const EmptyPage({super.key, required this.child, this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: color ?? Theme.of(context).colorScheme.surfaceContainerLowest,
+      color: color,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -21,13 +21,7 @@ class EmptyPage extends StatelessWidget {
               color: Theme.of(context).colorScheme.surfaceDim,
             ),
             const SizedBox(height: kSpacingSmall),
-            Text(
-              message,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Theme.of(context).colorScheme.surfaceDim),
-            ),
+            child,
           ],
         ),
       ),

@@ -44,7 +44,8 @@ class InstancesServices extends _$InstancesServices {
     final repo = ref.read(instanceRepoProvider);
     final instances =
         repo.search(key, pageNumber: pageNumber, pageSize: pageSize);
-    final count = repo.count(key);
+    final count = repo.count(key: key);
+    final totalCount = repo.count();
 
     return PaginationInstanceListModel(
       count: count,
@@ -52,6 +53,7 @@ class InstancesServices extends _$InstancesServices {
       currentPage: pageNumber ?? 1,
       instances: instances,
       key: key,
+      totalCount: totalCount,
     );
   }
 
@@ -67,5 +69,26 @@ class InstancesServices extends _$InstancesServices {
   List<InstanceModel> activeInstances() {
     final repo = ref.read(instanceRepoProvider);
     return repo.getActiveInstances(5);
+  }
+}
+
+@Riverpod(keepAlive: true)
+class InstancesNotifier extends _$InstancesNotifier {
+  @override
+  PaginationInstanceListModel build() {
+    return ref
+        .read(instancesServicesProvider.notifier)
+        .instances("", pageNumber: 1, pageSize: 10);
+  }
+
+  void changePage(String key, {int? pageNumber = 1, int? pageSize = 10}) {
+    state = ref
+        .read(instancesServicesProvider.notifier)
+        .instances(key, pageNumber: pageNumber, pageSize: pageSize);
+  }
+
+  void refresh() {
+    state = ref.read(instancesServicesProvider.notifier).instances(state.key,
+        pageNumber: state.currentPage, pageSize: state.pageSize);
   }
 }

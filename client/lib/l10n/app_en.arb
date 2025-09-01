@@ -318,5 +318,13 @@
   "display_msg_no_result": "No SQL result selected",
   "@display_msg_no_result": {
     "description": "No SQL result selected"
+  },
+  "display_no_instance_and_add_instance": "No database instance added, please add a database instance first",
+  "@display_no_instance_and_add_instance": {
+    "description": "No database instance added, please add a database instance first"
+  },
+  "display_no_instance_and_add_instance_button": "Add now",
+  "@display_no_instance_and_add_instance_button": {
+    "description": "No database instance added, please add a database instance first"
   }
 }

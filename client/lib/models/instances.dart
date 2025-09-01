@@ -13,7 +13,7 @@ abstract class InstanceRepo {
   InstanceModel? getInstanceByName(String name);
   InstanceModel? getInstanceById(InstanceId id);
   List<InstanceModel> search(String key, {int? pageNumber, int? pageSize});
-  int count(String key);
+  int count({String? key});
   List<InstanceModel> getActiveInstances(int top);
   Future<void> addActiveInstance(InstanceId id);
   Future<void> addInstanceActiveSchema(InstanceId id, String schema);
@@ -72,6 +72,7 @@ abstract class PaginationInstanceListModel with _$PaginationInstanceListModel {
     required int pageSize,
     required int count,
     required String key,
+    required int totalCount, // 总个数，非筛选过后的
   }) = _PaginationInstanceListModel;
 }
 

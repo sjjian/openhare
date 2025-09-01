@@ -78,5 +78,7 @@
     "metadata_tree_table": "表",
     "metadata_tree_column": "列",
     "metadata_tree_instance": "实例",
-    "display_msg_no_result": "未选中SQL结果"
+    "display_msg_no_result": "未选中SQL结果",
+    "display_no_instance_and_add_instance": "未添加数据库实例，请先添加一个数据库实例",
+    "display_no_instance_and_add_instance_button": "立即添加"
 }
