@@ -392,7 +392,7 @@ final sessionDrawerNotifierProvider =
 
 typedef _$SessionDrawerNotifier = Notifier<SessionDrawerModel>;
 String _$sessionMetadataServicesHash() =>
-    r'fb6e8446f4dc27839ef6268b8839763d45a805b6';
+    r'd913d2716ed479e29972c72b5200dba7471f5187';
 
 abstract class _$SessionMetadataServices
     extends BuildlessNotifier<SessionMetadataTreeModel?> {
@@ -576,7 +576,7 @@ final sessionOpBarNotifierProvider = AutoDisposeNotifierProvider<
 
 typedef _$SessionOpBarNotifier = AutoDisposeNotifier<SessionOpBarModel?>;
 String _$selectedSessionSQLEditorNotifierHash() =>
-    r'1b696b9307faeb5778533e1e119054ba8e52ed8f';
+    r'a53387c4f709419421c8193b0d3edece12d2a686';
 
 /// See also [SelectedSessionSQLEditorNotifier].
 @ProviderFor(SelectedSessionSQLEditorNotifier)

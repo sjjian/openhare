@@ -3,6 +3,7 @@ import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
@@ -148,10 +149,7 @@ class SqlResultTable extends ConsumerWidget {
 
     final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
-      return Container(
-          alignment: Alignment.center,
-          color: color,
-          child: Text(AppLocalizations.of(context)!.display_msg_no_data));
+      return EmptyPage(message: AppLocalizations.of(context)!.display_msg_no_data);
     }
     if (model.state == SQLExecuteState.done) {
       return PlutoGrid(

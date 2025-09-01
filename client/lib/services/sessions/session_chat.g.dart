@@ -7,7 +7,7 @@ part of 'session_chat.dart';
 // **************************************************************************
 
 String _$sessionAIChatNotifierHash() =>
-    r'55df10bf2101383ae656c8a04549e22a632b68e1';
+    r'b6d0821e966418d94d4936310e87481e8396dab3';
 
 /// See also [SessionAIChatNotifier].
 @ProviderFor(SessionAIChatNotifier)

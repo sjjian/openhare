@@ -314,5 +314,9 @@
   "metadata_tree_instance": "Instance",
   "@metadata_tree_instance": {
     "description": "Metadata tree instance"
+  },
+  "display_msg_no_result": "No SQL result selected",
+  "@display_msg_no_result": {
+    "description": "No SQL result selected"
   }
 }

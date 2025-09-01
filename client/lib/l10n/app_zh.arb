@@ -77,5 +77,6 @@
     "metadata_tree_schema": "模式",
     "metadata_tree_table": "表",
     "metadata_tree_column": "列",
-    "metadata_tree_instance": "实例"
+    "metadata_tree_instance": "实例",
+    "display_msg_no_result": "未选中SQL结果"
 }
