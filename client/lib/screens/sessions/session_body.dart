@@ -24,7 +24,6 @@ class SessionBodyPage extends ConsumerWidget {
       children: [
         Expanded(
           child: SplitView(
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
             controller: sessionController.multiSplitViewCtrl,
             axis: Axis.vertical,
             first: SQLEditor(
@@ -53,7 +52,6 @@ class SessionBodyPage extends ConsumerWidget {
             alignment: Alignment.topLeft,
             child: sessionDrawer.isRightPageOpen
                 ? SplitView(
-                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     axis: Axis.horizontal,
                     controller: sessionController.metaDataSplitViewCtrl,
                     first: left,

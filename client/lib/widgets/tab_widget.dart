@@ -183,14 +183,17 @@ class CommonTabStyle {
   final Color? selectedColor;
   final Color? hoverColor;
   final TextAlign? labelAlign;
-  CommonTabStyle(
-      {this.height,
-      this.maxWidth,
-      this.minWidth,
-      this.color,
-      this.selectedColor,
-      this.hoverColor,
-      this.labelAlign});
+  final BorderRadiusGeometry? borderRadius;
+  CommonTabStyle({
+    this.height,
+    this.maxWidth,
+    this.minWidth,
+    this.color,
+    this.selectedColor,
+    this.hoverColor,
+    this.labelAlign,
+    this.borderRadius,
+  });
 }
 
 class CommonTab extends StatefulWidget {
@@ -205,18 +208,18 @@ class CommonTab extends StatefulWidget {
   final GestureTapCallback? onTap;
   final VoidCallback? onDeleted;
 
-  const CommonTab(
-      {Key? key,
-      this.avatar,
-      required this.label,
-      required this.selected,
-      this.items,
-      this.onTap,
-      this.onDeleted,
-      this.style,
-      this.width,
-      this.height})
-      : super(key: key);
+  const CommonTab({
+    Key? key,
+    this.avatar,
+    required this.label,
+    required this.selected,
+    this.items,
+    this.onTap,
+    this.onDeleted,
+    this.style,
+    this.width,
+    this.height,
+  }) : super(key: key);
 
   CommonTab.fromWarp(
       {super.key,
@@ -292,40 +295,59 @@ class _CommonTabState extends State<CommonTab> {
                     items: widget.items!,
                   );
                 },
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: SizedBox(
             width: widget.width ?? defaultTabMaxWidth,
-            height: widget.height ?? 40,
-            decoration: BoxDecoration(
-                color: color(),
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(5), topRight: Radius.circular(5))),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (widget.avatar != null)
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: widget.avatar,
+                SizedBox(
+                  width: kSpacingSmall,
+                  child: VerticalDivider(
+                    color: Theme.of(context).dividerColor,
+                    thickness: kDividerThickness,
+                    width: kDividerSize,
+                    indent: 8,
+                    endIndent: 8,
                   ),
+                ),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                    constraints: const BoxConstraints(maxWidth: 50),
-                    child: Text(
-                      widget.label,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: widget.style?.labelAlign,
+                    padding: const EdgeInsets.fromLTRB(kSpacingTiny, 0, 0, 0),
+                    height: widget.height ?? 40,
+                    decoration: BoxDecoration(
+                      color: color(),
+                      borderRadius: widget.style?.borderRadius ??
+                          const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Row(
+                      children: [
+                        if (widget.avatar != null)
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: widget.avatar,
+                          ),
+                        Expanded(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 50),
+                            child: Text(
+                              widget.label,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: widget.style?.labelAlign,
+                            ),
+                          ),
+                        ),
+                        if (widget.onDeleted != null) ...[
+                          RectangleIconButton.tiny(
+                            icon: Icons.close,
+                            onPressed: widget.onDeleted,
+                          ),
+                          const SizedBox(width: kSpacingTiny),
+                        ],
+                      ],
                     ),
                   ),
                 ),
-                if (widget.onDeleted != null) ...[
-                  RectangleIconButton.tiny(
-                    icon: Icons.close,
-                    onPressed: widget.onDeleted,
-                  ),
-                  const SizedBox(width: kSpacingTiny),
-                ]
               ],
             ),
           ),
