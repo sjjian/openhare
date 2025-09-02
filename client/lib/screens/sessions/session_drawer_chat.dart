@@ -11,6 +11,7 @@ import 'package:client/services/settings/settings.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/menu.dart';
 import 'package:client/widgets/tooltip.dart';
@@ -770,7 +771,7 @@ class SessionChatGuide extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
+    return EmptyPage(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text(AppLocalizations.of(context)!.ai_chat_guide_tip),
       const SizedBox(height: kSpacingSmall),
