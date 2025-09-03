@@ -58,7 +58,7 @@ class SessionConnsServices extends _$SessionConnsServices {
     return ref.read(sessionConnRepoProvider).getSchemas(connId);
   }
 
-  Future<MetaDataNode> getMetadata(ConnId connId) async {
+  Future<List<MetaDataNode>> getMetadata(ConnId connId) async {
     return ref.read(sessionConnRepoProvider).getMetadata(connId);
   }
 

@@ -1,3 +1,4 @@
+import 'package:client/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 class TablePaginatedBar extends StatefulWidget {
@@ -19,6 +20,12 @@ class TablePaginatedBar extends StatefulWidget {
 }
 
 class _PaginatedBarState extends State<TablePaginatedBar> {
+  void _onChange(int pageNumber) {
+    setState(() {
+      widget.onChange(pageNumber);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     int totalPageNumber = (widget.count / widget.pageSize).ceil();
@@ -33,51 +40,26 @@ class _PaginatedBarState extends State<TablePaginatedBar> {
             padding: const EdgeInsets.only(right: 8.0),
             child: Text("${widget.pageNumber}/$totalPageNumber"),
           ),
-          IconButton(
-              onPressed: isFirstPage
-                  ? null
-                  : () {
-                      setState(() {
-                        widget.onChange(1);
-                      });
-                    },
-              icon: const Icon(Icons.first_page)),
-          IconButton(
-              onPressed: isFirstPage
-                  ? null
-                  : () {
-                      setState(() {
-                        widget.onChange(widget.pageNumber - 1);
-                      });
-                    },
-              icon: const Icon(Icons.keyboard_arrow_left)),
-          IconButton(
-              onPressed: isLastPage
-                  ? null
-                  : () {
-                      setState(() {
-                        widget.onChange(widget.pageNumber + 1);
-                      });
-                    },
-              icon: const Icon(Icons.keyboard_arrow_right_outlined)),
-          IconButton(
-              onPressed: isLastPage
-                  ? null
-                  : () {
-                      setState(() {
-                        widget.onChange(totalPageNumber);
-                      });
-                    },
-              icon: const Icon(Icons.last_page)),
+          RectangleIconButton.medium(
+            icon: Icons.first_page,
+            onPressed: isFirstPage ? null : () => _onChange(1),
+          ),
+          RectangleIconButton.medium(
+            icon: Icons.keyboard_arrow_left,
+            onPressed:
+                isFirstPage ? null : () => _onChange(widget.pageNumber - 1),
+          ),
+          RectangleIconButton.medium(
+            icon: Icons.keyboard_arrow_right_outlined,
+            onPressed:
+                isLastPage ? null : () => _onChange(widget.pageNumber + 1),
+          ),
+          RectangleIconButton.medium(
+            icon: Icons.last_page,
+            onPressed: isLastPage ? null : () => _onChange(totalPageNumber),
+          ),
         ],
       ),
     );
   }
 }
-
-// abstract class TablePageController {
-//   void onChange(int pageNumber);
-//   int get count;
-//   int get pageSize;
-//   int get pageNumber;
-// }

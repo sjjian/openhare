@@ -36,16 +36,17 @@ class PageSkeleton extends StatelessWidget {
   final Widget? bottomBar;
   final Widget child;
   final Widget? drawer;
+  final Color? backgroundColor;
 
   const PageSkeleton(
-      {Key? key, this.topBar, this.bottomBar, this.drawer, required this.child})
+      {Key? key, this.topBar, this.bottomBar, this.drawer, required this.child, this.backgroundColor})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithNavRail(
       child: Material(
-        color: Theme.of(context).colorScheme.surfaceContainerLow, // 全局背景色
+        color: backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerLow, // 全局背景色
         child: Column(children: [
           Container(
             color: Theme.of(context)

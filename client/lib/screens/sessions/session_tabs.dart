@@ -54,6 +54,10 @@ class SessionTabs extends ConsumerWidget {
                 hoverColor: Theme.of(context)
                     .colorScheme
                     .surfaceContainer, // session tab 鼠标移入的颜色
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(5),
+                  topRight: Radius.circular(5),
+                ),
               ),
               addTab: () {
                 ref.read(sessionsServicesProvider.notifier).newSession();

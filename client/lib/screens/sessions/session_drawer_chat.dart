@@ -11,6 +11,7 @@ import 'package:client/services/settings/settings.dart';
 import 'package:client/utils/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/menu.dart';
 import 'package:client/widgets/tooltip.dart';
@@ -81,7 +82,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
     if (model.metadata == null || model.currentSchema == null) {
       return {};
     }
-    return model.metadata!
+    return MetaDataNode(MetaType.instance, "", items: model.metadata!)
         .getChildren(MetaType.schema, model.currentSchema!)
         .where((e) => e.type == MetaType.table && e.value.contains(searchText))
         .fold({}, (acc, e) => {...acc, e.value: e.value});
@@ -461,9 +462,10 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 const Spacer(),
 
                 // 清空聊天记录
-                IconButton(
-                  iconSize: kIconSizeTiny,
-                  icon: const Icon(Icons.cleaning_services),
+                RectangleIconButton.small(
+                  tooltip:
+                      AppLocalizations.of(context)!.button_tooltip_clear_chat,
+                  icon: Icons.cleaning_services,
                   onPressed: model.canClearMessage()
                       ? () => services.cleanMessages(model.chatModel.id)
                       : null,
@@ -472,9 +474,10 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                 // 发送消息
                 (model.chatModel.state == AIChatState.waiting)
                     ? const Loading.small()
-                    : IconButton(
-                        iconSize: kIconSizeTiny,
-                        icon: const Icon(Icons.send),
+                    : RectangleIconButton.small(
+                        tooltip: AppLocalizations.of(context)!
+                            .button_tooltip_send_message,
+                        icon: Icons.send,
                         onPressed: model.canSendMessage()
                             ? () => _sendMessage(model.chatModel.id, model)
                             : null,
@@ -517,16 +520,17 @@ class _SqlChatFieldState extends State<SqlChatField> {
                 child: Text("SQL"),
               ),
               const Spacer(),
-              RectangleIconButton(
-                iconSize: kIconSizeSmall,
+              RectangleIconButton.small(
+                tooltip: AppLocalizations.of(context)!
+                    .button_tooltip_run_sql_new_tab,
                 icon: Icons.not_started_outlined,
                 iconColor: (widget.onRun != null) ? Colors.green : Colors.grey,
                 onPressed: () {
                   widget.onRun?.call(widget.codes);
                 },
               ),
-              RectangleIconButton(
-                iconSize: kIconSizeSmall,
+              RectangleIconButton.small(
+                tooltip: AppLocalizations.of(context)!.button_tooltip_copy_sql,
                 icon: (_copied) ? Icons.done : Icons.content_paste,
                 onPressed: () async {
                   await Clipboard.setData(
@@ -698,9 +702,9 @@ class SessionChatMessages extends ConsumerWidget {
                 const SizedBox(height: kSpacingTiny),
                 Row(
                   children: [
-                    RectangleIconButton(
-                      size: kIconSizeSmall,
-                      iconSize: kIconSizeTiny,
+                    RectangleIconButton.small(
+                      tooltip: AppLocalizations.of(context)!
+                          .button_tooltip_retry_message,
                       icon: Icons.refresh,
                       onPressed: () {
                         _retryMessage(context, ref, model, message);
@@ -767,7 +771,7 @@ class SessionChatGuide extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
+    return EmptyPage(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text(AppLocalizations.of(context)!.ai_chat_guide_tip),
       const SizedBox(height: kSpacingSmall),

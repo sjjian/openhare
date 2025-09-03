@@ -83,7 +83,7 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
-  Future<MetaDataNode> getMetadata(ConnId connId) {
+  Future<List<MetaDataNode>> getMetadata(ConnId connId) {
     return conns[connId.value]!.metadata();
   }
 
@@ -231,7 +231,7 @@ class SessionConn {
     return schemas;
   }
 
-  Future<MetaDataNode> metadata() async {
+  Future<List<MetaDataNode>> metadata() async {
     return await conn2!.metadata();
   }
 }

@@ -1,6 +1,9 @@
 import 'package:client/models/ai.dart';
 import 'package:client/models/instances.dart';
+import 'package:client/utils/state_value.dart';
+import 'package:client/widgets/data_tree.dart';
 import 'package:db_driver/db_driver.dart';
+import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:client/widgets/split_view.dart';
@@ -36,7 +39,7 @@ abstract class SessionConnRepo {
   Future<void> close(ConnId connId);
   Future<void> setCurrentSchema(ConnId connId, String schema);
   Future<List<String>> getSchemas(ConnId connId);
-  Future<MetaDataNode> getMetadata(ConnId connId);
+  Future<List<MetaDataNode>> getMetadata(ConnId connId);
   Future<BaseQueryResult?> query(ConnId connId, String query);
   Future<void> killQuery(ConnId connId);
 }
@@ -202,7 +205,7 @@ abstract class SessionStatusModel with _$SessionStatusModel {
 abstract class SessionSQLEditorModel with _$SessionSQLEditorModel {
   const factory SessionSQLEditorModel({
     String? currentSchema,
-    MetaDataNode? metadata,
+    List<MetaDataNode>? metadata,
   }) = _SessionSQLEditorModel;
 }
 
@@ -285,7 +288,7 @@ abstract class SessionAIChatModel with _$SessionAIChatModel {
     required SessionId sessionId,
     required String? currentSchema,
     required DatabaseType? dbType,
-    required MetaDataNode? metadata,
+    required List<MetaDataNode>? metadata,
     required ConnId? connId,
     required SQLConnectState? state,
     required AIChatModel chatModel,
@@ -303,4 +306,13 @@ abstract class SessionAIChatModel with _$SessionAIChatModel {
     return chatModel.state != AIChatState.waiting &&
         chatModel.messages.isNotEmpty;
   }
+}
+
+// session metadata tree model
+@freezed
+abstract class SessionMetadataTreeModel with _$SessionMetadataTreeModel {
+  const factory SessionMetadataTreeModel({
+    required SessionId sessionId,
+    required StateValue<TreeController<DataNode>> metadataTreeCtrl,
+  }) = _SessionMetadataTreeModel;
 }

@@ -175,7 +175,10 @@ class InstanceRepoImpl extends InstanceRepo {
 
   @override
 // todo: aync
-  int count(String key) {
+  int count({String? key}) {
+    if (key == null) {
+      return _instanceBox.count();
+    }
     final build =
         _instanceBox.query(InstanceStorage_.name.contains(key)).build();
     return build.count();

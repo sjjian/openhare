@@ -14,35 +14,39 @@ class SQLEditor extends ConsumerWidget {
 
   const SQLEditor({super.key, required this.codeController});
 
-  List<CodeKeywordPrompt> buildMetadataKeyword(MetaDataNode metadata) {
+  List<CodeKeywordPrompt> buildMetadataKeyword(List<MetaDataNode> metadata) {
     List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
-    metadata.visitor((node, parent) {
-      keywordPrompt.add(CodeKeywordPrompt(word: node.value));
-      return true;
-    });
+    for (final node in metadata) {
+      node.visitor((node, parent) {
+        keywordPrompt.add(CodeKeywordPrompt(word: node.value));
+        return true;
+      });
+    }
     return keywordPrompt;
   }
 
   Map<String, List<CodePrompt>> buildRelatePrompts(
-      MetaDataNode metadata, String? currentSchema) {
+      List<MetaDataNode> metadata, String? currentSchema) {
     Map<String, List<CodePrompt>> relatedPrompts = {};
     // todo: 有一个缺陷，有下划线的变量无法relate, 当存在类似的prefix时，例如: 存在`t1`时, `t1_1`无法关联。
-    metadata.visitor((node, parent) {
-      if (parent == null) {
-        return true;
-      }
-      if (parent.value == "") {
-        return true;
-      }
-      if (node.type == MetaType.schema && node.value != currentSchema) {
-        return false;
-      }
-      final ps = relatedPrompts.putIfAbsent(
-          parent.value, () => List.empty(growable: true));
+    for (final node in metadata) {
+      node.visitor((node, parent) {
+        if (parent == null) {
+          return true;
+        }
+        if (parent.value == "") {
+          return true;
+        }
+        if (node.type == MetaType.schema && node.value != currentSchema) {
+          return false;
+        }
+        final ps = relatedPrompts.putIfAbsent(
+            parent.value, () => List.empty(growable: true));
 
-      ps.add(CodeKeywordPrompt(word: node.value));
-      return true;
-    });
+        ps.add(CodeKeywordPrompt(word: node.value));
+        return true;
+      });
+    }
     return relatedPrompts;
   }
 
@@ -78,8 +82,9 @@ class SQLEditor extends ConsumerWidget {
             child: CodeEditor(
               wordWrap: false,
               style: CodeEditorStyle(
-                backgroundColor:
-                    Theme.of(context).colorScheme.surfaceContainerLowest, // SQL 编辑器背景色
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerLowest, // SQL 编辑器背景色
                 textStyle: GoogleFonts.robotoMono(
                   textStyle: Theme.of(context).textTheme.bodyMedium,
                   color: Theme.of(context).colorScheme.onSurface,

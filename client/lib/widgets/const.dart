@@ -19,3 +19,9 @@ const double kIconSizeTiny = 16.0;
 const double kIconSizeSmall = 20.0;
 const double kIconSizeMedium = 24.0;
 const double kIconSizeLarge = 36.0;
+
+// icon button
+const double kIconButtonSizeTiny = 24.0;
+const double kIconButtonSizeSmall = 32.0;
+const double kIconButtonSizeMedium = 36.0;
+const double kIconButtonSizeLarge = 48.0;

@@ -135,9 +135,11 @@ class PGConnection extends BaseConnection {
     await _conn.close();
   }
 
+  // TODO: 实现
   @override
-  Future<MetaDataNode> metadata() async {
-    return MetaDataNode(MetaType.instance, "");
+  Future<List<MetaDataNode>> metadata() async {
+    List<MetaDataNode> schemaNodes = List.empty(growable: true);
+    return schemaNodes;
   }
 
   @override

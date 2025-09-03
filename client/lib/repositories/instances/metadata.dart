@@ -1,4 +1,5 @@
 import 'package:client/models/instances.dart';
+import 'package:client/utils/state_value.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -6,22 +7,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'metadata.g.dart';
 
 class InstanceMetadataRepoImpl implements InstanceMetadataRepo {
-  Map<InstanceId, MetaDataNode> metadata = {};
+  Map<InstanceId, InstanceMetadataModel> models = {};
 
   @override
-  InstanceMetadataModel getMetadata(InstanceId instanceId) {
-    return InstanceMetadataModel(
-        instanceId: instanceId, metadata: metadata[instanceId]);
+  InstanceMetadataModel? getMetadata(InstanceId instanceId) {
+    return models[instanceId];
   }
 
   @override
-  void updateMetadata(InstanceId instanceId, MetaDataNode metadata) {
-    this.metadata[instanceId] = metadata;
-  }
-
-  @override
-  void addMetadata(InstanceId instanceId, MetaDataNode metadata) {
-    this.metadata[instanceId] = metadata;
+  void updateMetadata(
+      InstanceId instanceId, StateValue<List<MetaDataNode>> metadata) {
+    models[instanceId] =
+        InstanceMetadataModel(instanceId: instanceId, metadata: metadata);
   }
 }
 

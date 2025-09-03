@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/empty.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/file_type.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +19,16 @@ class SessionDrawerSqlResult extends ConsumerWidget {
       BuildContext context, SessionDrawerModel sessionDrawer) {
     BaseQueryValue? result = sessionDrawer.sqlResult;
     if (result == null) {
-      return const ValueDisplayField(data: "");
+      return EmptyPage(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        child: Text(
+          AppLocalizations.of(context)!.display_msg_no_result,
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(color: Theme.of(context).colorScheme.surfaceDim),
+        ),
+      );
     }
     BaseQueryColumn? column = sessionDrawer.sqlColumn;
     if (column == null) {
@@ -50,14 +61,15 @@ class SessionDrawerSqlResult extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     return Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: buildDisplayField(context, sessionDrawer),
-            // child: buildDisplayField(context),
-          ),
-        ],);
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: buildDisplayField(context, sessionDrawer),
+          // child: buildDisplayField(context),
+        ),
+      ],
+    );
   }
 }
 

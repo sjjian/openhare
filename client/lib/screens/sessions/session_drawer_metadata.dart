@@ -1,174 +1,66 @@
-import 'package:client/models/instances.dart';
-import 'package:client/services/instances/metadata.dart';
+import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/data_tree.dart';
-import 'package:client/widgets/data_type_icon.dart';
-import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/widgets/loading.dart';
-
-class RootNode implements DataNode {
-  final String name;
-
-  final List<DataNode> _children = List.empty(growable: true);
-
-  RootNode({this.name = ""});
-
-  @override
-  List<DataNode> get children {
-    return _children;
-  }
-
-  @override
-  Widget openIcons(BuildContext context) {
-    return HugeIcon(
-      size: kIconSizeTiny,
-      icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-
-  @override
-  Widget closeIcons(BuildContext context) {
-    return HugeIcon(
-      size: kIconSizeTiny,
-      icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-
-  @override
-  Widget builder(context) {
-    return Text(
-      style: Theme.of(context).textTheme.bodySmall,
-      children.isNotEmpty ? "$name  [${_children.length}]" : name,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-}
-
-class SchemaNode extends RootNode {
-  SchemaNode(String name) : super(name: name);
-
-  @override
-  Widget openIcons(BuildContext context) {
-    return HugeIcon(
-      size: kIconSizeTiny,
-      icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-
-  @override
-  Widget closeIcons(BuildContext context) {
-    return HugeIcon(
-      size: kIconSizeTiny,
-      icon: HugeIcons.strokeRoundedDatabase,
-      color: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-}
-
-class TableNode extends RootNode {
-  TableNode(String name) : super(name: name);
-
-  @override
-  Widget openIcons(BuildContext context) {
-    return HugeIcon(
-      size: kIconSizeTiny,
-      icon: HugeIcons.strokeRoundedTable,
-      color: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-
-  @override
-  Widget closeIcons(BuildContext context) {
-    return HugeIcon(
-      size: kIconSizeTiny,
-      icon: HugeIcons.strokeRoundedTable,
-      color: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-}
-
-class ColumnNode extends RootNode {
-  DataType type;
-  ColumnNode(String name, this.type) : super(name: name);
-
-  @override
-  Widget openIcons(BuildContext context) {
-    return DataTypeIcon(type: type);
-  }
-
-  @override
-  Widget closeIcons(BuildContext context) {
-    return DataTypeIcon(type: type);
-  }
-}
 
 class SessionDrawerMetadata extends ConsumerWidget {
   const SessionDrawerMetadata({Key? key}) : super(key: key);
 
-  DataNode buildDataNode(MetaDataNode node) {
-    return switch (node.type) {
-      MetaType.database => SchemaNode(node.value),
-      MetaType.table => TableNode(node.value),
-      MetaType.column =>
-        ColumnNode(node.value, node.getProp(MetaDataPropType.dataType)),
-      _ => SchemaNode(node.value)
-    };
+  Widget loadingPage() {
+    return const Align(
+      alignment: Alignment.center,
+      child: Loading.large(),
+    );
   }
 
-  DataNode buildMetadataTree(DataNode parent, List<MetaDataNode>? nodes) {
-    if (nodes == null) {
-      return parent;
-    }
-    for (var node in nodes) {
-      final dataNode = buildDataNode(node);
-      parent.children.add(dataNode);
-      if (node.items != null && node.items!.isNotEmpty) {
-        buildMetadataTree(dataNode, node.items!);
-      }
-    }
-    return parent;
+  Widget errorPage(
+      BuildContext context, WidgetRef ref, String error, SessionId sessionId) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(Icons.error, color: Theme.of(context).colorScheme.error),
+        const SizedBox(height: kSpacingSmall),
+        Text(error),
+        RectangleIconButton.medium(
+          icon: Icons.refresh,
+          onPressed: () {
+            ref
+                .read(sessionMetadataServicesProvider(sessionId).notifier)
+                .refresh();
+          },
+        )
+      ],
+    );
+  }
+
+  Widget bodyPage(TreeController<DataNode> controller) {
+    return DataTree(controller: controller);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    InstanceMetadataModel? model = ref.watch(sessionMetadataNotifierProvider);
-    Widget body = const Align(
-      alignment: Alignment.center,
-      child: Loading.big(),
-    );
+    SessionMetadataTreeModel? model =
+        ref.watch(sessionMetadataNotifierProvider);
 
-    RootNode root = RootNode();
-    List<MetaDataNode>? items;
     if (model == null) {
-      items = [];
-    } else if (model.metadata == null) {
-      ref
-          .read(instanceMetadataServicesProvider(model.instanceId).notifier)
-          .refreshMetadata();
-      items = [];
-    } else {
-      items = [model.metadata!];
+      return loadingPage();
     }
-
-    final metadataController = TreeController<DataNode>(
-      roots: buildMetadataTree(root, items).children,
-      childrenProvider: (DataNode node) => node.children,
-    );
-    body = DataTree(controller: metadataController);
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: body),
+        Expanded(
+            child: model.metadataTreeCtrl.match(
+          (value) => bodyPage(value),
+          (error) => errorPage(context, ref, error, model.sessionId),
+          () => loadingPage(),
+        )),
       ],
     );
   }

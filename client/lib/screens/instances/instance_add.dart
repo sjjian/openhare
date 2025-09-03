@@ -1,5 +1,4 @@
 import 'package:client/models/instances.dart';
-import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/button.dart';
@@ -41,9 +40,7 @@ class _AddInstancePageState extends State<AddInstancePage> {
     return PageSkeleton(
       topBar: Row(
         children: [
-          RectangleIconButton(
-            iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
-            iconSize: kIconSizeSmall,
+          RectangleIconButton.medium(
             icon: Icons.arrow_back,
             onPressed: () => GoRouter.of(context).go('/instances/list'),
           )
@@ -680,7 +677,7 @@ class AddInstanceBottomBar extends StatelessWidget {
 
     if (isDatabasePingDoing) {
       msg = Text(AppLocalizations.of(context)!.testing);
-      status = const Loading();
+      status = const Loading.medium();
     } else if (isDatabaseConnectable == null) {
       msg = const Text("");
       status = const Spacer();

@@ -6,7 +6,7 @@ part of 'sessions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionsServicesHash() => r'95f44abe8a951abc367c442f31524784c7673966';
+String _$sessionsServicesHash() => r'41e5b50ee48503cc3bfcff5bfca1a95f2888d925';
 
 /// See also [SessionsServices].
 @ProviderFor(SessionsServices)
@@ -391,13 +391,163 @@ final sessionDrawerNotifierProvider =
 );
 
 typedef _$SessionDrawerNotifier = Notifier<SessionDrawerModel>;
+String _$sessionMetadataServicesHash() =>
+    r'd913d2716ed479e29972c72b5200dba7471f5187';
+
+abstract class _$SessionMetadataServices
+    extends BuildlessNotifier<SessionMetadataTreeModel?> {
+  late final SessionId sessionId;
+
+  SessionMetadataTreeModel? build(
+    SessionId sessionId,
+  );
+}
+
+/// See also [SessionMetadataServices].
+@ProviderFor(SessionMetadataServices)
+const sessionMetadataServicesProvider = SessionMetadataServicesFamily();
+
+/// See also [SessionMetadataServices].
+class SessionMetadataServicesFamily extends Family<SessionMetadataTreeModel?> {
+  /// See also [SessionMetadataServices].
+  const SessionMetadataServicesFamily();
+
+  /// See also [SessionMetadataServices].
+  SessionMetadataServicesProvider call(
+    SessionId sessionId,
+  ) {
+    return SessionMetadataServicesProvider(
+      sessionId,
+    );
+  }
+
+  @override
+  SessionMetadataServicesProvider getProviderOverride(
+    covariant SessionMetadataServicesProvider provider,
+  ) {
+    return call(
+      provider.sessionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'sessionMetadataServicesProvider';
+}
+
+/// See also [SessionMetadataServices].
+class SessionMetadataServicesProvider extends NotifierProviderImpl<
+    SessionMetadataServices, SessionMetadataTreeModel?> {
+  /// See also [SessionMetadataServices].
+  SessionMetadataServicesProvider(
+    SessionId sessionId,
+  ) : this._internal(
+          () => SessionMetadataServices()..sessionId = sessionId,
+          from: sessionMetadataServicesProvider,
+          name: r'sessionMetadataServicesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sessionMetadataServicesHash,
+          dependencies: SessionMetadataServicesFamily._dependencies,
+          allTransitiveDependencies:
+              SessionMetadataServicesFamily._allTransitiveDependencies,
+          sessionId: sessionId,
+        );
+
+  SessionMetadataServicesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.sessionId,
+  }) : super.internal();
+
+  final SessionId sessionId;
+
+  @override
+  SessionMetadataTreeModel? runNotifierBuild(
+    covariant SessionMetadataServices notifier,
+  ) {
+    return notifier.build(
+      sessionId,
+    );
+  }
+
+  @override
+  Override overrideWith(SessionMetadataServices Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: SessionMetadataServicesProvider._internal(
+        () => create()..sessionId = sessionId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        sessionId: sessionId,
+      ),
+    );
+  }
+
+  @override
+  NotifierProviderElement<SessionMetadataServices, SessionMetadataTreeModel?>
+      createElement() {
+    return _SessionMetadataServicesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SessionMetadataServicesProvider &&
+        other.sessionId == sessionId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, sessionId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SessionMetadataServicesRef
+    on NotifierProviderRef<SessionMetadataTreeModel?> {
+  /// The parameter `sessionId` of this provider.
+  SessionId get sessionId;
+}
+
+class _SessionMetadataServicesProviderElement extends NotifierProviderElement<
+    SessionMetadataServices,
+    SessionMetadataTreeModel?> with SessionMetadataServicesRef {
+  _SessionMetadataServicesProviderElement(super.provider);
+
+  @override
+  SessionId get sessionId =>
+      (origin as SessionMetadataServicesProvider).sessionId;
+}
+
 String _$sessionMetadataNotifierHash() =>
-    r'6f5a3f76177ed4185619767efcb65c063851dd23';
+    r'badddcdf7d92972525d7d3ef742b03a1d86f4ab3';
 
 /// See also [SessionMetadataNotifier].
 @ProviderFor(SessionMetadataNotifier)
-final sessionMetadataNotifierProvider =
-    NotifierProvider<SessionMetadataNotifier, InstanceMetadataModel?>.internal(
+final sessionMetadataNotifierProvider = NotifierProvider<
+    SessionMetadataNotifier, SessionMetadataTreeModel?>.internal(
   SessionMetadataNotifier.new,
   name: r'sessionMetadataNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -407,7 +557,7 @@ final sessionMetadataNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SessionMetadataNotifier = Notifier<InstanceMetadataModel?>;
+typedef _$SessionMetadataNotifier = Notifier<SessionMetadataTreeModel?>;
 String _$sessionOpBarNotifierHash() =>
     r'dbb26e7ddc0617ce4dda534b460c1e9686eded9b';
 
@@ -426,7 +576,7 @@ final sessionOpBarNotifierProvider = AutoDisposeNotifierProvider<
 
 typedef _$SessionOpBarNotifier = AutoDisposeNotifier<SessionOpBarModel?>;
 String _$selectedSessionSQLEditorNotifierHash() =>
-    r'2e8fe32b94e3018aa00d5d023834e003e612c3b5';
+    r'a53387c4f709419421c8193b0d3edece12d2a686';
 
 /// See also [SelectedSessionSQLEditorNotifier].
 @ProviderFor(SelectedSessionSQLEditorNotifier)

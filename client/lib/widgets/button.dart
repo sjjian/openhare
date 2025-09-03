@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'const.dart';
 
 class RectangleIconButton extends StatefulWidget {
+  final String? tooltip;
   final IconData icon;
-  final double? size;
-  final double? iconSize;
+  final double size;
+  final double iconSize;
   final Color? iconColor;
   final Color? backgroundColor;
   final Color? hoverBackgroundColor;
@@ -13,14 +14,51 @@ class RectangleIconButton extends StatefulWidget {
 
   const RectangleIconButton(
       {Key? key,
+      this.tooltip,
       required this.icon,
       this.onPressed,
-      this.size = 36,
-      this.iconSize = 24,
+      required this.size,
+      required this.iconSize,
       this.iconColor,
       this.backgroundColor,
       this.hoverBackgroundColor})
       : super(key: key);
+
+  const RectangleIconButton.medium({
+    Key? key,
+    this.tooltip,
+    required this.icon,
+    this.onPressed,
+    this.iconColor,
+    this.backgroundColor,
+    this.hoverBackgroundColor,
+  })  : size = kIconButtonSizeMedium,
+        iconSize = kIconSizeMedium,
+        super(key: key);
+
+  const RectangleIconButton.small(
+      {Key? key,
+      this.tooltip,
+      required this.icon,
+      this.onPressed,
+      this.iconColor,
+      this.backgroundColor,
+      this.hoverBackgroundColor})
+      : size = kIconButtonSizeSmall,
+        iconSize = kIconSizeSmall,
+        super(key: key);
+
+  const RectangleIconButton.tiny(
+      {Key? key,
+      this.tooltip,
+      required this.icon,
+      this.onPressed,
+      this.iconColor,
+      this.backgroundColor,
+      this.hoverBackgroundColor})
+      : size = kIconButtonSizeTiny,
+        iconSize = kIconSizeTiny,
+        super(key: key);
 
   @override
   State<RectangleIconButton> createState() => _RectangleIconButtonState();
@@ -31,8 +69,7 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
 
   @override
   Widget build(BuildContext context) {
-    // 需要矩形的鼠标点击鼠标悬浮效果
-    return MouseRegion(
+    final button = MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (value) {
           if (!_isHovering) {
@@ -50,24 +87,36 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
         },
         child: GestureDetector(
           onTap: widget.onPressed,
-          child: Container(
-            width: widget.size,
-            height: widget.size,
-            decoration: BoxDecoration(
-              color: _isHovering
-                  ? widget.hoverBackgroundColor ??
-                      Theme.of(context)
-                          .colorScheme
-                          .surfaceContainer // icon button 鼠标悬浮的颜色
-                  : widget.backgroundColor, // icon button 背景色
-            ),
-            child: Icon(
-              widget.icon,
-              color: widget.iconColor,
-              size: widget.iconSize,
+          child: Padding(
+            padding: const EdgeInsets.all(2),
+            child: Container(
+              width: widget.size - 4,
+              height: widget.size - 4,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(widget.size * 0.2),
+                color: _isHovering
+                    ? widget.hoverBackgroundColor ??
+                        Theme.of(context)
+                            .colorScheme
+                            .primaryContainer // icon button 鼠标悬浮的颜色
+                    : widget.backgroundColor, // icon button 背景色
+              ),
+              child: Icon(
+                widget.icon,
+                color: widget.iconColor,
+                size: widget.iconSize - 4,
+              ),
             ),
           ),
         ));
+
+    if (widget.tooltip != null) {
+      return Tooltip(
+        message: widget.tooltip!,
+        child: button,
+      );
+    }
+    return button;
   }
 }
 

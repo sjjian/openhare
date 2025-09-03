@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mysql/mysql.dart';
 import 'db_driver_interface.dart';
@@ -211,32 +212,57 @@ class MySQLConnection extends BaseConnection {
   }
 
   @override
-  Future<MetaDataNode> metadata() async {
-    MetaDataNode metadata = MetaDataNode(MetaType.instance, "");
-    List<String> schemas = await this.schemas();
-
+  Future<List<MetaDataNode>> metadata() async {
+    // ref: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html
+    final results = await _query("""SELECT 
+    t.TABLE_SCHEMA,
+    t.TABLE_NAME,
+    c.COLUMN_NAME,
+    c.DATA_TYPE
+FROM 
+    information_schema.TABLES t
+JOIN 
+    information_schema.COLUMNS c 
+    ON t.TABLE_NAME = c.TABLE_NAME 
+    AND t.TABLE_SCHEMA = c.TABLE_SCHEMA
+WHERE 
+    t.TABLE_TYPE IN ('BASE TABLE', 'SYSTEM VIEW')
+ORDER BY
+    t.TABLE_SCHEMA,
+    t.TABLE_NAME, 
+    c.ORDINAL_POSITION;
+""");
+    final rows = results.rows;
     List<MetaDataNode> schemaNodes = List.empty(growable: true);
-    metadata.items = schemaNodes;
-    for (var schema in schemas) {
-      MetaDataNode schemaNode = MetaDataNode(MetaType.schema, schema);
-      // SchemaMeta schemaMeta = SchemaMeta(schema);
+    // group by Schema Name
+    final schemaRows =
+        rows.groupListsBy((result) => result.getString("TABLE_SCHEMA")!);
+
+    for (final schema in schemaRows.keys) {
+      final schemaNode = MetaDataNode(MetaType.schema, schema);
       schemaNodes.add(schemaNode);
-      List<MetaDataNode> tables = await getTables(schema);
-      schemaNode.items = tables;
-      for (var table in tables) {
-        // TableMeta tableMeta = TableMeta(table);
-        // schemaMeta.tables.add(tableMeta);
-        // todo: 一次性获取所有表信息
-        List<MetaDataNode> columns = await getTableColumns(schema, table.value);
 
-        table.items = columns;
+      // group by Table Name
+      List<MetaDataNode> tableNodes = List.empty(growable: true);
+      final tableRows = schemaRows[schema]!
+          .groupListsBy((result) => result.getString("TABLE_NAME")!);
+      for (final table in tableRows.keys) {
+        final tableNode = MetaDataNode(MetaType.table, table);
+        tableNodes.add(tableNode);
 
-        // List<TableKeyMeta> keys =
-        //     await session!.conn!.getTableKeys(schema, table);
-        // tableMeta.keys = keys;
+        // handler columns
+        final columnRows = tableRows[table]!;
+        final columnNodes = columnRows
+            .map((result) =>
+                MetaDataNode(MetaType.column, result.getString("COLUMN_NAME")!)
+                  ..withProp(MetaDataPropType.dataType,
+                      getDataType(result.getString("DATA_TYPE")!)))
+            .toList();
+        tableNode.items = columnNodes;
       }
+      schemaNode.items = tableNodes;
     }
-    return metadata;
+    return schemaNodes;
   }
 
   @override
@@ -264,17 +290,17 @@ class MySQLConnection extends BaseConnection {
     return currentSchema;
   }
 
-  Future<List<MetaDataNode>> getTables(String schema) async {
-    List<MetaDataNode> tables = List.empty(growable: true);
-    final results = await _query(
-        "select TABLE_NAME from information_schema.tables where table_schema='$schema' and TABLE_TYPE in ('BASE TABLE','SYSTEM VIEW')");
-    final rows = results.rows;
-    for (final result in rows) {
-      tables.add(MetaDataNode(MetaType.table, result.getString("TABLE_NAME")!));
-      // tables.add();
-    }
-    return tables;
-  }
+  // Future<List<MetaDataNode>> getTables(String schema) async {
+  //   List<MetaDataNode> tables = List.empty(growable: true);
+  //   final results = await _query(
+  //       "select TABLE_NAME from information_schema.tables where table_schema='$schema' and TABLE_TYPE in ('BASE TABLE','SYSTEM VIEW')");
+  //   final rows = results.rows;
+  //   for (final result in rows) {
+  //     tables.add(MetaDataNode(MetaType.table, result.getString("TABLE_NAME")!));
+  //     // tables.add();
+  //   }
+  //   return tables;
+  // }
 
   static DataType getDataType(String dataType) {
     return switch (dataType) {
@@ -301,24 +327,24 @@ class MySQLConnection extends BaseConnection {
     };
   }
 
-  Future<List<MetaDataNode>> getTableColumns(
-      String schema, String table) async {
-    List<MetaDataNode> columns = List.empty(growable: true);
-    // ref: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html
-    final results = await _query(
-        "select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT, EXTRA from information_schema.columns where TABLE_SCHEMA = '$schema' and TABLE_NAME = '$table'");
-    final rows = results.rows;
-    for (final result in rows) {
-      final node =
-          MetaDataNode(MetaType.column, result.getString("COLUMN_NAME")!)
-            ..withProp(MetaDataPropType.dataType,
-                getDataType(result.getString("DATA_TYPE")!));
+  // Future<List<MetaDataNode>> getTableColumns(
+  //     String schema, String table) async {
+  //   List<MetaDataNode> columns = List.empty(growable: true);
+  //   // ref: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html
+  //   final results = await _query(
+  //       "select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT, EXTRA from information_schema.columns where TABLE_SCHEMA = '$schema' and TABLE_NAME = '$table'");
+  //   final rows = results.rows;
+  //   for (final result in rows) {
+  //     final node =
+  //         MetaDataNode(MetaType.column, result.getString("COLUMN_NAME")!)
+  //           ..withProp(MetaDataPropType.dataType,
+  //               getDataType(result.getString("DATA_TYPE")!));
 
-      columns.add(node);
-      // columns.add(TableColumnMeta.loadFromRow(result));
-    }
-    return columns;
-  }
+  //     columns.add(node);
+  //     // columns.add(TableColumnMeta.loadFromRow(result));
+  //   }
+  //   return columns;
+  // }
 
   // Future<List<MetaDataNode>> getTableKeys(String schema, String table) async {
   //   List<TableKeyMeta> keys = List.empty(growable: true);

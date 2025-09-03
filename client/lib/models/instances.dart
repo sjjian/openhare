@@ -1,3 +1,4 @@
+import 'package:client/utils/state_value.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
@@ -12,16 +13,15 @@ abstract class InstanceRepo {
   InstanceModel? getInstanceByName(String name);
   InstanceModel? getInstanceById(InstanceId id);
   List<InstanceModel> search(String key, {int? pageNumber, int? pageSize});
-  int count(String key);
+  int count({String? key});
   List<InstanceModel> getActiveInstances(int top);
   Future<void> addActiveInstance(InstanceId id);
   Future<void> addInstanceActiveSchema(InstanceId id, String schema);
 }
 
 abstract class InstanceMetadataRepo {
-  InstanceMetadataModel getMetadata(InstanceId instanceId);
-  void updateMetadata(InstanceId instanceId, MetaDataNode metadata);
-  void addMetadata(InstanceId instanceId, MetaDataNode metadata);
+  InstanceMetadataModel? getMetadata(InstanceId instanceId);
+  void updateMetadata(InstanceId instanceId, StateValue<List<MetaDataNode>> metadata);
 }
 
 // instances model
@@ -72,6 +72,7 @@ abstract class PaginationInstanceListModel with _$PaginationInstanceListModel {
     required int pageSize,
     required int count,
     required String key,
+    required int totalCount, // 总个数，非筛选过后的
   }) = _PaginationInstanceListModel;
 }
 
@@ -81,6 +82,6 @@ abstract class PaginationInstanceListModel with _$PaginationInstanceListModel {
 abstract class InstanceMetadataModel with _$InstanceMetadataModel {
   const factory InstanceMetadataModel({
     required InstanceId instanceId,
-    MetaDataNode? metadata,
+    required StateValue<List<MetaDataNode>> metadata,
   }) = _InstanceMetadataModel;
 }

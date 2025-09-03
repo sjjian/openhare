@@ -3,6 +3,7 @@ import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
@@ -25,22 +26,19 @@ class SqlResultTables extends ConsumerWidget {
       labelAlign: TextAlign.center,
       selectedColor: Theme.of(context)
           .colorScheme
-          .surfaceContainerLowest, // sql result tab 的选中颜色
+          .surfaceContainerLow, // sql result tab 的选中颜色
       color: Theme.of(context)
           .colorScheme
-          .surfaceContainerLow, // sql result tab 的背景色
+          .surfaceContainerLowest, // sql result tab 的背景色
       hoverColor: Theme.of(context)
           .colorScheme
-          .surfaceContainerLowest, // sql result tab 的鼠标移入色
+          .surfaceContainerLow, // sql result tab 的鼠标移入色
     );
 
     Widget tab = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
       Expanded(
         child: CommonTabBar(
           height: 36,
-          color: Theme.of(context)
-              .colorScheme
-              .surfaceContainerLow, // CommonTabBar 背景色
           tabStyle: style,
           onReorder: (oldIndex, newIndex) {
             final sqlResultsServices =
@@ -79,7 +77,8 @@ class SqlResultTables extends ConsumerWidget {
                 ]
               : [],
         ),
-      )
+      ),
+      const SizedBox(width: kSpacingTiny),
     ]);
 
     return Row(
@@ -91,6 +90,12 @@ class SqlResultTables extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 constraints: const BoxConstraints(maxHeight: 32),
                 child: tab,
+              ),
+              const SizedBox(height: kSpacingTiny),
+              Divider(
+                height: kBlockDividerSize,
+                thickness: kBlockDividerThickness,
+                color: Theme.of(context).dividerColor,
               ),
               const Expanded(child: SqlResultTable())
             ],
@@ -148,10 +153,15 @@ class SqlResultTable extends ConsumerWidget {
 
     final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
-      return Container(
-          alignment: Alignment.center,
-          color: color,
-          child: Text(AppLocalizations.of(context)!.display_msg_no_data));
+      return EmptyPage(
+        child: Text(
+          AppLocalizations.of(context)!.display_msg_no_data,
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(color: Theme.of(context).colorScheme.surfaceDim),
+        ),
+      );
     }
     if (model.state == SQLExecuteState.done) {
       return PlutoGrid(
@@ -175,7 +185,9 @@ class SqlResultTable extends ConsumerWidget {
           style: PlutoGridStyleConfig(
             rowHeight: 24,
             columnHeight: 32,
-            gridBorderColor: color,
+            gridBorderColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerLowest, // sql result table 边框颜色
             rowColor: color,
             activatedColor: Theme.of(context)
                 .colorScheme
@@ -203,7 +215,7 @@ class SqlResultTable extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Loading.big(),
+              const Loading.large(),
               const SizedBox(height: kSpacingMedium),
               FilledButton(
                   onPressed: () async {

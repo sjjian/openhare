@@ -47,7 +47,8 @@ class SessionAIChatNotifier extends _$SessionAIChatNotifier {
       sessionId: session.sessionId,
       currentSchema: session.currentSchema,
       dbType: session.dbType,
-      metadata: metadata?.metadata,
+      metadata: metadata?.metadata
+          .match((value) => value, (error) => null, () => null),
       connId: session.connId,
       state: session.connState,
       llmAgents: llmAgents,

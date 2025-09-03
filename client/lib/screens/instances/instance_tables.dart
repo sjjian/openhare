@@ -1,6 +1,7 @@
 import 'package:client/models/instances.dart';
 import 'package:client/screens/instances/instance_update.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
@@ -8,31 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:client/l10n/app_localizations.dart';
-
-part 'instance_tables.g.dart';
-
-@Riverpod(keepAlive: true)
-class InstancesNotifier extends _$InstancesNotifier {
-  @override
-  PaginationInstanceListModel build() {
-    return ref
-        .read(instancesServicesProvider.notifier)
-        .instances("", pageNumber: 1, pageSize: 10);
-  }
-
-  void changePage(String key, {int? pageNumber = 1, int? pageSize = 10}) {
-    state = ref
-        .read(instancesServicesProvider.notifier)
-        .instances(key, pageNumber: pageNumber, pageSize: pageSize);
-  }
-
-  void refresh() {
-    state = ref.read(instancesServicesProvider.notifier).instances(state.key,
-        pageNumber: state.currentPage, pageSize: state.pageSize);
-  }
-}
 
 class InstancesPage extends StatelessWidget {
   const InstancesPage({Key? key}) : super(key: key);
@@ -71,14 +48,15 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
       DataCell(Text(instance.connectValue.user)),
       DataCell(Row(
         children: [
-          IconButton(
+          RectangleIconButton.small(
+            icon: Icons.edit,
             onPressed: () {
               updateInstanceController.tryUpdateInstance(instance);
               GoRouter.of(context).go('/instances/update');
             },
-            icon: const Icon(Icons.edit),
           ),
-          IconButton(
+          RectangleIconButton.small(
+            icon: Icons.delete,
             onPressed: () async {
               await ref
                   .read(instancesServicesProvider.notifier)
@@ -86,11 +64,10 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
 
               ref.read(instancesNotifierProvider.notifier).refresh();
             },
-            icon: const Icon(Icons.delete),
           ),
-          IconButton(
+          RectangleIconButton.small(
+            icon: Icons.more_vert_outlined,
             onPressed: () {},
-            icon: const Icon(Icons.more_vert_outlined),
           )
         ],
       ))

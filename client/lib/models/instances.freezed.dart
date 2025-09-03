@@ -633,6 +633,7 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
   int get pageSize;
   int get count;
   String get key;
+  int get totalCount;
 
   /// Create a copy of PaginationInstanceListModel
   /// with the given fields replaced by the non-null parameter values.
@@ -651,7 +652,8 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('currentPage', currentPage))
       ..add(DiagnosticsProperty('pageSize', pageSize))
       ..add(DiagnosticsProperty('count', count))
-      ..add(DiagnosticsProperty('key', key));
+      ..add(DiagnosticsProperty('key', key))
+      ..add(DiagnosticsProperty('totalCount', totalCount));
   }
 
   @override
@@ -665,7 +667,9 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
             (identical(other.pageSize, pageSize) ||
                 other.pageSize == pageSize) &&
             (identical(other.count, count) || other.count == count) &&
-            (identical(other.key, key) || other.key == key));
+            (identical(other.key, key) || other.key == key) &&
+            (identical(other.totalCount, totalCount) ||
+                other.totalCount == totalCount));
   }
 
   @override
@@ -675,11 +679,12 @@ mixin _$PaginationInstanceListModel implements DiagnosticableTreeMixin {
       currentPage,
       pageSize,
       count,
-      key);
+      key,
+      totalCount);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count, key: $key)';
+    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count, key: $key, totalCount: $totalCount)';
   }
 }
 
@@ -695,7 +700,8 @@ abstract mixin class $PaginationInstanceListModelCopyWith<$Res> {
       int currentPage,
       int pageSize,
       int count,
-      String key});
+      String key,
+      int totalCount});
 }
 
 /// @nodoc
@@ -716,6 +722,7 @@ class _$PaginationInstanceListModelCopyWithImpl<$Res>
     Object? pageSize = null,
     Object? count = null,
     Object? key = null,
+    Object? totalCount = null,
   }) {
     return _then(_self.copyWith(
       instances: null == instances
@@ -738,6 +745,10 @@ class _$PaginationInstanceListModelCopyWithImpl<$Res>
           ? _self.key
           : key // ignore: cast_nullable_to_non_nullable
               as String,
+      totalCount: null == totalCount
+          ? _self.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -752,7 +763,8 @@ class _PaginationInstanceListModel
       required this.currentPage,
       required this.pageSize,
       required this.count,
-      required this.key})
+      required this.key,
+      required this.totalCount})
       : _instances = instances;
 
   final List<InstanceModel> _instances;
@@ -771,6 +783,8 @@ class _PaginationInstanceListModel
   final int count;
   @override
   final String key;
+  @override
+  final int totalCount;
 
   /// Create a copy of PaginationInstanceListModel
   /// with the given fields replaced by the non-null parameter values.
@@ -789,7 +803,8 @@ class _PaginationInstanceListModel
       ..add(DiagnosticsProperty('currentPage', currentPage))
       ..add(DiagnosticsProperty('pageSize', pageSize))
       ..add(DiagnosticsProperty('count', count))
-      ..add(DiagnosticsProperty('key', key));
+      ..add(DiagnosticsProperty('key', key))
+      ..add(DiagnosticsProperty('totalCount', totalCount));
   }
 
   @override
@@ -804,7 +819,9 @@ class _PaginationInstanceListModel
             (identical(other.pageSize, pageSize) ||
                 other.pageSize == pageSize) &&
             (identical(other.count, count) || other.count == count) &&
-            (identical(other.key, key) || other.key == key));
+            (identical(other.key, key) || other.key == key) &&
+            (identical(other.totalCount, totalCount) ||
+                other.totalCount == totalCount));
   }
 
   @override
@@ -814,11 +831,12 @@ class _PaginationInstanceListModel
       currentPage,
       pageSize,
       count,
-      key);
+      key,
+      totalCount);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count, key: $key)';
+    return 'PaginationInstanceListModel(instances: $instances, currentPage: $currentPage, pageSize: $pageSize, count: $count, key: $key, totalCount: $totalCount)';
   }
 }
 
@@ -836,7 +854,8 @@ abstract mixin class _$PaginationInstanceListModelCopyWith<$Res>
       int currentPage,
       int pageSize,
       int count,
-      String key});
+      String key,
+      int totalCount});
 }
 
 /// @nodoc
@@ -857,6 +876,7 @@ class __$PaginationInstanceListModelCopyWithImpl<$Res>
     Object? pageSize = null,
     Object? count = null,
     Object? key = null,
+    Object? totalCount = null,
   }) {
     return _then(_PaginationInstanceListModel(
       instances: null == instances
@@ -879,6 +899,10 @@ class __$PaginationInstanceListModelCopyWithImpl<$Res>
           ? _self.key
           : key // ignore: cast_nullable_to_non_nullable
               as String,
+      totalCount: null == totalCount
+          ? _self.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -886,7 +910,7 @@ class __$PaginationInstanceListModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$InstanceMetadataModel implements DiagnosticableTreeMixin {
   InstanceId get instanceId;
-  MetaDataNode? get metadata;
+  StateValue<List<MetaDataNode>> get metadata;
 
   /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -930,7 +954,7 @@ abstract mixin class $InstanceMetadataModelCopyWith<$Res> {
           $Res Function(InstanceMetadataModel) _then) =
       _$InstanceMetadataModelCopyWithImpl;
   @useResult
-  $Res call({InstanceId instanceId, MetaDataNode? metadata});
+  $Res call({InstanceId instanceId, StateValue<List<MetaDataNode>> metadata});
 
   $InstanceIdCopyWith<$Res> get instanceId;
 }
@@ -949,17 +973,17 @@ class _$InstanceMetadataModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? instanceId = null,
-    Object? metadata = freezed,
+    Object? metadata = null,
   }) {
     return _then(_self.copyWith(
       instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      metadata: freezed == metadata
+      metadata: null == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as MetaDataNode?,
+              as StateValue<List<MetaDataNode>>,
     ));
   }
 
@@ -979,12 +1003,13 @@ class _$InstanceMetadataModelCopyWithImpl<$Res>
 class _InstanceMetadataModel
     with DiagnosticableTreeMixin
     implements InstanceMetadataModel {
-  const _InstanceMetadataModel({required this.instanceId, this.metadata});
+  const _InstanceMetadataModel(
+      {required this.instanceId, required this.metadata});
 
   @override
   final InstanceId instanceId;
   @override
-  final MetaDataNode? metadata;
+  final StateValue<List<MetaDataNode>> metadata;
 
   /// Create a copy of InstanceMetadataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1031,7 +1056,7 @@ abstract mixin class _$InstanceMetadataModelCopyWith<$Res>
       __$InstanceMetadataModelCopyWithImpl;
   @override
   @useResult
-  $Res call({InstanceId instanceId, MetaDataNode? metadata});
+  $Res call({InstanceId instanceId, StateValue<List<MetaDataNode>> metadata});
 
   @override
   $InstanceIdCopyWith<$Res> get instanceId;
@@ -1051,17 +1076,17 @@ class __$InstanceMetadataModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? instanceId = null,
-    Object? metadata = freezed,
+    Object? metadata = null,
   }) {
     return _then(_InstanceMetadataModel(
       instanceId: null == instanceId
           ? _self.instanceId
           : instanceId // ignore: cast_nullable_to_non_nullable
               as InstanceId,
-      metadata: freezed == metadata
+      metadata: null == metadata
           ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
-              as MetaDataNode?,
+              as StateValue<List<MetaDataNode>>,
     ));
   }
 

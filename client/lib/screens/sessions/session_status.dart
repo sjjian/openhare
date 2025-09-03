@@ -13,11 +13,12 @@ class SessionStatusTab extends ConsumerWidget {
   const SessionStatusTab({Key? key}) : super(key: key);
 
   Widget divider(BuildContext context) {
-    return const VerticalDivider(
+    return VerticalDivider(
       thickness: kDividerThickness,
       width: kDividerSize,
       indent: 10,
       endIndent: 10,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 
@@ -38,59 +39,69 @@ class SessionStatusTab extends ConsumerWidget {
       padding: const EdgeInsets.only(left: kSpacingSmall),
       child: Row(
         children: [
-          Tooltip(
-            message: model.connErrorMsg ?? '-',
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 80),
-                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("${AppLocalizations.of(context)!.short_conn}:"),
-                    const SizedBox(width: 4),
-                    Expanded(
-                        child: switch (model.connState) {
-                      SQLConnectState.connected ||
-                      SQLConnectState.executing =>
-                        const Icon(Icons.check_circle,
-                            size: kIconSizeTiny, color: Colors.green),
-                      SQLConnectState.failed ||
-                      SQLConnectState.unHealth =>
-                        const Icon(Icons.error,
-                            size: kIconSizeTiny, color: Colors.red),
-                      _ => const Text("-"),
-                    } // 根据model.state展示不同的图标
-                        ),
-                  ],
+          if (model.connErrorMsg != null)
+            Tooltip(
+              message: model.connErrorMsg ?? '-',
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: IntrinsicWidth(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 100),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text("${AppLocalizations.of(context)!.short_conn}:"),
+                        const SizedBox(width: kSpacingSmall),
+                        Expanded(
+                            child: switch (model.connState) {
+                          SQLConnectState.connected ||
+                          SQLConnectState.executing =>
+                            const Icon(Icons.check_circle,
+                                size: kIconSizeTiny, color: Colors.green),
+                          SQLConnectState.failed ||
+                          SQLConnectState.unHealth =>
+                            const Icon(Icons.error,
+                                size: kIconSizeTiny, color: Colors.red),
+                          _ => const Text("-"),
+                        } // 根据model.state展示不同的图标
+                            ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
           if (model.resultId != null) ...[
+            const SizedBox(width: kSpacingSmall),
             divider(context),
+            const SizedBox(width: kSpacingSmall),
             ValueStatusWidget(
                 label: AppLocalizations.of(context)!.effect_rows,
                 value: affectedRowsDisplay,
                 tooltip: affectedRowsDisplay),
+            const SizedBox(width: kSpacingSmall),
             divider(context),
+            const SizedBox(width: kSpacingSmall),
             ValueStatusWidget(
                 label: AppLocalizations.of(context)!.duration,
                 value: executeTimeDisplay,
                 tooltip: executeTimeDisplay),
+            const SizedBox(width: kSpacingSmall),
             divider(context),
+            const SizedBox(width: kSpacingSmall),
             ValueStatusWidget(
                 width: 300,
                 label: AppLocalizations.of(context)!.query,
                 value: shortQueryDisplay,
                 tooltip: model.query ??
                     AppLocalizations.of(context)!.no_query_executed),
+            const SizedBox(width: kSpacingSmall),
             if (model.state == SQLExecuteState.done && model.resultId != null)
-              RectangleIconButton(
+              RectangleIconButton.medium(
+                tooltip: AppLocalizations.of(context)!
+                    .button_tooltip_sql_result_download,
                 icon: Icons.download_rounded,
                 iconColor: Colors.green,
-                iconSize: kIconSizeSmall,
                 onPressed: () async {
                   //todo: 下载失效了，需要测试。
                   String? outputFile = await FilePicker.platform.saveFile(
@@ -128,7 +139,7 @@ class ValueStatusWidget extends StatelessWidget {
     required this.label,
     required this.value,
     this.tooltip,
-    this.width = 120,
+    this.width = 150,
   }) : super(key: key);
 
   @override
@@ -137,21 +148,22 @@ class ValueStatusWidget extends StatelessWidget {
       message: tooltip ?? value,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: Container(
-          constraints: BoxConstraints(maxWidth: width),
-          padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text('$label:'),
-              const SizedBox(width: kSpacingTiny),
-              Expanded(
-                child: Text(
-                  value,
-                  overflow: TextOverflow.ellipsis,
+        child: IntrinsicWidth(
+          child: Container(
+            constraints: BoxConstraints(maxWidth: width),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('$label:'),
+                const SizedBox(width: kSpacingTiny),
+                Expanded(
+                  child: Text(
+                    value,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
