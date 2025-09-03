@@ -92,6 +92,11 @@ class SqlResultTables extends ConsumerWidget {
                 child: tab,
               ),
               const SizedBox(height: kSpacingTiny),
+              Divider(
+                height: kBlockDividerSize,
+                thickness: kBlockDividerThickness,
+                color: Theme.of(context).dividerColor,
+              ),
               const Expanded(child: SqlResultTable())
             ],
           ),
@@ -182,7 +187,7 @@ class SqlResultTable extends ConsumerWidget {
             columnHeight: 32,
             gridBorderColor: Theme.of(context)
                 .colorScheme
-                .surfaceContainerLow, // sql result table 边框颜色
+                .surfaceContainerLowest, // sql result table 边框颜色
             rowColor: color,
             activatedColor: Theme.of(context)
                 .colorScheme
