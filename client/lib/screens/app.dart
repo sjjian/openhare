@@ -2,6 +2,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/screens/instances/instance_add.dart';
 import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/screens/instances/instance_update.dart';
+import 'package:client/screens/page_skeleton.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
@@ -130,85 +131,87 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
-        NavigationRail(
-          minWidth: navigationRailWidth,
-          backgroundColor:
-              Theme.of(context).colorScheme.surfaceContainerHighest, // navigation color
-          useIndicator: true,
-          selectedIndex: _calculateSelectedIndex(context),
-          onDestinationSelected: (value) {
-            _onItemTapped(value, context);
-          },
-          extended: extended,
-          leading: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: tabbarHeight),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    extended = !extended;
-                  });
-                },
-                child: extended
-                    ? const Icon(Icons.menu_open, size: kIconSizeSmall)
-                    : const Icon(Icons.menu, size: kIconSizeSmall),
+        MoveWindows(
+          child: NavigationRail(
+            minWidth: navigationRailWidth,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest, // navigation color
+            useIndicator: true,
+            selectedIndex: _calculateSelectedIndex(context),
+            onDestinationSelected: (value) {
+              _onItemTapped(value, context);
+            },
+            extended: extended,
+            leading: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: tabbarHeight),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      extended = !extended;
+                    });
+                  },
+                  child: extended
+                      ? const Icon(Icons.menu_open, size: kIconSizeSmall)
+                      : const Icon(Icons.menu, size: kIconSizeSmall),
+                ),
+              ],
+            ),
+            destinations: [
+              NavigationRailDestination(
+                icon: const Icon(Icons.personal_video),
+                label: Text(
+                  AppLocalizations.of(context)!.sessions,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              NavigationRailDestination(
+                icon: HugeIcon(
+                  icon: HugeIcons.strokeRoundedDatabase,
+                  color: Theme.of(context).iconTheme.color ?? Colors.black87,
+                ),
+                label: Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.db_instance,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+              ),
+              NavigationRailDestination(
+                icon: const Icon(Icons.settings),
+                label: Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.settings,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+              ),
+              // About 页面
+              NavigationRailDestination(
+                icon: const Icon(Icons.info_outline),
+                label: Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.about,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
               ),
             ],
+            // trailing: Expanded(
+            //   child: Align(
+            //     alignment: Alignment.bottomCenter,
+            //     child: Padding(
+            //       padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
+            //       child: Image.asset(
+            //         "assets/icons/logo.png",
+            //         height: kIconSizeLarge,
+            //         width: kIconSizeLarge,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ),
-          destinations: [
-            NavigationRailDestination(
-              icon: const Icon(Icons.personal_video),
-              label: Text(
-                AppLocalizations.of(context)!.sessions,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-            NavigationRailDestination(
-              icon: HugeIcon(
-                icon: HugeIcons.strokeRoundedDatabase,
-                color: Theme.of(context).iconTheme.color ?? Colors.black87,
-              ),
-              label: Center(
-                child: Text(
-                  AppLocalizations.of(context)!.db_instance,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
-            NavigationRailDestination(
-              icon: const Icon(Icons.settings),
-              label: Center(
-                child: Text(
-                  AppLocalizations.of(context)!.settings,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
-            // About 页面
-            NavigationRailDestination(
-              icon: const Icon(Icons.info_outline),
-              label: Center(
-                child: Text(
-                  AppLocalizations.of(context)!.about,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
-          ],
-          // trailing: Expanded(
-          //   child: Align(
-          //     alignment: Alignment.bottomCenter,
-          //     child: Padding(
-          //       padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
-          //       child: Image.asset(
-          //         "assets/icons/logo.png",
-          //         height: kIconSizeLarge,
-          //         width: kIconSizeLarge,
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ),
         Expanded(child: widget.child)
       ],

@@ -2,8 +2,8 @@ import 'package:client/repositories/repo.dart';
 import 'package:client/screens/app.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   // This is required so ObjectBox can get the application directory
@@ -14,13 +14,20 @@ void main() async {
 
   await ConnectionFactory.init();
 
-  runApp(ProviderScope(child: App()));
+  await windowManager.ensureInitialized();
 
-  doWhenWindowReady(() {
-    const initialSize = Size(1400, 1000);
-    appWindow.minSize = const Size(1350, 900);
-    appWindow.size = initialSize;
-    appWindow.alignment = Alignment.center;
-    appWindow.show();
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(1400, 1000),
+    minimumSize: Size(1350, 900),
+    center: true,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
+  );
+
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
   });
+
+  runApp(ProviderScope(child: App()));
 }
