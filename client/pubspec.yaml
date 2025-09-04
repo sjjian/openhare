@@ -32,8 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   pluto_grid: ^8.0.0
-  window_manager: ^0.3.7
-  bitsdojo_window: ^0.1.6
+  window_manager: ^0.5.1
   cupertino_icons: ^1.0.2
   multi_split_view: ^3.6.0
   mysql_client: ^0.0.27

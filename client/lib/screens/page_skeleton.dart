@@ -1,35 +1,82 @@
 import 'package:client/screens/app.dart';
 import 'package:client/widgets/const.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:window_manager/window_manager.dart';
 
-final buttonColors = WindowButtonColors(
-    iconNormal: const Color(0xFF805306),
-    mouseOver: const Color(0xFFF6A00C),
-    mouseDown: const Color(0xFF805306),
-    iconMouseOver: const Color(0xFF805306),
-    iconMouseDown: const Color(0xFFFFD500));
 
-final closeButtonColors = WindowButtonColors(
-    mouseOver: const Color(0xFFD32F2F),
-    mouseDown: const Color(0xFFB71C1C),
-    iconNormal: const Color(0xFF805306),
-    iconMouseOver: Colors.white);
+// todo: 在windows上需要添加窗口按钮
+// final buttonColors = WindowButtonColors(
+//     iconNormal: const Color(0xFF805306),
+//     mouseOver: const Color(0xFFF6A00C),
+//     mouseDown: const Color(0xFF805306),
+//     iconMouseOver: const Color(0xFF805306),
+//     iconMouseDown: const Color(0xFFFFD500));
 
-class WindowButtons extends StatelessWidget {
-  const WindowButtons({Key? key}) : super(key: key);
+// final closeButtonColors = WindowButtonColors(
+//     mouseOver: const Color(0xFFD32F2F),
+//     mouseDown: const Color(0xFFB71C1C),
+//     iconNormal: const Color(0xFF805306),
+//     iconMouseOver: Colors.white);
+
+// class WindowButtons extends StatelessWidget {
+//   const WindowButtons({Key? key}) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         MinimizeWindowButton(colors: buttonColors),
+//         MaximizeWindowButton(colors: buttonColors),
+//         CloseWindowButton(colors: closeButtonColors),
+//       ],
+//     );
+//   }
+// }
+
+// class DragToMoveArea2 extends StatelessWidget {
+//   final Widget child;
+//   const DragToMoveArea2({super.key, required this.child});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       behavior: HitTestBehavior.translucent,
+//       onPanStart: (details) {
+//         windowManager.startDragging();
+//       },
+//       child: child,
+//     );
+//   }
+// }
+
+class MoveWindows extends StatelessWidget {
+  const MoveWindows({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        MinimizeWindowButton(colors: buttonColors),
-        MaximizeWindowButton(colors: buttonColors),
-        CloseWindowButton(colors: closeButtonColors),
-      ],
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onPanStart: (details) {
+        windowManager.startDragging();
+      },
+      // todo: 存在手势竞争，换导致看起来点击child的按钮卡顿
+      // onDoubleTap: () async {
+      //   bool isMaximized = await windowManager.isMaximized();
+      //   if (!isMaximized) {
+      //     windowManager.maximize();
+      //   } else {
+      //     windowManager.unmaximize();
+      //   }
+      // },
+      child: child,
     );
   }
 }
+
 
 class PageSkeleton extends StatelessWidget {
   final Widget? topBar;
@@ -56,13 +103,12 @@ class PageSkeleton extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: MoveWindow(
-                    // todo: MoveWindow 存在延迟, 看后续如何优化, 参考: https://github.com/bitsdojo/bitsdojo_window/issues/187
-                    child: topBar,
+                  child: MoveWindows(
+                    child: topBar ?? const SizedBox.expand(),
                   ),
                 ),
                 const SizedBox(width: kSpacingLarge), // 顶部 tab 空部分空间, 防止无法拖动窗口.
-                if (!kIsWeb) const WindowButtons(),
+                // if (!kIsWeb) const WindowButtons(),
               ],
             ),
           ),
