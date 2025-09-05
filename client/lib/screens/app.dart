@@ -6,6 +6,7 @@ import 'package:client/screens/page_skeleton.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
+import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/const.dart';

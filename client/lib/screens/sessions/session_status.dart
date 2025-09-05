@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:client/models/sessions.dart';
+import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/button.dart';

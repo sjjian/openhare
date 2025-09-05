@@ -4,6 +4,7 @@ import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:excel/excel.dart' as excel;
 
 part 'session_sql_result.g.dart';
 
@@ -106,5 +107,56 @@ class SQLResultsServices extends _$SQLResultsServices {
   SQLResultDetailModel? getSQLResult(ResultId resultId) {
     final repo = ref.read(sqlResultsRepoProvider);
     return repo.getSQLResult(resultId);
+  }
+}
+
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
+  @override
+  SessionSQLResultsModel? build() {
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
+    if (sessionModel == null) {
+      return null;
+    }
+    return ref.watch(sQLResultsServicesProvider.select((m) {
+      return m.cache[sessionModel.sessionId];
+    }));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
+  @override
+  SQLResultDetailModel? build() {
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
+    if (sessionModel == null) {
+      return null;
+    }
+    SQLResultModel? sqlResultModel =
+        ref.watch(sQLResultsServicesProvider.select((m) {
+      return m.cache[sessionModel.sessionId]?.selected;
+    }));
+    if (sqlResultModel == null) {
+      return null;
+    }
+    return ref
+        .read(sQLResultsServicesProvider.notifier)
+        .getSQLResult(sqlResultModel.resultId);
+  }
+
+  excel.Excel toExcel() {
+    final data = excel.Excel.createExcel();
+    final sheet = data["Sheet1"];
+    sheet.appendRow(state!.data!.columns
+        .map<excel.TextCellValue>((e) => excel.TextCellValue(e.name))
+        .toList());
+    for (final row in state!.data!.rows) {
+      sheet.appendRow(row.values
+          .map<excel.TextCellValue>(
+              (e) => excel.TextCellValue(e.getString() ?? ''))
+          .toList());
+    }
+    return data;
   }
 }

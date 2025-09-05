@@ -1,5 +1,5 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/sessions/session_metadata_tree.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/data_tree.dart';

@@ -1,4 +1,6 @@
 import 'package:client/models/sessions.dart';
+import 'package:client/services/sessions/session_drawer.dart';
+import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/sessions.dart';

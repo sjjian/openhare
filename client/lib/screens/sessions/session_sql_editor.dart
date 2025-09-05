@@ -1,5 +1,5 @@
 import 'package:client/models/sessions.dart';
-import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/widgets/const.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';

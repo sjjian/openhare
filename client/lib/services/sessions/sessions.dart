@@ -5,18 +5,13 @@ import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/repositories/sessions/sessions.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/services/instances/instances.dart';
-import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/session_conn.dart';
+import 'package:client/services/sessions/session_drawer.dart';
+import 'package:client/services/sessions/session_metadata_tree.dart';
+import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_controller.dart';
-import 'package:client/utils/sql_highlight.dart';
-import 'package:client/utils/state_value.dart';
-import 'package:client/widgets/data_tree.dart';
-import 'package:db_driver/db_driver.dart';
-import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sql_editor/re_editor.dart';
-import 'package:excel/excel.dart' as excel;
 
 part 'sessions.g.dart';
 
@@ -158,65 +153,6 @@ class SessionsServices extends _$SessionsServices {
 }
 
 @Riverpod(keepAlive: true)
-class SessionSQLEditorService extends _$SessionSQLEditorService {
-  @override
-  SessionEditorModel build(SessionId sessionId) {
-    final controller = CodeLineEditingController(
-      spanBuilder: ({required codeLines, required context, required style}) {
-        return getSQLHighlightTextSpan(codeLines.asString(TextLineBreak.lf),
-            defalutStyle: style);
-      },
-    );
-
-    final code = ref.read(sessionRepoProvider).getCode(sessionId);
-    controller.text = code ?? "";
-    return SessionEditorModel(code: controller);
-  }
-
-  void saveCode() {
-    ref.read(sessionRepoProvider).saveCode(sessionId, state.code.text);
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionDrawerServices extends _$SessionDrawerServices {
-  @override
-  SessionDrawerModel build(SessionId sessionId) {
-    return SessionDrawerModel(
-        sessionId: sessionId,
-        drawerPage: DrawerPage.metadataTree,
-        sqlResult: null,
-        sqlColumn: null,
-        showRecord: false,
-        isRightPageOpen: true);
-  }
-
-  void showRightPage() {
-    state = state.copyWith(isRightPageOpen: true);
-  }
-
-  void hideRightPage() {
-    state = state.copyWith(isRightPageOpen: false);
-  }
-
-  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
-    state = state.copyWith(
-      drawerPage: DrawerPage.sqlResult,
-      sqlColumn: column ?? state.sqlColumn,
-      sqlResult: result ?? state.sqlResult,
-    );
-  }
-
-  void goToTree() {
-    state = state.copyWith(drawerPage: DrawerPage.metadataTree);
-  }
-
-  void showChat() {
-    state = state.copyWith(drawerPage: DrawerPage.aiChat);
-  }
-}
-
-@Riverpod(keepAlive: true)
 class SelectedSessionNotifier extends _$SelectedSessionNotifier {
   @override
   SessionModel? build() {
@@ -285,121 +221,12 @@ class SelectedSessionDetailNotifier extends _$SelectedSessionDetailNotifier {
   }
 }
 
-@Riverpod(keepAlive: true)
-class SessionDrawerNotifier extends _$SessionDrawerNotifier {
-  @override
-  SessionDrawerModel build() {
-    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return ref
-          .watch(sessionDrawerServicesProvider(const SessionId(value: 0)));
-    }
-    return ref.watch(sessionDrawerServicesProvider(sessionModel.sessionId));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionMetadataServices extends _$SessionMetadataServices {
-  @override
-  SessionMetadataTreeModel? build(SessionId sessionId) {
-    SessionModel? sessionModel =
-        ref.read(sessionsServicesProvider.notifier).getSession(sessionId);
-    if (sessionModel == null || sessionModel.instanceId == null) {
-      return null;
-    }
-
-    InstanceMetadataModel? metadataModel =
-        ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
-
-    // 如果 metadataModel 为空，则刷新
-    if (metadataModel == null) {
-      ref
-          .read(instanceMetadataServicesProvider(sessionModel.instanceId!)
-              .notifier)
-          .refreshMetadata();
-
-      return null;
-    }
-
-    return metadataModel.metadata.match(
-      (value) {
-        List<MetaDataNode> items = value;
-        RootNode root = RootNode();
-        final metadataController = TreeController<DataNode>(
-          roots: buildMetadataTree(root, items).children,
-          childrenProvider: (DataNode node) => node.children,
-        );
-
-        root.visitor((node) {
-          // 默认打开 SchemaNode
-          if (node is SchemaNode) {
-            metadataController.setExpansionState(node, true);
-          }
-          // 默认打开 currentSchema 对应的节点
-          if (node is SchemaValueNode &&
-              node.name == sessionModel.currentSchema) {
-            metadataController.setExpansionState(node, true);
-          }
-          // 默认打开所有table 节点
-          if (node is TableNode) {
-            metadataController.setExpansionState(node, true);
-          }
-          // 默认打开所有column 节点
-          if (node is ColumnNode) {
-            metadataController.setExpansionState(node, true);
-          }
-          return true;
-        });
-        return SessionMetadataTreeModel(
-          sessionId: sessionId,
-          metadataTreeCtrl: StateValue.done(metadataController),
-        );
-      },
-      (error) {
-        return SessionMetadataTreeModel(
-          sessionId: sessionId,
-          metadataTreeCtrl: StateValue.error(error),
-        );
-      },
-      () {
-        return SessionMetadataTreeModel(
-          sessionId: sessionId,
-          metadataTreeCtrl: const StateValue.running(),
-        );
-      },
-    );
-  }
-
-  Future<void> refresh() async {
-    final model =
-        ref.read(sessionsServicesProvider.notifier).getSession(sessionId);
-    if (model == null || model.instanceId == null) {
-      return;
-    }
-    ref
-        .read(instanceMetadataServicesProvider(model.instanceId!).notifier)
-        .refreshMetadata();
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionMetadataNotifier extends _$SessionMetadataNotifier {
-  @override
-  SessionMetadataTreeModel? build() {
-    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null || sessionModel.instanceId == null) {
-      return null;
-    }
-    return ref.watch(sessionMetadataServicesProvider(sessionModel.sessionId));
-  }
-}
-
 @Riverpod()
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
   SessionOpBarModel? build() {
     SessionDetailModel? session =
-        ref.watch(selectedSessionDetailNotifierProvider); // need conn
+        ref.watch(selectedSessionDetailNotifierProvider);
     if (session == null) {
       return null;
     }
@@ -421,100 +248,11 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
 }
 
 @Riverpod(keepAlive: true)
-class SelectedSessionSQLEditorNotifier
-    extends _$SelectedSessionSQLEditorNotifier {
-  @override
-  SessionSQLEditorModel build() {
-    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return const SessionSQLEditorModel();
-    }
-    if (sessionModel.instanceId != null) {
-      InstanceMetadataModel? sessionMeta =
-          ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
-      return SessionSQLEditorModel(
-        currentSchema: sessionModel.currentSchema,
-        metadata: sessionMeta?.metadata
-            .match((value) => value, (error) => null, () => null),
-      );
-    }
-
-    return SessionSQLEditorModel(
-      currentSchema: sessionModel.currentSchema,
-      metadata: null,
-    );
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionEditorNotifier extends _$SessionEditorNotifier {
-  @override
-  SessionEditorModel build() {
-    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return ref
-          .watch(sessionSQLEditorServiceProvider(const SessionId(value: 0)));
-    }
-    return ref.watch(sessionSQLEditorServiceProvider(sessionModel.sessionId));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
-  @override
-  SessionSQLResultsModel? build() {
-    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return null;
-    }
-    return ref.watch(sQLResultsServicesProvider.select((m) {
-      return m.cache[sessionModel.sessionId];
-    }));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
-  @override
-  SQLResultDetailModel? build() {
-    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return null;
-    }
-    SQLResultModel? sqlResultModel =
-        ref.watch(sQLResultsServicesProvider.select((m) {
-      return m.cache[sessionModel.sessionId]?.selected;
-    }));
-    if (sqlResultModel == null) {
-      return null;
-    }
-    return ref
-        .read(sQLResultsServicesProvider.notifier)
-        .getSQLResult(sqlResultModel.resultId);
-  }
-
-  excel.Excel toExcel() {
-    final data = excel.Excel.createExcel();
-    final sheet = data["Sheet1"];
-    sheet.appendRow(state!.data!.columns
-        .map<excel.TextCellValue>((e) => excel.TextCellValue(e.name))
-        .toList());
-    for (final row in state!.data!.rows) {
-      sheet.appendRow(row.values
-          .map<excel.TextCellValue>(
-              (e) => excel.TextCellValue(e.getString() ?? ''))
-          .toList());
-    }
-    return data;
-  }
-}
-
-@Riverpod(keepAlive: true)
 class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
   @override
   SessionStatusModel? build() {
     SessionDetailModel? session =
-        ref.watch(selectedSessionDetailNotifierProvider); // need detail
+        ref.watch(selectedSessionDetailNotifierProvider);
     if (session == null) {
       return null;
     }
