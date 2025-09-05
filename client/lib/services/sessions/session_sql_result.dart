@@ -44,7 +44,7 @@ class SQLResultsServices extends _$SQLResultsServices {
     return result;
   }
 
-  Future<void> loadFromQuery(ResultId resultId, String query) async {
+  Future<void> _query(ResultId resultId, String query) async {
     final repo = ref.read(sqlResultsRepoProvider);
 
     repo.updateSQLResult(
@@ -66,24 +66,41 @@ class SQLResultsServices extends _$SQLResultsServices {
       DateTime end = DateTime.now();
 
       repo.updateSQLResult(
-          resultId,
-          SQLResultDetailModel(
-              resultId: resultId,
-              query: query,
-              data: queryResult,
-              executeTime: end.difference(start),
-              state: SQLExecuteState.done));
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          data: queryResult,
+          executeTime: end.difference(start),
+          state: SQLExecuteState.done,
+        ),
+      );
     } catch (e) {
       repo.updateSQLResult(
-          resultId,
-          SQLResultDetailModel(
-              resultId: resultId,
-              query: query,
-              state: SQLExecuteState.error,
-              error: e.toString()));
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          state: SQLExecuteState.error,
+          error: e.toString(),
+        ),
+      );
     } finally {
+      // sleep 200ms, 不然当界面刷新太快时，无法感知结果是没变还是没执行. todo
+      await Future.delayed(const Duration(milliseconds: 200));
       ref.invalidateSelf();
     }
+  }
+
+  Future<void> queryAddResult(SessionId sessionId, String query) async {
+    final resultModel = addSQLResult(sessionId);
+    _query(resultModel.resultId, query);
+  }
+
+  Future<void> query(SessionId sessionId, String query) async {
+    SQLResultModel? resultModel = selectedSQLResult(sessionId);
+    resultModel ??= addSQLResult(sessionId);
+    _query(resultModel.resultId, query);
   }
 
   SQLResultDetailModel? getSQLResult(ResultId resultId) {

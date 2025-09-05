@@ -31,7 +31,7 @@ class SessionController {
       return cache[sessionId]!;
     }
     final controller = SessionController(
-      multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
+      multiSplitViewCtrl: SplitViewController(Area(flex: 5, min: 0), Area(flex: 5, min: 0)),
       metaDataSplitViewCtrl:
           SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)),
       aiChatSearchTextController: TextEditingController(),

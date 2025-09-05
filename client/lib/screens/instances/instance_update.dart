@@ -1,5 +1,4 @@
 import 'package:client/models/instances.dart';
-import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/button.dart';

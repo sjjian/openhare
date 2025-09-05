@@ -255,6 +255,10 @@
   "@button_tooltip_run_sql_new_tab": {
     "description": "Button tooltip run SQL on new tab"
   },
+  "button_tooltip_save": "Save SQL",
+  "@button_tooltip_save": {
+    "description": "Button tooltip save SQL"
+  },
   "button_tooltip_copy_sql": "Copy SQL text",
   "@button_tooltip_copy_sql": {
     "description": "Button tooltip copy SQL text"

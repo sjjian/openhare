@@ -568,12 +568,11 @@ class _SqlChatFieldState extends State<SqlChatField> {
 class SessionChatMessages extends ConsumerWidget {
   const SessionChatMessages({super.key});
 
-  // todo: 重复代码
   void _runSQL(BuildContext context, WidgetRef ref, SessionAIChatModel model,
       String code) {
-    final sqlResultsServices = ref.read(sQLResultsServicesProvider.notifier);
-    final resultModel = sqlResultsServices.addSQLResult(model.sessionId);
-    sqlResultsServices.loadFromQuery(resultModel.resultId, code);
+    ref
+        .read(sQLResultsServicesProvider.notifier)
+        .queryAddResult(model.sessionId, code);
   }
 
   void _retryMessage(BuildContext context, WidgetRef ref,

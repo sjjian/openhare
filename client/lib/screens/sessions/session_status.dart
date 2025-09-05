@@ -39,7 +39,7 @@ class SessionStatusTab extends ConsumerWidget {
       padding: const EdgeInsets.only(left: kSpacingSmall),
       child: Row(
         children: [
-          if (model.connErrorMsg != null)
+          if (model.connState != null)
             Tooltip(
               message: model.connErrorMsg ?? '-',
               child: MouseRegion(

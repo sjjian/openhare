@@ -141,15 +141,9 @@ class SessionOpBar extends ConsumerWidget {
       onPressed: SQLConnectState.isIdle(model.state)
           ? () {
               String query = getQuery();
-              final sqlResultsServices =
-                  ref.read(sQLResultsServicesProvider.notifier);
-
-              SQLResultModel? resultModel =
-                  sqlResultsServices.selectedSQLResult(model.sessionId);
-
-              resultModel ??= sqlResultsServices.addSQLResult(model.sessionId);
-
-              sqlResultsServices.loadFromQuery(resultModel.resultId, query);
+              ref
+                  .read(sQLResultsServicesProvider.notifier)
+                  .query(model.sessionId, query);
             }
           : () {
               connectDialog(context, ref, model);
@@ -169,11 +163,9 @@ class SessionOpBar extends ConsumerWidget {
             ? () {
                 String query = getQuery();
                 if (query.isNotEmpty) {
-                  final sqlResultsServices =
-                      ref.read(sQLResultsServicesProvider.notifier);
-                  final resultModel =
-                      sqlResultsServices.addSQLResult(model.sessionId);
-                  sqlResultsServices.loadFromQuery(resultModel.resultId, query);
+                  ref
+                      .read(sQLResultsServicesProvider.notifier)
+                      .queryAddResult(model.sessionId, query);
                 }
               }
             : () {
@@ -197,17 +189,28 @@ class SessionOpBar extends ConsumerWidget {
           ? () {
               String query = getQuery();
               if (query.isNotEmpty) {
-                final sqlResultsServices =
-                    ref.read(sQLResultsServicesProvider.notifier);
-                final resultModel =
-                    sqlResultsServices.addSQLResult(model.sessionId);
-                sqlResultsServices.loadFromQuery(
-                    resultModel.resultId, "explain $query");
+                ref
+                    .read(sQLResultsServicesProvider.notifier)
+                    .queryAddResult(model.sessionId, "explain $query");
               }
             }
           : () {
               connectDialog(context, ref, model);
             },
+    );
+  }
+
+  Widget saveWidget(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    return RectangleIconButton.medium(
+      tooltip: AppLocalizations.of(context)!.button_tooltip_save,
+      icon: Icons.save,
+      iconColor: Theme.of(context).colorScheme.onSurface,
+      onPressed: () {
+        ref
+            .read(sessionSQLEditorServiceProvider(model.sessionId).notifier)
+            .saveCode();
+      },
     );
   }
 
@@ -250,6 +253,7 @@ class SessionOpBar extends ConsumerWidget {
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
+          saveWidget(context, ref, model),
           const Expanded(child: SessionDrawerBar()),
         ],
       ),
@@ -373,7 +377,8 @@ class SessionDrawerBar extends ConsumerWidget {
         const Spacer(),
         if (model.isRightPageOpen) ...[
           RectangleIconButton.medium(
-              tooltip: AppLocalizations.of(context)!.button_tooltip_metadata_tree,
+              tooltip:
+                  AppLocalizations.of(context)!.button_tooltip_metadata_tree,
               icon: Icons.account_tree_outlined,
               backgroundColor: (model.drawerPage == DrawerPage.metadataTree)
                   ? Theme.of(context).colorScheme.primaryContainer

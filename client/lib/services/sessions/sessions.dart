@@ -98,7 +98,8 @@ class SessionsServices extends _$SessionsServices {
 
     // 1. delete session
     await ref.read(sessionRepoProvider).deleteSession(session.sessionId);
-
+    ref.invalidateSelf();
+    
     // 2. kill and close conn
     if (session.connId != null) {
       final connsServices = ref.read(sessionConnsServicesProvider.notifier);
@@ -120,8 +121,6 @@ class SessionsServices extends _$SessionsServices {
     ref.invalidate(sessionDrawerServicesProvider(session.sessionId));
     ref.invalidate(sessionMetadataServicesProvider(session.sessionId));
     SessionController.removeSessionController(session.sessionId);
-
-    ref.invalidateSelf();
   }
 
   Future<void> connectSession(SessionId sessionId) async {
@@ -319,15 +318,7 @@ class SessionDrawerNotifier extends _$SessionDrawerNotifier {
 class SessionMetadataServices extends _$SessionMetadataServices {
   @override
   SessionMetadataTreeModel? build(SessionId sessionId) {
-    // todo: 感觉开销有点高
-    SessionModel? sessionModel = ref.watch(sessionsServicesProvider.select((s) {
-      for (final session in s.sessions) {
-        if (session.sessionId == sessionId) {
-          return session;
-        }
-      }
-      return null;
-    }));
+    SessionDetailModel? sessionModel = ref.read(sessionsServicesProvider.notifier).getSession(sessionId);
     if (sessionModel == null || sessionModel.instanceId == null) {
       return null;
     }
