@@ -7,7 +7,7 @@ part of 'session_sql_result.dart';
 // **************************************************************************
 
 String _$sQLResultsServicesHash() =>
-    r'c5145c4e39b1d323c60866b83cf9419478dae425';
+    r'2e170f7bfc21a865581ae8a1d9927ee83d534fdd';
 
 /// See also [SQLResultsServices].
 @ProviderFor(SQLResultsServices)

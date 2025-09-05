@@ -13,7 +13,7 @@ class SessionsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
+    SessionModel? session = ref.watch(selectedSessionNotifierProvider);
     if (session == null || session.instanceId == null) {
       return const PageSkeleton(
         key: Key("add_session"),

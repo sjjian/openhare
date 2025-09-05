@@ -14,7 +14,7 @@ part 'session_chat.g.dart';
 class SessionAIChatNotifier extends _$SessionAIChatNotifier {
   @override
   SessionAIChatModel? build() {
-    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
+    SessionDetailModel? session = ref.watch(selectedSessionDetailNotifierProvider);
     if (session == null) {
       return null;
     }

@@ -36,7 +36,7 @@ class SessionTabs extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionDetailListModel model = ref.watch(sessionsNotifierProvider);
+    SessionDetailListModel model = ref.watch(sessionsDetailNotifierProvider);
     return Padding(
       padding: const EdgeInsets.only(top: kSpacingTiny),
       child: Row(

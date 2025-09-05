@@ -219,7 +219,7 @@ class SqlResultTable extends ConsumerWidget {
               const SizedBox(height: kSpacingMedium),
               FilledButton(
                   onPressed: () async {
-                    SessionDetailModel? sessionModel = ref
+                    SessionModel? sessionModel = ref
                         .read(sessionsServicesProvider.notifier)
                         .getSession(model.resultId.sessionId);
 

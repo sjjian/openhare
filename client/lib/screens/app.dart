@@ -134,8 +134,9 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
         MoveWindows(
           child: NavigationRail(
             minWidth: navigationRailWidth,
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest, // navigation color
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest, // navigation color
             useIndicator: true,
             selectedIndex: _calculateSelectedIndex(context),
             onDestinationSelected: (value) {
@@ -259,8 +260,8 @@ class _WindowListener with WindowListener {
 
   @override
   void onWindowClose() async {
-    SessionDetailListModel sessionRepo = ref.read(sessionsNotifierProvider);
-    for (var session in sessionRepo.sessions) {
+    SessionListModel sessions = ref.read(sessionsServicesProvider);
+    for (var session in sessions.sessions) {
       ref
           .read(sessionSQLEditorServiceProvider(session.sessionId).notifier)
           .saveCode();

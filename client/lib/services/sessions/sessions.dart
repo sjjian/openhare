@@ -28,33 +28,8 @@ class SessionsServices extends _$SessionsServices {
     return sessions;
   }
 
-  SessionDetailModel? getSession(SessionId sessionId) {
-    SessionModel? session = ref.read(sessionRepoProvider).getSession(sessionId);
-    if (session == null) {
-      return null;
-    }
-
-    InstanceModel? instance = session.instanceId == null
-        ? null
-        : ref
-            .read(instancesServicesProvider.notifier)
-            .getInstanceById(session.instanceId!);
-
-    SessionConnModel? conn = session.connId == null
-        ? null
-        : ref
-            .read(sessionConnsServicesProvider.notifier)
-            .getConn(session.connId!);
-
-    return SessionDetailModel(
-      sessionId: session.sessionId,
-      instanceId: instance?.id,
-      instanceName: instance?.name,
-      dbType: instance?.dbType,
-      connId: conn?.connId,
-      connState: conn?.state,
-      currentSchema: session.currentSchema,
-    );
+  SessionModel? getSession(SessionId sessionId) {
+    return ref.read(sessionRepoProvider).getSession(sessionId);
   }
 
   void selectSessionByIndex(int index) {
@@ -99,7 +74,7 @@ class SessionsServices extends _$SessionsServices {
     // 1. delete session
     await ref.read(sessionRepoProvider).deleteSession(session.sessionId);
     ref.invalidateSelf();
-    
+
     // 2. kill and close conn
     if (session.connId != null) {
       final connsServices = ref.read(sessionConnsServicesProvider.notifier);
@@ -242,7 +217,17 @@ class SessionDrawerServices extends _$SessionDrawerServices {
 }
 
 @Riverpod(keepAlive: true)
-class SessionsNotifier extends _$SessionsNotifier {
+class SelectedSessionNotifier extends _$SelectedSessionNotifier {
+  @override
+  SessionModel? build() {
+    return ref.watch(sessionsServicesProvider.select((s) {
+      return s.selectedSession;
+    }));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SessionsDetailNotifier extends _$SessionsDetailNotifier {
   @override
   SessionDetailListModel build() {
     SessionListModel sessions = ref.watch(sessionsServicesProvider);
@@ -291,10 +276,10 @@ class SessionsNotifier extends _$SessionsNotifier {
 }
 
 @Riverpod(keepAlive: true)
-class SelectedSessionNotifier extends _$SelectedSessionNotifier {
+class SelectedSessionDetailNotifier extends _$SelectedSessionDetailNotifier {
   @override
   SessionDetailModel? build() {
-    return ref.watch(sessionsNotifierProvider.select((s) {
+    return ref.watch(sessionsDetailNotifierProvider.select((s) {
       return s.selectedSession;
     }));
   }
@@ -304,8 +289,7 @@ class SelectedSessionNotifier extends _$SelectedSessionNotifier {
 class SessionDrawerNotifier extends _$SessionDrawerNotifier {
   @override
   SessionDrawerModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
       return ref
           .watch(sessionDrawerServicesProvider(const SessionId(value: 0)));
@@ -318,7 +302,8 @@ class SessionDrawerNotifier extends _$SessionDrawerNotifier {
 class SessionMetadataServices extends _$SessionMetadataServices {
   @override
   SessionMetadataTreeModel? build(SessionId sessionId) {
-    SessionDetailModel? sessionModel = ref.read(sessionsServicesProvider.notifier).getSession(sessionId);
+    SessionModel? sessionModel =
+        ref.read(sessionsServicesProvider.notifier).getSession(sessionId);
     if (sessionModel == null || sessionModel.instanceId == null) {
       return null;
     }
@@ -401,8 +386,7 @@ class SessionMetadataServices extends _$SessionMetadataServices {
 class SessionMetadataNotifier extends _$SessionMetadataNotifier {
   @override
   SessionMetadataTreeModel? build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null || sessionModel.instanceId == null) {
       return null;
     }
@@ -414,7 +398,8 @@ class SessionMetadataNotifier extends _$SessionMetadataNotifier {
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
   SessionOpBarModel? build() {
-    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
+    SessionDetailModel? session =
+        ref.watch(selectedSessionDetailNotifierProvider); // need conn
     if (session == null) {
       return null;
     }
@@ -440,8 +425,7 @@ class SelectedSessionSQLEditorNotifier
     extends _$SelectedSessionSQLEditorNotifier {
   @override
   SessionSQLEditorModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
       return const SessionSQLEditorModel();
     }
@@ -466,8 +450,7 @@ class SelectedSessionSQLEditorNotifier
 class SessionEditorNotifier extends _$SessionEditorNotifier {
   @override
   SessionEditorModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
       return ref
           .watch(sessionSQLEditorServiceProvider(const SessionId(value: 0)));
@@ -480,8 +463,7 @@ class SessionEditorNotifier extends _$SessionEditorNotifier {
 class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
   @override
   SessionSQLResultsModel? build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
       return null;
     }
@@ -495,8 +477,7 @@ class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
 class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
   @override
   SQLResultDetailModel? build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
       return null;
     }
@@ -532,7 +513,8 @@ class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
 class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
   @override
   SessionStatusModel? build() {
-    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
+    SessionDetailModel? session =
+        ref.watch(selectedSessionDetailNotifierProvider); // need detail
     if (session == null) {
       return null;
     }

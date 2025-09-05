@@ -86,8 +86,8 @@ class SQLResultsServices extends _$SQLResultsServices {
         ),
       );
     } finally {
-      // sleep 200ms, 不然当界面刷新太快时，无法感知结果是没变还是没执行. todo
-      await Future.delayed(const Duration(milliseconds: 200));
+      // sleep 100ms, 不然当界面刷新太快时，无法感知结果是没变还是没执行.
+      await Future.delayed(const Duration(milliseconds: 100));
       ref.invalidateSelf();
     }
   }

@@ -6,7 +6,7 @@ part of 'sessions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionsServicesHash() => r'41e5b50ee48503cc3bfcff5bfca1a95f2888d925';
+String _$sessionsServicesHash() => r'328c4d822fe2b27b54da19ee98c4438462e090b1';
 
 /// See also [SessionsServices].
 @ProviderFor(SessionsServices)
@@ -341,29 +341,13 @@ class _SessionDrawerServicesProviderElement
       (origin as SessionDrawerServicesProvider).sessionId;
 }
 
-String _$sessionsNotifierHash() => r'212cae0abe875e854818233fea3f558b4f4937e1';
-
-/// See also [SessionsNotifier].
-@ProviderFor(SessionsNotifier)
-final sessionsNotifierProvider =
-    NotifierProvider<SessionsNotifier, SessionDetailListModel>.internal(
-  SessionsNotifier.new,
-  name: r'sessionsNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sessionsNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SessionsNotifier = Notifier<SessionDetailListModel>;
 String _$selectedSessionNotifierHash() =>
-    r'0c574b88274a3e3398eb45a4578f0cfd8a937a7a';
+    r'1a775e95895ff62781465bbecf5f107f38548fd7';
 
 /// See also [SelectedSessionNotifier].
 @ProviderFor(SelectedSessionNotifier)
 final selectedSessionNotifierProvider =
-    NotifierProvider<SelectedSessionNotifier, SessionDetailModel?>.internal(
+    NotifierProvider<SelectedSessionNotifier, SessionModel?>.internal(
   SelectedSessionNotifier.new,
   name: r'selectedSessionNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -373,9 +357,43 @@ final selectedSessionNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SelectedSessionNotifier = Notifier<SessionDetailModel?>;
+typedef _$SelectedSessionNotifier = Notifier<SessionModel?>;
+String _$sessionsDetailNotifierHash() =>
+    r'0d2008c156b827fb25854f8e90636e69d5704498';
+
+/// See also [SessionsDetailNotifier].
+@ProviderFor(SessionsDetailNotifier)
+final sessionsDetailNotifierProvider =
+    NotifierProvider<SessionsDetailNotifier, SessionDetailListModel>.internal(
+  SessionsDetailNotifier.new,
+  name: r'sessionsDetailNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sessionsDetailNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SessionsDetailNotifier = Notifier<SessionDetailListModel>;
+String _$selectedSessionDetailNotifierHash() =>
+    r'0dcf1c781f6f004f2d672c388538823c6ae550e2';
+
+/// See also [SelectedSessionDetailNotifier].
+@ProviderFor(SelectedSessionDetailNotifier)
+final selectedSessionDetailNotifierProvider = NotifierProvider<
+    SelectedSessionDetailNotifier, SessionDetailModel?>.internal(
+  SelectedSessionDetailNotifier.new,
+  name: r'selectedSessionDetailNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedSessionDetailNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedSessionDetailNotifier = Notifier<SessionDetailModel?>;
 String _$sessionDrawerNotifierHash() =>
-    r'7b54f771fba9160ed2869cb44557b9f4e5f7beb5';
+    r'3b5e7c3efd8ddba2c9136dc89b2a5a2d6d50a58b';
 
 /// See also [SessionDrawerNotifier].
 @ProviderFor(SessionDrawerNotifier)
@@ -392,7 +410,7 @@ final sessionDrawerNotifierProvider =
 
 typedef _$SessionDrawerNotifier = Notifier<SessionDrawerModel>;
 String _$sessionMetadataServicesHash() =>
-    r'd913d2716ed479e29972c72b5200dba7471f5187';
+    r'201014dc7f2f6159b06c50b32777efda15843a8c';
 
 abstract class _$SessionMetadataServices
     extends BuildlessNotifier<SessionMetadataTreeModel?> {
@@ -542,7 +560,7 @@ class _SessionMetadataServicesProviderElement extends NotifierProviderElement<
 }
 
 String _$sessionMetadataNotifierHash() =>
-    r'badddcdf7d92972525d7d3ef742b03a1d86f4ab3';
+    r'12b3e508d687def19f7b5a0789c816312663206b';
 
 /// See also [SessionMetadataNotifier].
 @ProviderFor(SessionMetadataNotifier)
@@ -559,7 +577,7 @@ final sessionMetadataNotifierProvider = NotifierProvider<
 
 typedef _$SessionMetadataNotifier = Notifier<SessionMetadataTreeModel?>;
 String _$sessionOpBarNotifierHash() =>
-    r'dbb26e7ddc0617ce4dda534b460c1e9686eded9b';
+    r'2a5dd08f23d5a1124ce760f7aa9c23675c610526';
 
 /// See also [SessionOpBarNotifier].
 @ProviderFor(SessionOpBarNotifier)
@@ -576,7 +594,7 @@ final sessionOpBarNotifierProvider = AutoDisposeNotifierProvider<
 
 typedef _$SessionOpBarNotifier = AutoDisposeNotifier<SessionOpBarModel?>;
 String _$selectedSessionSQLEditorNotifierHash() =>
-    r'a53387c4f709419421c8193b0d3edece12d2a686';
+    r'16c275d47303f525f1c63d110880390e1663f701';
 
 /// See also [SelectedSessionSQLEditorNotifier].
 @ProviderFor(SelectedSessionSQLEditorNotifier)
@@ -593,7 +611,7 @@ final selectedSessionSQLEditorNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSessionSQLEditorNotifier = Notifier<SessionSQLEditorModel>;
 String _$sessionEditorNotifierHash() =>
-    r'66c05081ee89f9d4bdcde6758fa0560c2bc8a875';
+    r'c820c274d50eca8b98d63636195beedafb2e937a';
 
 /// See also [SessionEditorNotifier].
 @ProviderFor(SessionEditorNotifier)
@@ -610,7 +628,7 @@ final sessionEditorNotifierProvider =
 
 typedef _$SessionEditorNotifier = Notifier<SessionEditorModel>;
 String _$selectedSQLResultTabNotifierHash() =>
-    r'b704a8604cf1b91e02b547c4708d91f4583d961e';
+    r'32c57233cbf993985dbde8f6e7fee41f05701b15';
 
 /// See also [SelectedSQLResultTabNotifier].
 @ProviderFor(SelectedSQLResultTabNotifier)
@@ -627,7 +645,7 @@ final selectedSQLResultTabNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSQLResultTabNotifier = Notifier<SessionSQLResultsModel?>;
 String _$selectedSQLResultNotifierHash() =>
-    r'711988cfda75a87cad5dc61d7d7946149c2efe29';
+    r'bc31ff0547e16517fd1a1606afd31ffeb55581bf';
 
 /// See also [SelectedSQLResultNotifier].
 @ProviderFor(SelectedSQLResultNotifier)
@@ -644,7 +662,7 @@ final selectedSQLResultNotifierProvider =
 
 typedef _$SelectedSQLResultNotifier = Notifier<SQLResultDetailModel?>;
 String _$selectedSessionStatusNotifierHash() =>
-    r'9dcd0ea6b92a40cf73d34ce3dd68753cbfb83b36';
+    r'fdd375f0c151b798d7992980e461e2da08c88588';
 
 /// See also [SelectedSessionStatusNotifier].
 @ProviderFor(SelectedSessionStatusNotifier)
