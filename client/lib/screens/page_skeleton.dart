@@ -3,7 +3,6 @@ import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
-
 // todo: 在windows上需要添加窗口按钮
 // final buttonColors = WindowButtonColors(
 //     iconNormal: const Color(0xFF805306),
@@ -77,7 +76,6 @@ class MoveWindows extends StatelessWidget {
   }
 }
 
-
 class PageSkeleton extends StatelessWidget {
   final Widget? topBar;
   final Widget? bottomBar;
@@ -85,44 +83,72 @@ class PageSkeleton extends StatelessWidget {
   final Widget? drawer;
   final Color? backgroundColor;
 
-  const PageSkeleton(
-      {Key? key, this.topBar, this.bottomBar, this.drawer, required this.child, this.backgroundColor})
-      : super(key: key);
+  const PageSkeleton({
+    Key? key,
+    this.topBar,
+    this.bottomBar,
+    this.drawer,
+    required this.child,
+    this.backgroundColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithNavRail(
       child: Material(
-        color: backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerLow, // 全局背景色
-        child: Column(children: [
-          Container(
-            color: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHigh, // header 背景色
-            height: tabbarHeight,
-            child: Row(
-              children: [
-                Expanded(
-                  child: MoveWindows(
-                    child: topBar ?? const SizedBox.expand(),
+        color: backgroundColor ??
+            Theme.of(context).colorScheme.surfaceContainerLowest, // 全局背景色
+        child: Row(
+          children: [
+            VerticalDivider(
+              color: Theme.of(context).dividerColor,
+              thickness: kBlockDividerThickness,
+              width: kBlockDividerSize,
+            ),
+            Expanded(
+              child: Column(children: [
+                Container(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerLow, // header 背景色
+                  height: tabbarHeight,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: MoveWindows(
+                          child: topBar ?? const SizedBox.expand(),
+                        ),
+                      ),
+                      const SizedBox(
+                          width: kSpacingLarge), // 顶部 tab 空部分空间, 防止无法拖动窗口.
+                      // if (!kIsWeb) const WindowButtons(),
+                    ],
                   ),
                 ),
-                const SizedBox(width: kSpacingLarge), // 顶部 tab 空部分空间, 防止无法拖动窗口.
-                // if (!kIsWeb) const WindowButtons(),
-              ],
+                Divider(
+                  color: Theme.of(context).dividerColor,
+                  thickness: kBlockDividerThickness,
+                  height: kBlockDividerSize,
+                ),
+                Expanded(
+                  child: child,
+                ),
+                Divider(
+                  color: Theme.of(context).dividerColor,
+                  thickness: kBlockDividerThickness,
+                  height: kBlockDividerSize,
+                ),
+                Container(
+                  height: bottomBarHeight,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerLow, // bottom 背景色
+                  child: bottomBar,
+                )
+              ]),
             ),
-          ),
-          Expanded(
-            child: child,
-          ),
-          Container(
-            height: tabbarHeight,
-            color: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHigh, // bottom 背景色
-            child: bottomBar,
-          )
-        ]),
+          ],
+        ),
       ),
     );
   }

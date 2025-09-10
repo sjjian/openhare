@@ -108,9 +108,10 @@ class _CommonTabBarState extends State<CommonTabBar> {
         width = sumTabLength / length;
       }
 
+      // todo: 统一成一个icon button
       final moreTabIcon = SizedBox(
-        width: 36,
-        height: 36,
+        width: kIconButtonSizeMedium,
+        height: kIconButtonSizeMedium,
         child: Icon(
           size: 20,
           Icons.more_vert,
@@ -298,18 +299,9 @@ class _CommonTabState extends State<CommonTab> {
           child: SizedBox(
             width: widget.width ?? defaultTabMaxWidth,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: kSpacingSmall,
-                  child: VerticalDivider(
-                    color: Theme.of(context).dividerColor,
-                    thickness: kDividerThickness,
-                    width: kDividerSize,
-                    indent: 8,
-                    endIndent: 8,
-                  ),
-                ),
+                const SizedBox(width: kSpacingTiny / 2),
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(kSpacingTiny, 0, 0, 0),
@@ -318,6 +310,12 @@ class _CommonTabState extends State<CommonTab> {
                       color: color(),
                       borderRadius: widget.style?.borderRadius ??
                           const BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        width: 0.5,
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -327,6 +325,7 @@ class _CommonTabState extends State<CommonTab> {
                             height: 20,
                             child: widget.avatar,
                           ),
+                        const SizedBox(width: kSpacingTiny),
                         Expanded(
                           child: Container(
                             constraints: const BoxConstraints(maxWidth: 50),
@@ -348,6 +347,7 @@ class _CommonTabState extends State<CommonTab> {
                     ),
                   ),
                 ),
+                const SizedBox(width: kSpacingTiny / 2),
               ],
             ),
           ),

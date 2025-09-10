@@ -27,7 +27,7 @@ class SqlResultTables extends ConsumerWidget {
       labelAlign: TextAlign.center,
       selectedColor: Theme.of(context)
           .colorScheme
-          .surfaceContainerLow, // sql result tab 的选中颜色
+          .surfaceContainer, // sql result tab 的选中颜色
       color: Theme.of(context)
           .colorScheme
           .surfaceContainerLowest, // sql result tab 的背景色
@@ -79,7 +79,7 @@ class SqlResultTables extends ConsumerWidget {
               : [],
         ),
       ),
-      const SizedBox(width: kSpacingTiny),
+      const SizedBox(width: kSpacingTiny / 2),
     ]);
 
     return Row(

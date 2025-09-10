@@ -137,7 +137,7 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
             minWidth: navigationRailWidth,
             backgroundColor: Theme.of(context)
                 .colorScheme
-                .surfaceContainerHighest, // navigation color
+                .surfaceContainerLow, // navigation color
             useIndicator: true,
             selectedIndex: _calculateSelectedIndex(context),
             onDestinationSelected: (value) {
@@ -200,19 +200,6 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                 ),
               ),
             ],
-            // trailing: Expanded(
-            //   child: Align(
-            //     alignment: Alignment.bottomCenter,
-            //     child: Padding(
-            //       padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
-            //       child: Image.asset(
-            //         "assets/icons/logo.png",
-            //         height: kIconSizeLarge,
-            //         width: kIconSizeLarge,
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ),
         ),
         Expanded(child: widget.child)

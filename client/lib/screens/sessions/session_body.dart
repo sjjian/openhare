@@ -43,6 +43,11 @@ class SessionBodyPage extends ConsumerWidget {
     return Column(
       children: [
         SessionOpBar(codeController: sessionEditor.code),
+        Divider(
+          color: Theme.of(context).dividerColor,
+          thickness: kBlockDividerThickness,
+          height: kBlockDividerSize,
+        ),
         Expanded(
           child: Container(
             alignment: Alignment.topLeft,

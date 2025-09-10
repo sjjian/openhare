@@ -18,10 +18,11 @@ void main() async {
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1400, 1000),
-    minimumSize: Size(1350, 900),
+    minimumSize: Size(950, 600),
     center: true,
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
+    backgroundColor: Colors.white,
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {
