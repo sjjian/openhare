@@ -208,7 +208,7 @@ class DatabaseTypeCard extends StatelessWidget {
         color: selected
             ? Theme.of(context)
                 .colorScheme
-                .surfaceContainerHigh // db type card selected color
+                .surfaceContainer // db type card selected color
             : null,
       ),
       child: InkWell(
@@ -273,7 +273,7 @@ class DatabaseTypeCardList extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                for (final connMeta in connectionMetas)
+                for (final connMeta in connectionMetas) ...[
                   DatabaseTypeCard(
                     name: connMeta.displayName,
                     type: connMeta.type,
@@ -282,6 +282,8 @@ class DatabaseTypeCardList extends StatelessWidget {
                     selectedColor: selectedColor,
                     onTap: (type) => onDatabaseTypeChange?.call(type),
                   ),
+                  const SizedBox(width: kSpacingTiny),
+                ]
               ],
             ),
           ),
@@ -511,23 +513,16 @@ class AddInstanceForm extends StatelessWidget {
       return [
         Container(
             constraints: const BoxConstraints(maxHeight: 430),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainer // SQL 编辑器 color
-              ,
-            ),
             child: CodeEditor(
-              // todo: 抽取公共方法.
+              borderRadius: BorderRadius.circular(10),
               style: CodeEditorStyle(
                 backgroundColor: Theme.of(context)
                     .colorScheme
-                    .surfaceContainer, // SQL 编辑器背景色
+                    .surfaceContainerLow, // SQL 编辑器背景色
                 textStyle: GoogleFonts.robotoMono(
-                    textStyle: Theme.of(context).textTheme.bodyMedium,
-                    color:
-                        Theme.of(context).colorScheme.onSurface), // SQL 编辑器文字颜色
+                  textStyle: Theme.of(context).textTheme.bodyMedium,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ), // SQL 编辑器文字颜色
               ),
               indicatorBuilder:
                   (context, editingController, chunkController, notifier) {
