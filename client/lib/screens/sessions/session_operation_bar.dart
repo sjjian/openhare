@@ -231,7 +231,8 @@ class SessionOpBar extends ConsumerWidget {
 
     if (model == null) {
       return Container(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest, // op bar 背景色
+        color:
+            Theme.of(context).colorScheme.surfaceContainerLowest, // op bar 背景色
         constraints: BoxConstraints(maxHeight: height),
         child: const Spacer(),
       );
@@ -331,32 +332,38 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     child: Text(schema, overflow: TextOverflow.ellipsis));
               }).toList());
         },
-        child: Container(
-            padding: const EdgeInsets.only(left: kSpacingTiny),
-            color: (isEnter && !widget.disable)
-                ? Theme.of(context)
-                    .colorScheme
-                    .surfaceContainer // schema 鼠标移入的颜色
-                : null,
-            child: Row(
-              children: [
-                HugeIcon(
-                  icon: HugeIcons.strokeRoundedDatabase,
-                  color: widget.iconColor ??
-                      Theme.of(context).colorScheme.onSurface,
-                  size: kIconSizeSmall,
-                ),
-                Container(
-                    padding: const EdgeInsets.only(left: kSpacingTiny),
-                    width: 120,
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          widget.currentSchema ?? "",
-                          overflow: TextOverflow.ellipsis,
-                        ))),
-              ],
-            )),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
+          child: Container(
+              padding: const EdgeInsets.only(left: kSpacingTiny),
+              decoration: BoxDecoration(
+                color: (isEnter && !widget.disable)
+                    ? Theme.of(context)
+                        .colorScheme
+                        .primaryContainer // schema 鼠标移入的颜色
+                    : null,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Row(
+                children: [
+                  HugeIcon(
+                    icon: HugeIcons.strokeRoundedDatabase,
+                    color: widget.iconColor ??
+                        Theme.of(context).colorScheme.onSurface,
+                    size: kIconSizeSmall,
+                  ),
+                  Container(
+                      padding: const EdgeInsets.only(left: kSpacingTiny),
+                      width: 120,
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            widget.currentSchema ?? "",
+                            overflow: TextOverflow.ellipsis,
+                          ))),
+                ],
+              )),
+        ),
       ),
     );
   }
