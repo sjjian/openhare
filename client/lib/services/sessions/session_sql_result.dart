@@ -49,9 +49,10 @@ class SQLResultsServices extends _$SQLResultsServices {
     final repo = ref.read(sqlResultsRepoProvider);
 
     repo.updateSQLResult(
-        resultId,
-        SQLResultDetailModel(
-            resultId: resultId, query: query, state: SQLExecuteState.init));
+      resultId,
+      SQLResultDetailModel(
+          resultId: resultId, query: query, state: SQLExecuteState.init),
+    );
     ref.invalidateSelf();
 
     // todo
@@ -65,12 +66,14 @@ class SQLResultsServices extends _$SQLResultsServices {
       BaseQueryResult? queryResult =
           await connServices.query(sessionModel!.connId!, query);
       DateTime end = DateTime.now();
-
+      // sleep 100ms, 不然当界面刷新太快时，无法感知结果是没变还是没执行.
+      await Future.delayed(const Duration(milliseconds: 100));
       repo.updateSQLResult(
         resultId,
         SQLResultDetailModel(
           resultId: resultId,
           query: query,
+          queryId: queryResult?.queryId,
           data: queryResult,
           executeTime: end.difference(start),
           state: SQLExecuteState.done,
@@ -87,8 +90,6 @@ class SQLResultsServices extends _$SQLResultsServices {
         ),
       );
     } finally {
-      // sleep 100ms, 不然当界面刷新太快时，无法感知结果是没变还是没执行.
-      await Future.delayed(const Duration(milliseconds: 100));
       ref.invalidateSelf();
     }
   }
@@ -109,7 +110,6 @@ class SQLResultsServices extends _$SQLResultsServices {
     return repo.getSQLResult(resultId);
   }
 }
-
 
 @Riverpod(keepAlive: true)
 class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {

@@ -154,8 +154,8 @@ class SessionConn {
 
   // 后台循环ping进行探活，每隔5秒，如果探活失败则调用 onCloseCallback，并关闭连接
   void startHealthCheck() {
-    // 然后每隔5秒检查一次
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    // 然后每隔60秒检查一次, todo: 可配置
+    _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
       _checkConnection();
     });
   }
