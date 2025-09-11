@@ -21,7 +21,7 @@ class SessionDrawerBody extends ConsumerWidget {
         children: [
           Expanded(
             child: Container(
-                padding: const EdgeInsets.fromLTRB(kSpacingSmall - 5, 0,
+                padding: const EdgeInsets.fromLTRB(kSpacingSmall - 5, kSpacingTiny,
                     kSpacingSmall, 0), // 左边减去5, 减掉split view 多出来的空间
                 child: switch (sessionDrawer.drawerPage) {
                   DrawerPage.sqlResult => const SessionDrawerSqlResult(),

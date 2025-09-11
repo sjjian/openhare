@@ -21,7 +21,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/models/ai.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gpt_markdown/custom_widgets/code_field.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -236,6 +235,10 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            width: 0.5,
+          ),
         ),
         child: Column(
           children: [
@@ -514,6 +517,10 @@ class _SqlChatFieldState extends State<SqlChatField> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          width: 0.5,
+        ),
       ),
       padding: const EdgeInsets.fromLTRB(
           kSpacingSmall, kSpacingTiny, kSpacingSmall, kSpacingSmall),
@@ -625,7 +632,7 @@ class SessionChatMessages extends ConsumerWidget {
   Widget userMessageWidget(BuildContext context, AIChatMessageModel message) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          kSpacingSmall, kSpacingSmall, kSpacingSmall, 0),
+          kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingSmall),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
@@ -633,6 +640,10 @@ class SessionChatMessages extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              width: 0.5,
+            ),
           ),
           child: Text(
             message.content,
@@ -650,16 +661,16 @@ class SessionChatMessages extends ConsumerWidget {
       SessionAIChatModel model, AIChatMessageModel message) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          kSpacingTiny, kSpacingSmall, kSpacingTiny, kSpacingSmall),
+          kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingSmall),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          padding: const EdgeInsets.all(kSpacingSmall),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (message.error != null)
                 Text(
