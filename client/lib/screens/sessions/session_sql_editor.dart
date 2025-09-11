@@ -102,6 +102,11 @@ class SQLEditor extends ConsumerWidget {
                       width: 20,
                       controller: chunkController,
                       notifier: notifier,
+                    ),
+                    VerticalDivider(
+                      width: kBlockDividerSize,
+                      thickness: kBlockDividerThickness,
+                      color: Theme.of(context).dividerColor,
                     )
                   ],
                 );

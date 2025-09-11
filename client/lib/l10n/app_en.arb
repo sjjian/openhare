@@ -259,9 +259,9 @@
   "@button_tooltip_save": {
     "description": "Button tooltip save SQL"
   },
-  "button_tooltip_copy_sql": "Copy SQL text",
+  "button_tooltip_copy_sql": "Copy code text",
   "@button_tooltip_copy_sql": {
-    "description": "Button tooltip copy SQL text"
+    "description": "Button tooltip copy code text"
   },
   "button_tooltip_retry_message": "Retry from current message",
   "@button_tooltip_retry_message": {

@@ -64,7 +64,7 @@
     "button_tooltip_run_sql": "执行SQL在当前标签",
     "button_tooltip_run_sql_new_tab": "执行SQL并打开新标签",
     "button_tooltip_save": "保存SQL",
-    "button_tooltip_copy_sql": "复制SQL文本",
+    "button_tooltip_copy_sql": "复制代码文本",
     "button_tooltip_retry_message": "从当前消息重新生成",
     "button_tooltip_connect": "连接数据库",
     "button_tooltip_disconnect": "断开数据库连接",
