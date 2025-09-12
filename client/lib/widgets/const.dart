@@ -17,9 +17,9 @@ const double kBlockDividerThickness = 0.2;
 const double kBlockDividerSize = 1;
 
 // icon
-const double kIconSizeTiny = 16.0;
-const double kIconSizeSmall = 20.0;
-const double kIconSizeMedium = 24.0;
+const double kIconSizeTiny = 12.0;
+const double kIconSizeSmall = 16.0;
+const double kIconSizeMedium = 20.0;
 const double kIconSizeLarge = 36.0;
 
 // icon button

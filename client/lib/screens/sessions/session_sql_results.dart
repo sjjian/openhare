@@ -71,7 +71,7 @@ class SqlResultTables extends ConsumerWidget {
                               model.results[i].state == SQLExecuteState.init)
                           ? const Loading.small()
                           : const Icon(
-                              size: kIconSizeTiny,
+                              size: kIconSizeSmall,
                               Icons.grid_on,
                             ),
                     ),

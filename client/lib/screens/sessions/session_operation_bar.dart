@@ -179,11 +179,9 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget explainWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    return RectangleIconButton(
+    return RectangleIconButton.medium(
       tooltip: AppLocalizations.of(context)!.button_tooltip_explain_sql,
-      size: kIconSizeLarge,
-      iconSize: kIconSizeLarge,
-      icon: Icons.e_mobiledata,
+      icon: Icons.poll_outlined,
       iconColor: SQLConnectState.isIdle(model.state)
           ? const Color.fromARGB(255, 241, 192, 84)
           : Colors.grey,

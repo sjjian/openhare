@@ -199,7 +199,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
             HugeIcon(
               icon: HugeIcons.strokeRoundedTable,
               color: Theme.of(context).colorScheme.onSurface,
-              size: kIconSizeTiny,
+              size: kIconSizeSmall,
             ),
             const SizedBox(width: kSpacingTiny),
             Expanded(
@@ -321,12 +321,12 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                       _isTableSelected(model, table)
                                           ? const Icon(
                                               Icons.check_circle,
-                                              size: kIconSizeTiny,
+                                              size: kIconSizeSmall,
                                               color: Colors.green,
                                             )
                                           : const Icon(
                                               Icons.circle_outlined,
-                                              size: kIconSizeTiny,
+                                              size: kIconSizeSmall,
                                             ),
                                       const SizedBox(width: kSpacingTiny),
                                       Expanded(
@@ -391,7 +391,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                             model, searchTextController.text)
                                         ? Icons.check_circle
                                         : Icons.circle_outlined,
-                                    size: kIconSizeTiny,
+                                    size: kIconSizeSmall,
                                     color: _isAllTableSelected(
                                             model, searchTextController.text)
                                         ? Colors.green
@@ -423,8 +423,10 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                           _onSearchChanged();
                                         },
                                         trailing: const [
-                                          Icon(Icons.search,
-                                              size: kIconSizeTiny),
+                                          Icon(
+                                            Icons.search,
+                                            size: kIconSizeSmall,
+                                          ),
                                         ]),
                                   ),
                                 ),

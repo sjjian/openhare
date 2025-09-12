@@ -58,11 +58,11 @@ class SessionStatusTab extends ConsumerWidget {
                           SQLConnectState.connected ||
                           SQLConnectState.executing =>
                             const Icon(Icons.check_circle,
-                                size: kIconSizeTiny, color: Colors.green),
+                                size: kIconSizeSmall, color: Colors.green),
                           SQLConnectState.failed ||
                           SQLConnectState.unHealth =>
                             const Icon(Icons.error,
-                                size: kIconSizeTiny, color: Colors.red),
+                                size: kIconSizeSmall, color: Colors.red),
                           _ => const Text("-"),
                         } // 根据model.state展示不同的图标
                             ),

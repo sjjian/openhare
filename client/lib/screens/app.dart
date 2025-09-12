@@ -155,8 +155,8 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                     });
                   },
                   child: extended
-                      ? const Icon(Icons.menu_open, size: kIconSizeSmall)
-                      : const Icon(Icons.menu, size: kIconSizeSmall),
+                      ? const Icon(Icons.menu_open, size: kIconSizeMedium)
+                      : const Icon(Icons.menu, size: kIconSizeMedium),
                 ),
               ],
             ),
