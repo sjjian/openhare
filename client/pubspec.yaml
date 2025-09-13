@@ -34,7 +34,7 @@ dependencies:
   pluto_grid: ^8.0.0
   window_manager: ^0.5.1
   cupertino_icons: ^1.0.2
-  multi_split_view: ^3.6.0
+  multi_split_view: ^3.6.1
   mysql_client: ^0.0.27
   mysql1: ^0.20.0
   quiver: ^3.2.1
