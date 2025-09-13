@@ -63,64 +63,71 @@ class SQLEditor extends ConsumerWidget {
       keywordPrompt.addAll(buildMetadataKeyword(model.metadata!));
     }
 
-    return Column(
-      children: [
-        Expanded(
-          child: CodeAutocomplete(
-            viewBuilder: (context, notifier, onSelected) {
-              return _DefaultCodeAutocompleteListView(
-                notifier: notifier,
-                onSelected: onSelected,
-              );
-            },
-            promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
-              keywordPrompts: keywordPrompt,
-              relatedPrompts: (model.metadata != null)
-                  ? buildRelatePrompts(model.metadata!, model.currentSchema)
-                  : const {},
-            ),
-            child: CodeEditor(
-              wordWrap: false,
-              style: CodeEditorStyle(
-                backgroundColor: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerLowest, // SQL 编辑器背景色
-                textStyle: GoogleFonts.robotoMono(
-                  textStyle: Theme.of(context).textTheme.bodyMedium,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ), // SQL 编辑器文字颜色
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          children: [
+            Expanded(
+              child: CodeAutocomplete(
+                viewBuilder: (context, notifier, onSelected) {
+                  return _DefaultCodeAutocompleteListView(
+                    notifier: notifier,
+                    onSelected: onSelected,
+                  );
+                },
+                promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
+                  keywordPrompts: keywordPrompt,
+                  relatedPrompts: (model.metadata != null)
+                      ? buildRelatePrompts(model.metadata!, model.currentSchema)
+                      : const {},
+                ),
+                child: CodeEditor(
+                  wordWrap: false,
+                  style: CodeEditorStyle(
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerLowest, // SQL 编辑器背景色
+                    textStyle: GoogleFonts.robotoMono(
+                      textStyle: Theme.of(context).textTheme.bodyMedium,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ), // SQL 编辑器文字颜色
+                  ),
+                  indicatorBuilder:
+                      (context, editingController, chunkController, notifier) {
+                    if (constraints.maxWidth < 160) {
+                      return const SizedBox.shrink();
+                    }
+                    return Row(
+                      children: [
+                        DefaultCodeLineNumber(
+                          controller: editingController,
+                          notifier: notifier,
+                        ),
+                        DefaultCodeChunkIndicator(
+                          width: 20,
+                          controller: chunkController,
+                          notifier: notifier,
+                        ),
+                        VerticalDivider(
+                          width: kBlockDividerSize,
+                          thickness: kBlockDividerThickness,
+                          color: Theme.of(context).dividerColor,
+                        )
+                      ],
+                    );
+                  },
+                  controller: codeController,
+                ),
               ),
-              indicatorBuilder:
-                  (context, editingController, chunkController, notifier) {
-                return Row(
-                  children: [
-                    DefaultCodeLineNumber(
-                      controller: editingController,
-                      notifier: notifier,
-                    ),
-                    DefaultCodeChunkIndicator(
-                      width: 20,
-                      controller: chunkController,
-                      notifier: notifier,
-                    ),
-                    VerticalDivider(
-                      width: kBlockDividerSize,
-                      thickness: kBlockDividerThickness,
-                      color: Theme.of(context).dividerColor,
-                    )
-                  ],
-                );
-              },
-              controller: codeController,
             ),
-          ),
-        ),
-        Divider(
-          height: kBlockDividerSize,
-          thickness: kBlockDividerThickness,
-          color: Theme.of(context).dividerColor,
-        ),
-      ],
+            Divider(
+              height: kBlockDividerSize,
+              thickness: kBlockDividerThickness,
+              color: Theme.of(context).dividerColor,
+            ),
+          ],
+        );
+      },
     );
   }
 }

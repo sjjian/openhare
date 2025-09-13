@@ -28,9 +28,9 @@ class TooltipText extends StatelessWidget {
         return isOverflowing
             ? Tooltip(
                 message: text,
-                child: Text(text, style: textStyle),
+                child: Text(text, style: textStyle, maxLines: 1),
               )
-            : Text(text, style: textStyle);
+            : Text(text, style: textStyle, maxLines: 1);
       },
     );
   }

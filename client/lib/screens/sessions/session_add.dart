@@ -26,14 +26,14 @@ class AddSession extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              AppLocalizations.of(context)!.display_no_instance_and_add_instance,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall,
+              AppLocalizations.of(context)!
+                  .display_no_instance_and_add_instance,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: kSpacingSmall),
             LinkButton(
-              text: AppLocalizations.of(context)!.display_no_instance_and_add_instance_button,
+              text: AppLocalizations.of(context)!
+                  .display_no_instance_and_add_instance_button,
               onPressed: () {
                 GoRouter.of(context).go('/instances/add');
               },
@@ -71,36 +71,49 @@ class AddSession extends HookConsumerWidget {
           for (var inst in ref
               .read(instancesServicesProvider.notifier)
               .activeInstances()) // todo
-            Row(
-              children: [
-                SizedBox(
-                  width: 200,
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        connectionMetaMap[inst.dbType]!.logoAssertPath,
-                        height: 24,
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // 计算schema按钮的最大宽度
+                final schemaCount = inst.activeSchemas.length;
+                // 预留200给左侧instance，剩余宽度分配给schema
+                final availableWidth = constraints.maxWidth - 200;
+                final schemaButtonWidth = schemaCount > 0
+                    ? (availableWidth / schemaCount).clamp(80.0, 200.0)
+                    : 0.0;
+                return Row(
+                  // mainAxisAlignment: MainAxisAlignment。,
+                  children: [
+                    SizedBox(
+                      width: 200,
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            connectionMetaMap[inst.dbType]!.logoAssertPath,
+                            height: 24,
+                          ),
+                          LinkButton(
+                              onPressed: () {
+                                ref
+                                    .read(sessionsServicesProvider.notifier)
+                                    .addSession(inst);
+                              },
+                              text: inst.connectValue.name),
+                        ],
                       ),
+                    ),
+                    for (final schema in inst.activeSchemas.toList())
                       LinkButton(
-                          onPressed: () {
-                            ref
-                                .read(sessionsServicesProvider.notifier)
-                                .addSession(inst);
-                          },
-                          text: inst.connectValue.name),
-                    ],
-                  ),
-                ),
-                for (final schema in inst.activeSchemas.toList())
-                  LinkButton(
-                    text: schema,
-                    onPressed: () {
-                      ref
-                          .read(sessionsServicesProvider.notifier)
-                          .addSession(inst, schema: schema);
-                    },
-                  )
-              ],
+                        text: schema,
+                        maxWidth: schemaButtonWidth,
+                        onPressed: () {
+                          ref
+                              .read(sessionsServicesProvider.notifier)
+                              .addSession(inst, schema: schema);
+                        },
+                      ),
+                  ],
+                );
+              },
             ),
           const SizedBox(height: kSpacingMedium),
           Row(

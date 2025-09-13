@@ -128,8 +128,9 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
 class LinkButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
+  final double? maxWidth;
 
-  const LinkButton({Key? key, required this.text, this.onPressed})
+  const LinkButton({Key? key, required this.text, this.onPressed, this.maxWidth})
       : super(key: key);
 
   @override
@@ -151,8 +152,8 @@ class _LinkButtonState extends State<LinkButton> {
       child: GestureDetector(
         onTap: widget.onPressed,
         child: Container(
-          constraints: const BoxConstraints(
-            maxWidth: 200,
+          constraints: BoxConstraints(
+            maxWidth: widget.maxWidth ?? 200,
           ),
           padding:
               const EdgeInsets.fromLTRB(kSpacingSmall, 0, kSpacingSmall, 0),
