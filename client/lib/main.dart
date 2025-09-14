@@ -4,6 +4,7 @@ import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 void main() async {
   // This is required so ObjectBox can get the application directory
@@ -16,19 +17,13 @@ void main() async {
 
   await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(1400, 1000),
-    minimumSize: Size(950, 600),
-    center: true,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden,
-    backgroundColor: Colors.white,
-  );
-
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
-
   runApp(ProviderScope(child: App()));
+
+  doWhenWindowReady(() {
+    const initialSize = Size(1400, 1000);
+    appWindow.minSize = const Size(950, 600);
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.show();
+  });
 }
