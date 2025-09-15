@@ -46,7 +46,7 @@ dependencies:
   flutter_fancy_tree_view: ^1.6.0
   flutter_breadcrumb: ^1.0.1
   google_fonts: ^6.2.1
-  file_picker: ^8.1.7
+  file_picker: ^10.3.3
   excel: ^4.0.6
   re_editor: ^0.6.0
   collection: ^1.18.0

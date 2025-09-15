@@ -104,7 +104,6 @@ class SessionStatusTab extends ConsumerWidget {
                 icon: Icons.download_rounded,
                 iconColor: Colors.green,
                 onPressed: () async {
-                  //todo: 下载失效了，需要测试。
                   String? outputFile = await FilePicker.platform.saveFile(
                     dialogTitle:
                         AppLocalizations.of(context)!.display_msg_downlaod,
