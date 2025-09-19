@@ -5,18 +5,13 @@ import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/repositories/sessions/sessions.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/services/instances/instances.dart';
-import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/session_conn.dart';
+import 'package:client/services/sessions/session_drawer.dart';
+import 'package:client/services/sessions/session_metadata_tree.dart';
+import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_controller.dart';
-import 'package:client/utils/sql_highlight.dart';
-import 'package:client/utils/state_value.dart';
-import 'package:client/widgets/data_tree.dart';
-import 'package:db_driver/db_driver.dart';
-import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sql_editor/re_editor.dart';
-import 'package:excel/excel.dart' as excel;
 
 part 'sessions.g.dart';
 
@@ -28,33 +23,8 @@ class SessionsServices extends _$SessionsServices {
     return sessions;
   }
 
-  SessionDetailModel? getSession(SessionId sessionId) {
-    SessionModel? session = ref.read(sessionRepoProvider).getSession(sessionId);
-    if (session == null) {
-      return null;
-    }
-
-    InstanceModel? instance = session.instanceId == null
-        ? null
-        : ref
-            .read(instancesServicesProvider.notifier)
-            .getInstanceById(session.instanceId!);
-
-    SessionConnModel? conn = session.connId == null
-        ? null
-        : ref
-            .read(sessionConnsServicesProvider.notifier)
-            .getConn(session.connId!);
-
-    return SessionDetailModel(
-      sessionId: session.sessionId,
-      instanceId: instance?.id,
-      instanceName: instance?.name,
-      dbType: instance?.dbType,
-      connId: conn?.connId,
-      connState: conn?.state,
-      currentSchema: session.currentSchema,
-    );
+  SessionModel? getSession(SessionId sessionId) {
+    return ref.read(sessionRepoProvider).getSession(sessionId);
   }
 
   void selectSessionByIndex(int index) {
@@ -98,6 +68,7 @@ class SessionsServices extends _$SessionsServices {
 
     // 1. delete session
     await ref.read(sessionRepoProvider).deleteSession(session.sessionId);
+    ref.invalidateSelf();
 
     // 2. kill and close conn
     if (session.connId != null) {
@@ -120,8 +91,6 @@ class SessionsServices extends _$SessionsServices {
     ref.invalidate(sessionDrawerServicesProvider(session.sessionId));
     ref.invalidate(sessionMetadataServicesProvider(session.sessionId));
     SessionController.removeSessionController(session.sessionId);
-
-    ref.invalidateSelf();
   }
 
   Future<void> connectSession(SessionId sessionId) async {
@@ -184,66 +153,17 @@ class SessionsServices extends _$SessionsServices {
 }
 
 @Riverpod(keepAlive: true)
-class SessionSQLEditorService extends _$SessionSQLEditorService {
+class SelectedSessionNotifier extends _$SelectedSessionNotifier {
   @override
-  SessionEditorModel build(SessionId sessionId) {
-    final controller = CodeLineEditingController(
-      spanBuilder: ({required codeLines, required context, required style}) {
-        return getSQLHighlightTextSpan(codeLines.asString(TextLineBreak.lf),
-            defalutStyle: style);
-      },
-    );
-
-    final code = ref.read(sessionRepoProvider).getCode(sessionId);
-    controller.text = code ?? "";
-    return SessionEditorModel(code: controller);
-  }
-
-  void saveCode() {
-    ref.read(sessionRepoProvider).saveCode(sessionId, state.code.text);
+  SessionModel? build() {
+    return ref.watch(sessionsServicesProvider.select((s) {
+      return s.selectedSession;
+    }));
   }
 }
 
 @Riverpod(keepAlive: true)
-class SessionDrawerServices extends _$SessionDrawerServices {
-  @override
-  SessionDrawerModel build(SessionId sessionId) {
-    return SessionDrawerModel(
-        sessionId: sessionId,
-        drawerPage: DrawerPage.metadataTree,
-        sqlResult: null,
-        sqlColumn: null,
-        showRecord: false,
-        isRightPageOpen: true);
-  }
-
-  void showRightPage() {
-    state = state.copyWith(isRightPageOpen: true);
-  }
-
-  void hideRightPage() {
-    state = state.copyWith(isRightPageOpen: false);
-  }
-
-  void showSQLResult({BaseQueryValue? result, BaseQueryColumn? column}) {
-    state = state.copyWith(
-      drawerPage: DrawerPage.sqlResult,
-      sqlColumn: column ?? state.sqlColumn,
-      sqlResult: result ?? state.sqlResult,
-    );
-  }
-
-  void goToTree() {
-    state = state.copyWith(drawerPage: DrawerPage.metadataTree);
-  }
-
-  void showChat() {
-    state = state.copyWith(drawerPage: DrawerPage.aiChat);
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionsNotifier extends _$SessionsNotifier {
+class SessionsDetailNotifier extends _$SessionsDetailNotifier {
   @override
   SessionDetailListModel build() {
     SessionListModel sessions = ref.watch(sessionsServicesProvider);
@@ -292,130 +212,12 @@ class SessionsNotifier extends _$SessionsNotifier {
 }
 
 @Riverpod(keepAlive: true)
-class SelectedSessionNotifier extends _$SelectedSessionNotifier {
+class SelectedSessionDetailNotifier extends _$SelectedSessionDetailNotifier {
   @override
   SessionDetailModel? build() {
-    return ref.watch(sessionsNotifierProvider.select((s) {
+    return ref.watch(sessionsDetailNotifierProvider.select((s) {
       return s.selectedSession;
     }));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionDrawerNotifier extends _$SessionDrawerNotifier {
-  @override
-  SessionDrawerModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return ref
-          .watch(sessionDrawerServicesProvider(const SessionId(value: 0)));
-    }
-    return ref.watch(sessionDrawerServicesProvider(sessionModel.sessionId));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionMetadataServices extends _$SessionMetadataServices {
-  @override
-  SessionMetadataTreeModel? build(SessionId sessionId) {
-    // todo: 感觉开销有点高
-    SessionModel? sessionModel = ref.watch(sessionsServicesProvider.select((s) {
-      for (final session in s.sessions) {
-        if (session.sessionId == sessionId) {
-          return session;
-        }
-      }
-      return null;
-    }));
-    if (sessionModel == null || sessionModel.instanceId == null) {
-      return null;
-    }
-
-    InstanceMetadataModel? metadataModel =
-        ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
-
-    // 如果 metadataModel 为空，则刷新
-    if (metadataModel == null) {
-      ref
-          .read(instanceMetadataServicesProvider(sessionModel.instanceId!)
-              .notifier)
-          .refreshMetadata();
-
-      return null;
-    }
-
-    return metadataModel.metadata.match(
-      (value) {
-        List<MetaDataNode> items = value;
-        RootNode root = RootNode();
-        final metadataController = TreeController<DataNode>(
-          roots: buildMetadataTree(root, items).children,
-          childrenProvider: (DataNode node) => node.children,
-        );
-
-        root.visitor((node) {
-          // 默认打开 SchemaNode
-          if (node is SchemaNode) {
-            metadataController.setExpansionState(node, true);
-          }
-          // 默认打开 currentSchema 对应的节点
-          if (node is SchemaValueNode &&
-              node.name == sessionModel.currentSchema) {
-            metadataController.setExpansionState(node, true);
-          }
-          // 默认打开所有table 节点
-          if (node is TableNode) {
-            metadataController.setExpansionState(node, true);
-          }
-          // 默认打开所有column 节点
-          if (node is ColumnNode) {
-            metadataController.setExpansionState(node, true);
-          }
-          return true;
-        });
-        return SessionMetadataTreeModel(
-          sessionId: sessionId,
-          metadataTreeCtrl: StateValue.done(metadataController),
-        );
-      },
-      (error) {
-        return SessionMetadataTreeModel(
-          sessionId: sessionId,
-          metadataTreeCtrl: StateValue.error(error),
-        );
-      },
-      () {
-        return SessionMetadataTreeModel(
-          sessionId: sessionId,
-          metadataTreeCtrl: const StateValue.running(),
-        );
-      },
-    );
-  }
-
-  Future<void> refresh() async {
-    final model =
-        ref.read(sessionsServicesProvider.notifier).getSession(sessionId);
-    if (model == null || model.instanceId == null) {
-      return;
-    }
-    ref
-        .read(instanceMetadataServicesProvider(model.instanceId!).notifier)
-        .refreshMetadata();
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionMetadataNotifier extends _$SessionMetadataNotifier {
-  @override
-  SessionMetadataTreeModel? build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null || sessionModel.instanceId == null) {
-      return null;
-    }
-    return ref.watch(sessionMetadataServicesProvider(sessionModel.sessionId));
   }
 }
 
@@ -423,7 +225,8 @@ class SessionMetadataNotifier extends _$SessionMetadataNotifier {
 class SessionOpBarNotifier extends _$SessionOpBarNotifier {
   @override
   SessionOpBarModel? build() {
-    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
+    SessionDetailModel? session =
+        ref.watch(selectedSessionDetailNotifierProvider);
     if (session == null) {
       return null;
     }
@@ -445,103 +248,11 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
 }
 
 @Riverpod(keepAlive: true)
-class SelectedSessionSQLEditorNotifier
-    extends _$SelectedSessionSQLEditorNotifier {
-  @override
-  SessionSQLEditorModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return const SessionSQLEditorModel();
-    }
-    if (sessionModel.instanceId != null) {
-      InstanceMetadataModel? sessionMeta =
-          ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
-      return SessionSQLEditorModel(
-        currentSchema: sessionModel.currentSchema,
-        metadata: sessionMeta?.metadata
-            .match((value) => value, (error) => null, () => null),
-      );
-    }
-
-    return SessionSQLEditorModel(
-      currentSchema: sessionModel.currentSchema,
-      metadata: null,
-    );
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SessionEditorNotifier extends _$SessionEditorNotifier {
-  @override
-  SessionEditorModel build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return ref
-          .watch(sessionSQLEditorServiceProvider(const SessionId(value: 0)));
-    }
-    return ref.watch(sessionSQLEditorServiceProvider(sessionModel.sessionId));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
-  @override
-  SessionSQLResultsModel? build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return null;
-    }
-    return ref.watch(sQLResultsServicesProvider.select((m) {
-      return m.cache[sessionModel.sessionId];
-    }));
-  }
-}
-
-@Riverpod(keepAlive: true)
-class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
-  @override
-  SQLResultDetailModel? build() {
-    SessionDetailModel? sessionModel =
-        ref.watch(selectedSessionNotifierProvider);
-    if (sessionModel == null) {
-      return null;
-    }
-    SQLResultModel? sqlResultModel =
-        ref.watch(sQLResultsServicesProvider.select((m) {
-      return m.cache[sessionModel.sessionId]?.selected;
-    }));
-    if (sqlResultModel == null) {
-      return null;
-    }
-    return ref
-        .read(sQLResultsServicesProvider.notifier)
-        .getSQLResult(sqlResultModel.resultId);
-  }
-
-  excel.Excel toExcel() {
-    final data = excel.Excel.createExcel();
-    final sheet = data["Sheet1"];
-    sheet.appendRow(state!.data!.columns
-        .map<excel.TextCellValue>((e) => excel.TextCellValue(e.name))
-        .toList());
-    for (final row in state!.data!.rows) {
-      sheet.appendRow(row.values
-          .map<excel.TextCellValue>(
-              (e) => excel.TextCellValue(e.getString() ?? ''))
-          .toList());
-    }
-    return data;
-  }
-}
-
-@Riverpod(keepAlive: true)
 class SelectedSessionStatusNotifier extends _$SelectedSessionStatusNotifier {
   @override
   SessionStatusModel? build() {
-    SessionDetailModel? session = ref.watch(selectedSessionNotifierProvider);
+    SessionDetailModel? session =
+        ref.watch(selectedSessionDetailNotifierProvider);
     if (session == null) {
       return null;
     }

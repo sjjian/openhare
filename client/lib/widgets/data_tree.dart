@@ -69,7 +69,7 @@ class RootNode implements DataNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedFolder02,
       color: Theme.of(context).colorScheme.tertiary,
     );
@@ -78,7 +78,7 @@ class RootNode implements DataNode {
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedFolder01,
       color: Theme.of(context).colorScheme.tertiary,
     );
@@ -105,7 +105,7 @@ class FolderNode extends RootNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedFolder02,
       color: Theme.of(context).colorScheme.tertiary,
     );
@@ -114,7 +114,7 @@ class FolderNode extends RootNode {
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedFolder01,
       color: Theme.of(context).colorScheme.tertiary,
     );
@@ -188,7 +188,7 @@ class DataValueNode extends RootNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedTable,
       color: Theme.of(context).colorScheme.primary,
     );
@@ -197,7 +197,7 @@ class DataValueNode extends RootNode {
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedTable,
       color: Theme.of(context).colorScheme.onSurface,
     );
@@ -222,7 +222,7 @@ class SchemaValueNode extends DataValueNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedDatabase,
       color: Theme.of(context).colorScheme.primary,
     );
@@ -231,7 +231,7 @@ class SchemaValueNode extends DataValueNode {
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedDatabase,
       color: Theme.of(context).colorScheme.onSurface,
     );
@@ -244,7 +244,7 @@ class TableValueNode extends DataValueNode {
   @override
   Widget openIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedTable,
       color: Theme.of(context).colorScheme.primary,
     );
@@ -253,7 +253,7 @@ class TableValueNode extends DataValueNode {
   @override
   Widget closeIcons(BuildContext context) {
     return HugeIcon(
-      size: kIconSizeTiny,
+      size: kIconSizeSmall,
       icon: HugeIcons.strokeRoundedTable,
       color: Theme.of(context).colorScheme.onSurface,
     );
@@ -266,12 +266,12 @@ class ColumnValueNode extends DataValueNode {
 
   @override
   Widget openIcons(BuildContext context) {
-    return DataTypeIcon(type: type, size: kIconSizeTiny);
+    return DataTypeIcon(type: type, size: kIconSizeSmall);
   }
 
   @override
   Widget closeIcons(BuildContext context) {
-    return DataTypeIcon(type: type, size: kIconSizeTiny);
+    return DataTypeIcon(type: type, size: kIconSizeSmall);
   }
 }
 

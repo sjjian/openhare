@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:client/models/sessions.dart';
+import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/button.dart';
@@ -39,7 +40,7 @@ class SessionStatusTab extends ConsumerWidget {
       padding: const EdgeInsets.only(left: kSpacingSmall),
       child: Row(
         children: [
-          if (model.connErrorMsg != null)
+          if (model.connState != null)
             Tooltip(
               message: model.connErrorMsg ?? '-',
               child: MouseRegion(
@@ -57,11 +58,11 @@ class SessionStatusTab extends ConsumerWidget {
                           SQLConnectState.connected ||
                           SQLConnectState.executing =>
                             const Icon(Icons.check_circle,
-                                size: kIconSizeTiny, color: Colors.green),
+                                size: kIconSizeSmall, color: Colors.green),
                           SQLConnectState.failed ||
                           SQLConnectState.unHealth =>
                             const Icon(Icons.error,
-                                size: kIconSizeTiny, color: Colors.red),
+                                size: kIconSizeSmall, color: Colors.red),
                           _ => const Text("-"),
                         } // 根据model.state展示不同的图标
                             ),
@@ -103,7 +104,6 @@ class SessionStatusTab extends ConsumerWidget {
                 icon: Icons.download_rounded,
                 iconColor: Colors.green,
                 onPressed: () async {
-                  //todo: 下载失效了，需要测试。
                   String? outputFile = await FilePicker.platform.saveFile(
                     dialogTitle:
                         AppLocalizations.of(context)!.display_msg_downlaod,

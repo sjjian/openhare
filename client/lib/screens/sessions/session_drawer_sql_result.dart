@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:client/models/sessions.dart';
-import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/widgets/empty.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/utils/file_type.dart';

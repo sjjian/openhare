@@ -4,6 +4,7 @@ import 'package:client/repositories/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:excel/excel.dart' as excel;
 
 part 'session_sql_result.g.dart';
 
@@ -44,13 +45,14 @@ class SQLResultsServices extends _$SQLResultsServices {
     return result;
   }
 
-  Future<void> loadFromQuery(ResultId resultId, String query) async {
+  Future<void> _query(ResultId resultId, String query) async {
     final repo = ref.read(sqlResultsRepoProvider);
 
     repo.updateSQLResult(
-        resultId,
-        SQLResultDetailModel(
-            resultId: resultId, query: query, state: SQLExecuteState.init));
+      resultId,
+      SQLResultDetailModel(
+          resultId: resultId, query: query, state: SQLExecuteState.init),
+    );
     ref.invalidateSelf();
 
     // todo
@@ -64,30 +66,97 @@ class SQLResultsServices extends _$SQLResultsServices {
       BaseQueryResult? queryResult =
           await connServices.query(sessionModel!.connId!, query);
       DateTime end = DateTime.now();
-
+      // sleep 100ms, 不然当界面刷新太快时，无法感知结果是没变还是没执行.
+      await Future.delayed(const Duration(milliseconds: 100));
       repo.updateSQLResult(
-          resultId,
-          SQLResultDetailModel(
-              resultId: resultId,
-              query: query,
-              data: queryResult,
-              executeTime: end.difference(start),
-              state: SQLExecuteState.done));
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          queryId: queryResult?.queryId,
+          data: queryResult,
+          executeTime: end.difference(start),
+          state: SQLExecuteState.done,
+        ),
+      );
     } catch (e) {
       repo.updateSQLResult(
-          resultId,
-          SQLResultDetailModel(
-              resultId: resultId,
-              query: query,
-              state: SQLExecuteState.error,
-              error: e.toString()));
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          state: SQLExecuteState.error,
+          error: e.toString(),
+        ),
+      );
     } finally {
       ref.invalidateSelf();
     }
   }
 
+  Future<void> queryAddResult(SessionId sessionId, String query) async {
+    final resultModel = addSQLResult(sessionId);
+    _query(resultModel.resultId, query);
+  }
+
+  Future<void> query(SessionId sessionId, String query) async {
+    SQLResultModel? resultModel = selectedSQLResult(sessionId);
+    resultModel ??= addSQLResult(sessionId);
+    _query(resultModel.resultId, query);
+  }
+
   SQLResultDetailModel? getSQLResult(ResultId resultId) {
     final repo = ref.read(sqlResultsRepoProvider);
     return repo.getSQLResult(resultId);
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultTabNotifier extends _$SelectedSQLResultTabNotifier {
+  @override
+  SessionSQLResultsModel? build() {
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
+    if (sessionModel == null) {
+      return null;
+    }
+    return ref.watch(sQLResultsServicesProvider.select((m) {
+      return m.cache[sessionModel.sessionId];
+    }));
+  }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
+  @override
+  SQLResultDetailModel? build() {
+    SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
+    if (sessionModel == null) {
+      return null;
+    }
+    SQLResultModel? sqlResultModel =
+        ref.watch(sQLResultsServicesProvider.select((m) {
+      return m.cache[sessionModel.sessionId]?.selected;
+    }));
+    if (sqlResultModel == null) {
+      return null;
+    }
+    return ref
+        .read(sQLResultsServicesProvider.notifier)
+        .getSQLResult(sqlResultModel.resultId);
+  }
+
+  excel.Excel toExcel() {
+    final data = excel.Excel.createExcel();
+    final sheet = data["Sheet1"];
+    sheet.appendRow(state!.data!.columns
+        .map<excel.TextCellValue>((e) => excel.TextCellValue(e.name))
+        .toList());
+    for (final row in state!.data!.rows) {
+      sheet.appendRow(row.values
+          .map<excel.TextCellValue>(
+              (e) => excel.TextCellValue(e.getString() ?? ''))
+          .toList());
+    }
+    return data;
   }
 }

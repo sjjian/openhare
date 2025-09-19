@@ -36,9 +36,9 @@ class SessionTabs extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionDetailListModel model = ref.watch(sessionsNotifierProvider);
-    return Padding(
-      padding: const EdgeInsets.only(top: kSpacingTiny),
+    SessionDetailListModel model = ref.watch(sessionsDetailNotifierProvider);
+    return Container(
+      padding: const EdgeInsets.only(top: kSpacingTiny, bottom: kSpacingTiny),
       child: Row(
         children: [
           Expanded(
@@ -47,17 +47,14 @@ class SessionTabs extends ConsumerWidget {
                 minWidth: 90,
                 color: Theme.of(context)
                     .colorScheme
-                    .surfaceContainerHigh, // session tab 背景色
+                    .surfaceContainerLow, // session tab 背景色
                 selectedColor: Theme.of(context)
                     .colorScheme
-                    .surfaceContainerLow, // session tab 选择的颜色
+                    .surfaceContainerHigh, // session tab 选择的颜色
                 hoverColor: Theme.of(context)
                     .colorScheme
                     .surfaceContainer, // session tab 鼠标移入的颜色
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(5),
-                  topRight: Radius.circular(5),
-                ),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
               ),
               addTab: () {
                 ref.read(sessionsServicesProvider.notifier).newSession();

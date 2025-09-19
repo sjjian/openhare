@@ -33,8 +33,9 @@ dependencies:
     sdk: flutter
   pluto_grid: ^8.0.0
   window_manager: ^0.5.1
+  bitsdojo_window: ^0.1.6
   cupertino_icons: ^1.0.2
-  multi_split_view: ^3.6.0
+  multi_split_view: ^3.6.1
   mysql_client: ^0.0.27
   mysql1: ^0.20.0
   quiver: ^3.2.1
@@ -45,7 +46,7 @@ dependencies:
   flutter_fancy_tree_view: ^1.6.0
   flutter_breadcrumb: ^1.0.1
   google_fonts: ^6.2.1
-  file_picker: ^8.1.7
+  file_picker: ^10.3.3
   excel: ^4.0.6
   re_editor: ^0.6.0
   collection: ^1.18.0

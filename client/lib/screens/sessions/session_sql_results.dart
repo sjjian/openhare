@@ -1,10 +1,12 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_conn.dart';
+import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
+import 'package:client/widgets/tooltip.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +28,7 @@ class SqlResultTables extends ConsumerWidget {
       labelAlign: TextAlign.center,
       selectedColor: Theme.of(context)
           .colorScheme
-          .surfaceContainerLow, // sql result tab 的选中颜色
+          .surfaceContainer, // sql result tab 的选中颜色
       color: Theme.of(context)
           .colorScheme
           .surfaceContainerLowest, // sql result tab 的背景色
@@ -70,7 +72,7 @@ class SqlResultTables extends ConsumerWidget {
                               model.results[i].state == SQLExecuteState.init)
                           ? const Loading.small()
                           : const Icon(
-                              size: kIconSizeTiny,
+                              size: kIconSizeSmall,
                               Icons.grid_on,
                             ),
                     ),
@@ -78,7 +80,7 @@ class SqlResultTables extends ConsumerWidget {
               : [],
         ),
       ),
-      const SizedBox(width: kSpacingTiny),
+      const SizedBox(width: kSpacingTiny / 2),
     ]);
 
     return Row(
@@ -145,6 +147,100 @@ class SqlResultTable extends ConsumerWidget {
     }).toList();
   }
 
+  Widget buildEmptyBody(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const maxWidth = 64 + kSpacingSmall;
+        const maxHeight = 64 + kSpacingSmall;
+        if (constraints.maxWidth < maxWidth ||
+            constraints.maxHeight < maxHeight) {
+          return const SizedBox.shrink();
+        }
+        return EmptyPage(
+          child: Text(
+            AppLocalizations.of(context)!.display_msg_no_data,
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(color: Theme.of(context).colorScheme.surfaceDim),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildErrorBody(BuildContext context, SQLResultDetailModel model) {
+    // 监听父容器大小，小于内容高度则隐藏
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const maxHeight =
+            kIconSizeLarge + kSpacingMedium + 20.0 + kSpacingSmall * 2;
+        const maxWidth = kIconSizeLarge +kSpacingLarge * 2;
+        if (constraints.maxHeight < maxHeight ||
+            constraints.maxWidth < maxWidth) {
+          // 父容器太小，隐藏内容
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+              kSpacingLarge, kSpacingSmall, kSpacingLarge, kSpacingSmall),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error,
+                    size: kIconSizeLarge, color: Colors.red),
+                const SizedBox(height: kSpacingMedium),
+                TooltipText(text: '${model.error}${model.query}'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildWaitingBody(
+      BuildContext context, WidgetRef ref, SQLResultDetailModel model) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const maxHeight = kIconButtonSizeLarge + kSpacingMedium + 40;
+        const maxWidth = kIconButtonSizeLarge + 80;
+        if (constraints.maxHeight < maxHeight ||
+            constraints.maxWidth < maxWidth) {
+          return const SizedBox.shrink();
+        }
+        return Container(
+          alignment: Alignment.topLeft,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Loading.large(),
+                const SizedBox(height: kSpacingMedium),
+                FilledButton(
+                    onPressed: () async {
+                      SessionModel? sessionModel = ref
+                          .read(sessionsServicesProvider.notifier)
+                          .getSession(model.resultId.sessionId);
+
+                      if (sessionModel == null || sessionModel.connId == null) {
+                        return;
+                      }
+                      await ref
+                          .read(sessionConnsServicesProvider.notifier)
+                          .killQuery(sessionModel.connId!);
+                    },
+                    child: Text(AppLocalizations.of(context)!.cancel))
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final color = Theme.of(context)
@@ -153,15 +249,7 @@ class SqlResultTable extends ConsumerWidget {
 
     final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
-      return EmptyPage(
-        child: Text(
-          AppLocalizations.of(context)!.display_msg_no_data,
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(color: Theme.of(context).colorScheme.surfaceDim),
-        ),
-      );
+      return buildEmptyBody(context);
     }
     if (model.state == SQLExecuteState.done) {
       return PlutoGrid(
@@ -202,39 +290,9 @@ class SqlResultTable extends ConsumerWidget {
         rows: buildRows(model.data!.rows),
       );
     } else if (model.state == SQLExecuteState.error) {
-      return Container(
-          alignment: Alignment.topLeft,
-          color: color,
-          child: Text('${model.error}'));
+      return buildErrorBody(context, model);
     } else {
-      return Container(
-        alignment: Alignment.topLeft,
-        color: color,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Loading.large(),
-              const SizedBox(height: kSpacingMedium),
-              FilledButton(
-                  onPressed: () async {
-                    SessionDetailModel? sessionModel = ref
-                        .read(sessionsServicesProvider.notifier)
-                        .getSession(model.resultId.sessionId);
-
-                    if (sessionModel == null || sessionModel.connId == null) {
-                      return;
-                    }
-                    await ref
-                        .read(sessionConnsServicesProvider.notifier)
-                        .killQuery(sessionModel.connId!);
-                  },
-                  child: Text(AppLocalizations.of(context)!.cancel))
-            ],
-          ),
-        ),
-      );
+      return buildWaitingBody(context, ref, model);
     }
   }
 }

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 
 class SessionController {
-
   // split
   final SplitViewController multiSplitViewCtrl;
   final SplitViewController metaDataSplitViewCtrl;
@@ -15,7 +14,6 @@ class SessionController {
   final TextEditingController chatInputController;
   final TextEditingController aiChatSearchTextController;
   final ScrollController aiChatScrollController;
-
 
   SessionController(
       {required this.multiSplitViewCtrl,
@@ -31,9 +29,10 @@ class SessionController {
       return cache[sessionId]!;
     }
     final controller = SessionController(
-      multiSplitViewCtrl: SplitViewController(Area(), Area(min: 35, size: 500)),
+      multiSplitViewCtrl:
+          SplitViewController(Area(), Area(size: 500, min: 40)),
       metaDataSplitViewCtrl:
-          SplitViewController(Area(flex: 7, min: 3), Area(flex: 3, min: 3)),
+          SplitViewController(Area(), Area(size: 400, min: 360)),
       aiChatSearchTextController: TextEditingController(),
       chatInputController: TextEditingController(),
       aiChatScrollController: ScrollController(),

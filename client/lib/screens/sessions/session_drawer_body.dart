@@ -2,7 +2,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_chat.dart';
 import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_drawer_sql_result.dart';
-import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +21,7 @@ class SessionDrawerBody extends ConsumerWidget {
         children: [
           Expanded(
             child: Container(
-                padding: const EdgeInsets.fromLTRB(kSpacingSmall - 5, 0,
+                padding: const EdgeInsets.fromLTRB(kSpacingSmall - 5, kSpacingTiny,
                     kSpacingSmall, 0), // 左边减去5, 减掉split view 多出来的空间
                 child: switch (sessionDrawer.drawerPage) {
                   DrawerPage.sqlResult => const SessionDrawerSqlResult(),

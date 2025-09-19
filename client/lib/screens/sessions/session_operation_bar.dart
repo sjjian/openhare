@@ -1,4 +1,6 @@
 import 'package:client/models/sessions.dart';
+import 'package:client/services/sessions/session_drawer.dart';
+import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/sessions.dart';
@@ -141,15 +143,9 @@ class SessionOpBar extends ConsumerWidget {
       onPressed: SQLConnectState.isIdle(model.state)
           ? () {
               String query = getQuery();
-              final sqlResultsServices =
-                  ref.read(sQLResultsServicesProvider.notifier);
-
-              SQLResultModel? resultModel =
-                  sqlResultsServices.selectedSQLResult(model.sessionId);
-
-              resultModel ??= sqlResultsServices.addSQLResult(model.sessionId);
-
-              sqlResultsServices.loadFromQuery(resultModel.resultId, query);
+              ref
+                  .read(sQLResultsServicesProvider.notifier)
+                  .query(model.sessionId, query);
             }
           : () {
               connectDialog(context, ref, model);
@@ -169,11 +165,9 @@ class SessionOpBar extends ConsumerWidget {
             ? () {
                 String query = getQuery();
                 if (query.isNotEmpty) {
-                  final sqlResultsServices =
-                      ref.read(sQLResultsServicesProvider.notifier);
-                  final resultModel =
-                      sqlResultsServices.addSQLResult(model.sessionId);
-                  sqlResultsServices.loadFromQuery(resultModel.resultId, query);
+                  ref
+                      .read(sQLResultsServicesProvider.notifier)
+                      .queryAddResult(model.sessionId, query);
                 }
               }
             : () {
@@ -185,11 +179,9 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget explainWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    return RectangleIconButton(
+    return RectangleIconButton.medium(
       tooltip: AppLocalizations.of(context)!.button_tooltip_explain_sql,
-      size: kIconSizeLarge,
-      iconSize: kIconSizeLarge,
-      icon: Icons.e_mobiledata,
+      icon: Icons.poll_outlined,
       iconColor: SQLConnectState.isIdle(model.state)
           ? const Color.fromARGB(255, 241, 192, 84)
           : Colors.grey,
@@ -197,17 +189,28 @@ class SessionOpBar extends ConsumerWidget {
           ? () {
               String query = getQuery();
               if (query.isNotEmpty) {
-                final sqlResultsServices =
-                    ref.read(sQLResultsServicesProvider.notifier);
-                final resultModel =
-                    sqlResultsServices.addSQLResult(model.sessionId);
-                sqlResultsServices.loadFromQuery(
-                    resultModel.resultId, "explain $query");
+                ref
+                    .read(sQLResultsServicesProvider.notifier)
+                    .queryAddResult(model.sessionId, "explain $query");
               }
             }
           : () {
               connectDialog(context, ref, model);
             },
+    );
+  }
+
+  Widget saveWidget(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    return RectangleIconButton.medium(
+      tooltip: AppLocalizations.of(context)!.button_tooltip_save,
+      icon: Icons.save,
+      iconColor: Theme.of(context).colorScheme.onSurface,
+      onPressed: () {
+        ref
+            .read(sessionSQLEditorServiceProvider(model.sessionId).notifier)
+            .saveCode();
+      },
     );
   }
 
@@ -226,13 +229,14 @@ class SessionOpBar extends ConsumerWidget {
 
     if (model == null) {
       return Container(
-        color: Theme.of(context).colorScheme.surfaceContainerLow, // op bar 背景色
+        color:
+            Theme.of(context).colorScheme.surfaceContainerLowest, // op bar 背景色
         constraints: BoxConstraints(maxHeight: height),
         child: const Spacer(),
       );
     }
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLow, // op bar 背景色
+      color: Theme.of(context).colorScheme.surfaceContainerLowest, // op bar 背景色
       constraints: BoxConstraints(maxHeight: height),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -250,6 +254,7 @@ class SessionOpBar extends ConsumerWidget {
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
+          saveWidget(context, ref, model),
           const Expanded(child: SessionDrawerBar()),
         ],
       ),
@@ -325,32 +330,38 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                     child: Text(schema, overflow: TextOverflow.ellipsis));
               }).toList());
         },
-        child: Container(
-            padding: const EdgeInsets.only(left: kSpacingTiny),
-            color: (isEnter && !widget.disable)
-                ? Theme.of(context)
-                    .colorScheme
-                    .surfaceContainer // schema 鼠标移入的颜色
-                : null,
-            child: Row(
-              children: [
-                HugeIcon(
-                  icon: HugeIcons.strokeRoundedDatabase,
-                  color: widget.iconColor ??
-                      Theme.of(context).colorScheme.onSurface,
-                  size: kIconSizeSmall,
-                ),
-                Container(
-                    padding: const EdgeInsets.only(left: kSpacingTiny),
-                    width: 120,
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          widget.currentSchema ?? "",
-                          overflow: TextOverflow.ellipsis,
-                        ))),
-              ],
-            )),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
+          child: Container(
+              padding: const EdgeInsets.only(left: kSpacingTiny),
+              decoration: BoxDecoration(
+                color: (isEnter && !widget.disable)
+                    ? Theme.of(context)
+                        .colorScheme
+                        .primaryContainer // schema 鼠标移入的颜色
+                    : null,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Row(
+                children: [
+                  HugeIcon(
+                    icon: HugeIcons.strokeRoundedDatabase,
+                    color: widget.iconColor ??
+                        Theme.of(context).colorScheme.onSurface,
+                    size: kIconSizeSmall,
+                  ),
+                  Container(
+                      padding: const EdgeInsets.only(left: kSpacingTiny),
+                      width: 120,
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            widget.currentSchema ?? "",
+                            overflow: TextOverflow.ellipsis,
+                          ))),
+                ],
+              )),
+        ),
       ),
     );
   }
@@ -373,7 +384,8 @@ class SessionDrawerBar extends ConsumerWidget {
         const Spacer(),
         if (model.isRightPageOpen) ...[
           RectangleIconButton.medium(
-              tooltip: AppLocalizations.of(context)!.button_tooltip_metadata_tree,
+              tooltip:
+                  AppLocalizations.of(context)!.button_tooltip_metadata_tree,
               icon: Icons.account_tree_outlined,
               backgroundColor: (model.drawerPage == DrawerPage.metadataTree)
                   ? Theme.of(context).colorScheme.primaryContainer

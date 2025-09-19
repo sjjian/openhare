@@ -21,7 +21,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/models/ai.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gpt_markdown/custom_widgets/code_field.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -50,7 +49,7 @@ class _SessionDrawerChatState extends ConsumerState<SessionDrawerChat> {
               ? const SessionChatGuide()
               : const SessionChatMessages(),
         ),
-        const SizedBox(height: kSpacingMedium),
+        const SizedBox(height: kSpacingSmall),
         // 下方的输入框区域
         const SessionChatInputCard(),
         const SizedBox(height: kSpacingMedium),
@@ -200,7 +199,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
             HugeIcon(
               icon: HugeIcons.strokeRoundedTable,
               color: Theme.of(context).colorScheme.onSurface,
-              size: kIconSizeTiny,
+              size: kIconSizeSmall,
             ),
             const SizedBox(width: kSpacingTiny),
             Expanded(
@@ -228,14 +227,18 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(kSpacingMedium, 0, kSpacingMedium, 0),
+      padding: const EdgeInsets.fromLTRB(kSpacingSmall, 0, kSpacingSmall, 0),
       child: Container(
         padding: const EdgeInsets.fromLTRB(
             kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingTiny),
         // 设置一个圆角
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          color: Theme.of(context).colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            width: 0.5,
+          ),
         ),
         child: Column(
           children: [
@@ -318,12 +321,12 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                       _isTableSelected(model, table)
                                           ? const Icon(
                                               Icons.check_circle,
-                                              size: kIconSizeTiny,
+                                              size: kIconSizeSmall,
                                               color: Colors.green,
                                             )
                                           : const Icon(
                                               Icons.circle_outlined,
-                                              size: kIconSizeTiny,
+                                              size: kIconSizeSmall,
                                             ),
                                       const SizedBox(width: kSpacingTiny),
                                       Expanded(
@@ -388,7 +391,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                             model, searchTextController.text)
                                         ? Icons.check_circle
                                         : Icons.circle_outlined,
-                                    size: kIconSizeTiny,
+                                    size: kIconSizeSmall,
                                     color: _isAllTableSelected(
                                             model, searchTextController.text)
                                         ? Colors.green
@@ -420,8 +423,10 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                                           _onSearchChanged();
                                         },
                                         trailing: const [
-                                          Icon(Icons.search,
-                                              size: kIconSizeTiny),
+                                          Icon(
+                                            Icons.search,
+                                            size: kIconSizeSmall,
+                                          ),
                                         ]),
                                   ),
                                 ),
@@ -492,9 +497,15 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
 }
 
 class SqlChatField extends StatefulWidget {
-  final Function(String)? onRun;
+  final String name;
   final String codes;
-  const SqlChatField({super.key, required this.codes, required this.onRun});
+  final Function(String)? onRun;
+  const SqlChatField({
+    super.key,
+    required this.codes,
+    required this.onRun,
+    required this.name,
+  });
 
   @override
   State<SqlChatField> createState() => _SqlChatFieldState();
@@ -504,31 +515,35 @@ class _SqlChatFieldState extends State<SqlChatField> {
   bool _copied = false;
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.onInverseSurface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          width: 0.5,
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(
+          kSpacingSmall, kSpacingTiny, kSpacingSmall, kSpacingSmall),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8,
-                ),
-                child: Text("SQL"),
-              ),
+              Text(widget.name),
               const Spacer(),
-              RectangleIconButton.small(
-                tooltip: AppLocalizations.of(context)!
-                    .button_tooltip_run_sql_new_tab,
-                icon: Icons.not_started_outlined,
-                iconColor: (widget.onRun != null) ? Colors.green : Colors.grey,
-                onPressed: () {
-                  widget.onRun?.call(widget.codes);
-                },
-              ),
+              if (widget.name == "sql")
+                RectangleIconButton.small(
+                  tooltip: AppLocalizations.of(context)!
+                      .button_tooltip_run_sql_new_tab,
+                  icon: Icons.not_started_outlined,
+                  iconColor:
+                      (widget.onRun != null) ? Colors.green : Colors.grey,
+                  onPressed: () {
+                    widget.onRun?.call(widget.codes);
+                  },
+                ),
               RectangleIconButton.small(
                 tooltip: AppLocalizations.of(context)!.button_tooltip_copy_sql,
                 icon: (_copied) ? Icons.done : Icons.content_paste,
@@ -546,17 +561,22 @@ class _SqlChatFieldState extends State<SqlChatField> {
                   });
                 },
               ),
-              const SizedBox(width: kSpacingTiny),
             ],
           ),
-          const Divider(height: 1),
+          Divider(
+            height: kBlockDividerSize,
+            thickness: kBlockDividerThickness,
+            color: Theme.of(context).dividerColor,
+          ),
+          const SizedBox(height: kSpacingSmall),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(16),
             child: RichText(
-              text: getSQLHighlightTextSpan(widget.codes,
-                  defalutStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface)),
+              text: getSQLHighlightTextSpan(
+                widget.codes,
+                defalutStyle:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
             ),
           ),
         ],
@@ -568,12 +588,11 @@ class _SqlChatFieldState extends State<SqlChatField> {
 class SessionChatMessages extends ConsumerWidget {
   const SessionChatMessages({super.key});
 
-  // todo: 重复代码
   void _runSQL(BuildContext context, WidgetRef ref, SessionAIChatModel model,
       String code) {
-    final sqlResultsServices = ref.read(sQLResultsServicesProvider.notifier);
-    final resultModel = sqlResultsServices.addSQLResult(model.sessionId);
-    sqlResultsServices.loadFromQuery(resultModel.resultId, code);
+    ref
+        .read(sQLResultsServicesProvider.notifier)
+        .queryAddResult(model.sessionId, code);
   }
 
   void _retryMessage(BuildContext context, WidgetRef ref,
@@ -614,7 +633,8 @@ class SessionChatMessages extends ConsumerWidget {
   // 用户消息组件
   Widget userMessageWidget(BuildContext context, AIChatMessageModel message) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      padding: const EdgeInsets.fromLTRB(
+          kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingSmall),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
@@ -622,6 +642,10 @@ class SessionChatMessages extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              width: 0.5,
+            ),
           ),
           child: Text(
             message.content,
@@ -638,16 +662,17 @@ class SessionChatMessages extends ConsumerWidget {
   Widget assistantMessageWidget(BuildContext context, WidgetRef ref,
       SessionAIChatModel model, AIChatMessageModel message) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: const EdgeInsets.fromLTRB(
+          kSpacingSmall, kSpacingSmall, kSpacingSmall, kSpacingSmall),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (message.error != null)
                 Text(
@@ -686,15 +711,14 @@ class SessionChatMessages extends ConsumerWidget {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                   codeBuilder: (context, name, code, closed) {
-                    if (name == "sql") {
-                      return SqlChatField(
-                          codes: code,
-                          onRun: SQLConnectState.isIdle(model.state)
+                    return SqlChatField(
+                      name: name,
+                      codes: code,
+                      onRun:
+                          (name == "sql" && SQLConnectState.isIdle(model.state))
                               ? (code) => _runSQL(context, ref, model, code)
-                              : null);
-                    } else {
-                      return CodeField(name: name, codes: code);
-                    }
+                              : null,
+                    );
                   },
                 ),
               ),

@@ -6,6 +6,7 @@ import 'package:client/screens/page_skeleton.dart';
 import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/about/about.dart';
 import 'package:client/screens/sessions/sessions.dart';
+import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/const.dart';
@@ -134,8 +135,9 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
         MoveWindows(
           child: NavigationRail(
             minWidth: navigationRailWidth,
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest, // navigation color
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerLow, // navigation color
             useIndicator: true,
             selectedIndex: _calculateSelectedIndex(context),
             onDestinationSelected: (value) {
@@ -153,8 +155,8 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                     });
                   },
                   child: extended
-                      ? const Icon(Icons.menu_open, size: kIconSizeSmall)
-                      : const Icon(Icons.menu, size: kIconSizeSmall),
+                      ? const Icon(Icons.menu_open, size: kIconSizeMedium)
+                      : const Icon(Icons.menu, size: kIconSizeMedium),
                 ),
               ],
             ),
@@ -198,19 +200,6 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                 ),
               ),
             ],
-            // trailing: Expanded(
-            //   child: Align(
-            //     alignment: Alignment.bottomCenter,
-            //     child: Padding(
-            //       padding: const EdgeInsets.only(bottom: tabbarHeight / 2),
-            //       child: Image.asset(
-            //         "assets/icons/logo.png",
-            //         height: kIconSizeLarge,
-            //         width: kIconSizeLarge,
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ),
         ),
         Expanded(child: widget.child)
@@ -259,8 +248,8 @@ class _WindowListener with WindowListener {
 
   @override
   void onWindowClose() async {
-    SessionDetailListModel sessionRepo = ref.read(sessionsNotifierProvider);
-    for (var session in sessionRepo.sessions) {
+    SessionListModel sessions = ref.read(sessionsServicesProvider);
+    for (var session in sessions.sessions) {
       ref
           .read(sessionSQLEditorServiceProvider(session.sessionId).notifier)
           .saveCode();

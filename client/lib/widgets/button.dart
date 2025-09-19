@@ -7,6 +7,7 @@ class RectangleIconButton extends StatefulWidget {
   final IconData icon;
   final double size;
   final double iconSize;
+  final double padding;
   final Color? iconColor;
   final Color? backgroundColor;
   final Color? hoverBackgroundColor;
@@ -19,6 +20,7 @@ class RectangleIconButton extends StatefulWidget {
       this.onPressed,
       required this.size,
       required this.iconSize,
+      required this.padding,
       this.iconColor,
       this.backgroundColor,
       this.hoverBackgroundColor})
@@ -34,6 +36,7 @@ class RectangleIconButton extends StatefulWidget {
     this.hoverBackgroundColor,
   })  : size = kIconButtonSizeMedium,
         iconSize = kIconSizeMedium,
+        padding = 4,
         super(key: key);
 
   const RectangleIconButton.small(
@@ -46,6 +49,7 @@ class RectangleIconButton extends StatefulWidget {
       this.hoverBackgroundColor})
       : size = kIconButtonSizeSmall,
         iconSize = kIconSizeSmall,
+        padding = 2,
         super(key: key);
 
   const RectangleIconButton.tiny(
@@ -58,6 +62,7 @@ class RectangleIconButton extends StatefulWidget {
       this.hoverBackgroundColor})
       : size = kIconButtonSizeTiny,
         iconSize = kIconSizeTiny,
+        padding = 2,
         super(key: key);
 
   @override
@@ -88,10 +93,10 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
         child: GestureDetector(
           onTap: widget.onPressed,
           child: Padding(
-            padding: const EdgeInsets.all(2),
+            padding: EdgeInsets.all(widget.padding),
             child: Container(
-              width: widget.size - 4,
-              height: widget.size - 4,
+              width: widget.size - widget.padding * 2,
+              height: widget.size - widget.padding * 2,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(widget.size * 0.2),
                 color: _isHovering
@@ -104,7 +109,7 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
               child: Icon(
                 widget.icon,
                 color: widget.iconColor,
-                size: widget.iconSize - 4,
+                size: widget.iconSize,
               ),
             ),
           ),
@@ -123,8 +128,9 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
 class LinkButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
+  final double? maxWidth;
 
-  const LinkButton({Key? key, required this.text, this.onPressed})
+  const LinkButton({Key? key, required this.text, this.onPressed, this.maxWidth})
       : super(key: key);
 
   @override
@@ -146,8 +152,8 @@ class _LinkButtonState extends State<LinkButton> {
       child: GestureDetector(
         onTap: widget.onPressed,
         child: Container(
-          constraints: const BoxConstraints(
-            maxWidth: 200,
+          constraints: BoxConstraints(
+            maxWidth: widget.maxWidth ?? 200,
           ),
           padding:
               const EdgeInsets.fromLTRB(kSpacingSmall, 0, kSpacingSmall, 0),
