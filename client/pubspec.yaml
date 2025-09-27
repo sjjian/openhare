@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.2.0
+version: 0.3.0
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -56,8 +56,8 @@ dependencies:
     path: ../pkg/sql_parser/
   db_driver:
     path: ../pkg/db_driver/
-  objectbox: ^4.2.0
-  objectbox_sync_flutter_libs: any
+  objectbox: 4.2.0
+  objectbox_sync_flutter_libs: 4.2.0
   flutter_riverpod: 2.6.1
   riverpod_annotation: 2.6.1
   hooks_riverpod: 2.6.1
@@ -83,7 +83,7 @@ dev_dependencies:
   json_serializable: ^6.9.5
   build_runner: ^2.4.15
   test: ^1.25.2
-  objectbox_generator: any
+  objectbox_generator: 4.2.0
   riverpod_generator: 2.6.5
   freezed: ^3.0.6
   flutter_launcher_icons: "^0.14.4"
