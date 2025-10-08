@@ -24,19 +24,16 @@ class SessionOpBar extends ConsumerWidget {
 
   String getQuery() {
     var content = codeController.text.toString();
-    List<SQLChunk> querys = Splitter(content, ";").split();
+    List<SQLChunk> querys = Splitter(content, ";", skipWhitespace: true).split();
     CodeLineSelection s = codeController.selection;
     String query;
     // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
     if (!s.isCollapsed) {
       query = codeController.selectedText;
     } else {
-      int line = s.baseIndex + 1;
-      int row = s.baseOffset;
+      Pos cursor = Pos(0, s.baseIndex + 1, s.baseOffset);
       SQLChunk chunk = querys.firstWhere((chunk) {
-        if (line < chunk.end.line) {
-          return true;
-        } else if (line == chunk.end.line && row <= chunk.end.row) {
+        if (cursor.between(chunk.start, chunk.end)) {
           return true;
         }
         return false;
@@ -143,9 +140,11 @@ class SessionOpBar extends ConsumerWidget {
       onPressed: SQLConnectState.isIdle(model.state)
           ? () {
               String query = getQuery();
+              if (query.isNotEmpty) {
               ref
-                  .read(sQLResultsServicesProvider.notifier)
-                  .query(model.sessionId, query);
+                    .read(sQLResultsServicesProvider.notifier)
+                    .query(model.sessionId, query);
+              }
             }
           : () {
               connectDialog(context, ref, model);

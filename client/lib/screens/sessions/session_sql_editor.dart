@@ -63,6 +63,11 @@ class SQLEditor extends ConsumerWidget {
       keywordPrompt.addAll(buildMetadataKeyword(model.metadata!));
     }
 
+    final textStyle = GoogleFonts.robotoMono(
+      textStyle: Theme.of(context).textTheme.bodyMedium,
+      color: Theme.of(context).colorScheme.onSurface,
+    );
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return Column(
@@ -78,7 +83,8 @@ class SQLEditor extends ConsumerWidget {
                 promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
                   keywordPrompts: keywordPrompt,
                   relatedPrompts: (model.metadata != null)
-                      ? buildRelatePrompts(model.metadata!, model.currentSchema)
+                      ? buildRelatePrompts(
+                          model.metadata!, model.currentSchema)
                       : const {},
                 ),
                 child: CodeEditor(
@@ -87,36 +93,26 @@ class SQLEditor extends ConsumerWidget {
                     backgroundColor: Theme.of(context)
                         .colorScheme
                         .surfaceContainerLowest, // SQL 编辑器背景色
-                    textStyle: GoogleFonts.robotoMono(
-                      textStyle: Theme.of(context).textTheme.bodyMedium,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ), // SQL 编辑器文字颜色
+                    textStyle: textStyle, // SQL 编辑器文字颜色
                   ),
-                  indicatorBuilder:
-                      (context, editingController, chunkController, notifier) {
-                    if (constraints.maxWidth < 160) {
-                      return const SizedBox.shrink();
-                    }
-                    return Row(
-                      children: [
-                        DefaultCodeLineNumber(
-                          controller: editingController,
-                          notifier: notifier,
-                        ),
-                        DefaultCodeChunkIndicator(
-                          width: 20,
-                          controller: chunkController,
-                          notifier: notifier,
-                        ),
-                        VerticalDivider(
-                          width: kBlockDividerSize,
-                          thickness: kBlockDividerThickness,
-                          color: Theme.of(context).dividerColor,
-                        )
-                      ],
-                    );
-                  },
                   controller: codeController,
+                  indicatorBuilder: (context, editingController,
+                      chunkController, notifier) {
+                    return Row(children: [
+                      const SizedBox(width: kSpacingTiny),
+                      CodeLineNumber(
+                        textStyle: textStyle,
+                        totalHeight: constraints.maxHeight,
+                        notifier: notifier,
+                        codeController: codeController,
+                      ),
+                      VerticalDivider(
+                        width: kBlockDividerSize,
+                        thickness: kBlockDividerThickness,
+                        color: Theme.of(context).dividerColor,
+                      ),
+                    ]);
+                  },
                 ),
               ),
             ),
@@ -128,6 +124,154 @@ class SQLEditor extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class CodeLineNumber extends StatefulWidget {
+  final double totalHeight;
+  final TextStyle textStyle;
+  final CodeIndicatorValueNotifier notifier;
+  final CodeLineEditingController codeController;
+
+  const CodeLineNumber({
+    Key? key,
+    required this.notifier,
+    required this.totalHeight,
+    required this.textStyle,
+    required this.codeController,
+  }) : super(key: key);
+
+  @override
+  State<CodeLineNumber> createState() => _CodeLineNumberState();
+}
+
+class _CodeLineNumberState extends State<CodeLineNumber> {
+  @override
+  void initState() {
+    widget.codeController.addListener(_onValueChanged);
+    widget.notifier.addListener(_onValueChanged);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.notifier.removeListener(_onValueChanged);
+  }
+
+  void _onValueChanged() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ps = widget.notifier.value?.paragraphs ?? [];
+
+    // 计算开头的padding掉的高度
+    double paddingSize = (ps.isNotEmpty) ? ps.first.offset.dy : 0;
+
+    // 计算文字宽度, 默认最小是3.
+    final lastLineNumberLength =
+        max((ps.isNotEmpty) ? ps.last.index.toString().length : 0, 3);
+    final tp = TextPainter(
+      text: TextSpan(
+        text: '0' * lastLineNumberLength,
+        style: widget.textStyle,
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    tp.layout();
+
+    // 计算当前组件的宽度，加上了2个像素的divider 和内边距.
+    final width = tp.width + kSpacingTiny * 2 + 2;
+    if (widget.notifier.value == null) {
+      return SizedBox(width: width);
+    }
+    var content = widget.codeController.text.toString();
+    List<SQLChunk> querys =
+        Splitter(content, ";", skipWhitespace: true).split();
+    CodeLineSelection s = widget.codeController.selection;
+
+    // 计算当前选中的SQL块的开始和结束行.
+    int currentSQLBlockStartLine;
+    int currentSQLBlockEndLine;
+    if (!s.isCollapsed) {
+      if (s.baseIndex > s.extentIndex) {
+        currentSQLBlockStartLine = s.extentIndex + 1;
+        currentSQLBlockEndLine = s.baseIndex + 1;
+      } else {
+        currentSQLBlockStartLine = s.baseIndex + 1;
+        currentSQLBlockEndLine = s.extentIndex + 1;
+      }
+    } else {
+      Pos cursor = Pos(0, s.baseIndex + 1, s.baseOffset);
+      SQLChunk chunk = querys.firstWhere((chunk) {
+        if (cursor.between(chunk.start, chunk.end)) {
+          return true;
+        }
+        return false;
+      }, orElse: () => SQLChunk.empty());
+      currentSQLBlockStartLine = chunk.start.line;
+      currentSQLBlockEndLine = chunk.end.line;
+    }
+
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          SizedBox(height: paddingSize),
+          for (int i = 0; i < ps.length; i++)
+            SizedBox(
+              height: max(
+                  0,
+                  min(
+                    ps[i].preferredLineHeight,
+                    widget.totalHeight -
+                        paddingSize -
+                        i * ps[i].preferredLineHeight -
+                        1,
+                  )), // 减去1是为了让文字和下划线对齐
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      child: Text(
+                        (ps[i].index + 1).toString(),
+                        overflow: TextOverflow.clip,
+                        softWrap: false,
+                        textAlign: TextAlign.right,
+                        style: widget.textStyle.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: kSpacingTiny),
+                  SizedBox(
+                    width: 2,
+                    child: (ps[i].index + 1 >= currentSQLBlockStartLine &&
+                            ps[i].index + 1 <= currentSQLBlockEndLine)
+                        ? const VerticalDivider(
+                            color: Colors.green,
+                            thickness: 2,
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  const SizedBox(width: kSpacingTiny),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

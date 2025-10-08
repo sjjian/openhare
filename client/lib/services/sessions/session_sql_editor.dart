@@ -37,12 +37,13 @@ class SelectedSessionSQLEditorNotifier
   SessionSQLEditorModel build() {
     SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
-      return const SessionSQLEditorModel();
+      return const SessionSQLEditorModel(sessionId: SessionId(value: 0));
     }
     if (sessionModel.instanceId != null) {
       InstanceMetadataModel? sessionMeta =
           ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
       return SessionSQLEditorModel(
+        sessionId: sessionModel.sessionId,
         currentSchema: sessionModel.currentSchema,
         metadata: sessionMeta?.metadata
             .match((value) => value, (error) => null, () => null),
@@ -50,6 +51,7 @@ class SelectedSessionSQLEditorNotifier
     }
 
     return SessionSQLEditorModel(
+      sessionId: sessionModel.sessionId,
       currentSchema: sessionModel.currentSchema,
       metadata: null,
     );
