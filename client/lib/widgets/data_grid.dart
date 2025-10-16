@@ -241,34 +241,44 @@ class _DataGridState extends State<DataGrid> {
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final totalWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width);
+    final totalWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width) + _DataGridStyle.scrollPadding;
+    final contentWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width);
 
     return Container(
       height: widget.headerHeight,
-      decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: colorScheme.outlineVariant,
-              width: _DataGridStyle.borderWidth,
-            ),
-          ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(right: _DataGridStyle.scrollPadding),
-        child: SingleChildScrollView(
-          controller: widget.controller.headerHorizontalController,
-          scrollDirection: Axis.horizontal,
-          physics: const ClampingScrollPhysics(),
-          child: SizedBox(
-            width: totalWidth,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (int i = 0; i < widget.controller.columns.length; i++)
-                  _buildHeaderCell(context, widget.controller.columns[i], i),
-              ],
-            ),
+      child: SingleChildScrollView(
+        controller: widget.controller.headerHorizontalController,
+        scrollDirection: Axis.horizontal,
+        physics: const ClampingScrollPhysics(),
+        child: SizedBox(
+          width: totalWidth,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 表头内容区域，包含下边框
+              Container(
+                width: contentWidth,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: colorScheme.outlineVariant,
+                      width: _DataGridStyle.borderWidth,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < widget.controller.columns.length; i++)
+                      _buildHeaderCell(context, widget.controller.columns[i], i),
+                  ],
+                ),
+              ),
+              // 添加一个空的容器来提供额外的滚动空间
+              const SizedBox(width: _DataGridStyle.scrollPadding),
+            ],
           ),
         ),
       ),
@@ -315,7 +325,7 @@ class _DataGridState extends State<DataGrid> {
 
   /// 构建数据主体
   Widget _buildBody(BuildContext context) {
-    final totalWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width);
+    final totalWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width) + _DataGridStyle.scrollPadding;
     
     return Scrollbar(
       controller: widget.controller.verticalController,
@@ -332,18 +342,17 @@ class _DataGridState extends State<DataGrid> {
               controller: widget.controller.bodyHorizontalController,
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.only(right: _DataGridStyle.scrollPadding),
-                child: SizedBox(
-                  width: totalWidth,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (int i = 0; i < widget.controller.rows.length; i++)
-                        _buildRow(context, widget.controller.rows[i], i),
-                    ],
-                  ),
+              child: SizedBox(
+                width: totalWidth,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < widget.controller.rows.length; i++)
+                      _buildRow(context, widget.controller.rows[i], i),
+                    // 添加一个空的容器来提供额外的垂直滚动空间
+                    const SizedBox(height: _DataGridStyle.scrollPadding),
+                  ],
                 ),
               ),
             ),
@@ -397,11 +406,13 @@ class _DataGridState extends State<DataGrid> {
                 : null,
           ),
           child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (int i = 0; i < widget.controller.columns.length; i++)
                 _buildCell(context, widget.controller.columns[i], row.cells[i], rowIndex, i),
+              // 添加一个空的容器来提供额外的水平滚动空间
+              const SizedBox(width: _DataGridStyle.scrollPadding),
             ],
           ),
         ),
