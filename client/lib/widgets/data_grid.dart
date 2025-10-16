@@ -314,27 +314,30 @@ class _DataGridState extends State<DataGrid> {
     final totalWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width);
     
     return Scrollbar(
-      controller: widget.controller.bodyHorizontalController,
+      controller: widget.controller.verticalController,
       thumbVisibility: false,
       child: SingleChildScrollView(
-        controller: widget.controller.bodyHorizontalController,
-        scrollDirection: Axis.horizontal,
+        controller: widget.controller.verticalController,
         physics: const ClampingScrollPhysics(),
         child: SizedBox(
-          width: totalWidth,
+          height: widget.controller.rows.length * widget.rowHeight,
           child: Scrollbar(
-            controller: widget.controller.verticalController,
-            thumbVisibility: true,
+            controller: widget.controller.bodyHorizontalController,
+            thumbVisibility: false,
             child: SingleChildScrollView(
-              controller: widget.controller.verticalController,
+              controller: widget.controller.bodyHorizontalController,
+              scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (int i = 0; i < widget.controller.rows.length; i++)
-                    _buildRow(context, widget.controller.rows[i], i),
-                ],
+              child: SizedBox(
+                width: totalWidth,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < widget.controller.rows.length; i++)
+                      _buildRow(context, widget.controller.rows[i], i),
+                  ],
+                ),
               ),
             ),
           ),
