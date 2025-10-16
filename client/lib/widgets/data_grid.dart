@@ -3,13 +3,14 @@ import 'const.dart';
 
 // 样式常量
 class _DataGridStyle {
-  static const double defaultRowHeight = 28.0;
+  static const double defaultRowHeight = 24.0;
   static const double defaultHeaderHeight = 36.0;
   static const double defaultColumnWidth = 200.0;
   static const double minColumnWidth = 50.0;
   static const double resizeHandleWidth = 8.0;
   static const double borderWidth = 1.0;
   static const double borderRadius = 4.0;
+  static const double scrollPadding = 10.0;
   static const EdgeInsets cellPadding = EdgeInsets.symmetric(horizontal: kSpacingSmall);
 }
 
@@ -252,19 +253,22 @@ class _DataGridState extends State<DataGrid> {
             ),
           ),
       ),
-      child: SingleChildScrollView(
-        controller: widget.controller.headerHorizontalController,
-        scrollDirection: Axis.horizontal,
-        physics: const ClampingScrollPhysics(),
-        child: SizedBox(
-          width: totalWidth,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (int i = 0; i < widget.controller.columns.length; i++)
-                _buildHeaderCell(context, widget.controller.columns[i], i),
-            ],
+      child: Padding(
+        padding: const EdgeInsets.only(right: _DataGridStyle.scrollPadding),
+        child: SingleChildScrollView(
+          controller: widget.controller.headerHorizontalController,
+          scrollDirection: Axis.horizontal,
+          physics: const ClampingScrollPhysics(),
+          child: SizedBox(
+            width: totalWidth,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (int i = 0; i < widget.controller.columns.length; i++)
+                  _buildHeaderCell(context, widget.controller.columns[i], i),
+              ],
+            ),
           ),
         ),
       ),
@@ -320,7 +324,7 @@ class _DataGridState extends State<DataGrid> {
         controller: widget.controller.verticalController,
         physics: const ClampingScrollPhysics(),
         child: SizedBox(
-          height: widget.controller.rows.length * widget.rowHeight,
+          height: widget.controller.rows.length * widget.rowHeight + _DataGridStyle.scrollPadding,
           child: Scrollbar(
             controller: widget.controller.bodyHorizontalController,
             thumbVisibility: false,
@@ -328,15 +332,18 @@ class _DataGridState extends State<DataGrid> {
               controller: widget.controller.bodyHorizontalController,
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
-              child: SizedBox(
-                width: totalWidth,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (int i = 0; i < widget.controller.rows.length; i++)
-                      _buildRow(context, widget.controller.rows[i], i),
-                  ],
+              child: Padding(
+                padding: const EdgeInsets.only(right: _DataGridStyle.scrollPadding),
+                child: SizedBox(
+                  width: totalWidth,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (int i = 0; i < widget.controller.rows.length; i++)
+                        _buildRow(context, widget.controller.rows[i], i),
+                    ],
+                  ),
                 ),
               ),
             ),
