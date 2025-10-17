@@ -9,7 +9,6 @@ class _DataGridStyle {
   static const double minColumnWidth = 50.0;
   static const double resizeHandleWidth = 8.0;
   static const double borderWidth = 1.0;
-  static const double borderRadius = 4.0;
   static const double scrollPadding = 10.0;
   static const EdgeInsets cellPadding = EdgeInsets.symmetric(horizontal: kSpacingSmall);
 }
@@ -38,21 +37,17 @@ class DataGridController extends ChangeNotifier {
   }
 
   void _onHeaderScroll() {
-    if (!_isUpdatingScroll && _headerHorizontalController.hasClients) {
-      _isUpdatingScroll = true;
-      if (_bodyHorizontalController.hasClients) {
-        _bodyHorizontalController.jumpTo(_headerHorizontalController.offset);
-      }
-      _isUpdatingScroll = false;
-    }
+    _syncScroll(_headerHorizontalController, _bodyHorizontalController);
   }
 
   void _onBodyScroll() {
-    if (!_isUpdatingScroll && _bodyHorizontalController.hasClients) {
+    _syncScroll(_bodyHorizontalController, _headerHorizontalController);
+  }
+
+  void _syncScroll(ScrollController source, ScrollController target) {
+    if (!_isUpdatingScroll && source.hasClients && target.hasClients) {
       _isUpdatingScroll = true;
-      if (_headerHorizontalController.hasClients) {
-        _headerHorizontalController.jumpTo(_bodyHorizontalController.offset);
-      }
+      target.jumpTo(source.offset);
       _isUpdatingScroll = false;
     }
   }
@@ -125,10 +120,12 @@ class DataGridRow {
 class DataGridCell {
   final Widget content;
   final Alignment alignment;
+  final Color? backgroundColor;
 
   const DataGridCell({
     required this.content,
     this.alignment = Alignment.centerLeft,
+    this.backgroundColor,
   });
 }
 
@@ -142,15 +139,6 @@ class DataGrid extends StatefulWidget {
 
   /// 表头高度
   final double headerHeight;
-
-  /// 是否显示边框
-  final bool showBorder;
-
-  /// 是否显示分割线
-  final bool showDivider;
-
-  /// 是否显示斑马条纹
-  final bool showStripes;
 
   /// 空数据占位符
   final Widget? emptyWidget;
@@ -166,9 +154,6 @@ class DataGrid extends StatefulWidget {
     required this.controller,
     this.rowHeight = _DataGridStyle.defaultRowHeight,
     this.headerHeight = _DataGridStyle.defaultHeaderHeight,
-    this.showBorder = true,
-    this.showDivider = true,
-    this.showStripes = true,
     this.emptyWidget,
     this.onCellTap,
     this.onCellDoubleTap,
@@ -180,15 +165,16 @@ class DataGrid extends StatefulWidget {
 
 class _DataGridState extends State<DataGrid> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     widget.controller.dispose();
     super.dispose();
   }
+
+  /// 计算总宽度
+  double get _totalWidth => widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width) + _DataGridStyle.scrollPadding;
+  
+  /// 计算内容宽度
+  double get _contentWidth => widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width);
 
   /// 更新列宽
   void _updateColumnWidth(int index, double width) {
@@ -197,39 +183,18 @@ class _DataGridState extends State<DataGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Expanded(
       child: AnimatedBuilder(
         animation: widget.controller,
         builder: (context, child) {
           return SizedBox.expand(
-            child: Container(
-              decoration: widget.showBorder
-                  ? BoxDecoration(
-                      border: Border.all(
-                        color: colorScheme.outlineVariant,
-                        width: _DataGridStyle.borderWidth,
-                      ),
-                      borderRadius: BorderRadius.circular(_DataGridStyle.borderRadius),
-                    )
-                  : null,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(widget.showBorder ? _DataGridStyle.borderRadius : 0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 固定表头
-                    _buildHeader(context),
-                    // 数据行
-                    Expanded(
-                      child: _buildBody(context),
-                    ),
-                  ],
-                ),
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                Expanded(child: _buildBody(context)),
+              ],
             ),
           );
         },
@@ -239,26 +204,20 @@ class _DataGridState extends State<DataGrid> {
 
   /// 构建表头
   Widget _buildHeader(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final totalWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width) + _DataGridStyle.scrollPadding;
-    final contentWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width);
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
+    return SizedBox(
       height: widget.headerHeight,
       child: SingleChildScrollView(
         controller: widget.controller.headerHorizontalController,
         scrollDirection: Axis.horizontal,
         physics: const ClampingScrollPhysics(),
         child: SizedBox(
-          width: totalWidth,
+          width: _totalWidth,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 表头内容区域，包含下边框
               Container(
-                width: contentWidth,
+                width: _contentWidth,
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
@@ -268,15 +227,12 @@ class _DataGridState extends State<DataGrid> {
                   ),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 0; i < widget.controller.columns.length; i++)
                       _buildHeaderCell(context, widget.controller.columns[i], i),
                   ],
                 ),
               ),
-              // 添加一个空的容器来提供额外的滚动空间
               const SizedBox(width: _DataGridStyle.scrollPadding),
             ],
           ),
@@ -300,8 +256,8 @@ class _DataGridState extends State<DataGrid> {
             padding: _DataGridStyle.cellPadding,
             child: column.label,
           ),
-          // 分割线和拖动手柄
-          if (column.resizable && index <= widget.controller.columns.length - 1)
+          // 拖动手柄
+          if (column.resizable && index < widget.controller.columns.length)
             Positioned(
               right: 0,
               top: 0,
@@ -325,8 +281,6 @@ class _DataGridState extends State<DataGrid> {
 
   /// 构建数据主体
   Widget _buildBody(BuildContext context) {
-    final totalWidth = widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width) + _DataGridStyle.scrollPadding;
-    
     return Scrollbar(
       controller: widget.controller.verticalController,
       thumbVisibility: false,
@@ -343,14 +297,11 @@ class _DataGridState extends State<DataGrid> {
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
               child: SizedBox(
-                width: totalWidth,
+                width: _totalWidth,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 0; i < widget.controller.rows.length; i++)
                       _buildRow(context, widget.controller.rows[i], i),
-                    // 添加一个空的容器来提供额外的垂直滚动空间
                     const SizedBox(height: _DataGridStyle.scrollPadding),
                   ],
                 ),
@@ -363,58 +314,21 @@ class _DataGridState extends State<DataGrid> {
   }
 
   /// 构建数据行
-  Widget _buildRow(
-      BuildContext context, DataGridRow row, int rowIndex) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isHovered = widget.controller.hoveredRowIndex == rowIndex;
-    final isEvenRow = rowIndex % 2 == 0;
-
-    Color? backgroundColor;
-    if (isHovered) {
-      backgroundColor = colorScheme.surfaceContainerHighest.withOpacity(0.5);
-    } else if (widget.showStripes && !isEvenRow) {
-      backgroundColor = colorScheme.surfaceContainerLow;
-    }
-
+  Widget _buildRow(BuildContext context, DataGridRow row, int rowIndex) {
     return MouseRegion(
-      onHover: (_) {
-        if (widget.controller.hoveredRowIndex != rowIndex) {
-          widget.controller.hoveredRowIndex = rowIndex;
-        }
-      },
-      onExit: (_) {
-        if (widget.controller.hoveredRowIndex == rowIndex) {
-          widget.controller.hoveredRowIndex = null;
-        }
-      },
+      onHover: (_) => widget.controller.hoveredRowIndex = rowIndex,
+      onExit: (_) => widget.controller.hoveredRowIndex = null,
       cursor: widget.onCellTap != null || widget.onCellDoubleTap != null
           ? SystemMouseCursors.click
           : SystemMouseCursors.basic,
-      child: GestureDetector(
-        child: Container(
-          height: widget.rowHeight,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            border: widget.showDivider
-                ? Border(
-                    bottom: BorderSide(
-                      color: colorScheme.outlineVariant.withOpacity(0.5),
-                      width: 0.5,
-                    ),
-                  )
-                : null,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (int i = 0; i < widget.controller.columns.length; i++)
-                _buildCell(context, widget.controller.columns[i], row.cells[i], rowIndex, i),
-              // 添加一个空的容器来提供额外的水平滚动空间
-              const SizedBox(width: _DataGridStyle.scrollPadding),
-            ],
-          ),
+      child: Container(
+        height: widget.rowHeight,
+        child: Row(
+          children: [
+            for (int i = 0; i < widget.controller.columns.length; i++)
+              _buildCell(context, widget.controller.columns[i], row.cells[i], rowIndex, i),
+            const SizedBox(width: _DataGridStyle.scrollPadding),
+          ],
         ),
       ),
     );
@@ -428,19 +342,27 @@ class _DataGridState extends State<DataGrid> {
     int rowIndex,
     int columnIndex,
   ) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final width = widget.controller.columnWidths[columnIndex];
+    final rowCells = widget.controller.rows[rowIndex].cells;
+    final isHovered = widget.controller.hoveredRowIndex == rowIndex;
+
+    // 确定单元格背景色：优先级为 cell.backgroundColor > 悬停
+    Color? backgroundColor = cell.backgroundColor;
+    if (backgroundColor == null && isHovered) {
+      backgroundColor = colorScheme.surfaceContainerHighest.withOpacity(0.5);
+    }
 
     return SizedBox(
       width: width,
       child: GestureDetector(
-        onTap: () => widget.onCellTap?.call(rowIndex, columnIndex, cell, widget.controller.rows[rowIndex].cells),
-        onDoubleTap: () => widget.onCellDoubleTap?.call(rowIndex, columnIndex, cell, widget.controller.rows[rowIndex].cells),
+        onTap: () => widget.onCellTap?.call(rowIndex, columnIndex, cell, rowCells),
+        onDoubleTap: () => widget.onCellDoubleTap?.call(rowIndex, columnIndex, cell, rowCells),
         child: Container(
           alignment: column.alignment,
           padding: _DataGridStyle.cellPadding,
           decoration: BoxDecoration(
+            color: backgroundColor,
             border: Border(
               right: BorderSide(
                 color: colorScheme.outlineVariant,
@@ -482,21 +404,13 @@ class _ResizeHandleState extends State<_ResizeHandle> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isActive = _isHovered || _isDragging;
 
     return MouseRegion(
       cursor: SystemMouseCursors.resizeColumn,
-      onHover: (_) {
-        if (!_isHovered) {
-          setState(() => _isHovered = true);
-        }
-      },
-      onExit: (_) {
-        if (_isHovered) {
-          setState(() => _isHovered = false);
-        }
-      },
+      onHover: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onHorizontalDragStart: (details) {
           setState(() {
@@ -524,9 +438,7 @@ class _ResizeHandleState extends State<_ResizeHandle> {
             alignment: Alignment.centerRight,
             child: Container(
               width: _DataGridStyle.borderWidth,
-              color: _isHovered || _isDragging
-                  ? colorScheme.primary
-                  : colorScheme.outlineVariant,
+              color: isActive ? colorScheme.primary : colorScheme.outlineVariant,
             ),
           ),
         ),
