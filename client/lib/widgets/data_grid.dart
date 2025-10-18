@@ -196,17 +196,17 @@ class _DataGridState extends State<DataGrid> {
                 child: AnimatedBuilder(
                   animation: widget.controller,
                   builder: (context, child) {
-                    return RepaintBoundary(
-                      child: Row(
-                        children: [
-                          for (int i = 0;
-                              i < widget.controller.columns.length;
-                              i++)
-                            _buildHeaderCell(
+                    return Row(
+                      children: [
+                        for (int i = 0;
+                            i < widget.controller.columns.length;
+                            i++)
+                          RepaintBoundary(
+                            child: _buildHeaderCell(
                                 context, widget.controller.columns[i], i),
-                          const SizedBox(width: _DataGridStyle.scrollPadding),
-                        ],
-                      ),
+                          ),
+                        const SizedBox(width: _DataGridStyle.scrollPadding),
+                      ],
                     );
                   },
                 ),
@@ -312,13 +312,13 @@ class _DataGridState extends State<DataGrid> {
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (context, child) {
-        return RepaintBoundary(
-          child: Column(
-            children: [
-              for (int i = 0; i < widget.controller.rows.length; i++)
-                _buildRow(context, widget.controller.rows[i], i),
-            ],
-          ),
+        return Column(
+          children: [
+            for (int i = 0; i < widget.controller.rows.length; i++)
+              RepaintBoundary(
+                child: _buildRow(context, widget.controller.rows[i], i),
+              ),
+          ],
         );
       },
     );
@@ -411,8 +411,16 @@ class _DataGridRowWidgetState extends State<_DataGridRowWidget> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onHover: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onHover: (_) {
+        if (!_isHovered) {
+          setState(() => _isHovered = true);
+        }
+      },
+      onExit: (_) {
+        if (_isHovered) {
+          setState(() => _isHovered = false);
+        }
+      },
       cursor: widget.onCellTap != null || widget.onCellDoubleTap != null
           ? SystemMouseCursors.click
           : SystemMouseCursors.basic,
@@ -421,8 +429,10 @@ class _DataGridRowWidgetState extends State<_DataGridRowWidget> {
         child: Row(
           children: [
             for (int i = 0; i < widget.controller.columns.length; i++)
-              _buildCell(context, widget.controller.columns[i],
-                  widget.row.cells[i], i),
+              RepaintBoundary(
+                child: _buildCell(context, widget.controller.columns[i],
+                    widget.row.cells[i], i),
+              ),
           ],
         ),
       ),
@@ -448,6 +458,7 @@ class _DataGridRowWidgetState extends State<_DataGridRowWidget> {
     return _BorderedCell(
       borderColor: colorScheme.outlineVariant,
       borderWidth: _DataGridStyle.borderWidth,
+      backgroundColor: backgroundColor,
       child: SizedBox(
         width: width,
         height: widget.rowHeight,
@@ -460,7 +471,6 @@ class _DataGridRowWidgetState extends State<_DataGridRowWidget> {
             duration: const Duration(milliseconds: 150),
             alignment: Alignment.centerLeft,
             padding: _DataGridStyle.cellPadding,
-            color: backgroundColor,
             child: cell.content,
           ),
         ),
@@ -474,21 +484,26 @@ class _BorderedCell extends StatelessWidget {
   final Widget child;
   final Color borderColor;
   final double borderWidth;
+  final Color? backgroundColor;
 
   const _BorderedCell({
     required this.child,
     required this.borderColor,
     required this.borderWidth,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _CellBorderPainter(
-        color: borderColor,
-        strokeWidth: borderWidth,
+    return RepaintBoundary(
+      child: CustomPaint(
+        painter: _CellBorderPainter(
+          color: borderColor,
+          strokeWidth: borderWidth,
+          backgroundColor: backgroundColor,
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 }
@@ -498,14 +513,35 @@ class _BorderedCell extends StatelessWidget {
 class _CellBorderPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
+  final Color? backgroundColor;
 
   const _CellBorderPainter({
     required this.color,
     required this.strokeWidth,
+    this.backgroundColor,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    // 先绘制背景色，完全避开边框区域
+    if (backgroundColor != null) {
+      final backgroundPaint = Paint()
+        ..color = backgroundColor!
+        ..style = PaintingStyle.fill;
+      
+      // 计算背景色区域，完全避开右边框和下边框
+      // 使用 strokeWidth/2 的偏移来确保不重叠
+      final halfStroke = strokeWidth / 2;
+      final backgroundRect = Rect.fromLTWH(
+        halfStroke, 
+        halfStroke, 
+        size.width - strokeWidth, 
+        size.height - strokeWidth
+      );
+      canvas.drawRect(backgroundRect, backgroundPaint);
+    }
+
+    // 再绘制边框
     final paint = Paint()
       ..color = color
       ..strokeWidth = strokeWidth
@@ -523,6 +559,9 @@ class _CellBorderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CellBorderPainter oldDelegate) {
-    return color != oldDelegate.color || strokeWidth != oldDelegate.strokeWidth;
+    // 只有当颜色、线宽或背景色真正改变时才重绘
+    return color != oldDelegate.color || 
+           strokeWidth != oldDelegate.strokeWidth ||
+           backgroundColor != oldDelegate.backgroundColor;
   }
 }
