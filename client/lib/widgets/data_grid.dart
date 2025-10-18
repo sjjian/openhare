@@ -354,25 +354,15 @@ class _ResizeHandle extends StatefulWidget {
 }
 
 class _ResizeHandleState extends State<_ResizeHandle> {
-  bool _isHovered = false;
-  bool _isDragging = false;
   double? _dragStartX;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isActive = _isHovered || _isDragging;
-
     return MouseRegion(
       cursor: SystemMouseCursors.resizeColumn,
-      onHover: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onHorizontalDragStart: (details) {
-          setState(() {
-            _isDragging = true;
-            _dragStartX = details.globalPosition.dx;
-          });
+          _dragStartX = details.globalPosition.dx;
         },
         onHorizontalDragUpdate: (details) {
           if (_dragStartX != null) {
@@ -382,22 +372,11 @@ class _ResizeHandleState extends State<_ResizeHandle> {
           }
         },
         onHorizontalDragEnd: (_) {
-          setState(() {
-            _isDragging = false;
-            _dragStartX = null;
-          });
+          _dragStartX = null;
         },
         child: Container(
           width: _DataGridStyle.resizeHandleWidth,
           color: Colors.transparent,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              width: _DataGridStyle.borderWidth,
-              color:
-                  isActive ? colorScheme.primary : colorScheme.outlineVariant,
-            ),
-          ),
         ),
       ),
     );
@@ -437,7 +416,7 @@ class _DataGridRowWidgetState extends State<_DataGridRowWidget> {
       cursor: widget.onCellTap != null || widget.onCellDoubleTap != null
           ? SystemMouseCursors.click
           : SystemMouseCursors.basic,
-      child: Container(
+      child: SizedBox(
         height: widget.rowHeight,
         child: Row(
           children: [
