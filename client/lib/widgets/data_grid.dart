@@ -265,12 +265,6 @@ class DataGrid extends StatefulWidget {
 }
 
 class _DataGridState extends State<DataGrid> {
-  @override
-  void dispose() {
-    // 注意：不要在这里调用 controller.dispose()，因为控制器可能被其他地方使用
-    // widget.controller.dispose();
-    super.dispose();
-  }
 
   /// 计算总宽度
   double get _totalWidth => widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width) + _DataGridStyle.scrollPadding;
@@ -422,56 +416,73 @@ class _DataGridState extends State<DataGrid> {
 
   /// 构建数据主体
   Widget _buildBody(BuildContext context) {
-    return Scrollbar(
-      controller: widget.controller.verticalController,
-      thumbVisibility: true,
-      child: ClipRect(
-        child: SingleChildScrollView(
-          controller: widget.controller.verticalController,
-          physics: const ClampingScrollPhysics(),
-          child: SizedBox(
-            height: widget.controller.rows.length * widget.rowHeight + _DataGridStyle.scrollPadding,
-            child: Scrollbar(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final contentHeight = widget.controller.rows.length * widget.rowHeight + _DataGridStyle.scrollPadding;
+        final needsVerticalScroll = contentHeight > constraints.maxHeight;
+        
+        return Scrollbar(
+          controller: widget.controller.bodyHorizontalController,
+          thumbVisibility: true,
+          child: ClipRect(
+            child: SingleChildScrollView(
               controller: widget.controller.bodyHorizontalController,
-              thumbVisibility: true,
-              child: ClipRect(
-                child: SingleChildScrollView(
-                  controller: widget.controller.bodyHorizontalController,
-                  scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
-                  child: SizedBox(
-                    width: _totalWidth,
-                    child: AnimatedBuilder(
-                      animation: widget.controller,
-                      builder: (context, child) {
-                        return _DataGridBorderWidget(
-                          borderColor: Theme.of(context).colorScheme.outlineVariant,
-                          borderWidth: _DataGridStyle.borderWidth,
-                          columnWidths: widget.controller.columnWidths,
-                          rowHeight: widget.rowHeight,
-                          rowCount: widget.controller.rows.length,
-                          contentWidth: _contentWidth,
-                          showVerticalBorders: true,
-                          showHorizontalBorders: true,
-                          skipFirstRowTopBorder: true,
-                          child: RepaintBoundary(
-                            child: Column(
-                              children: [
-                                for (int i = 0; i < widget.controller.rows.length; i++)
-                                  _buildRow(context, widget.controller.rows[i], i),
-                              ],
+              scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
+              child: SizedBox(
+                width: _totalWidth,
+                child: needsVerticalScroll
+                    ? Scrollbar(
+                        controller: widget.controller.verticalController,
+                        thumbVisibility: true,
+                        child: ClipRect(
+                          child: SingleChildScrollView(
+                            controller: widget.controller.verticalController,
+                            physics: const ClampingScrollPhysics(),
+                            child: SizedBox(
+                              height: contentHeight,
+                              child: _buildDataContent(context),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                        ),
+                      )
+                    : SizedBox(
+                        height: constraints.maxHeight,
+                        child: _buildDataContent(context),
+                      ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
+    );
+  }
+
+  /// 构建数据内容
+  Widget _buildDataContent(BuildContext context) {
+    return AnimatedBuilder(
+      animation: widget.controller,
+      builder: (context, child) {
+        return _DataGridBorderWidget(
+          borderColor: Theme.of(context).colorScheme.outlineVariant,
+          borderWidth: _DataGridStyle.borderWidth,
+          columnWidths: widget.controller.columnWidths,
+          rowHeight: widget.rowHeight,
+          rowCount: widget.controller.rows.length,
+          contentWidth: _contentWidth,
+          showVerticalBorders: true,
+          showHorizontalBorders: true,
+          skipFirstRowTopBorder: true,
+          child: RepaintBoundary(
+            child: Column(
+              children: [
+                for (int i = 0; i < widget.controller.rows.length; i++)
+                  _buildRow(context, widget.controller.rows[i], i),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
