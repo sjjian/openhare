@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'const.dart';
 
 /// 自定义表格分割线绘制器
@@ -120,58 +121,39 @@ class DataGridController extends ChangeNotifier {
   final List<DataGridColumn> columns;
   final List<DataGridRow> rows;
   late List<double> _columnWidths;
-  final ScrollController _headerHorizontalController = ScrollController();
-  final ScrollController _bodyHorizontalController = ScrollController();
+  
+  // 使用 LinkedScrollControllerGroup 来管理水平滚动联动
+  final LinkedScrollControllerGroup _horizontalScrollGroup = LinkedScrollControllerGroup();
   final ScrollController _verticalController = ScrollController();
-  bool _isUpdatingScroll = false;
+  
+  // 延迟初始化的滚动控制器
+  ScrollController? _headerHorizontalController;
+  ScrollController? _headerBorderHorizontalController;
+  ScrollController? _bodyHorizontalController;
 
   DataGridController({
     required this.columns, 
     required this.rows
   }) {
     _columnWidths = List.generate(columns.length, (index) => columns[index].width);
-    _setupScrollLinkage();
-  }
-
-  void _setupScrollLinkage() {
-    _headerHorizontalController.addListener(_onHeaderScroll);
-    _bodyHorizontalController.addListener(_onBodyScroll);
-  }
-
-  /// 确保滚动控制器正确初始化
-  void ensureScrollControllersInitialized() {
-    // 这个方法可以在需要时被调用来确保滚动控制器正确初始化
-    if (!_headerHorizontalController.hasListeners) {
-      _headerHorizontalController.addListener(_onHeaderScroll);
-    }
-    if (!_bodyHorizontalController.hasListeners) {
-      _bodyHorizontalController.addListener(_onBodyScroll);
-    }
-  }
-
-  void _onHeaderScroll() {
-    _syncScroll(_headerHorizontalController, _bodyHorizontalController);
-  }
-
-  void _onBodyScroll() {
-    _syncScroll(_bodyHorizontalController, _headerHorizontalController);
-  }
-
-  void _syncScroll(ScrollController source, ScrollController target) {
-    if (!_isUpdatingScroll && source.hasClients && target.hasClients) {
-      _isUpdatingScroll = true;
-      // 确保滚动位置在有效范围内
-      final maxOffset = source.position.maxScrollExtent;
-      final clampedOffset = source.offset.clamp(0.0, maxOffset);
-      // 使用 jumpTo 来确保立即同步，避免动画延迟
-      target.jumpTo(clampedOffset);
-      _isUpdatingScroll = false;
-    }
   }
 
   
-  ScrollController get headerHorizontalController => _headerHorizontalController;
-  ScrollController get bodyHorizontalController => _bodyHorizontalController;
+  ScrollController get headerHorizontalController {
+    _headerHorizontalController ??= _horizontalScrollGroup.addAndGet();
+    return _headerHorizontalController!;
+  }
+  
+  ScrollController get headerBorderHorizontalController {
+    _headerBorderHorizontalController ??= _horizontalScrollGroup.addAndGet();
+    return _headerBorderHorizontalController!;
+  }
+  
+  ScrollController get bodyHorizontalController {
+    _bodyHorizontalController ??= _horizontalScrollGroup.addAndGet();
+    return _bodyHorizontalController!;
+  }
+  
   ScrollController get verticalController => _verticalController;
   List<double> get columnWidths => _columnWidths;
   
@@ -191,10 +173,9 @@ class DataGridController extends ChangeNotifier {
 
   @override
   void dispose() {
-    _headerHorizontalController.removeListener(_onHeaderScroll);
-    _bodyHorizontalController.removeListener(_onBodyScroll);
-    _headerHorizontalController.dispose();
-    _bodyHorizontalController.dispose();
+    _headerHorizontalController?.dispose();
+    _headerBorderHorizontalController?.dispose();
+    _bodyHorizontalController?.dispose();
     _verticalController.dispose();
     super.dispose();
   }
@@ -304,9 +285,6 @@ class _DataGridState extends State<DataGrid> {
 
   @override
   Widget build(BuildContext context) {
-    // 确保滚动控制器正确初始化
-    widget.controller.ensureScrollControllersInitialized();
-    
     return Expanded(
       child: SizedBox.expand(
         child: Column(
@@ -371,7 +349,7 @@ class _DataGridState extends State<DataGrid> {
           height: _DataGridStyle.borderWidth,
           child: ClipRect(
             child: SingleChildScrollView(
-              controller: widget.controller.headerHorizontalController,
+              controller: widget.controller.headerBorderHorizontalController,
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
               child: SizedBox(
