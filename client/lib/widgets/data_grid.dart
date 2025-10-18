@@ -121,15 +121,6 @@ class DataGridController extends ChangeNotifier {
   final List<DataGridColumn> columns;
   final List<DataGridRow> rows;
   late List<double> _columnWidths;
-  
-  // 使用 LinkedScrollControllerGroup 来管理水平滚动联动
-  final LinkedScrollControllerGroup _horizontalScrollGroup = LinkedScrollControllerGroup();
-  final ScrollController _verticalController = ScrollController();
-  
-  // 延迟初始化的滚动控制器
-  ScrollController? _headerHorizontalController;
-  ScrollController? _headerBorderHorizontalController;
-  ScrollController? _bodyHorizontalController;
 
   DataGridController({
     required this.columns, 
@@ -138,23 +129,6 @@ class DataGridController extends ChangeNotifier {
     _columnWidths = List.generate(columns.length, (index) => columns[index].width);
   }
 
-  
-  ScrollController get headerHorizontalController {
-    _headerHorizontalController ??= _horizontalScrollGroup.addAndGet();
-    return _headerHorizontalController!;
-  }
-  
-  ScrollController get headerBorderHorizontalController {
-    _headerBorderHorizontalController ??= _horizontalScrollGroup.addAndGet();
-    return _headerBorderHorizontalController!;
-  }
-  
-  ScrollController get bodyHorizontalController {
-    _bodyHorizontalController ??= _horizontalScrollGroup.addAndGet();
-    return _bodyHorizontalController!;
-  }
-  
-  ScrollController get verticalController => _verticalController;
   List<double> get columnWidths => _columnWidths;
   
   /// 更新列宽
@@ -169,15 +143,6 @@ class DataGridController extends ChangeNotifier {
       _columnWidths[index] = clampedWidth;
       notifyListeners();
     }
-  }
-
-  @override
-  void dispose() {
-    _headerHorizontalController?.dispose();
-    _headerBorderHorizontalController?.dispose();
-    _bodyHorizontalController?.dispose();
-    _verticalController.dispose();
-    super.dispose();
   }
 }
 
@@ -265,6 +230,33 @@ class DataGrid extends StatefulWidget {
 }
 
 class _DataGridState extends State<DataGrid> {
+  // 滚动控制器管理
+  late final LinkedScrollControllerGroup _horizontalScrollGroup;
+  late final ScrollController _verticalController;
+  late final ScrollController _headerHorizontalController;
+  late final ScrollController _headerBorderHorizontalController;
+  late final ScrollController _bodyHorizontalController;
+
+  @override
+  void initState() {
+    super.initState();
+    // 初始化滚动控制器
+    _horizontalScrollGroup = LinkedScrollControllerGroup();
+    _verticalController = ScrollController();
+    _headerHorizontalController = _horizontalScrollGroup.addAndGet();
+    _headerBorderHorizontalController = _horizontalScrollGroup.addAndGet();
+    _bodyHorizontalController = _horizontalScrollGroup.addAndGet();
+  }
+
+  @override
+  void dispose() {
+    // 清理滚动控制器
+    _headerHorizontalController.dispose();
+    _headerBorderHorizontalController.dispose();
+    _bodyHorizontalController.dispose();
+    _verticalController.dispose();
+    super.dispose();
+  }
 
   /// 计算总宽度
   double get _totalWidth => widget.controller.columnWidths.fold(0.0, (sum, width) => sum + width) + _DataGridStyle.scrollPadding;
@@ -305,7 +297,7 @@ class _DataGridState extends State<DataGrid> {
           height: widget.headerHeight,
           child: ClipRect(
             child: SingleChildScrollView(
-              controller: widget.controller.headerHorizontalController,
+              controller: _headerHorizontalController,
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
               child: SizedBox(
@@ -343,7 +335,7 @@ class _DataGridState extends State<DataGrid> {
           height: _DataGridStyle.borderWidth,
           child: ClipRect(
             child: SingleChildScrollView(
-              controller: widget.controller.headerBorderHorizontalController,
+              controller: _headerBorderHorizontalController,
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
               child: SizedBox(
@@ -422,22 +414,22 @@ class _DataGridState extends State<DataGrid> {
         final needsVerticalScroll = contentHeight > constraints.maxHeight;
         
         return Scrollbar(
-          controller: widget.controller.bodyHorizontalController,
+          controller: _bodyHorizontalController,
           thumbVisibility: true,
           child: ClipRect(
             child: SingleChildScrollView(
-              controller: widget.controller.bodyHorizontalController,
+              controller: _bodyHorizontalController,
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
               child: SizedBox(
                 width: _totalWidth,
                 child: needsVerticalScroll
                     ? Scrollbar(
-                        controller: widget.controller.verticalController,
+                        controller: _verticalController,
                         thumbVisibility: true,
                         child: ClipRect(
                           child: SingleChildScrollView(
-                            controller: widget.controller.verticalController,
+                            controller: _verticalController,
                             physics: const ClampingScrollPhysics(),
                             child: SizedBox(
                               height: contentHeight,
