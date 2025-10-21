@@ -3,6 +3,7 @@ import 'package:client/services/instances/instances.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:db_driver/db_driver.dart';
@@ -154,10 +155,7 @@ class AddSession extends HookConsumerWidget {
             ],
           ),
           const SizedBox(height: kSpacingSmall),
-          const Divider(
-            thickness: kDividerThickness,
-            height: kDividerSize,
-          ),
+          const PixelDivider(),
           const SizedBox(height: kSpacingMedium),
           Row(
             children: [

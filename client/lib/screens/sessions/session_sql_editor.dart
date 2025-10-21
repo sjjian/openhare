@@ -1,6 +1,7 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/divider.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -83,8 +84,7 @@ class SQLEditor extends ConsumerWidget {
                 promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
                   keywordPrompts: keywordPrompt,
                   relatedPrompts: (model.metadata != null)
-                      ? buildRelatePrompts(
-                          model.metadata!, model.currentSchema)
+                      ? buildRelatePrompts(model.metadata!, model.currentSchema)
                       : const {},
                 ),
                 child: CodeEditor(
@@ -96,8 +96,8 @@ class SQLEditor extends ConsumerWidget {
                     textStyle: textStyle, // SQL 编辑器文字颜色
                   ),
                   controller: codeController,
-                  indicatorBuilder: (context, editingController,
-                      chunkController, notifier) {
+                  indicatorBuilder:
+                      (context, editingController, chunkController, notifier) {
                     return Row(children: [
                       const SizedBox(width: kSpacingTiny),
                       CodeLineNumber(
@@ -106,21 +106,13 @@ class SQLEditor extends ConsumerWidget {
                         notifier: notifier,
                         codeController: codeController,
                       ),
-                      VerticalDivider(
-                        width: kBlockDividerSize,
-                        thickness: kBlockDividerThickness,
-                        color: Theme.of(context).dividerColor,
-                      ),
+                      const PixelVerticalDivider(),
                     ]);
                   },
                 ),
               ),
             ),
-            Divider(
-              height: kBlockDividerSize,
-              thickness: kBlockDividerThickness,
-              color: Theme.of(context).dividerColor,
-            ),
+            const PixelDivider(),
           ],
         );
       },

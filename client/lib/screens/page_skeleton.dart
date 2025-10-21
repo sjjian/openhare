@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:client/widgets/divider.dart';
 
 // todo: 在windows上需要添加窗口按钮
 final buttonColors = WindowButtonColors(
@@ -103,11 +104,7 @@ class PageSkeleton extends StatelessWidget {
             Theme.of(context).colorScheme.surfaceContainerLowest, // 全局背景色
         child: Row(
           children: [
-            VerticalDivider(
-              color: Theme.of(context).dividerColor,
-              thickness: kBlockDividerThickness,
-              width: kBlockDividerSize,
-            ),
+            const PixelVerticalDivider(),
             Expanded(
               child: Column(children: [
                 MoveWindows(
@@ -128,19 +125,11 @@ class PageSkeleton extends StatelessWidget {
                     ),
                   ),
                 ),
-                Divider(
-                  color: Theme.of(context).dividerColor,
-                  thickness: kBlockDividerThickness,
-                  height: kBlockDividerSize,
-                ),
+                const PixelDivider(),
                 Expanded(
                   child: child,
                 ),
-                Divider(
-                  color: Theme.of(context).dividerColor,
-                  thickness: kBlockDividerThickness,
-                  height: kBlockDividerSize,
-                ),
+                const PixelDivider(),
                 Container(
                   height: bottomBarHeight,
                   color: Theme.of(context)
@@ -188,10 +177,7 @@ class BodyPageSkeleton extends StatelessWidget {
                   child: header,
                 ),
                 const SizedBox(height: kSpacingSmall),
-                const Divider(
-                  thickness: kDividerThickness,
-                  height: kDividerSize,
-                ),
+                const PixelDivider(),
                 SizedBox(height: bottomSpaceSize),
                 // 产品描述部分
                 Expanded(child: child),

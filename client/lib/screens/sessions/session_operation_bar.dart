@@ -7,6 +7,7 @@ import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/button.dart';
+import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_parser/parser.dart';
@@ -24,7 +25,8 @@ class SessionOpBar extends ConsumerWidget {
 
   String getQuery() {
     var content = codeController.text.toString();
-    List<SQLChunk> querys = Splitter(content, ";", skipWhitespace: true).split();
+    List<SQLChunk> querys =
+        Splitter(content, ";", skipWhitespace: true).split();
     CodeLineSelection s = codeController.selection;
     String query;
     // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
@@ -141,7 +143,7 @@ class SessionOpBar extends ConsumerWidget {
           ? () {
               String query = getQuery();
               if (query.isNotEmpty) {
-              ref
+                ref
                     .read(sQLResultsServicesProvider.notifier)
                     .query(model.sessionId, query);
               }
@@ -213,12 +215,11 @@ class SessionOpBar extends ConsumerWidget {
     );
   }
 
-  Widget divider() {
-    return const VerticalDivider(
-      thickness: kDividerThickness,
-      width: kDividerSize,
+  Widget divider(BuildContext context) {
+    return PixelVerticalDivider(
       indent: 10,
       endIndent: 10,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
     );
   }
 
@@ -249,7 +250,7 @@ class SessionOpBar extends ConsumerWidget {
             disable: !SQLConnectState.isIdle(model.state),
             currentSchema: model.currentSchema,
           ),
-          divider(),
+          divider(context),
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),

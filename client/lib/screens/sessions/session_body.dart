@@ -6,7 +6,7 @@ import 'package:client/screens/sessions/session_sql_results.dart';
 import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_controller.dart';
-import 'package:client/widgets/const.dart';
+import 'package:client/widgets/divider.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +16,8 @@ class SessionBodyPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionEditorModel sessionEditor = ref.watch(sessionEditorNotifierProvider); // todo: 合并或者拆分page, 不要两个页面混在一起刷新
+    SessionEditorModel sessionEditor = ref
+        .watch(sessionEditorNotifierProvider); // todo: 合并或者拆分page, 不要两个页面混在一起刷新
     SessionDrawerModel sessionDrawer = ref.watch(sessionDrawerNotifierProvider);
     SessionController sessionController =
         SessionController.sessionController(sessionDrawer.sessionId);
@@ -33,21 +34,13 @@ class SessionBodyPage extends ConsumerWidget {
             second: const SqlResultTables(),
           ),
         ),
-        VerticalDivider(
-          width: kBlockDividerSize,
-          thickness: kBlockDividerThickness,
-          color: Theme.of(context).dividerColor,
-        ),
+        const PixelVerticalDivider(),
       ],
     );
     return Column(
       children: [
         SessionOpBar(codeController: sessionEditor.code),
-        Divider(
-          color: Theme.of(context).dividerColor,
-          thickness: kBlockDividerThickness,
-          height: kBlockDividerSize,
-        ),
+        const PixelDivider(),
         Expanded(
           child: Container(
             alignment: Alignment.topLeft,

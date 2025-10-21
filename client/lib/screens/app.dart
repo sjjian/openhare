@@ -99,12 +99,7 @@ class App extends HookConsumerWidget {
 
     return MaterialApp.router(
       title: 'openhare',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: model.theme == "dark"
-            ? MaterialTheme.darkScheme()
-            : MaterialTheme.lightScheme(),
-      ),
+      theme: defaultTheme(model.theme),
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

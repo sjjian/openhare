@@ -9,17 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:client/utils/duration_extend.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/l10n/app_localizations.dart';
+import 'package:client/widgets/divider.dart';
 
 class SessionStatusTab extends ConsumerWidget {
   const SessionStatusTab({Key? key}) : super(key: key);
 
   Widget divider(BuildContext context) {
-    return VerticalDivider(
-      thickness: kDividerThickness,
-      width: kDividerSize,
+    return PixelVerticalDivider(
       indent: 10,
       endIndent: 10,
-      color: Theme.of(context).colorScheme.onSurface,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
     );
   }
 
