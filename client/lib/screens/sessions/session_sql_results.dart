@@ -4,6 +4,7 @@ import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/data_grid.dart';
 import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/tooltip.dart';
@@ -11,9 +12,9 @@ import 'package:db_driver/db_driver.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/tab_widget.dart';
-import 'package:pluto_grid/pluto_grid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/l10n/app_localizations.dart';
+import 'package:client/widgets/divider.dart';
 
 class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);
@@ -94,11 +95,7 @@ class SqlResultTables extends ConsumerWidget {
                 child: tab,
               ),
               const SizedBox(height: kSpacingTiny),
-              Divider(
-                height: kBlockDividerSize,
-                thickness: kBlockDividerThickness,
-                color: Theme.of(context).dividerColor,
-              ),
+              const PixelDivider(),
               const Expanded(child: SqlResultTable())
             ],
           ),
@@ -111,39 +108,33 @@ class SqlResultTables extends ConsumerWidget {
 class SqlResultTable extends ConsumerWidget {
   const SqlResultTable({super.key});
 
-  List<PlutoColumn> buildColumns(List<BaseQueryColumn> columns) {
+  List<DataGridColumn> buildColumns(List<BaseQueryColumn> columns) {
     return columns
-        .map<PlutoColumn>((e) => PlutoColumn(
-            title: e.name,
-            field: e.name,
-            type: switch (e.dataType()) {
-              DataType.number => PlutoColumnType.number(),
-              _ => PlutoColumnType.text(),
-            },
-            titleSpan: WidgetSpan(
-              child: Row(
+        .map<DataGridColumn>((e) => DataGridColumn(
+              label: Row(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: kSpacingTiny),
-                    child: DataTypeIcon(
-                      type: e.dataType(),
-                      size: kIconSizeSmall,
-                    ),
+                    child:
+                        DataTypeIcon(type: e.dataType(), size: kIconSizeSmall),
                   ),
                   Expanded(
-                      child: Text(e.name, overflow: TextOverflow.ellipsis)),
+                    child: Text(e.name, overflow: TextOverflow.ellipsis),
+                  ),
                 ],
               ),
-            )))
+            ))
         .toList();
   }
 
-  List<PlutoRow> buildRows(List<QueryResultRow> rows) {
-    return rows.map<PlutoRow>((e) {
-      return PlutoRow(cells: <String, PlutoCell>{
+  List<DataGridRow> buildRows(List<QueryResultRow> rows, BuildContext context) {
+    return rows.map<DataGridRow>((e) {
+      return DataGridRow(cells: <DataGridCell>[
         for (int i = 0; i < e.columns.length; i++)
-          e.columns[i].name: PlutoCell(value: e.values[i].getSummary())
-      });
+          DataGridCell(
+              content: Text(e.values[i].getSummary() ?? '',
+                  maxLines: 1, style: Theme.of(context).textTheme.bodySmall))
+      ]);
     }).toList();
   }
 
@@ -175,7 +166,7 @@ class SqlResultTable extends ConsumerWidget {
       builder: (context, constraints) {
         const maxHeight =
             kIconSizeLarge + kSpacingMedium + 20.0 + kSpacingSmall * 2;
-        const maxWidth = kIconSizeLarge +kSpacingLarge * 2;
+        const maxWidth = kIconSizeLarge + kSpacingLarge * 2;
         if (constraints.maxHeight < maxHeight ||
             constraints.maxWidth < maxWidth) {
           // 父容器太小，隐藏内容
@@ -243,51 +234,26 @@ class SqlResultTable extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final color = Theme.of(context)
-        .colorScheme
-        .surfaceContainerLowest; // sql result body 的背景色
-
     final model = ref.watch(selectedSQLResultNotifierProvider);
     if (model == null) {
       return buildEmptyBody(context);
     }
     if (model.state == SQLExecuteState.done) {
-      return PlutoGrid(
-        key: ObjectKey(model),
-        mode: PlutoGridMode.selectWithOneTap,
-        onSelected: (event) {
+      return DataGrid(
+        key: ValueKey(model.resultId),
+        controller: DataGridController(
+          columns: buildColumns(model.data!.columns),
+          rows: buildRows(model.data!.rows, context),
+        ),
+        onCellTap: (rowIndex, columnIndex, cell, row) {
           ref
               .read(sessionDrawerServicesProvider(model.resultId.sessionId)
                   .notifier)
               .showSQLResult(
-                result: model.data!.rows[event.rowIdx!]
-                    .getValue(event.cell!.column.title),
-                column: model.data!.rows[event.rowIdx!]
-                    .getColumn(event.cell!.column.title),
+                result: model.data!.rows[rowIndex].values[columnIndex],
+                column: model.data!.rows[rowIndex].columns[columnIndex],
               );
         },
-        configuration: PlutoGridConfiguration(
-          localeText: AppLocalizations.of(context)!.localeName == "zh"
-              ? const PlutoGridLocaleText.china()
-              : const PlutoGridLocaleText(),
-          style: PlutoGridStyleConfig(
-            rowHeight: 24,
-            columnHeight: 32,
-            gridBorderColor: Theme.of(context)
-                .colorScheme
-                .surfaceContainerLowest, // sql result table 边框颜色
-            rowColor: color,
-            activatedColor: Theme.of(context)
-                .colorScheme
-                .surfaceContainer, // sql result table 行选中的颜色
-            gridBackgroundColor: color,
-            cellTextStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-        ),
-        columns: buildColumns(model.data!.columns),
-        rows: buildRows(model.data!.rows),
       );
     } else if (model.state == SQLExecuteState.error) {
       return buildErrorBody(context, model);
