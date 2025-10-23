@@ -37,6 +37,17 @@ class Postion {
   final int columnIndex;
 
   const Postion({required this.rowIndex, required this.columnIndex});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Postion &&
+        other.rowIndex == rowIndex &&
+        other.columnIndex == columnIndex;
+  }
+
+  @override
+  int get hashCode => Object.hash(rowIndex, columnIndex);
 }
 
 class RowSize {
@@ -300,13 +311,11 @@ class _DataGridState extends State<DataGrid> {
 
     return DataGridCellWidget(
       selected: (widget.controller.selectedCellPostion != null)
-          ? (postion.rowIndex ==
-                  widget.controller.selectedCellPostion!.rowIndex &&
-              postion.columnIndex ==
-                  widget.controller.selectedCellPostion!.columnIndex)
+          ? (widget.controller.selectedCellPostion == postion)
           : false,
-      backgroundColor: (postion.rowIndex ==
-              (widget.controller.selectedCellPostion?.rowIndex ?? -1))
+      backgroundColor: (widget.controller.selectedCellPostion != null &&
+              postion.rowIndex ==
+                  widget.controller.selectedCellPostion!.rowIndex)
           ? colorScheme.surfaceContainerLow
           : null,
       child: GestureDetector(
