@@ -109,31 +109,33 @@ class SqlResultTable extends ConsumerWidget {
   const SqlResultTable({super.key});
 
   List<DataGridColumn> buildColumns(List<BaseQueryColumn> columns) {
-    return columns
-        .map<DataGridColumn>((e) => DataGridColumn(
-              label: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: kSpacingTiny),
-                    child:
-                        DataTypeIcon(type: e.dataType(), size: kIconSizeSmall),
-                  ),
-                  Expanded(
-                    child: Text(e.name, overflow: TextOverflow.ellipsis),
-                  ),
-                ],
-              ),
-            ))
-        .toList();
+    return columns.map<DataGridColumn>((e) {
+      final width = (e.dataType() == DataType.number) ? 80.0 : 200.0;
+      return DataGridColumn(
+        size: RowSize(width: width),
+        contentBuilder: (context) => Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: kSpacingTiny),
+              child: DataTypeIcon(type: e.dataType(), size: kIconSizeSmall),
+            ),
+            Expanded(
+              child: Text(e.name, overflow: TextOverflow.ellipsis),
+            ),
+          ],
+        ),
+      );
+    }).toList();
   }
 
   List<DataGridRow> buildRows(List<QueryResultRow> rows, BuildContext context) {
     return rows.map<DataGridRow>((e) {
-      return DataGridRow(cells: <DataGridCell>[
+      return DataGridRow(cells: <DataGridCell<BaseQueryValue>>[
         for (int i = 0; i < e.columns.length; i++)
-          DataGridCell(
-              content: Text(e.values[i].getSummary() ?? '',
-                  maxLines: 1, style: Theme.of(context).textTheme.bodySmall))
+          DataGridCell<BaseQueryValue>(
+            contentBuilder: (context) => Text(e.values[i].getSummary() ?? '',
+                maxLines: 1, style: Theme.of(context).textTheme.bodySmall),
+          ),
       ]);
     }).toList();
   }
@@ -245,13 +247,15 @@ class SqlResultTable extends ConsumerWidget {
           columns: buildColumns(model.data!.columns),
           rows: buildRows(model.data!.rows, context),
         ),
-        onCellTap: (rowIndex, columnIndex, cell, row) {
+        onCellTap: (postion) {
           ref
               .read(sessionDrawerServicesProvider(model.resultId.sessionId)
                   .notifier)
               .showSQLResult(
-                result: model.data!.rows[rowIndex].values[columnIndex],
-                column: model.data!.rows[rowIndex].columns[columnIndex],
+                result: model
+                    .data!.rows[postion.rowIndex].values[postion.columnIndex],
+                column: model
+                    .data!.rows[postion.rowIndex].columns[postion.columnIndex],
               );
         },
       );
