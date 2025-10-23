@@ -318,18 +318,19 @@ class _DataGridState extends State<DataGrid> {
                   widget.controller.selectedCellPostion!.rowIndex)
           ? colorScheme.surfaceContainerLow
           : null,
-      child: GestureDetector(
-        onTap: () {
-          widget.controller.updateSelectedCell(postion);
-          widget.onCellTap?.call(postion);
-        },
-        onDoubleTap: () {
-          widget.controller.updateSelectedCell(postion);
-          widget.onCellDoubleTap?.call(postion);
-        },
-        child: SizedBox(
-          width: width,
-          height: widget.rowHeight,
+      child: SizedBox(
+        width: width,
+        height: widget.rowHeight,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            widget.controller.updateSelectedCell(postion);
+            widget.onCellTap?.call(postion);
+          },
+          onDoubleTap: () {
+            widget.controller.updateSelectedCell(postion);
+            widget.onCellDoubleTap?.call(postion);
+          },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             alignment: Alignment.centerLeft,
