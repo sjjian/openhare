@@ -15,6 +15,7 @@ import 'package:client/widgets/tab_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:client/widgets/divider.dart';
+import 'package:client/services/sessions/session_controller.dart';
 
 class SqlResultTables extends ConsumerWidget {
   const SqlResultTables({Key? key}) : super(key: key);
@@ -241,12 +242,18 @@ class SqlResultTable extends ConsumerWidget {
       return buildEmptyBody(context);
     }
     if (model.state == SQLExecuteState.done) {
-      return DataGrid(
-        key: ValueKey(model.resultId),
-        controller: DataGridController(
+      final controller = SQLResultController.sqlResultController(
+        model.resultId,
+        () => DataGridController(
           columns: buildColumns(model.data!.columns),
           rows: buildRows(model.data!.rows, context),
         ),
+      );
+      return DataGrid(
+        key: ValueKey(model.resultId),
+        controller: controller.controller,
+        horizontalScrollGroup: controller.horizontalScrollGroup,
+        verticalController: controller.verticalController,
         onCellTap: (postion) {
           ref
               .read(sessionDrawerServicesProvider(model.resultId.sessionId)

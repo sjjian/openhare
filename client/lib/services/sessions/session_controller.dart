@@ -1,9 +1,12 @@
 // 报存与session 有关的所有controller, 没想好怎么处理他们，感觉用riverpod 不太好。先自己处理吧
 
 import 'package:client/models/sessions.dart';
+import 'package:client/widgets/data_grid.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:flutter/material.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:multi_split_view/multi_split_view.dart';
+import 'package:client/widgets/scroll.dart';
 
 class SessionController {
   // split
@@ -50,4 +53,42 @@ class SessionController {
       cache.remove(sessionId);
     }
   }
+}
+
+class SQLResultController {
+  final DataGridController controller;
+
+  /// 表格滚动控制器
+  final KeepOffestLinkedScrollControllerGroup horizontalScrollGroup;
+  final KeepOffestScrollController verticalController;
+
+    SQLResultController({
+      required this.controller,
+      required this.horizontalScrollGroup,
+      required this.verticalController,
+    });
+
+    static Map<ResultId, SQLResultController> cache = {};
+
+
+    // 使用init回调，如果存在则跳过初始化
+    static SQLResultController sqlResultController(ResultId resultId, DataGridController Function() init) {
+      if (cache.containsKey(resultId)) {
+        return cache[resultId]!;
+      }
+      final controller = SQLResultController(
+        controller: init(),
+        horizontalScrollGroup: KeepOffestLinkedScrollControllerGroup(),
+        verticalController: KeepOffestScrollController(),
+      );
+      cache[resultId] = controller;
+      return controller;
+    }
+
+    static void removeSQLResultController(ResultId resultId) {
+      if (cache.containsKey(resultId)) {
+        cache[resultId]!.controller.dispose();
+        cache.remove(resultId);
+      }
+    }
 }

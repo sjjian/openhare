@@ -93,9 +93,18 @@ class DataGridCell<T> {
 
 /// 数据表格组件
 class DataGrid extends StatefulWidget {
+  /// 数据表格控制器
   final DataGridController controller;
-  final double rowHeight;
+  /// 表头的行高
   final double headerHeight;
+  /// 数据行的行高
+  final double rowHeight;
+
+  /// 水平滚动控制器组，用于同步表头和数据体的水平滚动
+  final LinkedScrollControllerGroup? horizontalScrollGroup;
+  
+  /// 垂直滚动控制器，用于数据行的垂直滚动
+  final ScrollController? verticalController;
 
   /// 单元格点击回调
   final void Function(Postion position)? onCellTap;
@@ -108,6 +117,8 @@ class DataGrid extends StatefulWidget {
     required this.controller,
     this.rowHeight = 24.0,
     this.headerHeight = 32.0,
+    this.horizontalScrollGroup,
+    this.verticalController,
     this.onCellTap,
     this.onCellDoubleTap,
   }) : super(key: key);
@@ -127,8 +138,8 @@ class _DataGridState extends State<DataGrid> {
   void initState() {
     super.initState();
     // 初始化滚动控制器
-    _horizontalScrollGroup = LinkedScrollControllerGroup();
-    _verticalController = ScrollController();
+    _horizontalScrollGroup = widget.horizontalScrollGroup ?? LinkedScrollControllerGroup();
+    _verticalController = widget.verticalController ?? ScrollController();
     _headerHorizontalController = _horizontalScrollGroup.addAndGet();
     _bodyHorizontalController = _horizontalScrollGroup.addAndGet();
   }
@@ -136,9 +147,11 @@ class _DataGridState extends State<DataGrid> {
   @override
   void dispose() {
     // 清理滚动控制器
+    if (widget.verticalController == null) {
+      _verticalController.dispose();
+    }
     _headerHorizontalController.dispose();
     _bodyHorizontalController.dispose();
-    _verticalController.dispose();
     super.dispose();
   }
 
