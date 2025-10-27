@@ -1,6 +1,7 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/repositories/sessions/session_sql_result.dart';
+import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -47,7 +48,8 @@ class SQLResultsServices extends _$SQLResultsServices {
 
   Future<void> _query(ResultId resultId, String query) async {
     final repo = ref.read(sqlResultsRepoProvider);
-
+    // todo: remove sql result controller 不确认全局cache controller 是不是好的设计，导致两处维护状态.
+    SQLResultController.removeSQLResultController(resultId);
     repo.updateSQLResult(
       resultId,
       SQLResultDetailModel(

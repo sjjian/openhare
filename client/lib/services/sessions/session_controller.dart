@@ -4,7 +4,6 @@ import 'package:client/models/sessions.dart';
 import 'package:client/widgets/data_grid.dart';
 import 'package:client/widgets/split_view.dart';
 import 'package:flutter/material.dart';
-import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:client/widgets/scroll.dart';
 
@@ -88,6 +87,7 @@ class SQLResultController {
     static void removeSQLResultController(ResultId resultId) {
       if (cache.containsKey(resultId)) {
         cache[resultId]!.controller.dispose();
+        cache[resultId]!.verticalController.dispose();
         cache.remove(resultId);
       }
     }
