@@ -56,7 +56,6 @@ DataNode buildMetadataTree(DataNode parent, List<MetaDataNode>? nodes) {
 }
 
 class RootNode implements DataNode {
-
   final List<DataNode> _children = List.empty(growable: true);
 
   RootNode();
@@ -97,7 +96,6 @@ class RootNode implements DataNode {
     }
   }
 }
-
 
 class FolderNode extends RootNode {
   FolderNode() : super();
@@ -277,8 +275,13 @@ class ColumnValueNode extends DataValueNode {
 
 class DataTree extends StatefulWidget {
   final TreeController<DataNode> controller;
+  final ScrollController? scrollController;
 
-  const DataTree({Key? key, required this.controller}) : super(key: key);
+  const DataTree({
+    Key? key,
+    required this.controller,
+    this.scrollController,
+  }) : super(key: key);
 
   @override
   State<DataTree> createState() => _DataTreeState();
@@ -289,6 +292,7 @@ class _DataTreeState extends State<DataTree> {
   Widget build(BuildContext context) {
     return TreeView<DataNode>(
       treeController: widget.controller,
+      controller: widget.scrollController,
       nodeBuilder: (BuildContext context, TreeEntry<DataNode> entry) {
         return MyTreeTile(
           key: ValueKey(entry.node),

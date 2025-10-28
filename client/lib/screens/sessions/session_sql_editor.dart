@@ -12,8 +12,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SQLEditor extends ConsumerWidget {
   final CodeLineEditingController codeController;
+  final CodeScrollController? scrollController;
 
-  const SQLEditor({super.key, required this.codeController});
+  const SQLEditor(
+      {super.key, required this.codeController, this.scrollController});
 
   List<CodeKeywordPrompt> buildMetadataKeyword(List<MetaDataNode> metadata) {
     List<CodeKeywordPrompt> keywordPrompt = List.empty(growable: true);
@@ -89,6 +91,7 @@ class SQLEditor extends ConsumerWidget {
                 ),
                 child: CodeEditor(
                   wordWrap: false,
+                  scrollController: scrollController,
                   style: CodeEditorStyle(
                     backgroundColor: Theme.of(context)
                         .colorScheme

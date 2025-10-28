@@ -5,7 +5,9 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 class KeepOffestScrollController extends ScrollController {
   double _savedOffset = 0.0;
 
-  KeepOffestScrollController({double initialOffset = 0.0}) : super(initialScrollOffset: initialOffset);
+  KeepOffestScrollController({
+    double initialOffset = 0.0,
+  }) : super(initialScrollOffset: initialOffset);
 
   @override
   void attach(ScrollPosition position) {
@@ -40,9 +42,9 @@ class KeepOffestScrollController extends ScrollController {
   }
 }
 
-
 /// 支持自动保存 offset 的 LinkedScrollControllerGroup
-class KeepOffestLinkedScrollControllerGroup extends LinkedScrollControllerGroup {
+class KeepOffestLinkedScrollControllerGroup
+    extends LinkedScrollControllerGroup {
   double _offset = 0.0;
 
   @override

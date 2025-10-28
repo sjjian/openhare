@@ -1,4 +1,5 @@
 import 'package:client/models/sessions.dart';
+import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/session_metadata_tree.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
@@ -39,8 +40,9 @@ class SessionDrawerMetadata extends ConsumerWidget {
     );
   }
 
-  Widget bodyPage(TreeController<DataNode> controller) {
-    return DataTree(controller: controller);
+  Widget bodyPage(
+      TreeController<DataNode> controller, ScrollController scrollController) {
+    return DataTree(controller: controller, scrollController: scrollController);
   }
 
   @override
@@ -51,13 +53,18 @@ class SessionDrawerMetadata extends ConsumerWidget {
     if (model == null) {
       return loadingPage();
     }
+
+    SessionController sessionController =
+        SessionController.sessionController(model.sessionId);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
             child: model.metadataTreeCtrl.match(
-          (value) => bodyPage(value),
+          (value) =>
+              bodyPage(value, sessionController.metadataTreeScrollController),
           (error) => errorPage(context, ref, error, model.sessionId),
           () => loadingPage(),
         )),

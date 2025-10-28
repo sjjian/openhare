@@ -29,8 +29,10 @@ class SessionBodyPage extends ConsumerWidget {
             controller: sessionController.multiSplitViewCtrl,
             axis: Axis.vertical,
             first: SQLEditor(
-                key: ValueKey(sessionEditor.code),
-                codeController: sessionEditor.code),
+              key: ValueKey(sessionEditor.code),
+              codeController: sessionEditor.code,
+              scrollController: sessionController.sqlEditorScrollController,
+            ),
             second: const SqlResultTables(),
           ),
         ),
