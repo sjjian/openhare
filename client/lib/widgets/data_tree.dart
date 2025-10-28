@@ -343,13 +343,13 @@ class _MyTreeTileState extends State<MyTreeTile> {
           color: isEnter
               ? Theme.of(context)
                   .colorScheme
-                  .surfaceContainer // meta data detail 鼠标移入的颜色
+                  .surfaceContainer // meta data detail 鼠标移入的颜色.
               : null,
           child: TreeIndentation(
             entry: widget.entry,
             guide: const IndentGuide.scopingLines(
               indent: 10,
-              thickness: 0.2,
+              thickness: 0.01, // 线条无法取消，只能设置成更细让无法看到.
               origin: 0.2,
             ),
             child: SizedBox(
