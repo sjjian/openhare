@@ -26,7 +26,7 @@ class SessionOpBar extends ConsumerWidget {
   String getQuery() {
     var content = codeController.text.toString();
     List<SQLChunk> querys =
-        Splitter(content, ";", skipWhitespace: true).split();
+        Splitter(content, ";", skipWhitespace: true, skipComment: true).split();
     CodeLineSelection s = codeController.selection;
     String query;
     // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
@@ -216,10 +216,9 @@ class SessionOpBar extends ConsumerWidget {
   }
 
   Widget divider(BuildContext context) {
-    return PixelVerticalDivider(
-      indent: 10,
-      endIndent: 10,
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: kSpacingTiny),
+      child: PixelVerticalDivider(indent: 10, endIndent: 10),
     );
   }
 
@@ -244,6 +243,7 @@ class SessionOpBar extends ConsumerWidget {
         children: [
           // connect
           connectWidget(context, ref, model),
+
           // schema list
           SchemaBar(
             connId: model.connId,
@@ -285,69 +285,64 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          isEnter = true;
-        });
-      },
-      onExit: (_) {
-        setState(() {
-          isEnter = false;
-        });
-      },
-      child: GestureDetector(
-        onTapUp: (detail) async {
-          if (widget.disable) {
-            return;
-          }
-          final position = detail.globalPosition;
-          final RenderBox overlay =
-              Overlay.of(context).context.findRenderObject() as RenderBox;
-          final overlayPos = overlay.localToGlobal(Offset.zero);
-
-          List<String> schemas = await ref
-              .read(sessionConnsServicesProvider.notifier)
-              .getSchemas(widget.connId!);
-
-          // todo
-          showMenu(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                position.dx - overlayPos.dx,
-                position.dy - overlayPos.dy,
-                position.dx - overlayPos.dx,
-                position.dy - overlayPos.dy,
-              ),
-              items: schemas.map((schema) {
-                return PopupMenuItem<String>(
-                    height: 30,
-                    onTap: () async {
-                      await ref
-                          .read(sessionConnsServicesProvider.notifier)
-                          .setCurrentSchema(widget.connId!, schema);
-                    },
-                    child: Text(schema, overflow: TextOverflow.ellipsis));
-              }).toList());
+    final color = (isEnter && !widget.disable)
+        ? Theme.of(context).colorScheme.primary // schema 鼠标移入的颜色
+        : Theme.of(context).colorScheme.onSurface;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: MouseRegion(
+        onEnter: (_) {
+          setState(() {
+            isEnter = true;
+          });
         },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
+        onExit: (_) {
+          setState(() {
+            isEnter = false;
+          });
+        },
+        child: GestureDetector(
+          onTapUp: (detail) async {
+            if (widget.disable) {
+              return;
+            }
+            final position = detail.globalPosition;
+            final RenderBox overlay =
+                Overlay.of(context).context.findRenderObject() as RenderBox;
+            final overlayPos = overlay.localToGlobal(Offset.zero);
+
+            List<String> schemas = await ref
+                .read(sessionConnsServicesProvider.notifier)
+                .getSchemas(widget.connId!);
+
+            // todo
+            showMenu(
+                context: context,
+                position: RelativeRect.fromLTRB(
+                  position.dx - overlayPos.dx,
+                  position.dy - overlayPos.dy,
+                  position.dx - overlayPos.dx,
+                  position.dy - overlayPos.dy,
+                ),
+                items: schemas.map((schema) {
+                  return PopupMenuItem<String>(
+                      height: 30,
+                      onTap: () async {
+                        await ref
+                            .read(sessionConnsServicesProvider.notifier)
+                            .setCurrentSchema(widget.connId!, schema);
+                      },
+                      child: Text(schema, overflow: TextOverflow.ellipsis));
+                }).toList());
+          },
           child: Container(
-              padding: const EdgeInsets.only(left: kSpacingTiny),
-              decoration: BoxDecoration(
-                color: (isEnter && !widget.disable)
-                    ? Theme.of(context)
-                        .colorScheme
-                        .primaryContainer // schema 鼠标移入的颜色
-                    : null,
-                borderRadius: BorderRadius.circular(5),
-              ),
+              padding:
+                  const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
               child: Row(
                 children: [
                   HugeIcon(
                     icon: HugeIcons.strokeRoundedDatabase,
-                    color: widget.iconColor ??
-                        Theme.of(context).colorScheme.onSurface,
+                    color: color,
                     size: kIconSizeSmall,
                   ),
                   Container(
@@ -358,6 +353,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                           child: Text(
                             widget.currentSchema ?? "",
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: color),
                           ))),
                 ],
               )),
