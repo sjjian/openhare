@@ -6,6 +6,7 @@ import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:client/widgets/tooltip.dart';
 
 abstract class DataNode {
   List<DataNode> get children;
@@ -123,9 +124,8 @@ class FolderNode extends RootNode {
   @override
   Widget builder(BuildContext context, bool isOpen) {
     final name = _name(context);
-    return Text(
-      children.isNotEmpty ? "$name  [${_children.length}]" : name,
-      overflow: TextOverflow.ellipsis,
+    return TooltipText(
+      text: children.isNotEmpty ? "$name  [${_children.length}]" : name,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -203,13 +203,12 @@ class DataValueNode extends RootNode {
 
   @override
   Widget builder(BuildContext context, bool isOpen) {
-    return Text(
-      name,
+    return TooltipText(
+      text: name,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
           color: isOpen
               ? Theme.of(context).colorScheme.onPrimaryContainer
               : Theme.of(context).colorScheme.onSurface),
-      overflow: TextOverflow.ellipsis,
     );
   }
 }

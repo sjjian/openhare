@@ -15,10 +15,9 @@ class SessionStatusTab extends ConsumerWidget {
   const SessionStatusTab({Key? key}) : super(key: key);
 
   Widget divider(BuildContext context) {
-    return PixelVerticalDivider(
-      indent: 10,
-      endIndent: 10,
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: kSpacingSmall),
+      child: PixelVerticalDivider(indent: 10, endIndent: 10),
     );
   }
 
@@ -72,31 +71,35 @@ class SessionStatusTab extends ConsumerWidget {
               ),
             ),
           if (model.resultId != null) ...[
-            const SizedBox(width: kSpacingSmall),
+            // affected rows
             divider(context),
-            const SizedBox(width: kSpacingSmall),
             ValueStatusWidget(
-                label: AppLocalizations.of(context)!.effect_rows,
-                value: affectedRowsDisplay,
-                tooltip: affectedRowsDisplay),
-            const SizedBox(width: kSpacingSmall),
+              label: AppLocalizations.of(context)!.effect_rows,
+              value: affectedRowsDisplay,
+              tooltip: affectedRowsDisplay,
+            ),
+
+            // duration
             divider(context),
-            const SizedBox(width: kSpacingSmall),
             ValueStatusWidget(
-                label: AppLocalizations.of(context)!.duration,
-                value: executeTimeDisplay,
-                tooltip: executeTimeDisplay),
-            const SizedBox(width: kSpacingSmall),
+              label: AppLocalizations.of(context)!.duration,
+              value: executeTimeDisplay,
+              tooltip: executeTimeDisplay,
+            ),
+
+            // sql query
             divider(context),
-            const SizedBox(width: kSpacingSmall),
             ValueStatusWidget(
                 width: 300,
                 label: AppLocalizations.of(context)!.query,
                 value: shortQueryDisplay,
                 tooltip: model.query ??
                     AppLocalizations.of(context)!.no_query_executed),
-            const SizedBox(width: kSpacingSmall),
-            if (model.state == SQLExecuteState.done && model.resultId != null)
+
+            // download result
+            if (model.state == SQLExecuteState.done &&
+                model.resultId != null) ...[
+              divider(context),
               RectangleIconButton.medium(
                 tooltip: AppLocalizations.of(context)!
                     .button_tooltip_sql_result_download,
@@ -118,7 +121,8 @@ class SessionStatusTab extends ConsumerWidget {
                       .toExcel()
                       .save()!);
                 },
-              ),
+              )
+            ],
           ],
           const Spacer(),
         ],
