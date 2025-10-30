@@ -189,7 +189,7 @@ class _CodeLineNumberState extends State<CodeLineNumber> {
     }
     var content = widget.codeController.text.toString();
     List<SQLChunk> querys =
-        Splitter(content, ";", skipWhitespace: true).split();
+        Splitter(content, ";", skipWhitespace: true, skipComment: true).split();
     CodeLineSelection s = widget.codeController.selection;
 
     // 计算当前选中的SQL块的开始和结束行.
