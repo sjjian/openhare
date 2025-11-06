@@ -8,7 +8,7 @@ import 'package:client/services/sessions/session_chat.dart';
 import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/settings/settings.dart';
-import 'package:client/utils/sql_highlight.dart';
+import 'package:client/widgets/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/divider.dart';

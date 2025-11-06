@@ -3,7 +3,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions/sessions.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/sessions.dart';
-import 'package:client/utils/sql_highlight.dart';
+import 'package:client/widgets/sql_highlight.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
 
