@@ -254,6 +254,7 @@ class SessionOpBar extends ConsumerWidget {
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
+          divider(context),
           saveWidget(context, ref, model),
           const Expanded(child: SessionDrawerBar()),
         ],
