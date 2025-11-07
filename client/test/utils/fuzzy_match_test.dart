@@ -45,35 +45,35 @@ void main() {
     });
   });
 
-  group('FuzzyMatch.matchWithResult - Prefix Match', () {
-    test('prefix match returns correct result', () {
+  group('FuzzyMatch.matchWithResult - Fuzzy Match', () {
+    test('fuzzy match returns correct result', () {
       final result = FuzzyMatch.matchWithResult('abc', 'abcdef');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.prefix);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.score, greaterThan(0.0));
       expect(result.score, lessThanOrEqualTo(1.0));
     });
 
-    test('prefix match score calculation', () {
+    test('fuzzy match score calculation', () {
       final result1 = FuzzyMatch.matchWithResult('abc', 'abcdef');
-      expect(result1.matchType, MatchType.prefix);
-      
+      expect(result1.matchType, MatchType.fuzzy);
+
       final result2 = FuzzyMatch.matchWithResult('abc', 'abc');
-      // result2 should be exact match, not prefix
+      // result2 should be exact match, not fuzzy
       expect(result2.matchType, MatchType.exact);
-      
+
       final result3 = FuzzyMatch.matchWithResult('a', 'abcdef');
-      expect(result3.matchType, MatchType.prefix);
-      expect(result3.score, 1.0 / 6.0); // 1/6
+      expect(result3.matchType, MatchType.fuzzy);
+      expect(result3.score, closeTo(0.962, 0.1)); // unified scoring algorithm with prefix match priority
     });
 
-    test('prefix match is case insensitive', () {
+    test('fuzzy match is case insensitive', () {
       final result1 = FuzzyMatch.matchWithResult('ABC', 'abcdef');
       final result2 = FuzzyMatch.matchWithResult('abc', 'ABCDEF');
       expect(result1.matched, isTrue);
-      expect(result1.matchType, MatchType.prefix);
+      expect(result1.matchType, MatchType.fuzzy);
       expect(result2.matched, isTrue);
-      expect(result2.matchType, MatchType.prefix);
+      expect(result2.matchType, MatchType.fuzzy);
     });
   });
 
@@ -81,7 +81,7 @@ void main() {
     test('substring match returns correct result', () {
       final result = FuzzyMatch.matchWithResult('def', 'abcdef');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.score, greaterThan(0.0));
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions!.length, 3);
@@ -91,10 +91,11 @@ void main() {
     test('substring match at start has higher score', () {
       final result1 = FuzzyMatch.matchWithResult('abc', 'abcabc');
       final result2 = FuzzyMatch.matchWithResult('abc', 'xyzabc');
-      
-      // First match should be prefix, second should be substring
-      expect(result1.matchType, MatchType.prefix);
-      expect(result2.matchType, MatchType.substring);
+
+      // 两者都应该是模糊匹配
+      expect(result1.matchType, MatchType.fuzzy);
+      expect(result2.matchType, MatchType.fuzzy);
+      // 较早的位置应该有更高的分数
       expect(result1.score, greaterThan(result2.score));
     });
 
@@ -103,135 +104,120 @@ void main() {
       final result2 = FuzzyMatch.matchWithResult('bc', 'xabcde');
       expect(result1.matched, isTrue);
       expect(result2.matched, isTrue);
-      // Closer to start should have higher score
+      expect(result1.matchType, MatchType.fuzzy);
+      expect(result2.matchType, MatchType.fuzzy);
+      // 越接近开头应该有更高的分数
       expect(result1.score, greaterThan(result2.score));
     });
 
     test('substring match is case insensitive', () {
       final result = FuzzyMatch.matchWithResult('DEF', 'abcdef');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
     });
   });
 
-  group('FuzzyMatch.matchWithResult - CamelCase Match', () {
-    test('camelCase match returns correct result', () {
+  group('FuzzyMatch.matchWithResult - Fuzzy Match (CamelCase-like)', () {
+    test('fuzzy match returns correct result for camelCase patterns', () {
       final result = FuzzyMatch.matchWithResult('gebi', 'getElementById');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions!.length, 4);
     });
 
-    test('camelCase match with consecutive characters', () {
-      // Test that characters can be matched in sequence even if not consecutive
-      // 'ebid' should match 'getElementById' as camelCase (e from Element, b from By, i from Id)
+    test('fuzzy match with non-consecutive characters', () {
+      // 测试字符即使不连续也能按顺序匹配
+      // 'ebid' 应该作为模糊匹配匹配 'getElementById'
       final result = FuzzyMatch.matchWithResult('ebid', 'getElementById');
       expect(result.matched, isTrue);
-      // Should match as camelCase (substring check fails, so camelCase is used)
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
-    test('camelCase match is case insensitive', () {
+    test('fuzzy match is case insensitive', () {
       final result = FuzzyMatch.matchWithResult('GEBI', 'getElementById');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
-    test('camelCase match with single word', () {
-      // 'abc' matches as prefix, not camelCase
-      // Use a pattern that doesn't match as prefix/substring
+    test('fuzzy match with mixed patterns', () {
+      // 使用按顺序匹配字符的模式
       final result = FuzzyMatch.matchWithResult('acd', 'abcDef');
-      // Should match as camelCase if not prefix/substring
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
-    test('camelCase match fails when characters not in order', () {
+    test('fuzzy match fails when characters not in order', () {
       final result = FuzzyMatch.matchWithResult('ebgi', 'getElementById');
       expect(result.matched, isFalse);
     });
   });
 
-  group('FuzzyMatch.matchWithResult - Acronym Match', () {
-    test('acronym match with multiple segments', () {
-      // 'geid' matches as camelCase (higher priority), not acronym
-      // Use a case where camelCase doesn't match to get acronym
+  group('FuzzyMatch.matchWithResult - Fuzzy Match (Acronym-like)', () {
+    test('fuzzy match with complex patterns', () {
       final result = FuzzyMatch.matchWithResult('geid', 'getElementById');
       expect(result.matched, isTrue);
-      // camelCase has higher priority than acronym
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
     });
 
-    test('acronym match with segment prefixes', () {
-      // 'gebi' matches as camelCase (higher priority), not acronym
+    test('fuzzy match with segment-like patterns', () {
       final result = FuzzyMatch.matchWithResult('gebi', 'getElementById');
       expect(result.matched, isTrue);
-      // camelCase has higher priority than acronym
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
-    test('acronym match with underscores', () {
-      // Test acronym matching with underscores (first char of each segment)
-      // 'gbid' matches, but camelCase has higher priority
+    test('fuzzy match with underscores', () {
       final result = FuzzyMatch.matchWithResult('gbid', 'get_element_by_id');
       expect(result.matched, isTrue);
-      // camelCase has higher priority than acronym
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
-    test('acronym match with hyphens', () {
-      // Test acronym matching with hyphens (first char of each segment)
-      // camelCase has higher priority
+    test('fuzzy match with hyphens', () {
       final result = FuzzyMatch.matchWithResult('gbid', 'get-element-by-id');
       expect(result.matched, isTrue);
-      // camelCase has higher priority
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
-    test('acronym match with spaces', () {
-      // Test acronym matching with spaces (first char of each segment)
-      // camelCase has higher priority
+    test('fuzzy match with spaces', () {
       final result = FuzzyMatch.matchWithResult('gbid', 'get element by id');
       expect(result.matched, isTrue);
-      // camelCase has higher priority
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
     });
     
     test('acronym match works when camelCase does not match', () {
-      // Find a case where camelCase doesn't match but acronym does
-      // This is tricky because camelCase matching is very flexible
-      // Let's test with a case where we explicitly want acronym behavior
-      // For example, matching first letters of segments when fuzzy matching fails
+      // 找到驼峰命名不匹配但缩写匹配的情况
+      // 这很棘手，因为驼峰命名匹配非常灵活
+      // 让我们测试一个明确需要缩写行为的案例
+      // 例如，在模糊匹配失败时匹配段的首字母
       final result = FuzzyMatch.matchWithResult('geby', 'getElementById');
       expect(result.matched, isTrue);
-      // Should match (camelCase or acronym)
+      // 应该匹配（驼峰命名或缩写）
       expect(result.matchType, isNot(MatchType.none));
     });
 
     test('acronym match with single segment uses fuzzy match', () {
       final result = FuzzyMatch.matchWithResult('abc', 'abcdef');
-      // Should match as prefix or substring, not acronym
+      // 应该作为前缀或子串匹配，而不是缩写
       expect(result.matched, isTrue);
-      // Acronym only applies when there are multiple segments
-      expect(result.matchType, isNot(MatchType.acronym));
+      // 缩写只在有多个段时适用
+      expect(result.matchType, isNot(MatchType.none));
     });
 
     test('acronym match is case insensitive', () {
-      // 'GEID' matches as camelCase (higher priority), not acronym
+      // 'GEID' 作为驼峰命名匹配（更高优先级），而不是缩写
       final result = FuzzyMatch.matchWithResult('GEID', 'getElementById');
       expect(result.matched, isTrue);
-      // camelCase has higher priority than acronym
-      expect(result.matchType, MatchType.camelCase);
+      // 驼峰命名比缩写有更高的优先级
+      expect(result.matchType, MatchType.fuzzy);
     });
     
     test('acronym match when camelCase does not match', () {
-      // Use a pattern that can only match as acronym (first char of each segment)
-      // This is tricky because camelCase might still match, so we test with a clearer case
+      // 使用只能作为缩写匹配的模式（每个段的第一个字符）
+      // 这很棘手，因为驼峰命名可能仍然匹配，所以我们用更明确的案例测试
       final result = FuzzyMatch.matchWithResult('geb', 'getElementById');
       expect(result.matched, isTrue);
-      // Should match (camelCase or acronym)
+      // 应该匹配（驼峰命名或缩写）
       expect(result.matchType, isNot(MatchType.none));
     });
   });
@@ -247,7 +233,7 @@ void main() {
 
     test('exact match is case sensitive for exact comparison', () {
       final result = FuzzyMatch.matchWithResult('abc', 'ABC');
-      // Should not be exact match due to case difference
+      // 由于大小写差异，不应该是完全匹配
       expect(result.matchType, isNot(MatchType.exact));
     });
   });
@@ -281,23 +267,17 @@ void main() {
     });
   });
 
-  group('FuzzyMatch.matchWithResult - Priority Order', () {
-    test('prefix match takes priority over substring', () {
-      final result = FuzzyMatch.matchWithResult('abc', 'abcabc');
-      expect(result.matchType, MatchType.prefix);
-    });
+  group('FuzzyMatch.matchWithResult - Unified Fuzzy Matching', () {
+    test('all matches use unified fuzzy algorithm', () {
+      final result1 = FuzzyMatch.matchWithResult('abc', 'abcabc');
+      expect(result1.matchType, MatchType.fuzzy);
 
-    test('substring match takes priority over camelCase', () {
-      final result = FuzzyMatch.matchWithResult('def', 'abcdef');
-      expect(result.matchType, MatchType.substring);
-    });
+      final result2 = FuzzyMatch.matchWithResult('def', 'abcdef');
+      expect(result2.matchType, MatchType.fuzzy);
 
-    test('camelCase match takes priority over acronym', () {
-      // This test depends on implementation details
-      // In general, camelCase should match before acronym when both are possible
-      final result = FuzzyMatch.matchWithResult('gebi', 'getElementById');
-      // Should match as camelCase or acronym depending on implementation
-      expect(result.matched, isTrue);
+      final result3 = FuzzyMatch.matchWithResult('gebi', 'getElementById');
+      expect(result3.matchType, MatchType.fuzzy);
+      expect(result3.matched, isTrue);
     });
   });
 
@@ -311,7 +291,7 @@ void main() {
     test('single character input', () {
       final result = FuzzyMatch.matchWithResult('a', 'abc');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.prefix);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
     test('single character target', () {
@@ -325,25 +305,25 @@ void main() {
     test('special characters in input', () {
       final result = FuzzyMatch.matchWithResult('def', 'abc-def-ghi');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
     test('special characters in target', () {
       final result = FuzzyMatch.matchWithResult('test', 'test_function');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.prefix);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
     test('numbers in strings', () {
       final result = FuzzyMatch.matchWithResult('123', 'abc123def');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
     });
 
     test('unicode characters', () {
       final result = FuzzyMatch.matchWithResult('中文', '这是中文测试');
       expect(result.matched, isTrue);
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
     });
   });
 
@@ -383,7 +363,7 @@ void main() {
 
     test('prefix score decreases with target length', () {
       final result1 = FuzzyMatch.matchWithResult('abc', 'abc');
-      // This is exact match, so different logic
+      // 这是完全匹配，所以逻辑不同
       expect(result1.matchType, MatchType.exact);
       
       final result2 = FuzzyMatch.matchWithResult('abc', 'abcdef');
@@ -397,7 +377,7 @@ void main() {
     });
 
     test('fuzzy score considers continuity', () {
-      // Consecutive matches should score higher than scattered matches
+      // 连续匹配应该比分散匹配获得更高的分数
       final result1 = FuzzyMatch.matchWithResult('abc', 'abcxyz');
       final result2 = FuzzyMatch.matchWithResult('axc', 'abcxyz');
       expect(result1.score, greaterThan(result2.score));
@@ -405,7 +385,7 @@ void main() {
 
     test('acronym score is boosted', () {
       final result = FuzzyMatch.matchWithResult('geid', 'getElementById');
-      if (result.matched && result.matchType == MatchType.acronym) {
+      if (result.matched && result.matchType == MatchType.fuzzy) {
         expect(result.score, greaterThan(0.0));
       }
     });
@@ -439,23 +419,23 @@ void main() {
   group('FuzzyMatchResult.matchPositions', () {
     test('prefix match returns correct consecutive positions', () {
       final result = FuzzyMatch.matchWithResult('abc', 'abcdef');
-      expect(result.matchType, MatchType.prefix);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions, [0, 1, 2]);
     });
 
     test('substring match returns correct consecutive positions', () {
       final result1 = FuzzyMatch.matchWithResult('def', 'abcdef');
-      expect(result1.matchType, MatchType.substring);
+      expect(result1.matchType, MatchType.fuzzy);
       expect(result1.matchPositions, isNotNull);
       expect(result1.matchPositions, [3, 4, 5]);
 
       final result2 = FuzzyMatch.matchWithResult('bc', 'abcde');
-      expect(result2.matchType, MatchType.substring);
+      expect(result2.matchType, MatchType.fuzzy);
       expect(result2.matchPositions, [1, 2]);
 
       final result3 = FuzzyMatch.matchWithResult('hello', 'xhelloworld');
-      expect(result3.matchType, MatchType.substring);
+      expect(result3.matchType, MatchType.fuzzy);
       expect(result3.matchPositions, [1, 2, 3, 4, 5]);
     });
 
@@ -469,51 +449,51 @@ void main() {
 
     test('camelCase match returns correct non-consecutive positions', () {
       final result = FuzzyMatch.matchWithResult('gebi', 'getElementById');
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions!.length, 4);
-      // Should match: g(0) - e(1) - b(10) - i(12)
+      // 应该匹配：g(0) - e(1) - b(10) - i(12)
       expect(result.matchPositions, [0, 1, 10, 12]);
     });
 
     test('camelCase match positions for consecutive characters', () {
-      // 'getel' matches as prefix, not camelCase
-      // Use a pattern that doesn't match as prefix/substring
+      // 'getel' 作为前缀匹配，而不是驼峰命名
+      // 使用不作为前缀/子串匹配的模式
       final result = FuzzyMatch.matchWithResult('geid', 'getElementById');
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions!.length, 4);
-      // Should match: g(0) - e(1) - i(12) - d(13)
+      // 应该匹配：g(0) - e(1) - i(12) - d(13)
       expect(result.matchPositions, [0, 1, 12, 13]);
     });
 
     test('camelCase match positions for scattered characters', () {
       final result = FuzzyMatch.matchWithResult('ebid', 'getElementById');
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions!.length, 4);
-      // Should match: e(1) - b(10) - i(12) - d(13)
+      // 应该匹配：e(1) - b(10) - i(12) - d(13)
       expect(result.matchPositions, [1, 10, 12, 13]);
     });
 
     test('acronym match returns correct positions for single segment', () {
-      // 'abc' matches as substring, not acronym
-      // Use a case where substring doesn't match to get acronym
+      // 'abc' 作为子串匹配，而不是缩写
+      // 使用子串不匹配的情况来获得缩写匹配
       final result = FuzzyMatch.matchWithResult('abc', 'xabcyz');
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions!.length, 3);
-      // Should match positions in sequence: a(1) - b(2) - c(3)
+      // 应该按顺序匹配位置：a(1) - b(2) - c(3)
       expect(result.matchPositions, [1, 2, 3]);
     });
 
     test('acronym match returns correct positions for multi-segment', () {
-      // Find a case where acronym matches (when camelCase doesn't)
-      // This is tricky because camelCase often matches first
-      // Let's test with a case where we can get acronym match
+      // 找到缩写匹配的情况（当驼峰命名不匹配时）
+      // 这很棘手，因为驼峰命名通常优先匹配
+      // 让我们测试一个可以获得缩写匹配的案例
       final result = FuzzyMatch.matchWithResult('geid', 'getElementById');
-      // This might match as camelCase or acronym depending on implementation
-      if (result.matchType == MatchType.acronym) {
+      // 这可能根据实现作为驼峰命名或缩写匹配
+      if (result.matchType == MatchType.fuzzy) {
         expect(result.matchPositions, isNotNull);
         expect(result.matchPositions!.length, 4);
       }
@@ -548,8 +528,8 @@ void main() {
     test('matchPositions are sorted in ascending order', () {
       final result = FuzzyMatch.matchWithResult('ebid', 'getElementById');
       expect(result.matchPositions, isNotNull);
-      
-      // Verify positions are in ascending order
+
+      // 验证位置按升序排列
       for (int i = 1; i < result.matchPositions!.length; i++) {
         expect(
           result.matchPositions![i],
@@ -561,33 +541,33 @@ void main() {
     test('matchPositions are within target string bounds', () {
       final result = FuzzyMatch.matchWithResult('def', 'abcdef');
       expect(result.matchPositions, isNotNull);
-      
+
       for (final position in result.matchPositions!) {
         expect(position, greaterThanOrEqualTo(0));
-        expect(position, lessThan(6)); // target length
+        expect(position, lessThan(6)); // 目标长度
       }
     });
 
     test('matchPositions for complex camelCase match', () {
-      // 'http' matches as prefix, not camelCase
-      // Use a pattern that doesn't match as prefix/substring
+      // 'http' 作为前缀匹配，而不是驼峰命名
+      // 使用不作为前缀/子串匹配的模式
       final result = FuzzyMatch.matchWithResult('hreq', 'HttpRequest');
-      expect(result.matchType, MatchType.camelCase);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, isNotNull);
       expect(result.matchPositions!.length, 4);
-      // Should match: h(0) - r(4) - e(5) - q(6)
+      // 应该匹配：h(0) - r(4) - e(5) - q(6)
       expect(result.matchPositions, [0, 4, 5, 6]);
     });
 
     test('matchPositions for substring match in middle', () {
       final result = FuzzyMatch.matchWithResult('world', 'helloworldtest');
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, [5, 6, 7, 8, 9]);
     });
 
     test('matchPositions for single character match', () {
       final result = FuzzyMatch.matchWithResult('a', 'xayz');
-      expect(result.matchType, MatchType.substring);
+      expect(result.matchType, MatchType.fuzzy);
       expect(result.matchPositions, [1]);
     });
   });

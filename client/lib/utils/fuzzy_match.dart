@@ -1,45 +1,32 @@
-/// A fuzzy string matching library for Dart/Flutter.
+/// Dart/Flutter 模糊字符串匹配库。
 ///
-/// Provides various matching strategies including prefix matching, substring
-/// matching, camelCase matching, and acronym matching.
+/// 提供受 fuzzywuzzy 启发的统一模糊匹配算法。
 library fuzzy_match;
 
-/// The type of match found.
+/// 找到的匹配类型。
 enum MatchType {
-  /// Exact match (not considered a match in this library).
+  /// 完全匹配（在此库中不视为匹配）。
   exact,
 
-  /// Prefix match - the input is a prefix of the target string.
-  prefix,
-
-  /// Substring match - the input appears anywhere in the target string.
-  substring,
-
-  /// CamelCase match - matches camelCase naming patterns.
-  camelCase,
-
-  /// Acronym match - matches acronym patterns like "getElementById".
-  acronym,
-
-  /// Fuzzy match - matches characters in sequence.
+  /// 模糊匹配 - 统一匹配算法。
   fuzzy,
 
-  /// No match found.
+  /// 未找到匹配。
   none,
 }
 
-/// The result of a fuzzy match operation.
+/// 模糊匹配操作的结果。
 class FuzzyMatchResult {
-  /// Whether a match was found.
+  /// 是否找到了匹配。
   final bool matched;
 
-  /// The type of match found.
+  /// 找到的匹配类型。
   final MatchType matchType;
 
-  /// The match score (0.0 to 1.0), higher is better.
+  /// 匹配分数（0.0 到 1.0），越高越好。
   final double score;
 
-  /// The positions where the input characters were matched in the target.
+  /// 输入字符在目标字符串中匹配的位置。
   final List<int>? matchPositions;
 
   const FuzzyMatchResult({
@@ -49,14 +36,14 @@ class FuzzyMatchResult {
     this.matchPositions,
   });
 
-  /// Creates a result for no match.
+  /// 创建无匹配的结果。
   const FuzzyMatchResult.noMatch()
       : matched = false,
         matchType = MatchType.none,
         score = 0.0,
         matchPositions = null;
 
-  /// Creates a result for an exact match.
+  /// 创建完全匹配的结果。
   const FuzzyMatchResult.exact()
       : matched = false,
         matchType = MatchType.exact,
@@ -68,135 +55,83 @@ class FuzzyMatchResult {
       'FuzzyMatchResult(matched: $matched, type: $matchType, score: $score)';
 }
 
-/// A utility class for fuzzy string matching.
+/// 模糊字符串匹配的工具类。将多种匹配策略组合成单个高效实现。
 ///
-/// This class provides various matching strategies to find strings that
-/// approximately match a given input pattern.
+/// 该算法按顺序查找字符序列，根据以下因素计算分数：
+/// - 长度覆盖率（输入有多少匹配）
+/// - 连续性（匹配字符的接近程度）
+/// - 位置偏好（越接近开头的匹配分数越高）
 ///
-/// Matching strategies (in order of priority):
-/// 1. Prefix match - highest priority
-/// 2. Substring match
-/// 3. CamelCase match
-/// 4. Acronym match
+/// 所有匹配都不区分大小写。完全匹配不视为有效匹配。
 ///
-/// All matching is case-insensitive by default. Exact matches are not
-/// considered valid matches.
-///
-/// Example usage:
+/// 使用示例：
 /// ```dart
-/// // Simple boolean match
+/// // 简单的布尔匹配
 /// bool result = FuzzyMatch.match('abc', 'abcdef');
 ///
-/// // Get detailed result
+/// // 获取详细结果
 /// FuzzyMatchResult result = FuzzyMatch.matchWithResult('abc', 'abcdef');
-/// print(result.matchType); // MatchType.prefix
+/// print(result.matched); // true
+/// print(result.matchType); // MatchType.fuzzy
 /// print(result.score); // 0.5
 /// ```
 class FuzzyMatch {
   FuzzyMatch._();
 
-  /// Checks if the input matches the target string.
-  ///
-  /// Returns `true` if a match is found, `false` otherwise.
-  ///
-  /// This is an optimized version that only checks for matches without
-  /// calculating scores or positions. Use [matchWithResult] if you need
-  /// detailed match information.
-  ///
-  /// - [input] - The search pattern to match.
-  /// - [target] - The target string to search in.
-  ///
-  /// Example:
-  /// ```dart
-  /// FuzzyMatch.match('abc', 'abcdef'); // true (prefix match)
-  /// FuzzyMatch.match('def', 'abcdef'); // true (substring match)
-  /// FuzzyMatch.match('gebi', 'getElementById'); // true (camelCase match)
-  /// ```
-  static bool match(String input, String target) {
-    // Empty input doesn't match
-    if (input.isEmpty) {
-      return false;
-    }
+  // 评分权重常量 - 用于统一分数的加权计算
+  static const double _prefixMatchWeight = 0.5; // 前缀匹配权重
+  static const double _positionPreferenceWeight = 0.3; // 位置偏好权重
+  static const double _continuityWeight = 0.15; // 连续性权重
+  static const double _lengthCoverageWeight = 0.05; // 长度覆盖率权重
 
-    // Check exact match (not considered a match)
-    if (target == input) {
-      return false;
-    }
+  // 位置偏好算法常量
+  static const double _startPositionDecayFactor = 0.3; // 起始位置衰减因子
+  static const double _averagePositionDecayFactor = 0.2; // 平均位置衰减因子
+  static const double _startPositionWeight = 0.7; // 起始位置在最终得分中的权重
+  static const double _averagePositionWeight = 0.3; // 平均位置在最终得分中的权重
+
+  // 连续性算法常量
+  static const double _gapDecayFactor = 0.1; // 间隙衰减因子
+
+  // ==================== 公共 API 方法 ====================
+
+  /// 检查输入是否与目标字符串匹配。
+  ///
+  /// 如果找到匹配则返回 `true`，否则返回 `false`。
+  ///
+  /// 这是一个优化的版本，只检查匹配而不计算分数或位置。
+  /// 如果需要详细的匹配信息，请使用 [matchWithResult]。
+  ///
+  /// - [input] - 要匹配的搜索模式。
+  /// - [target] - 要搜索的目标字符串。
+  static bool match(String input, String target) {
+    // 空输入不匹配
+    if (input.isEmpty) return false;
+
+    // 检查完全匹配（不视为匹配）
+    if (target == input) return false;
 
     final String normalizedInput = input.toLowerCase();
     final String normalizedTarget = target.toLowerCase();
 
-    // 1. Prefix match (fastest check)
-    if (normalizedTarget.startsWith(normalizedInput)) {
-      return true;
-    }
-
-    // 2. Substring match (fast check)
-    if (normalizedTarget.contains(normalizedInput)) {
-      return true;
-    }
-
-    // 3. Quick check for camelCase/acronym - only if target has uppercase letters
-    bool hasUppercase = false;
-    for (int i = 0; i < target.length; i++) {
-      final charCode = target.codeUnitAt(i);
-      if (charCode >= 65 && charCode <= 90) { // A-Z
-        hasUppercase = true;
-        break;
-      }
-    }
-
-    // Only do expensive matching if target has uppercase letters or separators
-    if (hasUppercase || normalizedTarget.contains('_') || 
-        normalizedTarget.contains('-') || normalizedTarget.contains(' ')) {
-      // Quick camelCase check - verify first character matches
-      if (normalizedTarget[0] == normalizedInput[0]) {
-        final positions = _findFuzzyMatchPositions(normalizedTarget, normalizedInput);
-        if (positions != null) {
-          return true;
-        }
-      }
-
-      // Quick acronym check
-      final segments = _extractSegments(target);
-      if (segments.length > 1) {
-        final positions = _matchSegments(segments, normalizedInput);
-        if (positions != null) {
-          return true;
-        }
-      } else if (segments.length == 1) {
-        final positions = _findFuzzyMatchPositions(
-            segments[0].toLowerCase(), normalizedInput);
-        if (positions != null) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    // 使用统一的模糊匹配算法
+    final result = _findFuzzyMatch(normalizedTarget, normalizedInput);
+    return result != null;
   }
 
-  /// Performs fuzzy matching and returns detailed result information.
+  /// 执行模糊匹配并返回详细的结果信息。
   ///
-  /// - [input] - The search pattern to match.
-  /// - [target] - The target string to search in.
+  /// - [input] - 要匹配的搜索模式。
+  /// - [target] - 要搜索的目标字符串。
   ///
-  /// Returns a [FuzzyMatchResult] containing match information.
-  ///
-  /// Example:
-  /// ```dart
-  /// final result = FuzzyMatch.matchWithResult('abc', 'abcdef');
-  /// print(result.matched); // true
-  /// print(result.matchType); // MatchType.prefix
-  /// print(result.score); // 0.5
-  /// ```
+  /// 返回包含匹配信息的 [FuzzyMatchResult]。
   static FuzzyMatchResult matchWithResult(String input, String target) {
-    // Empty input doesn't match
+    // 快速路径：空输入永远不匹配任何目标
     if (input.isEmpty) {
       return const FuzzyMatchResult.noMatch();
     }
 
-    // Check exact match (not considered a match)
+    // 检查完全匹配（不视为匹配）
     if (target == input) {
       return const FuzzyMatchResult.exact();
     }
@@ -204,275 +139,209 @@ class FuzzyMatch {
     final String normalizedInput = input.toLowerCase();
     final String normalizedTarget = target.toLowerCase();
 
-    // 1. Prefix match (highest priority)
-    if (normalizedTarget.startsWith(normalizedInput)) {
+    // 使用统一的模糊匹配算法
+    final matchResult = _findFuzzyMatch(normalizedTarget, normalizedInput);
+    if (matchResult != null) {
+      final score = _calculateUnifiedScore(input, target, matchResult);
       return FuzzyMatchResult(
         matched: true,
-        matchType: MatchType.prefix,
-        score: _calculatePrefixScore(input, target),
-        matchPositions: List.generate(
-          input.length,
-          (i) => i,
-        ),
-      );
-    }
-
-    // 2. Substring match
-    if (normalizedTarget.contains(normalizedInput)) {
-      final index = normalizedTarget.indexOf(normalizedInput);
-      return FuzzyMatchResult(
-        matched: true,
-        matchType: MatchType.substring,
-        score: _calculateSubstringScore(input, target, index),
-        matchPositions: List.generate(
-          input.length,
-          (i) => index + i,
-        ),
-      );
-    }
-
-    // 3. CamelCase match
-    final camelCaseResult = _matchCamelCase(target, input);
-    if (camelCaseResult.matched) {
-      return camelCaseResult;
-    }
-
-    // 4. Acronym match
-    final acronymResult = _matchAcronym(target, input);
-    if (acronymResult.matched) {
-      return acronymResult;
-    }
-
-    return const FuzzyMatchResult.noMatch();
-  }
-
-  /// Matches camelCase patterns.
-  ///
-  /// Example: input="gebi", target="getElementById" -> true (g-e-b-i)
-  static FuzzyMatchResult _matchCamelCase(String target, String input) {
-    final String normalizedInput = input.toLowerCase();
-    final String normalizedTarget = target.toLowerCase();
-
-    final positions = _findFuzzyMatchPositions(normalizedTarget, normalizedInput);
-    if (positions != null) {
-      return FuzzyMatchResult(
-        matched: true,
-        matchType: MatchType.camelCase,
-        score: _calculateFuzzyScore(input, target, positions),
-        matchPositions: positions,
+        matchType: MatchType.fuzzy,
+        score: score,
+        matchPositions: matchResult,
       );
     }
 
     return const FuzzyMatchResult.noMatch();
   }
 
-  /// Matches acronym patterns.
+  // ==================== 核心匹配算法 ====================
+
+  /// 统一的模糊匹配算法。
   ///
-  /// Example: input="geid", target="getElementById" -> true (g-e-i-d)
-  static FuzzyMatchResult _matchAcronym(String target, String input) {
-    final String normalizedInput = input.toLowerCase();
-
-    // Extract word segments (split by uppercase letters, underscores, hyphens, spaces)
-    final segments = _extractSegments(target);
-
-    // If only one segment, use fuzzy match
-    if (segments.length == 1) {
-      final normalizedTarget = target.toLowerCase();
-      final positions =
-          _findFuzzyMatchPositions(normalizedTarget, normalizedInput);
-      if (positions != null) {
-        return FuzzyMatchResult(
-          matched: true,
-          matchType: MatchType.acronym,
-          score: _calculateFuzzyScore(input, target, positions),
-          matchPositions: positions,
-        );
-      }
-      return const FuzzyMatchResult.noMatch();
-    }
-
-    // Multi-segment match: check if input matches each segment's prefix
-    // Example: "gebi" matches "getElementById" -> g-e-b-i
-    final positions = _matchSegments(segments, normalizedInput);
-    if (positions != null) {
-      return FuzzyMatchResult(
-        matched: true,
-        matchType: MatchType.acronym,
-        score: _calculateAcronymScore(input, target, positions),
-        matchPositions: positions,
-      );
-    }
-
-    return const FuzzyMatchResult.noMatch();
-  }
-
-  /// Extracts word segments from a string.
-  ///
-  /// Splits on uppercase letters, underscores, hyphens, and spaces.
-  static List<String> _extractSegments(String word) {
-    final List<String> segments = [];
-    final StringBuffer currentSegment = StringBuffer();
-
-    for (int i = 0; i < word.length; i++) {
-      final int charCode = word.codeUnitAt(i);
-      if (charCode == 32 || charCode == 95 || charCode == 45) {
-        // space, _, -
-        if (currentSegment.isNotEmpty) {
-          segments.add(currentSegment.toString());
-          currentSegment.clear();
-        }
-      } else if (i > 0 && charCode >= 65 && charCode <= 90) {
-        // A-Z (camelCase boundary)
-        if (currentSegment.isNotEmpty) {
-          segments.add(currentSegment.toString());
-          currentSegment.clear();
-        }
-        currentSegment.write(word[i]);
-      } else {
-        currentSegment.write(word[i]);
-      }
-    }
-    if (currentSegment.isNotEmpty) {
-      segments.add(currentSegment.toString());
-    }
-
-    return segments;
-  }
-
-  /// Matches input against segments.
-  static List<int>? _matchSegments(
-    List<String> segments,
-    String input,
-  ) {
-    final List<int> positions = [];
-    int inputIndex = 0;
-    int absoluteIndex = 0;
-
-    for (final String segment in segments) {
-      if (inputIndex >= input.length) {
-        break;
-      }
-      final String normalizedSegment = segment.toLowerCase();
-
-      // Try to match current segment (from first character, can match consecutive chars)
-      int segmentIndex = 0;
-      final int segmentStartIndex = absoluteIndex;
-
-      while (inputIndex < input.length &&
-          segmentIndex < normalizedSegment.length &&
-          input[inputIndex] == normalizedSegment[segmentIndex]) {
-        positions.add(segmentStartIndex + segmentIndex);
-        inputIndex++;
-        segmentIndex++;
-      }
-
-      // If current segment didn't match any character, fail
-      if (segmentIndex == 0) {
-        return null;
-      }
-
-      absoluteIndex += segment.length;
-    }
-
-    if (inputIndex == input.length) {
-      return positions;
-    }
-
-    return null;
-  }
-
-  /// Finds positions where input characters appear in sequence in target.
-  ///
-  /// Returns a list of positions if all characters are found in order,
-  /// or `null` if not.
-  static List<int>? _findFuzzyMatchPositions(
-    String target,
-    String input,
-  ) {
+  /// 查找输入字符按顺序出现在目标字符串中的最佳位置序列。
+  /// 如果所有字符都能匹配则返回位置，否则返回 null。
+  static List<int>? _findFuzzyMatch(String target, String input) {
+    // 边界情况：空输入匹配空位置
     if (input.isEmpty) return [];
+
+    // 边界情况：目标字符串长度不足以包含输入
     if (target.length < input.length) return null;
 
-    final List<int> positions = [];
-    int inputIndex = 0;
-    int targetIndex = 0;
+    final List<int> matchPositions = [];
+    int inputCharIndex = 0;
+    int targetCharIndex = 0;
 
-    while (inputIndex < input.length && targetIndex < target.length) {
-      if (input[inputIndex] == target[targetIndex]) {
-        positions.add(targetIndex);
-        inputIndex++;
+    // 按顺序查找每个输入字符在目标字符串中的匹配位置
+    while (inputCharIndex < input.length && targetCharIndex < target.length) {
+      if (input[inputCharIndex] == target[targetCharIndex]) {
+        matchPositions.add(targetCharIndex);
+        inputCharIndex++;
       }
-      targetIndex++;
+      targetCharIndex++;
     }
 
-    if (inputIndex == input.length) {
-      return positions;
+    // 如果匹配了所有输入字符，返回匹配位置
+    if (inputCharIndex == input.length) {
+      return matchPositions;
     }
 
     return null;
   }
 
-  /// Calculates a score for prefix matches (0.0 to 1.0).
-  static double _calculatePrefixScore(String input, String target) {
-    if (target.isEmpty) return 0.0;
-    return input.length / target.length;
-  }
+  // ==================== 评分算法 ====================
 
-  /// Calculates a score for substring matches (0.0 to 1.0).
-  static double _calculateSubstringScore(
-    String input,
-    String target,
-    int index,
-  ) {
-    if (target.isEmpty) return 0.0;
-    // Prefer matches closer to the start
-    final positionFactor = 1.0 - (index / target.length) * 0.3;
-    final lengthFactor = input.length / target.length;
-    return lengthFactor * positionFactor;
-  }
-
-  /// Calculates a score for fuzzy matches (0.0 to 1.0).
-  static double _calculateFuzzyScore(
+  /// 计算模糊匹配的统一分数（0.0 到 1.0）。
+  ///
+  /// 算法通过加权组合四个关键因素来评估匹配质量：
+  ///
+  /// 1. 前缀匹配奖励 (权重 0.5)
+  ///    - 完美前缀匹配：输入完全是目标的前缀，得分 1.0
+  ///    - 部分前缀匹配：匹配从开头连续开始，得分 0.8
+  ///    - 普通匹配：无奖励
+  ///
+  /// 2. 位置偏好分数 (权重 0.3)
+  ///    - 越接近目标开头位置的匹配，得分越高
+  ///    - 使用指数衰减函数，避免长文本的绝对位置劣势
+  ///
+  /// 3. 连续性分数 (权重 0.15)
+  ///    - 匹配字符间间隙越小（越连续），得分越高
+  ///    - 完美连续匹配得 1.0，随间隙增加呈指数下降
+  ///
+  /// 4. 长度覆盖率 (权重 0.05)
+  ///    - 输入长度占目标长度的比例
+  ///    - 防止过短输入获得不合理高分
+  ///
+  /// 最终得分 = (前缀奖励 × 0.5 + 位置分数 × 0.3 + 连续性分数 × 0.15 + 覆盖率 × 0.05)
+  static double _calculateUnifiedScore(
     String input,
     String target,
     List<int> positions,
   ) {
+    // 边界情况：空目标或空位置列表，返回最低分
     if (target.isEmpty || positions.isEmpty) return 0.0;
 
-    final lengthScore = input.length / target.length;
-    final continuityScore = _calculateContinuityScore(positions);
-    final positionScore = _calculatePositionScore(positions, target.length);
+    // 计算四个评分因子的得分
+    final double prefixBonus = _calculatePrefixBonus(input, target, positions);
+    final double positionScore =
+        _calculatePositionPreference(positions, target.length);
+    final double continuityScore = _calculateContinuityScore(positions);
+    final double lengthCoverage = input.length / target.length;
 
-    return (lengthScore * 0.4 + continuityScore * 0.4 + positionScore * 0.2)
-        .clamp(0.0, 1.0);
+    // 加权组合所有因子，确保结果在有效范围内
+    final double finalScore = prefixBonus * _prefixMatchWeight +
+        positionScore * _positionPreferenceWeight +
+        continuityScore * _continuityWeight +
+        lengthCoverage * _lengthCoverageWeight;
+
+    return finalScore.clamp(0.0, 1.0);
   }
 
-  /// Calculates a score for acronym matches (0.0 to 1.0).
-  static double _calculateAcronymScore(
-    String input,
-    String target,
-    List<int> positions,
-  ) {
-    return _calculateFuzzyScore(input, target, positions) * 1.1;
-  }
+  // ==================== 辅助方法 ====================
 
-  /// Calculates continuity score based on position gaps.
-  static double _calculateContinuityScore(List<int> positions) {
-    if (positions.length <= 1) return 1.0;
-
-    int gaps = 0;
+  /// 检查位置列表是否连续（每个位置比前一个大1）。
+  static bool _isConsecutive(List<int> positions) {
     for (int i = 1; i < positions.length; i++) {
-      if (positions[i] != positions[i - 1] + 1) {
-        gaps++;
-      }
+      if (positions[i] != positions[i - 1] + 1) return false;
+    }
+    return true;
+  }
+
+  /// 计算前缀匹配奖励。
+  ///
+  /// 如果输入是目标字符串的前缀，返回高分。
+  /// 前缀匹配比普通匹配更重要。
+  static double _calculatePrefixBonus(
+      String input, String target, List<int> positions) {
+    // 检查是否是完美前缀匹配：匹配位置连续从开头开始且匹配全部输入
+    if (positions.length == input.length &&
+        positions.isNotEmpty &&
+        positions[0] == 0 &&
+        _isConsecutive(positions)) {
+      return 1.0; // 完美前缀匹配
     }
 
-    return 1.0 / (1.0 + gaps);
+    // 检查部分前缀匹配：匹配位置连续且从开头开始
+    final isPrefixMatch = positions.isNotEmpty &&
+        positions[0] == 0 && // 从开头开始
+        _isConsecutive(positions); // 连续
+
+    return isPrefixMatch ? 0.8 : 0.0;
   }
 
-  /// Calculates position score (prefer matches at the start).
-  static double _calculatePositionScore(List<int> positions, int targetLength) {
+  /// 根据位置间隙计算连续性分数。
+  ///
+  /// 该算法衡量匹配字符的连续程度：
+  ///
+  /// 1. 计算总间隙：遍历所有相邻匹配位置间的字符数
+  ///    间隙 = 后一个位置 - 前一个位置 - 1
+  ///    例如：[1,2,4]的间隙为 (2-1-1) + (4-2-1) = 0 + 1 = 1
+  ///
+  /// 2. 应用指数衰减：间隙为0时得分为1.0，随间隙增加呈指数下降
+  ///    得分 = 1.0 / (1.0 + 总间隙 × 衰减因子)
+  ///
+  /// 这种设计使得连续匹配获得最高分，分散匹配得分较低。
+  static double _calculateContinuityScore(List<int> positions) {
+    // 边界情况：单个字符或空列表，认为是完美连续
+    if (positions.length <= 1) return 1.0;
+
+    // 计算所有相邻匹配位置间的间隙总和
+    int totalCharacterGaps = 0;
+    for (int i = 1; i < positions.length; i++) {
+      final int charactersBetweenMatches =
+          positions[i] - positions[i - 1] - 1; // -1是因为连续位置间应相差1
+      totalCharacterGaps += charactersBetweenMatches;
+    }
+
+    // 间隙越小得分越高，使用指数衰减函数
+    final double continuityScore =
+        1.0 / (1.0 + totalCharacterGaps * _gapDecayFactor);
+
+    return continuityScore.clamp(0.0, 1.0);
+  }
+
+  /// 计算位置偏好分数。
+  ///
+  /// 该算法偏好在目标字符串中出现较早的匹配，通过以下步骤计算：
+  ///
+  /// 1. 计算起始位置得分：匹配序列第一个字符的位置
+  ///    得分 = 1.0 / (1.0 + 起始位置 × 衰减因子)
+  ///    起始位置为0时得分为1.0，随位置增加呈指数下降
+  ///
+  /// 2. 计算平均位置得分：所有匹配位置的平均值
+  ///    得分 = 1.0 / (1.0 + 平均位置 × 衰减因子)
+  ///    衰减速度比起始位置稍慢
+  ///
+  /// 3. 组合两个得分：起始位置权重更高，因为它更重要
+  ///    最终得分 = 起始得分 × 0.7 + 平均得分 × 0.3
+  ///
+  /// 这种设计确保了匹配越早开始且位置越集中，得分越高。
+  static double _calculatePositionPreference(
+      List<int> positions, int targetLength) {
+    // 边界情况：目标为空或无匹配位置
     if (targetLength == 0 || positions.isEmpty) return 0.0;
-    final avgPosition = positions.reduce((a, b) => a + b) / positions.length;
-    return 1.0 - (avgPosition / targetLength) * 0.5;
+
+    // 提取关键位置指标
+    final int startPosition = positions[0]; // 匹配序列的起始位置
+
+    // 计算所有匹配位置的平均值
+    int sumOfPositions = 0;
+    for (final position in positions) {
+      sumOfPositions += position;
+    }
+    final double averageMatchPosition = sumOfPositions / positions.length;
+
+    // 计算起始位置得分：越靠前得分越高
+    final double startScore =
+        1.0 / (1.0 + startPosition * _startPositionDecayFactor);
+
+    // 计算平均位置得分：衰减速度稍慢
+    final double averageScore =
+        1.0 / (1.0 + averageMatchPosition * _averagePositionDecayFactor);
+
+    // 组合两个得分，起始位置权重更高
+    final double combinedScore = startScore * _startPositionWeight +
+        averageScore * _averagePositionWeight;
+
+    return combinedScore.clamp(0.0, 1.0);
   }
 }

@@ -28,13 +28,12 @@ class FuzzyMatchCodePrompt extends CodeKeywordPrompt {
   int get hashCode => word.hashCode;
 
   /// Builds a TextSpan with highlighted match positions.
-  /// 
+  ///
   /// If [cachedResult] is provided, it will be used instead of recalculating.
   /// This improves performance when the result was already computed during sorting.
   TextSpan getTextSpan(BuildContext context, String input,
       [FuzzyMatchResult? cachedResult]) {
-    final matchResult =
-        cachedResult ?? FuzzyMatch.matchWithResult(input, word);
+    final matchResult = cachedResult ?? FuzzyMatch.matchWithResult(input, word);
     final baseStyle = GoogleFonts.robotoMono(
       textStyle: Theme.of(context).textTheme.bodyMedium,
       color: Theme.of(context).colorScheme.onSurface,
@@ -137,6 +136,55 @@ class SQLEditorAutocompletePromptsBuilder
     _allKeywordPrompts.addAll(directPrompts);
   }
 
+  bool _isInsideString(Characters before, Characters after) {
+    // Check whether the position is inside a string
+    return before.containsSymbols(const ['\'', '"']) &&
+        after.containsSymbols(const ['\'', '"']);
+  }
+
+  String _extractWordBeforePosition(Characters characters, int endOffset) {
+    int start = endOffset - 1;
+    for (; start >= 0; start--) {
+      if (!characters.elementAt(start).isValidVariablePart) {
+        break;
+      }
+    }
+    return characters.getRange(start + 1, endOffset).string;
+  }
+
+  (String input, Iterable<CodePrompt> prompts) _extractInputAndPrompts(
+      Characters charactersBefore) {
+    // Handle dot notation (e.g., table.column)
+    if (charactersBefore.takeLast(1).string == '.') {
+      const input = '';
+      final target = _extractWordBeforePosition(
+          charactersBefore, charactersBefore.length - 1);
+      final prompts = relatedPrompts[target] ?? const [];
+      return (input, prompts);
+    }
+
+    // Handle regular input extraction
+    final input = _extractWordBeforePosition(charactersBefore, charactersBefore.length);
+    if (input.isEmpty) {
+      return ('', const []);
+    }
+
+    // Check if this is a qualified name (e.g., table.column)
+    if (charactersBefore.length > 1 &&
+        charactersBefore.elementAt(charactersBefore.length - 2) == '.') {
+      final target = _extractWordBeforePosition(
+          charactersBefore, charactersBefore.length - 1);
+      final allPrompts = relatedPrompts[target]?.where((prompt) => prompt.match(input)) ?? const [];
+      final prompts = _sortAndLimitPrompts(allPrompts, input);
+      return (input, prompts);
+    }
+
+    // Handle keyword/direct prompts
+    final allPrompts = _allKeywordPrompts.where((prompt) => prompt.match(input));
+    final prompts = _sortAndLimitPrompts(allPrompts, input);
+    return (input, prompts);
+  }
+
   @override
   CodeAutocompleteEditingValue? build(
       BuildContext context, CodeLine codeLine, CodeLineSelection selection) {
@@ -148,65 +196,27 @@ class SQLEditorAutocompletePromptsBuilder
     }
     final Characters charactersAfter =
         text.substring(selection.extentOffset).characters;
-    // FIXME：Check whether the position is inside a string
-    if (charactersBefore.containsSymbols(const ['\'', '"']) &&
-        charactersAfter.containsSymbols(const ['\'', '"'])) {
+
+    if (_isInsideString(charactersBefore, charactersAfter)) {
       return null;
     }
-    // TODO Should check operator `->` for some languages like c/c++
-    final Iterable<CodePrompt> prompts;
-    final String input;
-    if (charactersBefore.takeLast(1).string == '.') {
-      input = '';
-      int start = charactersBefore.length - 2;
-      for (; start >= 0; start--) {
-        if (!charactersBefore.elementAt(start).isValidVariablePart) {
-          break;
-        }
-      }
-      final String target = charactersBefore
-          .getRange(start + 1, charactersBefore.length - 1)
-          .string;
-      prompts = relatedPrompts[target] ?? const [];
-    } else {
-      int start = charactersBefore.length - 1;
-      for (; start >= 0; start--) {
-        if (!charactersBefore.elementAt(start).isValidVariablePart) {
-          break;
-        }
-      }
-      input =
-          charactersBefore.getRange(start + 1, charactersBefore.length).string;
-      if (input.isEmpty) {
-        return null;
-      }
-      if (start > 0 && charactersBefore.elementAt(start) == '.') {
-        final int mark = start;
-        for (start = start - 1; start >= 0; start--) {
-          if (!charactersBefore.elementAt(start).isValidVariablePart) {
-            break;
-          }
-        }
-        final String target = charactersBefore.getRange(start + 1, mark).string;
-        final allPrompts =
-            relatedPrompts[target]?.where((prompt) => prompt.match(input)) ??
-                const [];
-        prompts = _sortAndLimitPrompts(allPrompts, input);
-      } else {
-        final allPrompts =
-            _allKeywordPrompts.where((prompt) => prompt.match(input));
-        prompts = _sortAndLimitPrompts(allPrompts, input);
-      }
+
+    final (input, prompts) = _extractInputAndPrompts(charactersBefore);
+
+    if (input.isEmpty && prompts.isEmpty) {
+      return null;
     }
+
     if (prompts.isEmpty) {
       return null;
     }
+
     return CodeAutocompleteEditingValue(
         input: input, prompts: prompts.toList(), index: 0);
   }
 
   /// Sorts prompts by match score and limits the result count for performance.
-  /// 
+  ///
   /// Limits to top 100 matches to prevent UI lag when there are many candidates.
   static const int _maxPrompts = 100;
 
@@ -234,10 +244,7 @@ class SQLEditorAutocompletePromptsBuilder
 
     // Sort by score (descending) and limit
     scoredPrompts.sort((a, b) => b.$2.compareTo(a.$2));
-    return scoredPrompts
-        .take(_maxPrompts)
-        .map((item) => item.$1)
-        .toList();
+    return scoredPrompts.take(_maxPrompts).map((item) => item.$1).toList();
   }
 }
 
@@ -335,7 +342,7 @@ class _SQLEditorAutoCompleteListViewState
         size: 16,
       );
     }
-    
+
     if (prompt is DBObjectPrompt) {
       switch (prompt.type) {
         case MetaType.instance:
