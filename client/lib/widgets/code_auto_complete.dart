@@ -28,9 +28,6 @@ class FuzzyMatchCodePrompt extends CodeKeywordPrompt {
   int get hashCode => word.hashCode;
 
   /// Builds a TextSpan with highlighted match positions.
-  ///
-  /// If [cachedResult] is provided, it will be used instead of recalculating.
-  /// This improves performance when the result was already computed during sorting.
   TextSpan getTextSpan(BuildContext context, String input,
       [FuzzyMatchResult? cachedResult]) {
     final matchResult = cachedResult ?? FuzzyMatch.matchWithResult(input, word);
@@ -107,6 +104,14 @@ extension _CodeAutocompleteStringExtension on String {
         (char >= 48 && char <= 57) || // 0–9
         char == 95; // _
   }
+
+  bool get isNumeric {
+    if (isEmpty) return false;
+    for (var codeUnit in codeUnits) {
+      if (codeUnit < 48 || codeUnit > 57) return false; // '0'~'9'
+    }
+    return true;
+  }
 }
 
 extension _CodeAutocompleteCharactersExtension on Characters {
@@ -152,22 +157,29 @@ class SQLEditorAutocompletePromptsBuilder
     return characters.getRange(start + 1, endOffset).string;
   }
 
-  (String input, Iterable<CodePrompt> prompts) _extractInputAndPrompts(
-      Characters charactersBefore) {
+  String _extractInput(Characters charactersBefore) {
     // Handle dot notation (e.g., table.column)
     if (charactersBefore.takeLast(1).string == '.') {
-      const input = '';
-      final target = _extractWordBeforePosition(
-          charactersBefore, charactersBefore.length - 1);
-      final prompts = relatedPrompts[target] ?? const [];
-      return (input, prompts);
+      return '';
     }
-
     // Handle regular input extraction
     final input =
         _extractWordBeforePosition(charactersBefore, charactersBefore.length);
-    if (input.isEmpty) {
-      return ('', const []);
+
+    // If input is empty and not a dot notation, no autocomplete needed
+    if (input.isEmpty && charactersBefore.takeLast(1).string != '.') {
+      return '';
+    }
+    return input;
+  }
+
+  Iterable<CodePrompt> _getPromptsForInput(
+      String input, Characters charactersBefore) {
+    // Handle dot notation (e.g., table.column)
+    if (charactersBefore.takeLast(1).string == '.') {
+      final target = _extractWordBeforePosition(
+          charactersBefore, charactersBefore.length - 1);
+      return relatedPrompts[target] ?? const [];
     }
 
     // Check if this is a qualified name (e.g., table.column)
@@ -178,15 +190,13 @@ class SQLEditorAutocompletePromptsBuilder
       final allPrompts =
           relatedPrompts[target]?.where((prompt) => prompt.match(input)) ??
               const [];
-      final prompts = _sortAndLimitPrompts(allPrompts, input);
-      return (input, prompts);
+      return _sortAndLimitPrompts(allPrompts, input);
     }
 
     // Handle keyword/direct prompts
     final allPrompts =
         _allKeywordPrompts.where((prompt) => prompt.match(input));
-    final prompts = _sortAndLimitPrompts(allPrompts, input);
-    return (input, prompts);
+    return _sortAndLimitPrompts(allPrompts, input);
   }
 
   @override
@@ -205,7 +215,12 @@ class SQLEditorAutocompletePromptsBuilder
       return null;
     }
 
-    final (input, prompts) = _extractInputAndPrompts(charactersBefore);
+    final input = _extractInput(charactersBefore);
+    // skip number;
+    if (input.isNumeric) {
+      return null;
+    }
+    final prompts = _getPromptsForInput(input, charactersBefore);
 
     if (input.isEmpty && prompts.isEmpty) {
       return null;
@@ -304,7 +319,6 @@ class SQLEditorAutoCompleteListView extends StatefulWidget
 
 class _SQLEditorAutoCompleteListViewState
     extends State<SQLEditorAutoCompleteListView> {
-
   @override
   void initState() {
     widget.notifier.addListener(_onValueChanged);
@@ -316,7 +330,6 @@ class _SQLEditorAutoCompleteListViewState
     widget.notifier.removeListener(_onValueChanged);
     super.dispose();
   }
-
 
   Widget _buildPromptText(BuildContext context, CodePrompt prompt) {
     final baseStyle = GoogleFonts.robotoMono(
