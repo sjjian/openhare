@@ -304,9 +304,6 @@ class SQLEditorAutoCompleteListView extends StatefulWidget
 
 class _SQLEditorAutoCompleteListViewState
     extends State<SQLEditorAutoCompleteListView> {
-  // Cache for match results to avoid recalculating during rendering
-  final Map<CodePrompt, FuzzyMatchResult> _matchResultCache = {};
-  String _cachedInput = '';
 
   @override
   void initState() {
@@ -320,23 +317,6 @@ class _SQLEditorAutoCompleteListViewState
     super.dispose();
   }
 
-  void _updateCache() {
-    final input = widget.notifier.value.input;
-    if (input == _cachedInput) {
-      return; // Cache is still valid
-    }
-
-    _matchResultCache.clear();
-    _cachedInput = input;
-
-    // Pre-compute match results for all FuzzyMatchCodePrompt prompts
-    for (final prompt in widget.notifier.value.prompts) {
-      if (prompt is FuzzyMatchCodePrompt) {
-        _matchResultCache[prompt] =
-            FuzzyMatch.matchWithResult(input, prompt.word);
-      }
-    }
-  }
 
   Widget _buildPromptText(BuildContext context, CodePrompt prompt) {
     final baseStyle = GoogleFonts.robotoMono(
@@ -346,12 +326,8 @@ class _SQLEditorAutoCompleteListViewState
 
     if (prompt is FuzzyMatchCodePrompt) {
       final input = widget.notifier.value.input;
-      // Update cache if needed
-      _updateCache();
-      // Use cached result if available
-      final cachedResult = _matchResultCache[prompt];
       return Text.rich(
-        prompt.getTextSpan(context, input, cachedResult),
+        prompt.getTextSpan(context, input),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       );
