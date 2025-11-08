@@ -164,7 +164,8 @@ class SQLEditorAutocompletePromptsBuilder
     }
 
     // Handle regular input extraction
-    final input = _extractWordBeforePosition(charactersBefore, charactersBefore.length);
+    final input =
+        _extractWordBeforePosition(charactersBefore, charactersBefore.length);
     if (input.isEmpty) {
       return ('', const []);
     }
@@ -174,13 +175,16 @@ class SQLEditorAutocompletePromptsBuilder
         charactersBefore.elementAt(charactersBefore.length - 2) == '.') {
       final target = _extractWordBeforePosition(
           charactersBefore, charactersBefore.length - 1);
-      final allPrompts = relatedPrompts[target]?.where((prompt) => prompt.match(input)) ?? const [];
+      final allPrompts =
+          relatedPrompts[target]?.where((prompt) => prompt.match(input)) ??
+              const [];
       final prompts = _sortAndLimitPrompts(allPrompts, input);
       return (input, prompts);
     }
 
     // Handle keyword/direct prompts
-    final allPrompts = _allKeywordPrompts.where((prompt) => prompt.match(input));
+    final allPrompts =
+        _allKeywordPrompts.where((prompt) => prompt.match(input));
     final prompts = _sortAndLimitPrompts(allPrompts, input);
     return (input, prompts);
   }
@@ -262,10 +266,37 @@ class SQLEditorAutoCompleteListView extends StatefulWidget
   }) : super(key: key);
 
   @override
-  Size get preferredSize => Size(
-      450,
+  Size get preferredSize {
+    // 计算最长的提示词的宽度
+    CodePrompt? maxLengthPrompt;
+    for (final prompt in notifier.value.prompts) {
+      if (prompt.word.length > (maxLengthPrompt?.word.length ?? 0)) {
+        maxLengthPrompt = prompt;
+      }
+    }
+    double textWidth = 0;
+    if (maxLengthPrompt != null) {
+      final fullTextPainter = TextPainter(
+        text: TextSpan(
+          text: maxLengthPrompt.word,
+          // todo: 这里未指定字体大小，可能会导致调整了字体之后计算不匹配的问题
+          style: GoogleFonts.robotoMono(),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      fullTextPainter.layout();
+      textWidth = fullTextPainter.width;
+    }
+    // Calculate total width: icon(16) * 2 + spacing(5) * 3 + text width + padding(20)
+    double maxWidth = 16 * 2 + textWidth + kSpacingTiny * 3 + 20;
+
+    return Size(
+      // 长度在区间 400 - 800 之间
+      min(max(maxWidth, 400.0), 600.0),
       // 2 is border size
-      min(kItemHeight * notifier.value.prompts.length, 250) + 2);
+      min(kItemHeight * notifier.value.prompts.length, 250) + 2,
+    );
+  }
 
   @override
   State<StatefulWidget> createState() => _SQLEditorAutoCompleteListViewState();
@@ -436,8 +467,7 @@ class _SQLEditorAutoCompleteListViewState
                     children: [
                       getIcon(context, prompt),
                       const SizedBox(width: kSpacingTiny),
-                      _buildPromptText(context, prompt),
-                      const Spacer(),
+                      Expanded(child: _buildPromptText(context, prompt)),
                       const SizedBox(width: kSpacingTiny),
                       if (prompt is DBObjectPrompt &&
                           prompt.type == MetaType.column)
