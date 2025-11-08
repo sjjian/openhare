@@ -5,6 +5,7 @@ import 'package:client/services/ai/agent.dart';
 import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:client/l10n/app_localizations.dart';
@@ -134,10 +135,7 @@ class SystemSettingPage extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: kSpacingTiny),
-        const Divider(
-          thickness: kDividerThickness,
-          height: kDividerSize,
-        ),
+        const PixelDivider(),
         const SizedBox(height: kSpacingTiny),
         Row(
           children: [

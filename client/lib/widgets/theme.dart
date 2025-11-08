@@ -1,5 +1,15 @@
 import "package:flutter/material.dart";
 
+ThemeData defaultTheme(String theme) => ThemeData(
+      useMaterial3: true,
+      colorScheme: theme == "dark"
+          ? MaterialTheme.darkScheme()
+          : MaterialTheme.lightScheme(),
+      dividerColor: theme == "dark"
+          ? MaterialTheme.darkScheme().onSurfaceVariant
+          : const Color(0xffD3D9DF),
+    );
+
 class MaterialTheme {
   final TextTheme textTheme;
 
@@ -149,10 +159,9 @@ class MaterialTheme {
     ),
   );
 
-
   List<ExtendedColor> get extendedColors => [
-    customColor1,
-  ];
+        customColor1,
+      ];
 }
 
 class ExtendedColor {

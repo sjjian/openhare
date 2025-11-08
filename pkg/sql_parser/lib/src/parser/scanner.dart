@@ -14,6 +14,16 @@ class Pos {
   Pos copy() {
     return Pos(cursor, line, row);
   }
+
+  // 实现一个between 函数, 判断是否在两个Pos之间, 
+  // 基于line 和 row, 当line 等于start 的line时，row 必须小于等于start 的row, 
+  // 当line 等于end 的line时，row 必须大于等于end 的row.
+  bool between(Pos start, Pos end) {
+    return line >= start.line &&
+        line <= end.line &&
+        (line == start.line ? row >= start.row : true) &&
+        (line == end.line ? row <= end.row : true);
+  }
 }
 
 class Scanner {

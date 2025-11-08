@@ -67,6 +67,7 @@ class Char {
       char == $v ||
       char == $v ||
       char == $r ||
+      char == $n ||
       char == $f;
 
   static bool isUppercaseLatin(int char) => char >= A && char <= Z;

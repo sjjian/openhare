@@ -7,6 +7,7 @@ import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/button.dart';
+import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_parser/parser.dart';
@@ -24,19 +25,17 @@ class SessionOpBar extends ConsumerWidget {
 
   String getQuery() {
     var content = codeController.text.toString();
-    List<SQLChunk> querys = Splitter(content, ";").split();
+    List<SQLChunk> querys =
+        Splitter(content, ";", skipWhitespace: true, skipComment: true).split();
     CodeLineSelection s = codeController.selection;
     String query;
     // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
     if (!s.isCollapsed) {
       query = codeController.selectedText;
     } else {
-      int line = s.baseIndex + 1;
-      int row = s.baseOffset;
+      Pos cursor = Pos(0, s.baseIndex + 1, s.baseOffset);
       SQLChunk chunk = querys.firstWhere((chunk) {
-        if (line < chunk.end.line) {
-          return true;
-        } else if (line == chunk.end.line && row <= chunk.end.row) {
+        if (cursor.between(chunk.start, chunk.end)) {
           return true;
         }
         return false;
@@ -143,9 +142,11 @@ class SessionOpBar extends ConsumerWidget {
       onPressed: SQLConnectState.isIdle(model.state)
           ? () {
               String query = getQuery();
-              ref
-                  .read(sQLResultsServicesProvider.notifier)
-                  .query(model.sessionId, query);
+              if (query.isNotEmpty) {
+                ref
+                    .read(sQLResultsServicesProvider.notifier)
+                    .query(model.sessionId, query);
+              }
             }
           : () {
               connectDialog(context, ref, model);
@@ -214,12 +215,10 @@ class SessionOpBar extends ConsumerWidget {
     );
   }
 
-  Widget divider() {
-    return const VerticalDivider(
-      thickness: kDividerThickness,
-      width: kDividerSize,
-      indent: 10,
-      endIndent: 10,
+  Widget divider(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: kSpacingTiny),
+      child: PixelVerticalDivider(indent: 10, endIndent: 10),
     );
   }
 
@@ -244,16 +243,18 @@ class SessionOpBar extends ConsumerWidget {
         children: [
           // connect
           connectWidget(context, ref, model),
+
           // schema list
           SchemaBar(
             connId: model.connId,
             disable: !SQLConnectState.isIdle(model.state),
             currentSchema: model.currentSchema,
           ),
-          divider(),
+          divider(context),
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
+          divider(context),
           saveWidget(context, ref, model),
           const Expanded(child: SessionDrawerBar()),
         ],
@@ -285,69 +286,64 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          isEnter = true;
-        });
-      },
-      onExit: (_) {
-        setState(() {
-          isEnter = false;
-        });
-      },
-      child: GestureDetector(
-        onTapUp: (detail) async {
-          if (widget.disable) {
-            return;
-          }
-          final position = detail.globalPosition;
-          final RenderBox overlay =
-              Overlay.of(context).context.findRenderObject() as RenderBox;
-          final overlayPos = overlay.localToGlobal(Offset.zero);
-
-          List<String> schemas = await ref
-              .read(sessionConnsServicesProvider.notifier)
-              .getSchemas(widget.connId!);
-
-          // todo
-          showMenu(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                position.dx - overlayPos.dx,
-                position.dy - overlayPos.dy,
-                position.dx - overlayPos.dx,
-                position.dy - overlayPos.dy,
-              ),
-              items: schemas.map((schema) {
-                return PopupMenuItem<String>(
-                    height: 30,
-                    onTap: () async {
-                      await ref
-                          .read(sessionConnsServicesProvider.notifier)
-                          .setCurrentSchema(widget.connId!, schema);
-                    },
-                    child: Text(schema, overflow: TextOverflow.ellipsis));
-              }).toList());
+    final color = (isEnter && !widget.disable)
+        ? Theme.of(context).colorScheme.primary // schema 鼠标移入的颜色
+        : Theme.of(context).colorScheme.onSurface;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: MouseRegion(
+        onEnter: (_) {
+          setState(() {
+            isEnter = true;
+          });
         },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
+        onExit: (_) {
+          setState(() {
+            isEnter = false;
+          });
+        },
+        child: GestureDetector(
+          onTapUp: (detail) async {
+            if (widget.disable) {
+              return;
+            }
+            final position = detail.globalPosition;
+            final RenderBox overlay =
+                Overlay.of(context).context.findRenderObject() as RenderBox;
+            final overlayPos = overlay.localToGlobal(Offset.zero);
+
+            List<String> schemas = await ref
+                .read(sessionConnsServicesProvider.notifier)
+                .getSchemas(widget.connId!);
+
+            // todo
+            showMenu(
+                context: context,
+                position: RelativeRect.fromLTRB(
+                  position.dx - overlayPos.dx,
+                  position.dy - overlayPos.dy,
+                  position.dx - overlayPos.dx,
+                  position.dy - overlayPos.dy,
+                ),
+                items: schemas.map((schema) {
+                  return PopupMenuItem<String>(
+                      height: 30,
+                      onTap: () async {
+                        await ref
+                            .read(sessionConnsServicesProvider.notifier)
+                            .setCurrentSchema(widget.connId!, schema);
+                      },
+                      child: Text(schema, overflow: TextOverflow.ellipsis));
+                }).toList());
+          },
           child: Container(
-              padding: const EdgeInsets.only(left: kSpacingTiny),
-              decoration: BoxDecoration(
-                color: (isEnter && !widget.disable)
-                    ? Theme.of(context)
-                        .colorScheme
-                        .primaryContainer // schema 鼠标移入的颜色
-                    : null,
-                borderRadius: BorderRadius.circular(5),
-              ),
+              padding:
+                  const EdgeInsets.fromLTRB(0, kSpacingTiny, 0, kSpacingTiny),
               child: Row(
                 children: [
                   HugeIcon(
                     icon: HugeIcons.strokeRoundedDatabase,
-                    color: widget.iconColor ??
-                        Theme.of(context).colorScheme.onSurface,
+                    color: color,
                     size: kIconSizeSmall,
                   ),
                   Container(
@@ -358,6 +354,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
                           child: Text(
                             widget.currentSchema ?? "",
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: color),
                           ))),
                 ],
               )),

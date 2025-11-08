@@ -33,7 +33,6 @@ openhare is a professional, cross-platform desktop SQL query tool built with Flu
 
 ### UI & UX
 - [SQL Editor](https://github.com/reqable/re-editor)
-- [PlutoGrid](https://github.com/bosskmk/pluto_grid) (Data grid)
 - [HugeIcons](https://github.com/hugeicons/hugeicons-flutter)
 - [Window Manager](https://github.com/leanflutter/window_manager)
 

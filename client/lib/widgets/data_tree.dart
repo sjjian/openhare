@@ -6,6 +6,7 @@ import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:client/widgets/tooltip.dart';
 
 abstract class DataNode {
   List<DataNode> get children;
@@ -56,7 +57,6 @@ DataNode buildMetadataTree(DataNode parent, List<MetaDataNode>? nodes) {
 }
 
 class RootNode implements DataNode {
-
   final List<DataNode> _children = List.empty(growable: true);
 
   RootNode();
@@ -98,7 +98,6 @@ class RootNode implements DataNode {
   }
 }
 
-
 class FolderNode extends RootNode {
   FolderNode() : super();
 
@@ -125,9 +124,8 @@ class FolderNode extends RootNode {
   @override
   Widget builder(BuildContext context, bool isOpen) {
     final name = _name(context);
-    return Text(
-      children.isNotEmpty ? "$name  [${_children.length}]" : name,
-      overflow: TextOverflow.ellipsis,
+    return TooltipText(
+      text: children.isNotEmpty ? "$name  [${_children.length}]" : name,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -205,13 +203,12 @@ class DataValueNode extends RootNode {
 
   @override
   Widget builder(BuildContext context, bool isOpen) {
-    return Text(
-      name,
+    return TooltipText(
+      text: name,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
           color: isOpen
               ? Theme.of(context).colorScheme.onPrimaryContainer
               : Theme.of(context).colorScheme.onSurface),
-      overflow: TextOverflow.ellipsis,
     );
   }
 }
@@ -277,8 +274,13 @@ class ColumnValueNode extends DataValueNode {
 
 class DataTree extends StatefulWidget {
   final TreeController<DataNode> controller;
+  final ScrollController? scrollController;
 
-  const DataTree({Key? key, required this.controller}) : super(key: key);
+  const DataTree({
+    Key? key,
+    required this.controller,
+    this.scrollController,
+  }) : super(key: key);
 
   @override
   State<DataTree> createState() => _DataTreeState();
@@ -289,6 +291,7 @@ class _DataTreeState extends State<DataTree> {
   Widget build(BuildContext context) {
     return TreeView<DataNode>(
       treeController: widget.controller,
+      controller: widget.scrollController,
       nodeBuilder: (BuildContext context, TreeEntry<DataNode> entry) {
         return MyTreeTile(
           key: ValueKey(entry.node),
@@ -339,13 +342,13 @@ class _MyTreeTileState extends State<MyTreeTile> {
           color: isEnter
               ? Theme.of(context)
                   .colorScheme
-                  .surfaceContainer // meta data detail 鼠标移入的颜色
+                  .surfaceContainer // meta data detail 鼠标移入的颜色.
               : null,
           child: TreeIndentation(
             entry: widget.entry,
             guide: const IndentGuide.scopingLines(
               indent: 10,
-              thickness: 0.2,
+              thickness: 0.01, // 线条无法取消，只能设置成更细让无法看到.
               origin: 0.2,
             ),
             child: SizedBox(

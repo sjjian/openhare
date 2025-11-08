@@ -354,10 +354,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (SessionStorage object, fb.Builder fbb) {
-        final currentSchemaOffset =
-            object.currentSchema == null
-                ? null
-                : fbb.writeString(object.currentSchema!);
+        final currentSchemaOffset = object.currentSchema == null
+            ? null
+            : fbb.writeString(object.currentSchema!);
         fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.instance.targetId);
@@ -487,24 +486,25 @@ obx_int.ModelDefinition getObjectBoxModel() {
           (const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0) / 1000)
               .round(),
         );
-        final object = InstanceStorage(
-            id: idParam,
-            stDbType: stDbTypeParam,
-            name: nameParam,
-            host: hostParam,
-            port: portParam,
-            user: userParam,
-            password: passwordParam,
-            desc: descParam,
-            stCustom: stCustomParam,
-            initQuerys: initQuerysParam,
-            createdAt: createdAtParam,
-            latestOpenAt: latestOpenAtParam,
-          )
-          ..stActiveSchemas = const fb.ListReader<String>(
-            fb.StringReader(asciiOptimization: true),
-            lazy: false,
-          ).vTableGet(buffer, rootOffset, 28, []);
+        final object =
+            InstanceStorage(
+                id: idParam,
+                stDbType: stDbTypeParam,
+                name: nameParam,
+                host: hostParam,
+                port: portParam,
+                user: userParam,
+                password: passwordParam,
+                desc: descParam,
+                stCustom: stCustomParam,
+                initQuerys: initQuerysParam,
+                createdAt: createdAtParam,
+                latestOpenAt: latestOpenAtParam,
+              )
+              ..stActiveSchemas = const fb.ListReader<String>(
+                fb.StringReader(asciiOptimization: true),
+                lazy: false,
+              ).vTableGet(buffer, rootOffset, 28, []);
 
         return object;
       },
@@ -518,8 +518,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (SessionCodeStorage object, fb.Builder fbb) {
-        final textOffset =
-            object.text == null ? null : fbb.writeString(object.text!);
+        final textOffset = object.text == null
+            ? null
+            : fbb.writeString(object.text!);
         fbb.startTable(3);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, textOffset);

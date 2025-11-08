@@ -204,6 +204,7 @@ abstract class SessionStatusModel with _$SessionStatusModel {
 @freezed
 abstract class SessionSQLEditorModel with _$SessionSQLEditorModel {
   const factory SessionSQLEditorModel({
+    required SessionId sessionId,
     String? currentSchema,
     List<MetaDataNode>? metadata,
   }) = _SessionSQLEditorModel;

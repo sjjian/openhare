@@ -151,4 +151,25 @@ void main() {
     expect(s.pos.row, 1);
     expect(s.pos.cursor, 37);
   });
+
+  test('test between', () {
+    // 测试line > start.line and line < end.line
+    expect(Pos(0, 1, 1).between(Pos(0, 0, 1), Pos(0, 2, 1)), true);
+    
+    // 测试 line = start.line
+    expect(Pos(0, 1, 1).between(Pos(0, 1, 1), Pos(0, 2, 1)), true);
+    expect(Pos(0, 1, 1).between(Pos(0, 1, 2), Pos(0, 2, 1)), false);
+
+    // 测试 line = end.line
+    expect(Pos(0, 2, 1).between(Pos(0, 1, 1), Pos(0, 2, 1)), true);
+    expect(Pos(0, 2, 2).between(Pos(0, 1, 1), Pos(0, 2, 1)), false);
+
+    // 测试 line > start.line and line < end.line
+    expect(Pos(0, 2, 1).between(Pos(0, 1, 1), Pos(0, 2, 1)), true);
+    expect(Pos(0, 2, 1).between(Pos(0, 0, 1), Pos(0, 1, 1)), false);
+    expect(Pos(0, 2, 1).between(Pos(0, 1, 1), Pos(0, 0, 1)), false);
+    
+    // 测试line = start.line and line = end.line
+    expect(Pos(0, 1, 1).between(Pos(0, 1, 1), Pos(0, 1, 1)), true);
+  });
 }

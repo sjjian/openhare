@@ -8,9 +8,10 @@ import 'package:client/services/sessions/session_chat.dart';
 import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/settings/settings.dart';
-import 'package:client/utils/sql_highlight.dart';
+import 'package:client/widgets/sql_highlight.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/menu.dart';
@@ -563,11 +564,7 @@ class _SqlChatFieldState extends State<SqlChatField> {
               ),
             ],
           ),
-          Divider(
-            height: kBlockDividerSize,
-            thickness: kBlockDividerThickness,
-            color: Theme.of(context).dividerColor,
-          ),
+          const PixelDivider(),
           const SizedBox(height: kSpacingSmall),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,

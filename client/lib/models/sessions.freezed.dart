@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -69,6 +68,163 @@ class _$SessionIdCopyWithImpl<$Res> implements $SessionIdCopyWith<$Res> {
           : value // ignore: cast_nullable_to_non_nullable
               as int,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionId].
+extension SessionIdPatterns on SessionId {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionId value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionId() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionId value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionId():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionId value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionId() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionId() when $default != null:
+        return $default(_that.value);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionId():
+        return $default(_that.value);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionId() when $default != null:
+        return $default(_that.value);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -268,6 +424,172 @@ class _$SessionModelCopyWithImpl<$Res> implements $SessionModelCopyWith<$Res> {
     return $ConnIdCopyWith<$Res>(_self.connId!, (value) {
       return _then(_self.copyWith(connId: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionModel].
+extension SessionModelPatterns on SessionModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(SessionId sessionId, InstanceId? instanceId,
+            ConnId? connId, String? currentSchema)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionModel() when $default != null:
+        return $default(_that.sessionId, _that.instanceId, _that.connId,
+            _that.currentSchema);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(SessionId sessionId, InstanceId? instanceId,
+            ConnId? connId, String? currentSchema)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionModel():
+        return $default(_that.sessionId, _that.instanceId, _that.connId,
+            _that.currentSchema);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(SessionId sessionId, InstanceId? instanceId,
+            ConnId? connId, String? currentSchema)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionModel() when $default != null:
+        return $default(_that.sessionId, _that.instanceId, _that.connId,
+            _that.currentSchema);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -588,6 +910,214 @@ class _$SessionDetailModelCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SessionDetailModel].
+extension SessionDetailModelPatterns on SessionDetailModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionDetailModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionDetailModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionDetailModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            InstanceId? instanceId,
+            String? instanceName,
+            DatabaseType? dbType,
+            ConnId? connId,
+            SQLConnectState? connState,
+            String? connErrorMsg,
+            String? currentSchema)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailModel() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.instanceId,
+            _that.instanceName,
+            _that.dbType,
+            _that.connId,
+            _that.connState,
+            _that.connErrorMsg,
+            _that.currentSchema);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            InstanceId? instanceId,
+            String? instanceName,
+            DatabaseType? dbType,
+            ConnId? connId,
+            SQLConnectState? connState,
+            String? connErrorMsg,
+            String? currentSchema)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailModel():
+        return $default(
+            _that.sessionId,
+            _that.instanceId,
+            _that.instanceName,
+            _that.dbType,
+            _that.connId,
+            _that.connState,
+            _that.connErrorMsg,
+            _that.currentSchema);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            SessionId sessionId,
+            InstanceId? instanceId,
+            String? instanceName,
+            DatabaseType? dbType,
+            ConnId? connId,
+            SQLConnectState? connState,
+            String? connErrorMsg,
+            String? currentSchema)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailModel() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.instanceId,
+            _that.instanceName,
+            _that.dbType,
+            _that.connId,
+            _that.connState,
+            _that.connErrorMsg,
+            _that.currentSchema);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SessionDetailModel implements SessionDetailModel {
@@ -870,6 +1400,168 @@ class _$SessionListModelCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SessionListModel].
+extension SessionListModelPatterns on SessionListModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionListModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionListModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionListModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionListModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionListModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionListModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            List<SessionModel> sessions, SessionModel? selectedSession)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionListModel() when $default != null:
+        return $default(_that.sessions, _that.selectedSession);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<SessionModel> sessions, SessionModel? selectedSession)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionListModel():
+        return $default(_that.sessions, _that.selectedSession);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            List<SessionModel> sessions, SessionModel? selectedSession)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionListModel() when $default != null:
+        return $default(_that.sessions, _that.selectedSession);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SessionListModel implements SessionListModel {
@@ -1058,6 +1750,169 @@ class _$SessionDetailListModelCopyWithImpl<$Res>
     return $SessionDetailModelCopyWith<$Res>(_self.selectedSession!, (value) {
       return _then(_self.copyWith(selectedSession: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionDetailListModel].
+extension SessionDetailListModelPatterns on SessionDetailListModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionDetailListModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailListModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionDetailListModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailListModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionDetailListModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailListModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<SessionDetailModel> sessions,
+            SessionDetailModel? selectedSession)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailListModel() when $default != null:
+        return $default(_that.sessions, _that.selectedSession);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<SessionDetailModel> sessions,
+            SessionDetailModel? selectedSession)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailListModel():
+        return $default(_that.sessions, _that.selectedSession);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<SessionDetailModel> sessions,
+            SessionDetailModel? selectedSession)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDetailListModel() when $default != null:
+        return $default(_that.sessions, _that.selectedSession);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -1292,6 +2147,172 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SessionOpBarModel].
+extension SessionOpBarModelPatterns on SessionOpBarModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionOpBarModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionOpBarModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionOpBarModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionOpBarModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionOpBarModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionOpBarModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(SessionId sessionId, ConnId? connId,
+            SQLConnectState? state, String currentSchema, bool isRightPageOpen)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionOpBarModel() when $default != null:
+        return $default(_that.sessionId, _that.connId, _that.state,
+            _that.currentSchema, _that.isRightPageOpen);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(SessionId sessionId, ConnId? connId,
+            SQLConnectState? state, String currentSchema, bool isRightPageOpen)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionOpBarModel():
+        return $default(_that.sessionId, _that.connId, _that.state,
+            _that.currentSchema, _that.isRightPageOpen);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(SessionId sessionId, ConnId? connId,
+            SQLConnectState? state, String currentSchema, bool isRightPageOpen)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionOpBarModel() when $default != null:
+        return $default(_that.sessionId, _that.connId, _that.state,
+            _that.currentSchema, _that.isRightPageOpen);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SessionOpBarModel implements SessionOpBarModel {
@@ -1497,6 +2518,163 @@ class _$SessionEditorModelCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SessionEditorModel].
+extension SessionEditorModelPatterns on SessionEditorModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionEditorModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionEditorModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionEditorModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionEditorModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionEditorModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionEditorModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(CodeLineEditingController code)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionEditorModel() when $default != null:
+        return $default(_that.code);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(CodeLineEditingController code) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionEditorModel():
+        return $default(_that.code);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(CodeLineEditingController code)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionEditorModel() when $default != null:
+        return $default(_that.code);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SessionEditorModel implements SessionEditorModel {
@@ -1684,6 +2862,187 @@ class _$SessionDrawerModelCopyWithImpl<$Res>
     return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
       return _then(_self.copyWith(sessionId: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionDrawerModel].
+extension SessionDrawerModelPatterns on SessionDrawerModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionDrawerModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDrawerModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionDrawerModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDrawerModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionDrawerModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDrawerModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            DrawerPage drawerPage,
+            BaseQueryValue? sqlResult,
+            BaseQueryColumn? sqlColumn,
+            bool showRecord,
+            bool isRightPageOpen)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDrawerModel() when $default != null:
+        return $default(_that.sessionId, _that.drawerPage, _that.sqlResult,
+            _that.sqlColumn, _that.showRecord, _that.isRightPageOpen);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            DrawerPage drawerPage,
+            BaseQueryValue? sqlResult,
+            BaseQueryColumn? sqlColumn,
+            bool showRecord,
+            bool isRightPageOpen)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDrawerModel():
+        return $default(_that.sessionId, _that.drawerPage, _that.sqlResult,
+            _that.sqlColumn, _that.showRecord, _that.isRightPageOpen);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            SessionId sessionId,
+            DrawerPage drawerPage,
+            BaseQueryValue? sqlResult,
+            BaseQueryColumn? sqlColumn,
+            bool showRecord,
+            bool isRightPageOpen)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionDrawerModel() when $default != null:
+        return $default(_that.sessionId, _that.drawerPage, _that.sqlResult,
+            _that.sqlColumn, _that.showRecord, _that.isRightPageOpen);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -1898,6 +3257,169 @@ class _$SessionSplitViewModelCopyWithImpl<$Res>
           : metaDataSplitViewCtrl // ignore: cast_nullable_to_non_nullable
               as SplitViewController,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionSplitViewModel].
+extension SessionSplitViewModelPatterns on SessionSplitViewModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionSplitViewModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSplitViewModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionSplitViewModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSplitViewModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionSplitViewModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSplitViewModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(SplitViewController multiSplitViewCtrl,
+            SplitViewController metaDataSplitViewCtrl)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSplitViewModel() when $default != null:
+        return $default(_that.multiSplitViewCtrl, _that.metaDataSplitViewCtrl);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(SplitViewController multiSplitViewCtrl,
+            SplitViewController metaDataSplitViewCtrl)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSplitViewModel():
+        return $default(_that.multiSplitViewCtrl, _that.metaDataSplitViewCtrl);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(SplitViewController multiSplitViewCtrl,
+            SplitViewController metaDataSplitViewCtrl)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSplitViewModel() when $default != null:
+        return $default(_that.multiSplitViewCtrl, _that.metaDataSplitViewCtrl);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -2155,6 +3677,220 @@ class _$SessionStatusModelCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SessionStatusModel].
+extension SessionStatusModelPatterns on SessionStatusModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionStatusModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionStatusModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionStatusModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionStatusModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionStatusModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionStatusModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            String instanceName,
+            SQLConnectState? connState,
+            String? connErrorMsg,
+            ResultId? resultId,
+            SQLExecuteState state,
+            Duration? executeTime,
+            BigInt? affectedRows,
+            String? query)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionStatusModel() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.instanceName,
+            _that.connState,
+            _that.connErrorMsg,
+            _that.resultId,
+            _that.state,
+            _that.executeTime,
+            _that.affectedRows,
+            _that.query);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            String instanceName,
+            SQLConnectState? connState,
+            String? connErrorMsg,
+            ResultId? resultId,
+            SQLExecuteState state,
+            Duration? executeTime,
+            BigInt? affectedRows,
+            String? query)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionStatusModel():
+        return $default(
+            _that.sessionId,
+            _that.instanceName,
+            _that.connState,
+            _that.connErrorMsg,
+            _that.resultId,
+            _that.state,
+            _that.executeTime,
+            _that.affectedRows,
+            _that.query);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            SessionId sessionId,
+            String instanceName,
+            SQLConnectState? connState,
+            String? connErrorMsg,
+            ResultId? resultId,
+            SQLExecuteState state,
+            Duration? executeTime,
+            BigInt? affectedRows,
+            String? query)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionStatusModel() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.instanceName,
+            _that.connState,
+            _that.connErrorMsg,
+            _that.resultId,
+            _that.state,
+            _that.executeTime,
+            _that.affectedRows,
+            _that.query);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SessionStatusModel implements SessionStatusModel {
@@ -2355,6 +4091,7 @@ class __$SessionStatusModelCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$SessionSQLEditorModel {
+  SessionId get sessionId;
   String? get currentSchema;
   List<MetaDataNode>? get metadata;
 
@@ -2371,18 +4108,20 @@ mixin _$SessionSQLEditorModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is SessionSQLEditorModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
             const DeepCollectionEquality().equals(other.metadata, metadata));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentSchema,
+  int get hashCode => Object.hash(runtimeType, sessionId, currentSchema,
       const DeepCollectionEquality().hash(metadata));
 
   @override
   String toString() {
-    return 'SessionSQLEditorModel(currentSchema: $currentSchema, metadata: $metadata)';
+    return 'SessionSQLEditorModel(sessionId: $sessionId, currentSchema: $currentSchema, metadata: $metadata)';
   }
 }
 
@@ -2392,7 +4131,12 @@ abstract mixin class $SessionSQLEditorModelCopyWith<$Res> {
           $Res Function(SessionSQLEditorModel) _then) =
       _$SessionSQLEditorModelCopyWithImpl;
   @useResult
-  $Res call({String? currentSchema, List<MetaDataNode>? metadata});
+  $Res call(
+      {SessionId sessionId,
+      String? currentSchema,
+      List<MetaDataNode>? metadata});
+
+  $SessionIdCopyWith<$Res> get sessionId;
 }
 
 /// @nodoc
@@ -2408,10 +4152,15 @@ class _$SessionSQLEditorModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? sessionId = null,
     Object? currentSchema = freezed,
     Object? metadata = freezed,
   }) {
     return _then(_self.copyWith(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as SessionId,
       currentSchema: freezed == currentSchema
           ? _self.currentSchema
           : currentSchema // ignore: cast_nullable_to_non_nullable
@@ -2422,15 +4171,192 @@ class _$SessionSQLEditorModelCopyWithImpl<$Res>
               as List<MetaDataNode>?,
     ));
   }
+
+  /// Create a copy of SessionSQLEditorModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionSQLEditorModel].
+extension SessionSQLEditorModelPatterns on SessionSQLEditorModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionSQLEditorModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLEditorModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionSQLEditorModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLEditorModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionSQLEditorModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLEditorModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(SessionId sessionId, String? currentSchema,
+            List<MetaDataNode>? metadata)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLEditorModel() when $default != null:
+        return $default(_that.sessionId, _that.currentSchema, _that.metadata);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(SessionId sessionId, String? currentSchema,
+            List<MetaDataNode>? metadata)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLEditorModel():
+        return $default(_that.sessionId, _that.currentSchema, _that.metadata);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(SessionId sessionId, String? currentSchema,
+            List<MetaDataNode>? metadata)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLEditorModel() when $default != null:
+        return $default(_that.sessionId, _that.currentSchema, _that.metadata);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
 
 class _SessionSQLEditorModel implements SessionSQLEditorModel {
   const _SessionSQLEditorModel(
-      {this.currentSchema, final List<MetaDataNode>? metadata})
+      {required this.sessionId,
+      this.currentSchema,
+      final List<MetaDataNode>? metadata})
       : _metadata = metadata;
 
+  @override
+  final SessionId sessionId;
   @override
   final String? currentSchema;
   final List<MetaDataNode>? _metadata;
@@ -2457,18 +4383,20 @@ class _SessionSQLEditorModel implements SessionSQLEditorModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _SessionSQLEditorModel &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
             (identical(other.currentSchema, currentSchema) ||
                 other.currentSchema == currentSchema) &&
             const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentSchema,
+  int get hashCode => Object.hash(runtimeType, sessionId, currentSchema,
       const DeepCollectionEquality().hash(_metadata));
 
   @override
   String toString() {
-    return 'SessionSQLEditorModel(currentSchema: $currentSchema, metadata: $metadata)';
+    return 'SessionSQLEditorModel(sessionId: $sessionId, currentSchema: $currentSchema, metadata: $metadata)';
   }
 }
 
@@ -2480,7 +4408,13 @@ abstract mixin class _$SessionSQLEditorModelCopyWith<$Res>
       __$SessionSQLEditorModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String? currentSchema, List<MetaDataNode>? metadata});
+  $Res call(
+      {SessionId sessionId,
+      String? currentSchema,
+      List<MetaDataNode>? metadata});
+
+  @override
+  $SessionIdCopyWith<$Res> get sessionId;
 }
 
 /// @nodoc
@@ -2496,10 +4430,15 @@ class __$SessionSQLEditorModelCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? sessionId = null,
     Object? currentSchema = freezed,
     Object? metadata = freezed,
   }) {
     return _then(_SessionSQLEditorModel(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as SessionId,
       currentSchema: freezed == currentSchema
           ? _self.currentSchema
           : currentSchema // ignore: cast_nullable_to_non_nullable
@@ -2509,6 +4448,16 @@ class __$SessionSQLEditorModelCopyWithImpl<$Res>
           : metadata // ignore: cast_nullable_to_non_nullable
               as List<MetaDataNode>?,
     ));
+  }
+
+  /// Create a copy of SessionSQLEditorModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionIdCopyWith<$Res> get sessionId {
+    return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
+      return _then(_self.copyWith(sessionId: value));
+    });
   }
 }
 
@@ -2568,6 +4517,163 @@ class _$ConnIdCopyWithImpl<$Res> implements $ConnIdCopyWith<$Res> {
           : value // ignore: cast_nullable_to_non_nullable
               as int,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ConnId].
+extension ConnIdPatterns on ConnId {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ConnId value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ConnId() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ConnId value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ConnId():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ConnId value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ConnId() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ConnId() when $default != null:
+        return $default(_that.value);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ConnId():
+        return $default(_that.value);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ConnId() when $default != null:
+        return $default(_that.value);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -2722,6 +4828,166 @@ class _$SessionConnModelCopyWithImpl<$Res>
     return $ConnIdCopyWith<$Res>(_self.connId, (value) {
       return _then(_self.copyWith(connId: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionConnModel].
+extension SessionConnModelPatterns on SessionConnModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionConnModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionConnModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionConnModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(ConnId connId, SQLConnectState state, String? errorMsg)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnModel() when $default != null:
+        return $default(_that.connId, _that.state, _that.errorMsg);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(ConnId connId, SQLConnectState state, String? errorMsg)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnModel():
+        return $default(_that.connId, _that.state, _that.errorMsg);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(ConnId connId, SQLConnectState state, String? errorMsg)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnModel() when $default != null:
+        return $default(_that.connId, _that.state, _that.errorMsg);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -2887,6 +5153,163 @@ class _$SessionConnListModelCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SessionConnListModel].
+extension SessionConnListModelPatterns on SessionConnListModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionConnListModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnListModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionConnListModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnListModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionConnListModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnListModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(Map<ConnId, SessionConnModel> conns)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnListModel() when $default != null:
+        return $default(_that.conns);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(Map<ConnId, SessionConnModel> conns) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnListModel():
+        return $default(_that.conns);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(Map<ConnId, SessionConnModel> conns)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionConnListModel() when $default != null:
+        return $default(_that.conns);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SessionConnListModel implements SessionConnListModel {
@@ -3040,6 +5463,163 @@ class _$ResultIdCopyWithImpl<$Res> implements $ResultIdCopyWith<$Res> {
     return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
       return _then(_self.copyWith(sessionId: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [ResultId].
+extension ResultIdPatterns on ResultId {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ResultId value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ResultId() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ResultId value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ResultId():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ResultId value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ResultId() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(SessionId sessionId, int value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ResultId() when $default != null:
+        return $default(_that.sessionId, _that.value);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(SessionId sessionId, int value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ResultId():
+        return $default(_that.sessionId, _that.value);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(SessionId sessionId, int value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ResultId() when $default != null:
+        return $default(_that.sessionId, _that.value);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -3217,6 +5797,166 @@ class _$SQLResultModelCopyWithImpl<$Res>
     return $ResultIdCopyWith<$Res>(_self.resultId, (value) {
       return _then(_self.copyWith(resultId: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SQLResultModel].
+extension SQLResultModelPatterns on SQLResultModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SQLResultModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SQLResultModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SQLResultModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(ResultId resultId, String queryId, SQLExecuteState state)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultModel() when $default != null:
+        return $default(_that.resultId, _that.queryId, _that.state);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(ResultId resultId, String queryId, SQLExecuteState state)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultModel():
+        return $default(_that.resultId, _that.queryId, _that.state);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(ResultId resultId, String queryId, SQLExecuteState state)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultModel() when $default != null:
+        return $default(_that.resultId, _that.queryId, _that.state);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -3442,6 +6182,190 @@ class _$SQLResultDetailModelCopyWithImpl<$Res>
     return $ResultIdCopyWith<$Res>(_self.resultId, (value) {
       return _then(_self.copyWith(resultId: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SQLResultDetailModel].
+extension SQLResultDetailModelPatterns on SQLResultDetailModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SQLResultDetailModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultDetailModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SQLResultDetailModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultDetailModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SQLResultDetailModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultDetailModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            ResultId resultId,
+            SQLExecuteState state,
+            String? queryId,
+            String? query,
+            Duration? executeTime,
+            String? error,
+            BaseQueryResult? data)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultDetailModel() when $default != null:
+        return $default(_that.resultId, _that.state, _that.queryId, _that.query,
+            _that.executeTime, _that.error, _that.data);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            ResultId resultId,
+            SQLExecuteState state,
+            String? queryId,
+            String? query,
+            Duration? executeTime,
+            String? error,
+            BaseQueryResult? data)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultDetailModel():
+        return $default(_that.resultId, _that.state, _that.queryId, _that.query,
+            _that.executeTime, _that.error, _that.data);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            ResultId resultId,
+            SQLExecuteState state,
+            String? queryId,
+            String? query,
+            Duration? executeTime,
+            String? error,
+            BaseQueryResult? data)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultDetailModel() when $default != null:
+        return $default(_that.resultId, _that.state, _that.queryId, _that.query,
+            _that.executeTime, _that.error, _that.data);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -3701,6 +6625,169 @@ class _$SessionSQLResultsModelCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SessionSQLResultsModel].
+extension SessionSQLResultsModelPatterns on SessionSQLResultsModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionSQLResultsModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLResultsModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionSQLResultsModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLResultsModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionSQLResultsModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLResultsModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(SessionId sessionId, List<SQLResultModel> results,
+            SQLResultModel? selected)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLResultsModel() when $default != null:
+        return $default(_that.sessionId, _that.results, _that.selected);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(SessionId sessionId, List<SQLResultModel> results,
+            SQLResultModel? selected)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLResultsModel():
+        return $default(_that.sessionId, _that.results, _that.selected);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(SessionId sessionId, List<SQLResultModel> results,
+            SQLResultModel? selected)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionSQLResultsModel() when $default != null:
+        return $default(_that.sessionId, _that.results, _that.selected);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SessionSQLResultsModel implements SessionSQLResultsModel {
@@ -3891,6 +6978,163 @@ class _$SQLResultsModelCopyWithImpl<$Res>
           : cache // ignore: cast_nullable_to_non_nullable
               as Map<SessionId, SessionSQLResultsModel>,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [SQLResultsModel].
+extension SQLResultsModelPatterns on SQLResultsModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SQLResultsModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultsModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SQLResultsModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultsModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SQLResultsModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultsModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(Map<SessionId, SessionSQLResultsModel> cache)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultsModel() when $default != null:
+        return $default(_that.cache);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(Map<SessionId, SessionSQLResultsModel> cache) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultsModel():
+        return $default(_that.cache);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(Map<SessionId, SessionSQLResultsModel> cache)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SQLResultsModel() when $default != null:
+        return $default(_that.cache);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -4148,6 +7392,214 @@ class _$SessionAIChatModelCopyWithImpl<$Res>
     return $LLMAgentsModelCopyWith<$Res>(_self.llmAgents, (value) {
       return _then(_self.copyWith(llmAgents: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionAIChatModel].
+extension SessionAIChatModelPatterns on SessionAIChatModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionAIChatModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionAIChatModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionAIChatModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionAIChatModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionAIChatModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionAIChatModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            String? currentSchema,
+            DatabaseType? dbType,
+            List<MetaDataNode>? metadata,
+            ConnId? connId,
+            SQLConnectState? state,
+            AIChatModel chatModel,
+            LLMAgentsModel llmAgents)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionAIChatModel() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.currentSchema,
+            _that.dbType,
+            _that.metadata,
+            _that.connId,
+            _that.state,
+            _that.chatModel,
+            _that.llmAgents);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            SessionId sessionId,
+            String? currentSchema,
+            DatabaseType? dbType,
+            List<MetaDataNode>? metadata,
+            ConnId? connId,
+            SQLConnectState? state,
+            AIChatModel chatModel,
+            LLMAgentsModel llmAgents)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionAIChatModel():
+        return $default(
+            _that.sessionId,
+            _that.currentSchema,
+            _that.dbType,
+            _that.metadata,
+            _that.connId,
+            _that.state,
+            _that.chatModel,
+            _that.llmAgents);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            SessionId sessionId,
+            String? currentSchema,
+            DatabaseType? dbType,
+            List<MetaDataNode>? metadata,
+            ConnId? connId,
+            SQLConnectState? state,
+            AIChatModel chatModel,
+            LLMAgentsModel llmAgents)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionAIChatModel() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.currentSchema,
+            _that.dbType,
+            _that.metadata,
+            _that.connId,
+            _that.state,
+            _that.chatModel,
+            _that.llmAgents);
+      case _:
+        return null;
+    }
   }
 }
 
@@ -4449,6 +7901,169 @@ class _$SessionMetadataTreeModelCopyWithImpl<$Res>
     return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
       return _then(_self.copyWith(sessionId: value));
     });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionMetadataTreeModel].
+extension SessionMetadataTreeModelPatterns on SessionMetadataTreeModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionMetadataTreeModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionMetadataTreeModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionMetadataTreeModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionMetadataTreeModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionMetadataTreeModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionMetadataTreeModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(SessionId sessionId,
+            StateValue<TreeController<DataNode>> metadataTreeCtrl)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionMetadataTreeModel() when $default != null:
+        return $default(_that.sessionId, _that.metadataTreeCtrl);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(SessionId sessionId,
+            StateValue<TreeController<DataNode>> metadataTreeCtrl)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionMetadataTreeModel():
+        return $default(_that.sessionId, _that.metadataTreeCtrl);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(SessionId sessionId,
+            StateValue<TreeController<DataNode>> metadataTreeCtrl)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionMetadataTreeModel() when $default != null:
+        return $default(_that.sessionId, _that.metadataTreeCtrl);
+      case _:
+        return null;
+    }
   }
 }
 

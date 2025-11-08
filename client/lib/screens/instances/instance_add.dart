@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sql_parser/parser.dart';
-import 'package:client/utils/sql_highlight.dart';
+import 'package:client/widgets/sql_highlight.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:client/widgets/loading.dart';
 

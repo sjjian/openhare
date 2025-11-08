@@ -3,7 +3,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/repositories/sessions/sessions.dart';
 import 'package:client/services/instances/metadata.dart';
 import 'package:client/services/sessions/sessions.dart';
-import 'package:client/utils/sql_highlight.dart';
+import 'package:client/widgets/sql_highlight.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
 
@@ -37,12 +37,13 @@ class SelectedSessionSQLEditorNotifier
   SessionSQLEditorModel build() {
     SessionModel? sessionModel = ref.watch(selectedSessionNotifierProvider);
     if (sessionModel == null) {
-      return const SessionSQLEditorModel();
+      return const SessionSQLEditorModel(sessionId: SessionId(value: 0));
     }
     if (sessionModel.instanceId != null) {
       InstanceMetadataModel? sessionMeta =
           ref.watch(instanceMetadataServicesProvider(sessionModel.instanceId!));
       return SessionSQLEditorModel(
+        sessionId: sessionModel.sessionId,
         currentSchema: sessionModel.currentSchema,
         metadata: sessionMeta?.metadata
             .match((value) => value, (error) => null, () => null),
@@ -50,6 +51,7 @@ class SelectedSessionSQLEditorNotifier
     }
 
     return SessionSQLEditorModel(
+      sessionId: sessionModel.sessionId,
       currentSchema: sessionModel.currentSchema,
       metadata: null,
     );
