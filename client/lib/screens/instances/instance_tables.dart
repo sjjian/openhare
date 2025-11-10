@@ -35,9 +35,13 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
     return DataRow(cells: [
       DataCell(Row(
         children: [
-          Image.asset(connectionMetaMap[instance.dbType]!.logoAssertPath),
+          Image.asset(
+            connectionMetaMap[instance.dbType]!.logoAssertPath,
+            width: kIconSizeMedium,
+            height: kIconSizeMedium,
+          ),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: const EdgeInsets.only(left: kSpacingSmall),
             child: Text(instance.connectValue.name),
           )
         ],
@@ -142,6 +146,8 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                 scrollDirection: Axis.vertical,
                 child: DataTable(
                   checkboxHorizontalMargin: 0,
+                  horizontalMargin: 0,
+                  columnSpacing: 0,
                   dividerThickness: kDividerThickness,
                   showBottomBorder: true,
                   columns: column,
