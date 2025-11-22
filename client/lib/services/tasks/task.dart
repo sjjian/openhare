@@ -10,6 +10,7 @@ import 'package:client/models/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:excel/excel.dart' as excel;
 import 'package:path/path.dart' as p;
+import 'package:client/utils/file_utils.dart';
 
 part 'task.g.dart';
 
@@ -119,10 +120,18 @@ class TasksServices extends _$TasksServices {
             .toList());
       }
       print("start file save");
-      File file = File(p.join(parameters.fileDir, parameters.fileName));
+      // 获取唯一的文件名，如果文件已存在则自动添加序号
+      final uniqueFileName = getUniqueFileName(parameters.fileDir, parameters.fileName);
+      File file = File(p.join(parameters.fileDir, uniqueFileName));
       await file.writeAsBytes(data.save()!);
-      print("file save success");
-      updateTask(task.copyWith(status: TaskStatus.completed));
+      print("file save success, saved as: $uniqueFileName");
+      
+      // 更新参数，使用实际保存的文件名
+      final finalParameters = parameters.copyWith(fileName: uniqueFileName);
+      updateTask(task.copyWith(
+        status: TaskStatus.completed,
+        parameters: jsonEncode(finalParameters.toJson()),
+      ));
     } catch (e) {
       updateTask(
           task.copyWith(status: TaskStatus.failed, errorMessage: e.toString()));

@@ -18,7 +18,9 @@ Future<bool> openFile(String path) async {
     final result = await Process.run('open', [path]);
     return result.exitCode == 0;
   } else if (Platform.isWindows) {
-    final result = await Process.run('start', [path], runInShell: true);
+    // Windows: 使用 start "" "path" 格式，确保路径被正确引用
+    // 空字符串作为标题参数，后面跟文件路径
+    final result = await Process.run('cmd', ['/c', 'start', '""', path], runInShell: false);
     return result.exitCode == 0;
   } else if (Platform.isLinux) {
     final result = await Process.run('xdg-open', [path]);
