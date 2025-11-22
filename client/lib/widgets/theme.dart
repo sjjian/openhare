@@ -1,14 +1,26 @@
 import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
 
-ThemeData defaultTheme(String theme) => ThemeData(
-      useMaterial3: true,
-      colorScheme: theme == "dark"
-          ? MaterialTheme.darkScheme()
-          : MaterialTheme.lightScheme(),
-      dividerColor: theme == "dark"
-          ? MaterialTheme.darkScheme().onSurfaceVariant
-          : const Color(0xffD3D9DF),
-    );
+ThemeData defaultTheme(String theme) {
+  final baseTextTheme = theme == "dark"
+      ? ThemeData.dark().textTheme
+      : ThemeData.light().textTheme;
+  final textTheme = GoogleFonts.notoSansScTextTheme(baseTextTheme);
+  final primaryTextTheme = GoogleFonts.notoSansScTextTheme(baseTextTheme);
+
+  return ThemeData(
+    useMaterial3: true,
+    fontFamily: GoogleFonts.notoSansSc().fontFamily,
+    colorScheme: theme == "dark"
+        ? MaterialTheme.darkScheme()
+        : MaterialTheme.lightScheme(),
+    dividerColor: theme == "dark"
+        ? MaterialTheme.darkScheme().onSurfaceVariant
+        : const Color(0xffD3D9DF),
+    textTheme: textTheme,
+    primaryTextTheme: primaryTextTheme,
+  );
+}
 
 class MaterialTheme {
   final TextTheme textTheme;
