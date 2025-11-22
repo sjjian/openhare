@@ -239,6 +239,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
 
     return SessionOpBarModel(
       sessionId: session.sessionId,
+      instanceId: session.instanceId,
       connId: session.connId,
       state: session.connState,
       currentSchema: session.currentSchema ?? "",

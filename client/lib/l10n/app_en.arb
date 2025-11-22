@@ -330,5 +330,9 @@
   "display_no_instance_and_add_instance_button": "Add now",
   "@display_no_instance_and_add_instance_button": {
     "description": "No database instance added, please add a database instance first"
+  },
+  "scheduled_task": "Scheduled Task",
+  "@scheduled_task": {
+    "description": "Scheduled Task"
   }
 }

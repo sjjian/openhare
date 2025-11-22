@@ -85,7 +85,8 @@ class InstanceStorage {
   })  : activeSchemas = activeSchemas ?? ActiveSet<String>(List.empty()),
         dbType = DatabaseType.values[stDbType],
         createdAt = createdAt ?? DateTime.now(),
-        latestOpenAt = latestOpenAt ?? DateTime(1970, 1, 1); //latestOpenAt 默认值未很早之前的时间
+        latestOpenAt =
+            latestOpenAt ?? DateTime(1970, 1, 1); //latestOpenAt 默认值未很早之前的时间
 
   InstanceStorage.fromModel(InstanceModel model)
       : id = model.id.value,

@@ -1,4 +1,5 @@
 import 'package:client/models/sessions.dart';
+import 'package:client/screens/tasks/export_data.dart';
 import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
@@ -201,6 +202,22 @@ class SessionOpBar extends ConsumerWidget {
     );
   }
 
+  Widget exportDataWidget(
+      BuildContext context, SessionOpBarModel model) {
+    return RectangleIconButton.medium(
+      tooltip: AppLocalizations.of(context)!.button_tooltip_sql_result_download,
+      icon: Icons.file_download_sharp,
+      iconColor: Colors.green,
+      verticalOffset: 1,
+      onPressed: () {
+        showExportDataDialog(context,
+            instanceId: model.instanceId!,
+            schema: model.currentSchema,
+            query: getQuery());
+      },
+    );
+  }
+
   Widget saveWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
@@ -254,6 +271,7 @@ class SessionOpBar extends ConsumerWidget {
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
+          exportDataWidget(context, model),
           divider(context),
           saveWidget(context, ref, model),
           const Expanded(child: SessionDrawerBar()),

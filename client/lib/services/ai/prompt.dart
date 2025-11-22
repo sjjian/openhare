@@ -1,5 +1,6 @@
 // 下面的prompt 都用英文
 import 'package:client/models/sessions.dart';
+import 'package:client/models/tasks.dart';
 import 'package:db_driver/db_driver.dart';
 
 const testTemplate = """
@@ -41,4 +42,33 @@ String genChatSystemPrompt(SessionAIChatModel model) {
 
   return prompt.replaceAll(
       "{tables}", tableInfos.map((e) => e.toString()).join("\n"));
+}
+
+// 导入任务的文件命名
+const exportDataFileRenameTemplate = """
+你的任务是帮我给数据导出任务的导出文件命名, 你需要根据SQL查询和一些背景信息, 给出一个合适的文件名。
+SQL:
+{sql}
+
+数据库信息:
+schema名称: {schemaName}
+
+当前时间: {currentTime}
+语言偏好: {language}
+
+tips: 
+- 名称不要太长, 最好概况业务或者查询意图，不需要后缀
+
+输出json格式:
+{
+  "fileName": "文件名",
+  "desc": "当前导出任务对应的业务描述或者意图描述"
+}
+""";
+
+String getExportDataFileRenamePrompt(ExportDataParameters parameters, String language) {
+  return exportDataFileRenameTemplate.replaceAll("{sql}", parameters.query)
+      .replaceAll("{schemaName}", parameters.schema)
+      .replaceAll("{currentTime}", DateTime.now().toIso8601String())
+      .replaceAll("{language}", language);
 }

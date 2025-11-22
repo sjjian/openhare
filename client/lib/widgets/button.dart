@@ -8,6 +8,9 @@ class RectangleIconButton extends StatefulWidget {
   final double size;
   final double iconSize;
   final double padding;
+
+  /// 不同的icon 存在视觉对齐与实际对齐不一样，因此加一个偏移量来调整
+  final double verticalOffset;
   final Color? iconColor;
   final Color? backgroundColor;
   final Color? hoverBackgroundColor;
@@ -21,6 +24,7 @@ class RectangleIconButton extends StatefulWidget {
       required this.size,
       required this.iconSize,
       required this.padding,
+      this.verticalOffset = 0,
       this.iconColor,
       this.backgroundColor,
       this.hoverBackgroundColor})
@@ -34,33 +38,36 @@ class RectangleIconButton extends StatefulWidget {
     this.iconColor,
     this.backgroundColor,
     this.hoverBackgroundColor,
+    this.verticalOffset = 0,
   })  : size = kIconButtonSizeMedium,
         iconSize = kIconSizeMedium,
         padding = 4,
         super(key: key);
 
-  const RectangleIconButton.small(
-      {Key? key,
-      this.tooltip,
-      required this.icon,
-      this.onPressed,
-      this.iconColor,
-      this.backgroundColor,
-      this.hoverBackgroundColor})
-      : size = kIconButtonSizeSmall,
+  const RectangleIconButton.small({
+    Key? key,
+    this.tooltip,
+    required this.icon,
+    this.onPressed,
+    this.iconColor,
+    this.backgroundColor,
+    this.hoverBackgroundColor,
+    this.verticalOffset = 0,
+  })  : size = kIconButtonSizeSmall,
         iconSize = kIconSizeSmall,
         padding = 2,
         super(key: key);
 
-  const RectangleIconButton.tiny(
-      {Key? key,
-      this.tooltip,
-      required this.icon,
-      this.onPressed,
-      this.iconColor,
-      this.backgroundColor,
-      this.hoverBackgroundColor})
-      : size = kIconButtonSizeTiny,
+  const RectangleIconButton.tiny({
+    Key? key,
+    this.tooltip,
+    required this.icon,
+    this.onPressed,
+    this.iconColor,
+    this.backgroundColor,
+    this.hoverBackgroundColor,
+    this.verticalOffset = 0,
+  })  : size = kIconButtonSizeTiny,
         iconSize = kIconSizeTiny,
         padding = 2,
         super(key: key);
@@ -93,7 +100,12 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
         child: GestureDetector(
           onTap: widget.onPressed,
           child: Padding(
-            padding: EdgeInsets.all(widget.padding),
+            padding: EdgeInsets.only(
+              left: widget.padding,
+              right: widget.padding,
+              top: widget.padding + widget.verticalOffset,
+              bottom: widget.padding - widget.verticalOffset,
+            ),
             child: Container(
               width: widget.size - widget.padding * 2,
               height: widget.size - widget.padding * 2,
@@ -130,7 +142,8 @@ class LinkButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final double? maxWidth;
 
-  const LinkButton({Key? key, required this.text, this.onPressed, this.maxWidth})
+  const LinkButton(
+      {Key? key, required this.text, this.onPressed, this.maxWidth})
       : super(key: key);
 
   @override

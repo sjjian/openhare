@@ -46,10 +46,11 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
           )
         ],
       )),
-      DataCell(Text(instance.connectValue.desc)),
       DataCell(Text(instance.connectValue.host)),
       DataCell(Text("${instance.connectValue.port}")),
       DataCell(Text(instance.connectValue.user)),
+      DataCell(
+          Text(instance.connectValue.desc, overflow: TextOverflow.ellipsis)),
       DataCell(Row(
         children: [
           RectangleIconButton.small(
@@ -81,12 +82,30 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
   @override
   Widget build(BuildContext context) {
     final column = [
-      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_name)),
-      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_desc)),
-      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_host)),
-      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_port)),
-      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_user)),
-      DataColumn(label: Text(AppLocalizations.of(context)!.db_instance_op))
+      DataColumn(
+        label: Text(AppLocalizations.of(context)!.db_instance_name),
+        columnWidth: const FlexColumnWidth(2),
+      ),
+      DataColumn(
+        label: Text(AppLocalizations.of(context)!.db_instance_host),
+        columnWidth: const FlexColumnWidth(2),
+      ),
+      DataColumn(
+        label: Text(AppLocalizations.of(context)!.db_instance_port),
+        columnWidth: const FlexColumnWidth(1),
+      ),
+      DataColumn(
+        label: Text(AppLocalizations.of(context)!.db_instance_user),
+        columnWidth: const FlexColumnWidth(1),
+      ),
+      DataColumn(
+        label: Text(AppLocalizations.of(context)!.db_instance_desc),
+        columnWidth: const FlexColumnWidth(3),
+      ),
+      DataColumn(
+        label: Text(AppLocalizations.of(context)!.db_instance_op),
+        columnWidth: const FlexColumnWidth(2),
+      ),
     ];
 
     final model = ref.watch(instancesNotifierProvider);

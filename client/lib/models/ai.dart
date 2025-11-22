@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'ai.freezed.dart';
+part 'ai.g.dart';
 
 abstract class LLMAgentRepo {
   LLMAgentsModel getLLMAgents();
@@ -115,4 +116,16 @@ abstract class AIChatListModel with _$AIChatListModel {
   const factory AIChatListModel({
     required Map<AIChatId, AIChatModel> chats,
   }) = _AIChatListModel;
+}
+
+/// AI生成的文件名和描述结果
+@freezed
+abstract class ExportFileNameResult with _$ExportFileNameResult {
+  const factory ExportFileNameResult({
+    required String fileName,
+    String? desc,
+  }) = _ExportFileNameResult;
+
+  factory ExportFileNameResult.fromJson(Map<String, dynamic> json) =>
+      _$ExportFileNameResultFromJson(json);
 }

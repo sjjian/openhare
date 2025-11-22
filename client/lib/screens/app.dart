@@ -18,6 +18,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:client/screens/tasks/task.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -36,6 +37,11 @@ class App extends HookConsumerWidget {
           path: "/sessions",
           pageBuilder: (context, state) =>
               const NoTransitionPage<void>(child: SessionsPage()),
+        ),
+        GoRoute(
+          path: "/tasks",
+          pageBuilder: (context, state) =>
+              const NoTransitionPage<void>(child: TaskPage()),
         ),
         GoRoute(
           path: '/settings',
@@ -163,6 +169,13 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
+               NavigationRailDestination(
+                icon: const Icon(Icons.schedule),
+                label: Text(
+                  AppLocalizations.of(context)!.scheduled_task,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
               NavigationRailDestination(
                 icon: HugeIcon(
                   icon: HugeIcons.strokeRoundedDatabase,
@@ -207,14 +220,17 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
     if (location.startsWith('/sessions')) {
       return 0;
     }
-    if (location.startsWith('/instances')) {
+    if (location.startsWith('/tasks')) {
       return 1;
     }
-    if (location.startsWith('/settings')) {
+    if (location.startsWith('/instances')) {
       return 2;
     }
-    if (location.startsWith('/about')) {
+    if (location.startsWith('/settings')) {
       return 3;
+    }
+    if (location.startsWith('/about')) {
+      return 4;
     }
     return 0;
   }
@@ -226,12 +242,19 @@ class _ScaffoldWithNavRailState extends State<ScaffoldWithNavRail> {
     switch (index) {
       case 0:
         GoRouter.of(context).go('/sessions');
+        break;
       case 1:
-        GoRouter.of(context).go('/instances');
+        GoRouter.of(context).go('/tasks');
+        break;
       case 2:
-        GoRouter.of(context).go('/settings');
+        GoRouter.of(context).go('/instances');
+        break;
       case 3:
+        GoRouter.of(context).go('/settings');
+        break;
+      case 4:
         GoRouter.of(context).go('/about');
+        break;
     }
   }
 }

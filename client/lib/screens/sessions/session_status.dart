@@ -95,34 +95,6 @@ class SessionStatusTab extends ConsumerWidget {
                 value: shortQueryDisplay,
                 tooltip: model.query ??
                     AppLocalizations.of(context)!.no_query_executed),
-
-            // download result
-            if (model.state == SQLExecuteState.done &&
-                model.resultId != null) ...[
-              divider(context),
-              RectangleIconButton.medium(
-                tooltip: AppLocalizations.of(context)!
-                    .button_tooltip_sql_result_download,
-                icon: Icons.download_rounded,
-                iconColor: Colors.green,
-                onPressed: () async {
-                  String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle:
-                        AppLocalizations.of(context)!.display_msg_downlaod,
-                    fileName:
-                        '${model.instanceName}-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
-                  );
-                  if (outputFile == null) {
-                    return;
-                  }
-                  File file = File(outputFile);
-                  await file.writeAsBytes(ref
-                      .read(selectedSQLResultNotifierProvider.notifier)
-                      .toExcel()
-                      .save()!);
-                },
-              )
-            ],
           ],
           const Spacer(),
         ],

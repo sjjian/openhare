@@ -113,6 +113,7 @@ abstract class SessionDetailListModel with _$SessionDetailListModel {
 abstract class SessionOpBarModel with _$SessionOpBarModel {
   const factory SessionOpBarModel({
     required SessionId sessionId,
+    InstanceId? instanceId,
     required ConnId? connId,
     required SQLConnectState? state,
     required String currentSchema,

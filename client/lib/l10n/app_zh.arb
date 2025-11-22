@@ -81,5 +81,9 @@
     "metadata_tree_instance": "实例",
     "display_msg_no_result": "未选中SQL结果",
     "display_no_instance_and_add_instance": "未添加数据库实例，请先添加一个数据库实例",
-    "display_no_instance_and_add_instance_button": "立即添加"
+    "display_no_instance_and_add_instance_button": "立即添加",
+    "scheduled_task": "定时任务",
+    "@scheduled_task": {
+      "description": "定时任务"
+    }
 }

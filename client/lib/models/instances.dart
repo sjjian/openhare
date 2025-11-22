@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
 part 'instances.freezed.dart';
+part 'instances.g.dart';
 
 abstract class InstanceRepo {
   Future<void> add(InstanceModel model);
@@ -31,6 +32,8 @@ abstract class InstanceId with _$InstanceId {
   const factory InstanceId({
     required int value,
   }) = _InstanceId;
+
+  factory InstanceId.fromJson(Map<String, dynamic> json) => _$InstanceIdFromJson(json);
 }
 
 @freezed
