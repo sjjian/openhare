@@ -3,3 +3,9 @@
 test.sql
 .DS_Store
 client/lib/l10n/*.dart
+
+# Generated files
+*.g.dart
+*.freezed.dart
+.flutter-plugins
+.flutter-plugins-dependencies
