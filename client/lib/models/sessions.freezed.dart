@@ -2024,6 +2024,7 @@ class __$SessionDetailListModelCopyWithImpl<$Res>
 /// @nodoc
 mixin _$SessionOpBarModel {
   SessionId get sessionId;
+  InstanceId? get instanceId;
   ConnId? get connId;
   SQLConnectState? get state;
   String get currentSchema;
@@ -2044,6 +2045,8 @@ mixin _$SessionOpBarModel {
             other is SessionOpBarModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
+            (identical(other.instanceId, instanceId) ||
+                other.instanceId == instanceId) &&
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.currentSchema, currentSchema) ||
@@ -2053,12 +2056,12 @@ mixin _$SessionOpBarModel {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, sessionId, connId, state, currentSchema, isRightPageOpen);
+  int get hashCode => Object.hash(runtimeType, sessionId, instanceId, connId,
+      state, currentSchema, isRightPageOpen);
 
   @override
   String toString() {
-    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, state: $state, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
+    return 'SessionOpBarModel(sessionId: $sessionId, instanceId: $instanceId, connId: $connId, state: $state, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
   }
 }
 
@@ -2070,12 +2073,14 @@ abstract mixin class $SessionOpBarModelCopyWith<$Res> {
   @useResult
   $Res call(
       {SessionId sessionId,
+      InstanceId? instanceId,
       ConnId? connId,
       SQLConnectState? state,
       String currentSchema,
       bool isRightPageOpen});
 
   $SessionIdCopyWith<$Res> get sessionId;
+  $InstanceIdCopyWith<$Res>? get instanceId;
   $ConnIdCopyWith<$Res>? get connId;
 }
 
@@ -2093,6 +2098,7 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? sessionId = null,
+    Object? instanceId = freezed,
     Object? connId = freezed,
     Object? state = freezed,
     Object? currentSchema = null,
@@ -2103,6 +2109,10 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
               as SessionId,
+      instanceId: freezed == instanceId
+          ? _self.instanceId
+          : instanceId // ignore: cast_nullable_to_non_nullable
+              as InstanceId?,
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
@@ -2129,6 +2139,20 @@ class _$SessionOpBarModelCopyWithImpl<$Res>
   $SessionIdCopyWith<$Res> get sessionId {
     return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
       return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionOpBarModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $InstanceIdCopyWith<$Res>? get instanceId {
+    if (_self.instanceId == null) {
+      return null;
+    }
+
+    return $InstanceIdCopyWith<$Res>(_self.instanceId!, (value) {
+      return _then(_self.copyWith(instanceId: value));
     });
   }
 
@@ -2240,16 +2264,21 @@ extension SessionOpBarModelPatterns on SessionOpBarModel {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(SessionId sessionId, ConnId? connId,
-            SQLConnectState? state, String currentSchema, bool isRightPageOpen)?
+    TResult Function(
+            SessionId sessionId,
+            InstanceId? instanceId,
+            ConnId? connId,
+            SQLConnectState? state,
+            String currentSchema,
+            bool isRightPageOpen)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _SessionOpBarModel() when $default != null:
-        return $default(_that.sessionId, _that.connId, _that.state,
-            _that.currentSchema, _that.isRightPageOpen);
+        return $default(_that.sessionId, _that.instanceId, _that.connId,
+            _that.state, _that.currentSchema, _that.isRightPageOpen);
       case _:
         return orElse();
     }
@@ -2270,15 +2299,20 @@ extension SessionOpBarModelPatterns on SessionOpBarModel {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(SessionId sessionId, ConnId? connId,
-            SQLConnectState? state, String currentSchema, bool isRightPageOpen)
+    TResult Function(
+            SessionId sessionId,
+            InstanceId? instanceId,
+            ConnId? connId,
+            SQLConnectState? state,
+            String currentSchema,
+            bool isRightPageOpen)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SessionOpBarModel():
-        return $default(_that.sessionId, _that.connId, _that.state,
-            _that.currentSchema, _that.isRightPageOpen);
+        return $default(_that.sessionId, _that.instanceId, _that.connId,
+            _that.state, _that.currentSchema, _that.isRightPageOpen);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -2298,15 +2332,20 @@ extension SessionOpBarModelPatterns on SessionOpBarModel {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(SessionId sessionId, ConnId? connId,
-            SQLConnectState? state, String currentSchema, bool isRightPageOpen)?
+    TResult? Function(
+            SessionId sessionId,
+            InstanceId? instanceId,
+            ConnId? connId,
+            SQLConnectState? state,
+            String currentSchema,
+            bool isRightPageOpen)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SessionOpBarModel() when $default != null:
-        return $default(_that.sessionId, _that.connId, _that.state,
-            _that.currentSchema, _that.isRightPageOpen);
+        return $default(_that.sessionId, _that.instanceId, _that.connId,
+            _that.state, _that.currentSchema, _that.isRightPageOpen);
       case _:
         return null;
     }
@@ -2318,6 +2357,7 @@ extension SessionOpBarModelPatterns on SessionOpBarModel {
 class _SessionOpBarModel implements SessionOpBarModel {
   const _SessionOpBarModel(
       {required this.sessionId,
+      this.instanceId,
       required this.connId,
       required this.state,
       required this.currentSchema,
@@ -2325,6 +2365,8 @@ class _SessionOpBarModel implements SessionOpBarModel {
 
   @override
   final SessionId sessionId;
+  @override
+  final InstanceId? instanceId;
   @override
   final ConnId? connId;
   @override
@@ -2349,6 +2391,8 @@ class _SessionOpBarModel implements SessionOpBarModel {
             other is _SessionOpBarModel &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
+            (identical(other.instanceId, instanceId) ||
+                other.instanceId == instanceId) &&
             (identical(other.connId, connId) || other.connId == connId) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.currentSchema, currentSchema) ||
@@ -2358,12 +2402,12 @@ class _SessionOpBarModel implements SessionOpBarModel {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, sessionId, connId, state, currentSchema, isRightPageOpen);
+  int get hashCode => Object.hash(runtimeType, sessionId, instanceId, connId,
+      state, currentSchema, isRightPageOpen);
 
   @override
   String toString() {
-    return 'SessionOpBarModel(sessionId: $sessionId, connId: $connId, state: $state, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
+    return 'SessionOpBarModel(sessionId: $sessionId, instanceId: $instanceId, connId: $connId, state: $state, currentSchema: $currentSchema, isRightPageOpen: $isRightPageOpen)';
   }
 }
 
@@ -2377,6 +2421,7 @@ abstract mixin class _$SessionOpBarModelCopyWith<$Res>
   @useResult
   $Res call(
       {SessionId sessionId,
+      InstanceId? instanceId,
       ConnId? connId,
       SQLConnectState? state,
       String currentSchema,
@@ -2384,6 +2429,8 @@ abstract mixin class _$SessionOpBarModelCopyWith<$Res>
 
   @override
   $SessionIdCopyWith<$Res> get sessionId;
+  @override
+  $InstanceIdCopyWith<$Res>? get instanceId;
   @override
   $ConnIdCopyWith<$Res>? get connId;
 }
@@ -2402,6 +2449,7 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? sessionId = null,
+    Object? instanceId = freezed,
     Object? connId = freezed,
     Object? state = freezed,
     Object? currentSchema = null,
@@ -2412,6 +2460,10 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
           ? _self.sessionId
           : sessionId // ignore: cast_nullable_to_non_nullable
               as SessionId,
+      instanceId: freezed == instanceId
+          ? _self.instanceId
+          : instanceId // ignore: cast_nullable_to_non_nullable
+              as InstanceId?,
       connId: freezed == connId
           ? _self.connId
           : connId // ignore: cast_nullable_to_non_nullable
@@ -2438,6 +2490,20 @@ class __$SessionOpBarModelCopyWithImpl<$Res>
   $SessionIdCopyWith<$Res> get sessionId {
     return $SessionIdCopyWith<$Res>(_self.sessionId, (value) {
       return _then(_self.copyWith(sessionId: value));
+    });
+  }
+
+  /// Create a copy of SessionOpBarModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $InstanceIdCopyWith<$Res>? get instanceId {
+    if (_self.instanceId == null) {
+      return null;
+    }
+
+    return $InstanceIdCopyWith<$Res>(_self.instanceId!, (value) {
+      return _then(_self.copyWith(instanceId: value));
     });
   }
 

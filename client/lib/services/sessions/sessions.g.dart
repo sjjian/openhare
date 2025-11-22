@@ -74,7 +74,7 @@ final selectedSessionDetailNotifierProvider = NotifierProvider<
 
 typedef _$SelectedSessionDetailNotifier = Notifier<SessionDetailModel?>;
 String _$sessionOpBarNotifierHash() =>
-    r'2a5dd08f23d5a1124ce760f7aa9c23675c610526';
+    r'cddc8626853933043c353bb9945522290e64a477';
 
 /// See also [SessionOpBarNotifier].
 @ProviderFor(SessionOpBarNotifier)

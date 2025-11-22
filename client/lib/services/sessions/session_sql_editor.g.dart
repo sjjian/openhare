@@ -177,7 +177,7 @@ class _SessionSQLEditorServiceProviderElement
 }
 
 String _$selectedSessionSQLEditorNotifierHash() =>
-    r'16c275d47303f525f1c63d110880390e1663f701';
+    r'40ac6063c23d6422377cba2e1e8ea70ae846bcbd';
 
 /// See also [SelectedSessionSQLEditorNotifier].
 @ProviderFor(SelectedSessionSQLEditorNotifier)

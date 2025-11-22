@@ -23,6 +23,9 @@ mixin _$InstanceId implements DiagnosticableTreeMixin {
   $InstanceIdCopyWith<InstanceId> get copyWith =>
       _$InstanceIdCopyWithImpl<InstanceId>(this as InstanceId, _$identity);
 
+  /// Serializes this InstanceId to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
@@ -38,6 +41,7 @@ mixin _$InstanceId implements DiagnosticableTreeMixin {
             (identical(other.value, value) || other.value == value));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, value);
 
@@ -237,9 +241,11 @@ extension InstanceIdPatterns on InstanceId {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _InstanceId with DiagnosticableTreeMixin implements InstanceId {
   const _InstanceId({required this.value});
+  factory _InstanceId.fromJson(Map<String, dynamic> json) =>
+      _$InstanceIdFromJson(json);
 
   @override
   final int value;
@@ -251,6 +257,13 @@ class _InstanceId with DiagnosticableTreeMixin implements InstanceId {
   @pragma('vm:prefer-inline')
   _$InstanceIdCopyWith<_InstanceId> get copyWith =>
       __$InstanceIdCopyWithImpl<_InstanceId>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$InstanceIdToJson(
+      this,
+    );
+  }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -267,6 +280,7 @@ class _InstanceId with DiagnosticableTreeMixin implements InstanceId {
             (identical(other.value, value) || other.value == value));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, value);
 
