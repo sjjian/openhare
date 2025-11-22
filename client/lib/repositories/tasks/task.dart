@@ -50,6 +50,25 @@ class TaskRepoImpl implements TaskRepo {
   }
 
   @override
+  TaskModel? getLatestTask({TaskType? type}) {
+    var filteredTasks = _tasks.values.toList();
+
+    // 按类型过滤
+    if (type != null) {
+      filteredTasks = filteredTasks.where((task) => task.type == type).toList();
+    }
+
+    // 如果没有任务，返回 null
+    if (filteredTasks.isEmpty) {
+      return null;
+    }
+
+    // 按创建时间降序排序，返回最新的任务
+    filteredTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return filteredTasks.first;
+  }
+
+  @override
   TaskListResult getTasks({
     String? key,
     int? pageNumber,

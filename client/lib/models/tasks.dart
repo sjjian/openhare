@@ -71,6 +71,8 @@ abstract class TaskRepo {
   // 根据ID获取任务
   TaskModel? getTaskById(TaskId id);
 
+  // 获取最近一次任务（可选按类型过滤）
+  TaskModel? getLatestTask({TaskType? type});
 
   // 分页获取任务（返回list和count）
   TaskListResult getTasks(

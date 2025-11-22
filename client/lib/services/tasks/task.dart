@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:client/models/tasks.dart';
 import 'package:client/repositories/tasks/task.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/models/sessions.dart';
@@ -71,6 +72,10 @@ class TasksServices extends _$TasksServices {
 
   TaskModel? getTaskById(TaskId id) {
     return _repo.getTaskById(id);
+  }
+
+  TaskModel? getLatestTask({TaskType? type}) {
+    return _repo.getLatestTask(type: type);
   }
 
   void updateTask(TaskModel task) {
@@ -159,4 +164,14 @@ class TasksNotifier extends _$TasksNotifier {
           type: type ?? state.type,
         );
   }
+}
+
+@Riverpod(keepAlive: true)
+TaskModel? latestExportTask(Ref ref) {
+  // 监听任务列表变化，当任务更新时自动重新计算
+  ref.watch(tasksNotifierProvider);
+  
+  return ref.read(tasksServicesProvider.notifier).getLatestTask(
+    type: TaskType.exportData,
+  );
 }

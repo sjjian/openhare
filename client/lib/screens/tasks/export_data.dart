@@ -63,6 +63,7 @@ class _ExportDataDialogContentState
   String? selectedDir;
   bool _isGenerating = false;
   String? _errorMessage;
+  bool _hasInitializedDir = false; // 标记是否已初始化目录
   late final TextEditingController instanceIdController;
   late final TextEditingController dirController;
   late final TextEditingController fileNameController;
@@ -81,6 +82,7 @@ class _ExportDataDialogContentState
     );
     descController = TextEditingController();
   }
+
 
   @override
   void dispose() {
@@ -317,6 +319,26 @@ class _ExportDataDialogContentState
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
+    
+    final latestTask = ref.watch(latestExportTaskProvider);
+    
+    // 当有最新任务且目录未初始化时，自动填充目录
+    if (!_hasInitializedDir && latestTask != null) {
+      final exportParams = latestTask.exportDataParameters;
+      if (exportParams != null && exportParams.fileDir.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              selectedDir = exportParams.fileDir;
+              dirController.text = exportParams.fileDir;
+              _hasInitializedDir = true;
+            });
+          }
+        });
+      } else {
+        _hasInitializedDir = true; // 即使没有目录也标记为已初始化，避免重复检查
+      }
+    }
 
     return CustomDialog(
       title: '导出数据',
@@ -333,7 +355,7 @@ class _ExportDataDialogContentState
             controller: dirController,
             decoration: _buildInputDecoration(
               colorScheme,
-              labelText: '保存的地址',
+              labelText: '导出的目录',
               suffixIcon: Padding(
                 padding: const EdgeInsets.only(right: 5),
                 child: RectangleIconButton.medium(
