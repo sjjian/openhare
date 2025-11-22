@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   objectbox_sync_flutter_libs
   screen_retriever_windows
   url_launcher_windows
+  vclibs
   window_manager
 )
 
