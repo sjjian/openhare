@@ -1,7 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'db_driver_conn_meta.g.dart';
-
 enum DatabaseType { mysql, pg }
 
 const String settingMetaGroupBase = "base";
@@ -117,7 +113,6 @@ class SettingValue<SettingMeta, E> {
   SettingValue({required this.meta, required this.value});
 }
 
-@JsonSerializable()
 class ConnectValue {
   String name;
   String host;
@@ -159,9 +154,4 @@ class ConnectValue {
       }
     }).join("\n");
   }
-
-  factory ConnectValue.fromJson(Map<String, dynamic> json) =>
-      _$ConnectValueFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ConnectValueToJson(this);
 }

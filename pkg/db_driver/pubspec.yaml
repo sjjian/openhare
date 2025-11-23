@@ -9,7 +9,6 @@ environment:
 # Add regular dependencies here.
 dependencies:
   uuid: ^4.5.1
-  json_annotation: ^4.9.0
   # path: ^1.8.0
   mysql:
     path: impl/mysql/
@@ -21,5 +20,3 @@ dependencies:
 dev_dependencies:
   lints: ^4.0.0
   test: ^1.24.0
-  json_serializable: ^6.8.0
-  build_runner: ^2.4.9

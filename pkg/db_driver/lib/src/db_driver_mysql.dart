@@ -17,25 +17,23 @@ class MysqlQueryValue extends BaseQueryValue {
 
   @override
   String? getString() {
-    return _value.when<String?>(
-      bytes: (field0) => utf8.decode(field0,
-          allowMalformed: true), // todo: support gbk, latin1?
-      int: (field0) => field0.toString(),
-      uInt: (field0) => field0.toString(),
-      float: (field0) => field0.toString(),
-      double: (field0) => field0.toString(),
-      dateTime: (field0) => field0.toString(),
-      null_: () => null,
-    );
+    return switch (_value) {
+      QueryValue_NULL() => null,
+      QueryValue_Bytes(:final field0) => utf8.decode(field0, allowMalformed: true), // todo: support gbk, latin1?
+      QueryValue_Int(:final field0) => field0.toString(),
+      QueryValue_UInt(:final field0) => field0.toString(),
+      QueryValue_Float(:final field0) => field0.toString(),
+      QueryValue_Double(:final field0) => field0.toString(),
+      QueryValue_DateTime(:final field0) => field0.toString(),
+    };
   }
 
   @override
   List<int> getBytes() {
-    return _value.maybeWhen(
-        bytes: (field0) {
-          return field0;
-        },
-        orElse: () => List.empty());
+    return switch (_value) {
+      QueryValue_Bytes(:final field0) => field0.toList(),
+      _ => <int>[],
+    };
   }
 }
 
