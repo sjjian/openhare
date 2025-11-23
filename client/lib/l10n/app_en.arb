@@ -334,5 +334,158 @@
   "scheduled_task": "Scheduled Task",
   "@scheduled_task": {
     "description": "Scheduled Task"
+  },
+  "task_status_pending": "Pending",
+  "@task_status_pending": {
+    "description": "Task status pending"
+  },
+  "task_status_running": "Running",
+  "@task_status_running": {
+    "description": "Task status running"
+  },
+  "task_status_completed": "Completed",
+  "@task_status_completed": {
+    "description": "Task status completed"
+  },
+  "task_status_failed": "Failed",
+  "@task_status_failed": {
+    "description": "Task status failed"
+  },
+  "task_status_cancelled": "Cancelled",
+  "@task_status_cancelled": {
+    "description": "Task status cancelled"
+  },
+  "date_today": "Today",
+  "@date_today": {
+    "description": "Date format today"
+  },
+  "date_yesterday": "Yesterday",
+  "@date_yesterday": {
+    "description": "Date format yesterday"
+  },
+  "date_monday": "Mon",
+  "@date_monday": {
+    "description": "Date format Monday"
+  },
+  "date_tuesday": "Tue",
+  "@date_tuesday": {
+    "description": "Date format Tuesday"
+  },
+  "date_wednesday": "Wed",
+  "@date_wednesday": {
+    "description": "Date format Wednesday"
+  },
+  "date_thursday": "Thu",
+  "@date_thursday": {
+    "description": "Date format Thursday"
+  },
+  "date_friday": "Fri",
+  "@date_friday": {
+    "description": "Date format Friday"
+  },
+  "date_saturday": "Sat",
+  "@date_saturday": {
+    "description": "Date format Saturday"
+  },
+  "date_sunday": "Sun",
+  "@date_sunday": {
+    "description": "Date format Sunday"
+  },
+  "error_file_not_found": "File not found: {path}",
+  "@error_file_not_found": {
+    "description": "Error message file not found",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "error_open_file_failed": "Failed to open file: {error}",
+  "@error_open_file_failed": {
+    "description": "Error message open file failed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "error_open_folder_failed": "Failed to open folder: {error}",
+  "@error_open_folder_failed": {
+    "description": "Error message open folder failed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "task_column_file_name": "File Name",
+  "@task_column_file_name": {
+    "description": "Task table column file name"
+  },
+  "task_column_created_at": "Created At",
+  "@task_column_created_at": {
+    "description": "Task table column created at"
+  },
+  "task_column_status": "Status",
+  "@task_column_status": {
+    "description": "Task table column status"
+  },
+  "tooltip_open_folder": "Open file location",
+  "@tooltip_open_folder": {
+    "description": "Tooltip open file location"
+  },
+  "tooltip_delete_task": "Delete task",
+  "@tooltip_delete_task": {
+    "description": "Tooltip delete task"
+  },
+  "task_no_tasks": "No tasks",
+  "@task_no_tasks": {
+    "description": "No tasks message"
+  },
+  "export_data_title": "Export Data",
+  "@export_data_title": {
+    "description": "Export data dialog title"
+  },
+  "export_data_directory_label": "Export Directory",
+  "@export_data_directory_label": {
+    "description": "Export data directory label"
+  },
+  "tooltip_select_directory": "Select directory",
+  "@tooltip_select_directory": {
+    "description": "Tooltip select directory"
+  },
+  "tooltip_ai_generate_file_name": "Use AI to auto-generate file name and description",
+  "@tooltip_ai_generate_file_name": {
+    "description": "Tooltip AI generate file name"
+  },
+  "error_llm_agent_not_found": "No available LLM Agent found, please configure in settings first",
+  "@error_llm_agent_not_found": {
+    "description": "Error message LLM agent not found"
+  },
+  "error_generate_file_name_failed": "Failed to generate file name: {error}",
+  "@error_generate_file_name_failed": {
+    "description": "Error message generate file name failed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "error_unknown_error": "Unknown error occurred: {error}",
+  "@error_unknown_error": {
+    "description": "Error message unknown error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "export_data_exporting": "Exporting",
+  "@export_data_exporting": {
+    "description": "Export data exporting text"
+  },
+  "export_data_schema_sql": "schema SQL, SQL as follows:",
+  "@export_data_schema_sql": {
+    "description": "Export data schema SQL text"
   }
 }

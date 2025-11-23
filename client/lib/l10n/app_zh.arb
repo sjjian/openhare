@@ -85,5 +85,77 @@
     "scheduled_task": "定时任务",
     "@scheduled_task": {
       "description": "定时任务"
-    }
+    },
+    "task_status_pending": "待执行",
+    "task_status_running": "执行中",
+    "task_status_completed": "已完成",
+    "task_status_failed": "失败",
+    "task_status_cancelled": "已取消",
+    "date_today": "今天",
+    "date_yesterday": "昨天",
+    "date_monday": "周一",
+    "date_tuesday": "周二",
+    "date_wednesday": "周三",
+    "date_thursday": "周四",
+    "date_friday": "周五",
+    "date_saturday": "周六",
+    "date_sunday": "周日",
+    "error_file_not_found": "文件不存在: {path}",
+    "@error_file_not_found": {
+      "description": "文件不存在错误消息",
+      "placeholders": {
+        "path": {
+          "type": "String"
+        }
+      }
+    },
+    "error_open_file_failed": "打开文件失败: {error}",
+    "@error_open_file_failed": {
+      "description": "打开文件失败错误消息",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "error_open_folder_failed": "打开文件所在目录失败: {error}",
+    "@error_open_folder_failed": {
+      "description": "打开文件所在目录失败错误消息",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "task_column_file_name": "文件名",
+    "task_column_created_at": "创建时间",
+    "task_column_status": "状态",
+    "tooltip_open_folder": "打开文件所在目录",
+    "tooltip_delete_task": "删除任务",
+    "task_no_tasks": "暂无任务",
+    "export_data_title": "导出数据",
+    "export_data_directory_label": "导出的目录",
+    "tooltip_select_directory": "选择目录",
+    "tooltip_ai_generate_file_name": "使用AI自动生成文件名和描述",
+    "error_llm_agent_not_found": "未找到可用的LLM Agent，请先在设置中配置",
+    "error_generate_file_name_failed": "生成文件名失败: {error}",
+    "@error_generate_file_name_failed": {
+      "description": "生成文件名失败错误消息",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "error_unknown_error": "发生未知错误: {error}",
+    "@error_unknown_error": {
+      "description": "未知错误消息",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "export_data_exporting": "正在导出",
+    "export_data_schema_sql": "schema 的 SQL，SQL 如下："
 }

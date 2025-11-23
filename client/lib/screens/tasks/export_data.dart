@@ -83,7 +83,6 @@ class _ExportDataDialogContentState
     descController = TextEditingController();
   }
 
-
   @override
   void dispose() {
     instanceIdController.dispose();
@@ -150,7 +149,7 @@ class _ExportDataDialogContentState
       final lastUsedAgent = llmAgents.lastUsedLLMAgent;
 
       if (lastUsedAgent == null) {
-        _showError('未找到可用的LLM Agent，请先在设置中配置');
+        _showError(AppLocalizations.of(context)!.error_llm_agent_not_found);
         return;
       }
 
@@ -194,7 +193,8 @@ class _ExportDataDialogContentState
         // 成功时清除错误
         _showError(null);
       } catch (e) {
-        _showError('生成文件名失败: ${e.toString()}');
+        _showError(AppLocalizations.of(context)!
+            .error_generate_file_name_failed(e.toString()));
       } finally {
         if (mounted) {
           setState(() {
@@ -203,7 +203,8 @@ class _ExportDataDialogContentState
         }
       }
     } catch (e) {
-      _showError('发生未知错误: ${e.toString()}');
+      _showError(
+          AppLocalizations.of(context)!.error_unknown_error(e.toString()));
       if (mounted) {
         setState(() {
           _isGenerating = false;
@@ -247,7 +248,10 @@ class _ExportDataDialogContentState
                       color: colorScheme.onSurfaceVariant,
                     ),
                     children: [
-                      const TextSpan(text: '正在导出 '),
+                      TextSpan(
+                          text: AppLocalizations.of(context)!
+                              .export_data_exporting),
+                      const TextSpan(text: ' '),
                       TextSpan(
                         text: widget.schema,
                         style: textTheme.bodyMedium?.copyWith(
@@ -255,7 +259,9 @@ class _ExportDataDialogContentState
                           color: colorScheme.onSurface,
                         ),
                       ),
-                      const TextSpan(text: ' schema 的 SQL，SQL 如下：'),
+                      TextSpan(
+                          text:
+                              ' ${AppLocalizations.of(context)!.export_data_schema_sql}'),
                     ],
                   ),
                 ),
@@ -319,9 +325,9 @@ class _ExportDataDialogContentState
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
-    
+
     final latestTask = ref.watch(latestExportTaskProvider);
-    
+
     // 当有最新任务且目录未初始化时，自动填充目录
     if (!_hasInitializedDir && latestTask != null) {
       final exportParams = latestTask.exportDataParameters;
@@ -341,7 +347,7 @@ class _ExportDataDialogContentState
     }
 
     return CustomDialog(
-      title: '导出数据',
+      title: AppLocalizations.of(context)!.export_data_title,
       titleIcon: const Icon(
         Icons.file_download,
         color: Colors.green,
@@ -355,12 +361,14 @@ class _ExportDataDialogContentState
             controller: dirController,
             decoration: _buildInputDecoration(
               colorScheme,
-              labelText: '导出的目录',
+              labelText:
+                  AppLocalizations.of(context)!.export_data_directory_label,
               suffixIcon: Padding(
                 padding: const EdgeInsets.only(right: 5),
                 child: RectangleIconButton.medium(
                   icon: Icons.folder_open,
-                  tooltip: "选择目录",
+                  tooltip:
+                      AppLocalizations.of(context)!.tooltip_select_directory,
                   iconColor: colorScheme.primary,
                   onPressed: _selectDirectory,
                 ),
@@ -377,14 +385,17 @@ class _ExportDataDialogContentState
                 enabled: !_isGenerating,
                 decoration: _buildInputDecoration(
                   colorScheme,
-                  labelText: '文件名',
+                  labelText:
+                      AppLocalizations.of(context)!.task_column_file_name,
                   suffixIcon: Padding(
                     padding: const EdgeInsets.only(right: 5),
                     child: _isGenerating
                         ? const Loading.medium()
                         : RectangleIconButton.medium(
                             icon: Icons.auto_awesome,
-                            tooltip: _errorMessage ?? "使用AI自动生成文件名和描述",
+                            tooltip: _errorMessage ??
+                                AppLocalizations.of(context)!
+                                    .tooltip_ai_generate_file_name,
                             iconColor: _errorMessage != null
                                 ? colorScheme.error
                                 : Colors.purple[600]!,
@@ -423,7 +434,7 @@ class _ExportDataDialogContentState
             enabled: !_isGenerating,
             decoration: _buildInputDecoration(
               colorScheme,
-              labelText: '备注',
+              labelText: AppLocalizations.of(context)!.db_instance_desc,
             ),
             maxLines: 2,
           ),

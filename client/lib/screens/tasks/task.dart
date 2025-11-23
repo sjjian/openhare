@@ -36,15 +36,21 @@ class _TaskTableState extends ConsumerState<TaskTable> {
   final Map<int, String> _fileErrors = {};
   final _verticalScrollController = ScrollController();
 
-  static const _statusLabels = {
-    TaskStatus.pending: '待执行',
-    TaskStatus.running: '执行中',
-    TaskStatus.completed: '已完成',
-    TaskStatus.failed: '失败',
-    TaskStatus.cancelled: '已取消',
-  };
-
-  String _statusLabel(TaskStatus status) => _statusLabels[status] ?? '';
+  String _statusLabel(BuildContext context, TaskStatus status) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (status) {
+      case TaskStatus.pending:
+        return l10n.task_status_pending;
+      case TaskStatus.running:
+        return l10n.task_status_running;
+      case TaskStatus.completed:
+        return l10n.task_status_completed;
+      case TaskStatus.failed:
+        return l10n.task_status_failed;
+      case TaskStatus.cancelled:
+        return l10n.task_status_cancelled;
+    }
+  }
 
   Color _statusColor(BuildContext context, TaskStatus status) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -54,7 +60,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
       case TaskStatus.running:
         return colorScheme.primary;
       case TaskStatus.completed:
-        return colorScheme.secondary;
+        return Colors.green.shade200; // todo: 颜色统一放
       case TaskStatus.failed:
         return colorScheme.error;
       case TaskStatus.cancelled:
@@ -62,7 +68,8 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     }
   }
 
-  String _formatDateTime(DateTime dateTime) {
+  String _formatDateTime(BuildContext context, DateTime dateTime) {
+    final l10n = AppLocalizations.of(context)!;
     final local = dateTime.toLocal();
     final now = DateTime.now().toLocal();
     final timeStr = '${local.hour.toString().padLeft(2, '0')}:'
@@ -71,19 +78,27 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     if (local.year == now.year &&
         local.month == now.month &&
         local.day == now.day) {
-      return '今天 $timeStr';
+      return '${l10n.date_today} $timeStr';
     }
 
     final yesterday = now.subtract(const Duration(days: 1));
     if (local.year == yesterday.year &&
         local.month == yesterday.month &&
         local.day == yesterday.day) {
-      return '昨天 $timeStr';
+      return '${l10n.date_yesterday} $timeStr';
     }
 
     final difference = now.difference(local);
     if (difference.inDays < 7) {
-      const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+      final weekdays = [
+        l10n.date_monday,
+        l10n.date_tuesday,
+        l10n.date_wednesday,
+        l10n.date_thursday,
+        l10n.date_friday,
+        l10n.date_saturday,
+        l10n.date_sunday,
+      ];
       return '${weekdays[local.weekday - 1]} $timeStr';
     }
 
@@ -114,10 +129,27 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     try {
       final success = await openFile(path);
       if (!success) {
-        setState(() => _fileErrors[taskId] = '文件不存在: $path');
+        setState(() => _fileErrors[taskId] =
+            AppLocalizations.of(context)!.error_file_not_found(path));
       }
     } catch (e) {
-      setState(() => _fileErrors[taskId] = '打开文件失败: $e');
+      setState(() => _fileErrors[taskId] =
+          AppLocalizations.of(context)!.error_open_file_failed(e.toString()));
+    }
+  }
+
+  Future<void> _openFileInFolder(String path, int taskId) async {
+    setState(() => _fileErrors.remove(taskId));
+
+    try {
+      final success = await openFileInFolder(path);
+      if (!success) {
+        setState(() => _fileErrors[taskId] =
+            AppLocalizations.of(context)!.error_file_not_found(path));
+      }
+    } catch (e) {
+      setState(() => _fileErrors[taskId] =
+          AppLocalizations.of(context)!.error_open_folder_failed(e.toString()));
     }
   }
 
@@ -126,8 +158,8 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     final color = _statusColor(context, status);
     final isRunning = status == TaskStatus.running;
     final statusText = isRunning
-        ? '${_statusLabel(status)} ${task.progressPercent}'
-        : _statusLabel(status);
+        ? '${_statusLabel(context, status)} ${task.progressPercent}'
+        : _statusLabel(context, status);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -280,7 +312,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
         DataCell(Tooltip(
           message: _formatFullDateTime(task.createdAt),
           child: Text(
-            _formatDateTime(task.createdAt),
+            _formatDateTime(context, task.createdAt),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         )),
@@ -292,49 +324,63 @@ class _TaskTableState extends ConsumerState<TaskTable> {
         )),
         DataCell(_buildStatusChip(context, task)),
         DataCell(
-          RectangleIconButton.small(
-            tooltip: '删除任务',
-            icon: Icons.delete,
-            onPressed: () => tasksService.deleteTask(task.id),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RectangleIconButton.small(
+                tooltip: AppLocalizations.of(context)!.tooltip_open_folder,
+                icon: Icons.folder_open,
+                onPressed: exportPath != null
+                    ? () => _openFileInFolder(exportPath, task.id.value)
+                    : null,
+              ),
+              const SizedBox(width: kSpacingTiny),
+              RectangleIconButton.small(
+                tooltip: AppLocalizations.of(context)!.tooltip_delete_task,
+                icon: Icons.delete,
+                onPressed: () => tasksService.deleteTask(task.id),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  List<DataColumn> _buildColumns() {
+  List<DataColumn> _buildColumns(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return [
-      const DataColumn(
-        label: Text('文件名'),
-        columnWidth: FlexColumnWidth(2),
+      DataColumn(
+        label: Text(l10n.task_column_file_name),
+        columnWidth: const FlexColumnWidth(2),
       ),
-      const DataColumn(
-        label: Text('详情'),
-        columnWidth: FlexColumnWidth(1.5),
+      DataColumn(
+        label: Text(l10n.db_instance_desc),
+        columnWidth: const FlexColumnWidth(1.5),
       ),
-      const DataColumn(
-        label: Text('实例'),
-        columnWidth: FlexColumnWidth(),
+      DataColumn(
+        label: Text(l10n.metadata_tree_instance),
+        columnWidth: const FlexColumnWidth(),
       ),
-      const DataColumn(
-        label: Text('Schema'),
-        columnWidth: FlexColumnWidth(),
+      DataColumn(
+        label: Text(l10n.metadata_tree_schema),
+        columnWidth: const FlexColumnWidth(),
       ),
-      const DataColumn(
-        label: Text('创建时间'),
-        columnWidth: FlexColumnWidth(),
+      DataColumn(
+        label: Text(l10n.task_column_created_at),
+        columnWidth: const FlexColumnWidth(),
       ),
-      const DataColumn(
-        label: Text('耗时'),
-        columnWidth: FlexColumnWidth(),
+      DataColumn(
+        label: Text(l10n.duration),
+        columnWidth: const FlexColumnWidth(),
       ),
-      const DataColumn(
-        label: Text('状态'),
-        columnWidth: FlexColumnWidth(),
+      DataColumn(
+        label: Text(l10n.task_column_status),
+        columnWidth: const FlexColumnWidth(),
       ),
-      const DataColumn(
-        label: Text('操作'),
-        columnWidth: FlexColumnWidth(),
+      DataColumn(
+        label: Text(l10n.db_instance_op),
+        columnWidth: const FlexColumnWidth(),
       ),
     ];
   }
@@ -389,7 +435,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
             child: model.tasks.isEmpty
                 ? EmptyPage(
                     child: Text(
-                      '暂无任务',
+                      AppLocalizations.of(context)!.task_no_tasks,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -407,7 +453,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
                         columnSpacing: kSpacingSmall,
                         dividerThickness: kDividerThickness,
                         showBottomBorder: true,
-                        columns: _buildColumns(),
+                        columns: _buildColumns(context),
                         rows: model.tasks.map(_buildDataRow).toList(),
                         sortAscending: false,
                         showCheckboxColumn: true,
