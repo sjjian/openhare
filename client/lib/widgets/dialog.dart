@@ -106,21 +106,18 @@ class CustomDialog extends StatelessWidget {
           ),
           padding: const EdgeInsets.fromLTRB(
             kSpacingMedium,
-            kSpacingLarge,
+            kSpacingMedium,
             kSpacingMedium,
             kSpacingMedium,
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (titleIcon != null) ...[
-                    titleIcon!,
-                    const SizedBox(width: kSpacingTiny),
-                  ],
-                  Text(title, style: textTheme.titleLarge),
+                  if (titleIcon != null) titleIcon!,
+                  Text(title,
+                      style: textTheme.titleLarge, textAlign: TextAlign.center),
                 ],
               ),
               const SizedBox(height: kSpacingMedium),

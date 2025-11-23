@@ -348,9 +348,10 @@ class _ExportDataDialogContentState
 
     return CustomDialog(
       title: AppLocalizations.of(context)!.export_data_title,
-      titleIcon: const Icon(
-        Icons.file_download,
-        color: Colors.green,
+      titleIcon: const RectangleIconButton.medium(
+        icon: Icons.file_download,
+        iconColor: Colors.green,
+        verticalOffset: 1.5,
       ),
       content: Column(
         mainAxisSize: MainAxisSize.max,

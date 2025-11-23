@@ -82,16 +82,18 @@ class _RectangleIconButtonState extends State<RectangleIconButton> {
   @override
   Widget build(BuildContext context) {
     final button = MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor: widget.onPressed != null
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
         onEnter: (value) {
-          if (!_isHovering) {
+          if (widget.onPressed != null && !_isHovering) {
             setState(() {
               _isHovering = true;
             });
           }
         },
         onExit: (value) {
-          if (_isHovering) {
+          if (widget.onPressed != null && _isHovering) {
             setState(() {
               _isHovering = false;
             });
