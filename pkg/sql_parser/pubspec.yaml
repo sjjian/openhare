@@ -6,13 +6,6 @@ version: 1.0.0
 environment:
   sdk: ^3.2.1
 
-# Add regular dependencies here.
-dependencies:
-  # path: ^1.8.0
-  build: ^2.4.1
-  build_runner: ^2.4.9
-  source_gen: ^2.0.0
-
 dev_dependencies:
   lints: ^2.1.0
   test: ^1.25.2
