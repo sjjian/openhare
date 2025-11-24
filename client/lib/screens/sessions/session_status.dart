@@ -2,7 +2,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
-import 'package:client/utils/duration_extend.dart';
+import 'package:client/utils/time_format.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:client/widgets/divider.dart';

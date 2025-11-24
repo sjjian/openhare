@@ -3,7 +3,7 @@ import 'package:client/models/tasks.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:client/services/instances/instances.dart';
 import 'package:client/services/tasks/task.dart';
-import 'package:client/utils/duration_extend.dart';
+import 'package:client/utils/time_format.dart';
 import 'package:client/utils/open_file.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
@@ -66,55 +66,6 @@ class _TaskTableState extends ConsumerState<TaskTable> {
       case TaskStatus.cancelled:
         return colorScheme.outlineVariant;
     }
-  }
-
-  String _formatDateTime(BuildContext context, DateTime dateTime) {
-    final l10n = AppLocalizations.of(context)!;
-    final local = dateTime.toLocal();
-    final now = DateTime.now().toLocal();
-    final timeStr = '${local.hour.toString().padLeft(2, '0')}:'
-        '${local.minute.toString().padLeft(2, '0')}';
-
-    if (local.year == now.year &&
-        local.month == now.month &&
-        local.day == now.day) {
-      return '${l10n.date_today} $timeStr';
-    }
-
-    final yesterday = now.subtract(const Duration(days: 1));
-    if (local.year == yesterday.year &&
-        local.month == yesterday.month &&
-        local.day == yesterday.day) {
-      return '${l10n.date_yesterday} $timeStr';
-    }
-
-    final difference = now.difference(local);
-    if (difference.inDays < 7) {
-      final weekdays = [
-        l10n.date_monday,
-        l10n.date_tuesday,
-        l10n.date_wednesday,
-        l10n.date_thursday,
-        l10n.date_friday,
-        l10n.date_saturday,
-        l10n.date_sunday,
-      ];
-      return '${weekdays[local.weekday - 1]} $timeStr';
-    }
-
-    return '${local.year.toString().padLeft(4, '0')}-'
-        '${local.month.toString().padLeft(2, '0')}-'
-        '${local.day.toString().padLeft(2, '0')} $timeStr';
-  }
-
-  String _formatFullDateTime(DateTime dateTime) {
-    final local = dateTime.toLocal();
-    return '${local.year.toString().padLeft(4, '0')}-'
-        '${local.month.toString().padLeft(2, '0')}-'
-        '${local.day.toString().padLeft(2, '0')} '
-        '${local.hour.toString().padLeft(2, '0')}:'
-        '${local.minute.toString().padLeft(2, '0')}:'
-        '${local.second.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -310,9 +261,9 @@ class _TaskTableState extends ConsumerState<TaskTable> {
         DataCell(
             _buildText(params?.schema, isPlaceholder: params?.schema == null)),
         DataCell(Tooltip(
-          message: _formatFullDateTime(task.createdAt),
+          message: task.createdAt.formatFullDateTime(context),
           child: Text(
-            _formatDateTime(context, task.createdAt),
+            task.createdAt.formatDateTime(context),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         )),
