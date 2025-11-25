@@ -135,6 +135,8 @@
     "task_no_tasks": "暂无任务",
     "export_data_title": "导出数据",
     "export_data_directory_label": "导出的目录",
+    "export_data_directory_required": "请选择导出的目录",
+    "export_data_file_name_required": "请输入文件名",
     "tooltip_select_directory": "选择目录",
     "tooltip_ai_generate_file_name": "使用AI自动生成文件名和描述",
     "error_llm_agent_not_found": "未找到可用的LLM Agent，请先在设置中配置",

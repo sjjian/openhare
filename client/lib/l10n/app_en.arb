@@ -450,6 +450,14 @@
   "@export_data_directory_label": {
     "description": "Export data directory label"
   },
+  "export_data_directory_required": "Please select export directory",
+  "@export_data_directory_required": {
+    "description": "Export data directory required error message"
+  },
+  "export_data_file_name_required": "Please enter file name",
+  "@export_data_file_name_required": {
+    "description": "Export data file name required error message"
+  },
   "tooltip_select_directory": "Select directory",
   "@tooltip_select_directory": {
     "description": "Tooltip select directory"
