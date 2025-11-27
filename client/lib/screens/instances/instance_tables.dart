@@ -23,6 +23,8 @@ class InstancesPage extends StatelessWidget {
   }
 }
 
+final instanceSearchTextController = TextEditingController();
+
 class InstanceTable extends ConsumerStatefulWidget {
   const InstanceTable({super.key});
 
@@ -110,7 +112,6 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
 
     final model = ref.watch(instancesNotifierProvider);
 
-    final searchTextController = TextEditingController(text: model.key);
     return BodyPageSkeleton(
       bottomSpaceSize: kSpacingSmall,
       header: Row(
@@ -142,7 +143,16 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
                       maxWidth: 200,
                     )),
                 child: SearchBar(
-                  controller: searchTextController,
+                  controller: instanceSearchTextController,
+                  backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.surfaceContainerLow,
+                  ),
+                  side: WidgetStatePropertyAll(
+                    BorderSide(
+                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                      width: 0.5,
+                    ),
+                  ),
                   onChanged: (value) {
                     ref.read(instancesNotifierProvider.notifier).changePage(
                         value,
@@ -185,7 +195,7 @@ class _InstanceTableState extends ConsumerState<InstanceTable> {
             pageNumber: model.currentPage,
             onChange: (pageNumber) {
               ref.read(instancesNotifierProvider.notifier).changePage(
-                  searchTextController.text,
+                  instanceSearchTextController.text,
                   pageNumber: pageNumber,
                   pageSize: model.pageSize);
             },

@@ -34,6 +34,7 @@ class TaskTable extends ConsumerStatefulWidget {
 class _TaskTableState extends ConsumerState<TaskTable> {
   final Map<int, String> _fileErrors = {};
   final _verticalScrollController = ScrollController();
+  final _searchTextController = TextEditingController();
 
   String _statusLabel(BuildContext context, TaskStatus status) {
     final l10n = AppLocalizations.of(context)!;
@@ -70,6 +71,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
   @override
   void dispose() {
     _verticalScrollController.dispose();
+    _searchTextController.dispose();
     super.dispose();
   }
 
@@ -337,7 +339,6 @@ class _TaskTableState extends ConsumerState<TaskTable> {
   Widget build(BuildContext context) {
     final model = ref.watch(tasksNotifierProvider);
     final notifier = ref.read(tasksNotifierProvider.notifier);
-    final searchTextController = TextEditingController(text: model.key);
 
     return BodyPageSkeleton(
       bottomSpaceSize: kSpacingSmall,
@@ -357,11 +358,21 @@ class _TaskTableState extends ConsumerState<TaskTable> {
                     elevation: WidgetStatePropertyAll(0),
                     constraints: BoxConstraints(
                       minHeight: kIconSizeLarge,
-                      maxWidth: 240,
+                      maxWidth: 200,
                     ),
                   ),
                   child: SearchBar(
-                    controller: searchTextController,
+                    controller: _searchTextController,
+                    backgroundColor: WidgetStatePropertyAll(
+                      Theme.of(context).colorScheme.surfaceContainerLow,
+                    ),
+                    side: WidgetStatePropertyAll(
+                      BorderSide(
+                        color:
+                            Theme.of(context).colorScheme.surfaceContainerHigh,
+                        width: 0.5,
+                      ),
+                    ),
                     onChanged: (value) {
                       notifier.changePage(key: value);
                     },
@@ -415,7 +426,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
             pageNumber: model.currentPage,
             onChange: (pageNumber) {
               notifier.changePage(
-                key: searchTextController.text,
+                key: _searchTextController.text,
                 pageNumber: pageNumber,
               );
             },

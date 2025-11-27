@@ -1,5 +1,6 @@
 import 'package:client/screens/page_skeleton.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/screens/instances/instance_tables.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
@@ -18,7 +19,6 @@ class AddSession extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final model = ref.watch(instancesNotifierProvider);
-    final searchTextController = TextEditingController(text: model.key);
 
     if (model.totalCount == 0) {
       return EmptyPage(
@@ -137,7 +137,7 @@ class AddSession extends HookConsumerWidget {
                               maxWidth: 200,
                             )),
                         child: SearchBar(
-                          controller: searchTextController,
+                          controller: instanceSearchTextController,
                           onChanged: (value) {
                             ref
                                 .read(instancesNotifierProvider.notifier)
@@ -222,7 +222,7 @@ class AddSession extends HookConsumerWidget {
             pageNumber: model.currentPage,
             onChange: (pageNumber) {
               ref.read(instancesNotifierProvider.notifier).changePage(
-                  searchTextController.text,
+                  instanceSearchTextController.text,
                   pageNumber: pageNumber,
                   pageSize: model.pageSize);
             },
