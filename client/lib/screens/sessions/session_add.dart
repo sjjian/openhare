@@ -138,6 +138,17 @@ class AddSession extends HookConsumerWidget {
                             )),
                         child: SearchBar(
                           controller: instanceSearchTextController,
+                          backgroundColor: WidgetStatePropertyAll(
+                            Theme.of(context).colorScheme.surfaceContainerLow,
+                          ),
+                          side: WidgetStatePropertyAll(
+                            BorderSide(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHigh,
+                              width: 0.5,
+                            ),
+                          ),
                           onChanged: (value) {
                             ref
                                 .read(instancesNotifierProvider.notifier)
