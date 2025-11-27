@@ -14,24 +14,18 @@ class TaskRepoImpl implements TaskRepo {
   TaskRepoImpl();
 
   @override
-  TaskModel createTask({
-    required TaskType type,
-    String? parameters,
-    String? desc,
-  }) {
+  TaskModel createTask(TaskModel task) {
     final now = DateTime.now();
-    final task = TaskModel(
-      id: TaskId(value: _nextId++),
-      type: type,
-      status: TaskStatus.pending,
-      progress: 0.0,
-      createdAt: now,
+    // 如果任务没有 ID，自动生成一个
+    final taskId = task.id.value == 0 ? TaskId(value: _nextId++) : task.id;
+    // 确保 createdAt 和 updatedAt 已设置
+    final finalTask = task.copyWith(
+      id: taskId,
+      createdAt: task.createdAt.isBefore(DateTime(2000)) ? now : task.createdAt,
       updatedAt: now,
-      parameters: parameters,
-      desc: desc,
     );
-    _tasks[task.id.value] = task;
-    return task;
+    _tasks[finalTask.id.value] = finalTask;
+    return finalTask;
   }
 
   @override

@@ -2,7 +2,7 @@ import 'package:client/l10n/app_localizations.dart';
 import 'package:client/models/instances.dart';
 import 'package:client/models/tasks.dart';
 import 'package:client/services/ai/agent.dart';
-import 'package:client/services/tasks/task.dart';
+import 'package:client/services/tasks/export_data.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
@@ -29,25 +29,20 @@ Future<ExportDataParameters?> showExportDataDialog(
 }) async {
   return showDialog<ExportDataParameters>(
     context: context,
-    builder: (dialogContext) {
-      return _ExportDataDialogContent(
-        parentContext: context,
-        instanceId: instanceId,
-        schema: schema,
-        query: query,
-      );
-    },
+    builder: (_) => _ExportDataDialogContent(
+      instanceId: instanceId,
+      schema: schema,
+      query: query,
+    ),
   );
 }
 
 class _ExportDataDialogContent extends ConsumerStatefulWidget {
-  final BuildContext parentContext;
   final InstanceId instanceId;
   final String schema;
   final String query;
 
   const _ExportDataDialogContent({
-    required this.parentContext,
     required this.instanceId,
     required this.schema,
     required this.query,
@@ -62,8 +57,6 @@ class _ExportDataDialogContentState
     extends ConsumerState<_ExportDataDialogContent> {
   bool _isGenerating = false;
   String? _errorMessage;
-  bool _hasTriedInitializeDir = false; // 是否已尝试过初始化目录
-  late final TextEditingController instanceIdController;
   late final TextEditingController dirController;
   late final TextEditingController fileNameController;
   late final TextEditingController descController;
@@ -72,20 +65,20 @@ class _ExportDataDialogContentState
   @override
   void initState() {
     super.initState();
-    instanceIdController = TextEditingController(
-      text: widget.instanceId.value.toString(),
-    );
-    dirController = TextEditingController();
+    // 填充文件名
     fileNameController = TextEditingController(
       text:
-          'export-${DateTime.now().toIso8601String().replaceAll(":", "-").split('.')[0]}.xlsx',
+          'export-${DateTime.now().toIso8601String().split('.').first.replaceAll(':', '-')}.xlsx',
     );
+    // 自动填充目录
+    final latestTask = ref.read(latestExportTaskProvider);
+    dirController =
+        TextEditingController(text: latestTask?.parameters?.fileDir ?? '');
     descController = TextEditingController();
   }
 
   @override
   void dispose() {
-    instanceIdController.dispose();
     dirController.dispose();
     fileNameController.dispose();
     descController.dispose();
@@ -97,11 +90,7 @@ class _ExportDataDialogContentState
       dialogTitle: AppLocalizations.of(context)!.display_msg_downlaod,
     );
     if (directory != null) {
-      setState(() {
-        dirController.text = directory;
-      });
-      // 清除验证错误并更新按钮状态
-      _formKey.currentState?.validate();
+      dirController.text = directory;
     }
   }
 
@@ -115,17 +104,6 @@ class _ExportDataDialogContentState
     );
   }
 
-  bool _isFormValid() {
-    final formState = _formKey.currentState;
-    if (formState == null) return false;
-
-    // 检查所有字段是否有效
-    final dirValid = dirController.text.trim().isNotEmpty;
-    final fileNameValid = fileNameController.text.trim().isNotEmpty;
-
-    return dirValid && fileNameValid;
-  }
-
   void _handleSubmit() {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -133,7 +111,7 @@ class _ExportDataDialogContentState
 
     final parameters = _getExportDataParameters();
 
-    ref.read(tasksServicesProvider.notifier).exportData(
+    ref.read(exportDataTasksServicesProvider.notifier).exportData(
           parameters,
           desc: descController.text,
         );
@@ -141,25 +119,19 @@ class _ExportDataDialogContentState
     Navigator.of(context).pop();
   }
 
-  void _showError(String? message) {
-    setState(() {
-      _errorMessage = message;
-    });
-  }
-
   Future<void> _generateFileNameWithAI() async {
     final llmAgents = ref.read(lLMAgentServiceProvider);
     final lastUsedAgent = llmAgents.lastUsedLLMAgent;
 
     if (lastUsedAgent == null) {
-      _showError(AppLocalizations.of(context)!.error_llm_agent_not_found);
+      setState(() {
+        _errorMessage = AppLocalizations.of(context)!.error_llm_agent_not_found;
+      });
       return;
     }
 
-    // 清除之前的错误
-    _showError(null);
-
     setState(() {
+      _errorMessage = null;
       _isGenerating = true;
     });
 
@@ -186,18 +158,12 @@ class _ExportDataDialogContentState
       if (result.desc != null && result.desc!.isNotEmpty) {
         descController.text = result.desc!;
       }
-
-      // 成功时清除错误并触发验证，更新按钮状态
-      _showError(null);
-      if (mounted) {
-        setState(() {
-          _formKey.currentState?.validate();
-        });
-      }
     } catch (e) {
       if (mounted) {
-        _showError(AppLocalizations.of(context)!
-            .error_generate_file_name_failed(e.toString()));
+        setState(() {
+          _errorMessage = AppLocalizations.of(context)!
+              .error_generate_file_name_failed(e.toString());
+        });
       }
     } finally {
       if (mounted) {
@@ -320,51 +286,35 @@ class _ExportDataDialogContentState
     Widget? suffixIcon,
     bool required = false,
   }) {
+    final defaultBorder = OutlineInputBorder(
+      borderSide: BorderSide(
+        color: colorScheme.outline,
+        width: 0.5,
+      ),
+    );
+    final errorBorderStyle = OutlineInputBorder(
+      borderSide: BorderSide(
+        color: colorScheme.error,
+        width: 0.5,
+      ),
+    );
+
     return InputDecoration(
       label: required
-          ? Text.rich(
-              TextSpan(
-                text: labelText,
-                children: [
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: colorScheme.error),
-                  ),
-                ],
-              ),
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(labelText),
+                Text('*', style: TextStyle(color: colorScheme.error)),
+              ],
             )
-          : null,
-      labelText: required ? null : labelText,
-      border: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: colorScheme.outline,
-          width: 0.5,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: colorScheme.outline,
-          width: 0.5,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: colorScheme.primary,
-          width: 0.5,
-        ),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: colorScheme.error,
-          width: 0.5,
-        ),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: colorScheme.error,
-          width: 0.5,
-        ),
-      ),
+          : Text(labelText),
+      border: defaultBorder,
+      enabledBorder: defaultBorder,
+      disabledBorder: defaultBorder,
+      focusedBorder: defaultBorder,
+      errorBorder: errorBorderStyle,
+      focusedErrorBorder: errorBorderStyle,
       suffixIcon: suffixIcon,
     );
   }
@@ -373,27 +323,6 @@ class _ExportDataDialogContentState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    final latestTask = ref.watch(latestExportTaskProvider);
-
-    // 当有最新任务且目录字段为空时，自动填充目录（仅尝试一次）
-    if (!_hasTriedInitializeDir &&
-        latestTask != null &&
-        dirController.text.trim().isEmpty) {
-      final exportParams = latestTask.exportDataParameters;
-      if (exportParams != null && exportParams.fileDir.isNotEmpty) {
-        _hasTriedInitializeDir = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && dirController.text.trim().isEmpty) {
-            setState(() {
-              dirController.text = exportParams.fileDir;
-            });
-          }
-        });
-      } else {
-        _hasTriedInitializeDir = true;
-      }
-    }
 
     return CustomDialog(
       title: AppLocalizations.of(context)!.export_data_title,
@@ -412,10 +341,6 @@ class _ExportDataDialogContentState
             TextFormField(
               controller: dirController,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              // 触发重建以更新提交按钮的启用状态
-              onChanged: (_) {
-                setState(() {});
-              },
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return AppLocalizations.of(context)!
@@ -442,33 +367,23 @@ class _ExportDataDialogContentState
             ),
             const SizedBox(height: kSpacingMedium),
             // 文件名输入
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  controller: fileNameController,
-                  enabled: !_isGenerating,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  // 触发重建以更新提交按钮的启用状态
-                  onChanged: (_) {
-                    setState(() {});
-                  },
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return AppLocalizations.of(context)!
-                          .export_data_file_name_required;
-                    }
-                    return null;
-                  },
-                  decoration: _buildInputDecoration(
-                    colorScheme,
-                    labelText:
-                        AppLocalizations.of(context)!.task_column_file_name,
-                    required: true,
-                    suffixIcon: _buildFileNameSuffixIcons(context, colorScheme),
-                  ),
-                ),
-              ],
+            TextFormField(
+              controller: fileNameController,
+              enabled: !_isGenerating,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return AppLocalizations.of(context)!
+                      .export_data_file_name_required;
+                }
+                return null;
+              },
+              decoration: _buildInputDecoration(
+                colorScheme,
+                labelText: AppLocalizations.of(context)!.task_column_file_name,
+                required: true,
+                suffixIcon: _buildFileNameSuffixIcons(context, colorScheme),
+              ),
             ),
             const SizedBox(height: kSpacingMedium),
             // 备注
@@ -494,7 +409,7 @@ class _ExportDataDialogContentState
         ),
         const SizedBox(width: kSpacingSmall),
         TextButton(
-          onPressed: _isFormValid() ? _handleSubmit : null,
+          onPressed: _handleSubmit,
           child: Text(AppLocalizations.of(context)!.submit),
         ),
       ],

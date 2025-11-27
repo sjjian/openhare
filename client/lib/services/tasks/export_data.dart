@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:convert';
 
 import 'package:client/models/tasks.dart';
 import 'package:client/repositories/tasks/task.dart';
@@ -9,19 +8,12 @@ import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/models/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:excel/excel.dart' as excel;
-import 'package:path/path.dart' as p;
 import 'package:client/utils/file_utils.dart';
 
-part 'task.g.dart';
-
-abstract class Task {
-  start();
-  stop();
-  onStatusChanged(TaskStatus status);
-}
+part 'export_data.g.dart';
 
 @Riverpod()
-class TasksServices extends _$TasksServices {
+class ExportDataTasksServices extends _$ExportDataTasksServices {
   TaskRepo get _repo => ref.read(taskRepoProvider);
 
   @override
@@ -29,20 +21,32 @@ class TasksServices extends _$TasksServices {
     return 1;
   }
 
-  TaskModel createTask({
-    required TaskType type,
-    String? parameters,
-    String? desc,
-  }) {
-    return _repo.createTask(type: type, parameters: parameters, desc: desc);
+  ExportDataModel _createTask(ExportDataModel task) {
+    final taskModel = _repo.createTask(task.toModel());
+    ref.invalidate(tasksNotifierProvider);
+    return ExportDataModel.fromModel(taskModel);
   }
 
-  PaginationTaskListModel tasks(
+  void _updateTask(ExportDataModel task) {
+    _repo.updateTask(task.toModel());
+    ref.invalidate(tasksNotifierProvider);
+  }
+
+  void deleteTask(TaskId id) {
+    _repo.deleteTask(id);
+    ref.invalidate(tasksNotifierProvider);
+  }
+
+  ExportDataModel? getLatestTask() {
+    final task = _repo.getLatestTask(type: TaskType.exportData);
+    return task != null ? ExportDataModel.fromModel(task) : null;
+  }
+
+  PaginationExportDataTaskListModel tasks(
     String key, {
     int? pageNumber,
     int? pageSize,
     TaskStatus? status,
-    TaskType? type,
   }) {
     final sanitizedKey = key.trim();
     final currentPage = (pageNumber != null && pageNumber > 0) ? pageNumber : 1;
@@ -53,54 +57,46 @@ class TasksServices extends _$TasksServices {
       pageNumber: currentPage,
       pageSize: size,
       status: status,
-      type: type,
+      type: TaskType.exportData,
     );
 
     // 获取总数量（无筛选条件）
     final totalResult = _repo.getTasks();
 
-    return PaginationTaskListModel(
-      tasks: result.tasks,
+    return PaginationExportDataTaskListModel(
+      tasks:
+          result.tasks.map((task) => ExportDataModel.fromModel(task)).toList(),
       currentPage: currentPage,
       pageSize: size,
       count: result.count,
       key: sanitizedKey,
       totalCount: totalResult.count,
       status: status,
-      type: type,
     );
-  }
-
-  TaskModel? getTaskById(TaskId id) {
-    return _repo.getTaskById(id);
-  }
-
-  TaskModel? getLatestTask({TaskType? type}) {
-    return _repo.getLatestTask(type: type);
-  }
-
-  void updateTask(TaskModel task) {
-    _repo.updateTask(task);
-    ref.invalidate(tasksNotifierProvider);
-  }
-
-  void deleteTask(TaskId id) {
-    _repo.deleteTask(id);
-    ref.invalidate(tasksNotifierProvider);
   }
 
   Future<void> exportData(ExportDataParameters parameters,
       {String? desc}) async {
-    TaskModel task = createTask(
-      type: TaskType.exportData,
-      parameters: jsonEncode(parameters.toJson()),
+    // 获取唯一的文件名，如果文件已存在则自动添加序号
+    final uniqueFileName =
+        getUniqueFileName(parameters.fileDir, parameters.fileName);
+    // 更新参数，使用实际保存的文件名
+    final finalParameters = parameters.copyWith(fileName: uniqueFileName);
+
+    final now = DateTime.now();
+    ExportDataModel task = _createTask(ExportDataModel(
+      id: TaskId.empty(),
+      parameters: finalParameters,
       desc: desc,
-    );
+      status: TaskStatus.running,
+      progress: 0.0,
+      createdAt: now,
+      updatedAt: now,
+    ));
 
     final connServices = ref.read(sessionConnsServicesProvider.notifier);
     SessionConnModel? connModel;
     try {
-      print("start create conn, parameters: $parameters");
       connModel = await connServices.createConn(parameters.instanceId,
           currentSchema: parameters.schema);
       await connServices.connect(connModel.connId);
@@ -119,42 +115,33 @@ class TasksServices extends _$TasksServices {
                 (e) => excel.TextCellValue(e.getString() ?? ''))
             .toList());
       }
-      print("start file save");
-      // 获取唯一的文件名，如果文件已存在则自动添加序号
-      final uniqueFileName = getUniqueFileName(parameters.fileDir, parameters.fileName);
-      File file = File(p.join(parameters.fileDir, uniqueFileName));
+
+      File file = File(finalParameters.exportFilePath);
       await file.writeAsBytes(data.save()!);
-      print("file save success, saved as: $uniqueFileName");
-      
-      // 更新参数，使用实际保存的文件名
-      final finalParameters = parameters.copyWith(fileName: uniqueFileName);
-      updateTask(task.copyWith(
+
+      _updateTask(task.copyWith(
         status: TaskStatus.completed,
-        parameters: jsonEncode(finalParameters.toJson()),
       ));
     } catch (e) {
-      updateTask(
-          task.copyWith(status: TaskStatus.failed, errorMessage: e.toString()));
-      print("export data error: $e");
+      _updateTask(task.copyWith(
+        status: TaskStatus.failed,
+        errorMessage: e.toString(),
+      ));
     } finally {
       if (connModel != null) {
-        print("start close conn");
         await connServices.close(connModel.connId);
-        print("close conn success");
         await connServices.removeConn(connModel.connId);
-        print("remove conn success");
       }
     }
-    return;
   }
 }
 
 @Riverpod(keepAlive: true)
 class TasksNotifier extends _$TasksNotifier {
   @override
-  PaginationTaskListModel build() {
+  PaginationExportDataTaskListModel build() {
     return ref
-        .read(tasksServicesProvider.notifier)
+        .read(exportDataTasksServicesProvider.notifier)
         .tasks("", pageNumber: 1, pageSize: 10);
   }
 
@@ -163,24 +150,22 @@ class TasksNotifier extends _$TasksNotifier {
     int? pageNumber,
     int? pageSize,
     TaskStatus? status,
-    TaskType? type,
   }) {
-    state = ref.read(tasksServicesProvider.notifier).tasks(
+    state = ref.read(exportDataTasksServicesProvider.notifier).tasks(
           key ?? state.key,
           pageNumber: pageNumber ?? state.currentPage,
           pageSize: pageSize ?? state.pageSize,
           status: status ?? state.status,
-          type: type ?? state.type,
         );
   }
 }
 
 @Riverpod(keepAlive: true)
-TaskModel? latestExportTask(Ref ref) {
+ExportDataModel? latestExportTask(Ref ref) {
   // 监听任务列表变化，当任务更新时自动重新计算
   ref.watch(tasksNotifierProvider);
-  
-  return ref.read(tasksServicesProvider.notifier).getLatestTask(
-    type: TaskType.exportData,
-  );
+
+  final task =
+      ref.read(exportDataTasksServicesProvider.notifier).getLatestTask();
+  return task;
 }

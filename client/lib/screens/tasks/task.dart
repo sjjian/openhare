@@ -2,7 +2,7 @@ import 'package:client/l10n/app_localizations.dart';
 import 'package:client/models/tasks.dart';
 import 'package:client/screens/page_skeleton.dart';
 import 'package:client/services/instances/instances.dart';
-import 'package:client/services/tasks/task.dart';
+import 'package:client/services/tasks/export_data.dart';
 import 'package:client/utils/time_format.dart';
 import 'package:client/utils/open_file.dart';
 import 'package:client/widgets/button.dart';
@@ -11,7 +11,6 @@ import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/paginated_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 
 class TaskPage extends StatelessWidget {
   const TaskPage({super.key});
@@ -104,7 +103,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     }
   }
 
-  Widget _buildStatusChip(BuildContext context, TaskModel task) {
+  Widget _buildStatusChip(BuildContext context, ExportDataModel task) {
     final status = task.status;
     final color = _statusColor(context, status);
     final isRunning = status == TaskStatus.running;
@@ -230,14 +229,13 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     return _buildText(fileName);
   }
 
-  DataRow _buildDataRow(TaskModel task) {
-    final tasksService = ref.read(tasksServicesProvider.notifier);
+  DataRow _buildDataRow(ExportDataModel task) {
+    final tasksService = ref.read(exportDataTasksServicesProvider.notifier);
     final instancesService = ref.read(instancesServicesProvider.notifier);
-    final params = task.exportDataParameters;
-    final fileName = params?.fileName;
-    final exportPath =
-        params != null ? p.join(params.fileDir, params.fileName) : null;
-    final instanceId = params?.instanceId;
+    final fileName = task.parameters?.fileName;
+    final exportPath = task.parameters?.exportFilePath;
+    final instanceId = task.parameters?.instanceId;
+    final schema = task.parameters?.schema;
     final instance = instanceId != null
         ? instancesService.getInstanceById(instanceId)
         : null;
@@ -258,8 +256,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
         ),
         DataCell(_buildText(task.desc)),
         DataCell(_buildText(instance?.name, isPlaceholder: instance == null)),
-        DataCell(
-            _buildText(params?.schema, isPlaceholder: params?.schema == null)),
+        DataCell(_buildText(schema, isPlaceholder: schema == null)),
         DataCell(Tooltip(
           message: task.createdAt.formatFullDateTime(context),
           child: Text(

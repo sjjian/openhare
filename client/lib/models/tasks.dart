@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:client/models/instances.dart';
 
@@ -26,6 +25,12 @@ abstract class TaskId with _$TaskId {
   const factory TaskId({
     required int value,
   }) = _TaskId;
+
+  factory TaskId.empty() => const TaskId(value: 0);
+
+  const TaskId._();
+
+  bool get isEmpty => value == 0;
 }
 
 // 数据导出任务参数
@@ -39,7 +44,15 @@ abstract class ExportDataParameters with _$ExportDataParameters {
     required String fileName, // 导出文件名
   }) = _ExportDataParameters;
 
-  factory ExportDataParameters.fromJson(Map<String, dynamic> json) => _$ExportDataParametersFromJson(json);
+  const ExportDataParameters._();
+
+  /// 获取导出文件路径
+  String get exportFilePath {
+    return '$fileDir/$fileName';
+  }
+
+  factory ExportDataParameters.fromJson(Map<String, dynamic> json) =>
+      _$ExportDataParametersFromJson(json);
 }
 
 // 分页查询结果
@@ -56,11 +69,7 @@ class TaskListResult {
 // 任务仓库接口
 abstract class TaskRepo {
   // 创建任务
-  TaskModel createTask({
-    required TaskType type,
-    String? parameters,
-    String? desc,
-  });
+  TaskModel createTask(TaskModel task);
 
   // 删除任务
   void deleteTask(TaskId id);
@@ -100,49 +109,94 @@ abstract class TaskModel with _$TaskModel {
     String? result,
     String? desc,
   }) = _TaskModel;
+}
 
-  // 便捷方法
-  const TaskModel._();
+// todo: TaskModel 与 ExportDataModel 有大量重复字段，后续看有啥好的方式优化
+@freezed
+abstract class ExportDataModel with _$ExportDataModel {
+  const factory ExportDataModel({
+    required TaskId id,
+    required TaskStatus status,
+    required double progress,
+    String? currentStep,
+    String? progressMessage,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    String? errorMessage,
+    String? errorDetails,
+    ExportDataParameters? parameters,
+    String? result,
+    String? desc,
+  }) = _ExportDataModel;
 
-  bool get isCompleted => status == TaskStatus.completed;
-  bool get isRunning => status == TaskStatus.running;
-  bool get hasError => status == TaskStatus.failed;
-  bool get isPending => status == TaskStatus.pending;
+  const ExportDataModel._();
+
+  factory ExportDataModel.fromModel(TaskModel model) {
+    if (model.type != TaskType.exportData) {
+      throw ArgumentError('TaskModel type must be exportData');
+    }
+    ExportDataParameters? parsedParameters;
+    if (model.parameters != null) {
+      try {
+        final json = jsonDecode(model.parameters!);
+        if (json is Map<String, dynamic>) {
+          parsedParameters = ExportDataParameters.fromJson(json);
+        }
+      } catch (e) {
+        // 解析失败时保持为 null
+      }
+    }
+    return ExportDataModel(
+      id: model.id,
+      status: model.status,
+      progress: model.progress,
+      currentStep: model.currentStep,
+      progressMessage: model.progressMessage,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt,
+      errorMessage: model.errorMessage,
+      errorDetails: model.errorDetails,
+      parameters: parsedParameters,
+      result: model.result,
+      desc: model.desc,
+    );
+  }
+
+  TaskModel toModel() {
+    return TaskModel(
+      id: id,
+      type: TaskType.exportData,
+      status: status,
+      progress: progress,
+      currentStep: currentStep,
+      progressMessage: progressMessage,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      errorMessage: errorMessage,
+      errorDetails: errorDetails,
+      parameters: parameters != null ? jsonEncode(parameters!.toJson()) : null,
+      result: result,
+      desc: desc,
+    );
+  }
 
   // 格式化的进度百分比
   String get progressPercent => '${(progress * 100).round()}%';
 
   // 任务持续时间
   Duration get duration => updatedAt.difference(createdAt);
-
-  // 获取导出数据参数
-  ExportDataParameters? get exportDataParameters {
-    if (type != TaskType.exportData) return null;
-    if (parameters == null) return null;
-    
-    try {
-      final params = jsonDecode(parameters!);
-      if (params is Map<String, dynamic>) {
-        return ExportDataParameters.fromJson(params);
-      }
-    } catch (e) {
-      return null;
-    }
-    
-    return null;
-  }
 }
 
 @freezed
-abstract class PaginationTaskListModel with _$PaginationTaskListModel {
-  const factory PaginationTaskListModel({
-    required List<TaskModel> tasks,
+abstract class PaginationExportDataTaskListModel
+    with _$PaginationExportDataTaskListModel {
+  const factory PaginationExportDataTaskListModel({
+    required List<ExportDataModel> tasks,
     required int currentPage,
     required int pageSize,
     required int count,
     required String key,
     required int totalCount,
     TaskStatus? status,
-    TaskType? type,
-  }) = _PaginationTaskListModel;
+  }) = _PaginationExportDataTaskListModel;
 }
