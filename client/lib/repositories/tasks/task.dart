@@ -67,7 +67,6 @@ class TaskRepoImpl implements TaskRepo {
     String? key,
     int? pageNumber,
     int? pageSize,
-    TaskStatus? status,
     TaskType? type,
   }) {
     // 过滤任务
@@ -81,12 +80,6 @@ class TaskRepoImpl implements TaskRepo {
               task.desc?.toLowerCase().contains(sanitizedKey.toLowerCase()) ??
               false)
           .toList();
-    }
-
-    // 按状态过滤
-    if (status != null) {
-      filteredTasks =
-          filteredTasks.where((task) => task.status == status).toList();
     }
 
     // 按类型过滤

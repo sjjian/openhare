@@ -1,7 +1,6 @@
 import 'package:client/l10n/app_localizations.dart';
 import 'package:client/models/tasks.dart';
 import 'package:client/screens/page_skeleton.dart';
-import 'package:client/services/instances/instances.dart';
 import 'package:client/services/tasks/export_data.dart';
 import 'package:client/utils/time_format.dart';
 import 'package:client/utils/open_file.dart';
@@ -105,7 +104,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     }
   }
 
-  Widget _buildStatusChip(BuildContext context, ExportDataModel task) {
+  Widget _buildStatusChip(BuildContext context, ExportDataTaskListItemModel task) {
     final status = task.status;
     final color = _statusColor(context, status);
     final isRunning = status == TaskStatus.running;
@@ -231,16 +230,12 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     return _buildText(fileName);
   }
 
-  DataRow _buildDataRow(ExportDataModel task) {
+  DataRow _buildDataRow(ExportDataTaskListItemModel task) {
     final tasksService = ref.read(exportDataTasksServicesProvider.notifier);
-    final instancesService = ref.read(instancesServicesProvider.notifier);
-    final fileName = task.parameters?.fileName;
-    final exportPath = task.parameters?.exportFilePath;
-    final instanceId = task.parameters?.instanceId;
-    final schema = task.parameters?.schema;
-    final instance = instanceId != null
-        ? instancesService.getInstanceById(instanceId)
-        : null;
+    final fileName = task.fileName;
+    final exportPath = task.exportFilePath;
+    final instanceName = task.instanceName;
+    final schema = task.schema;
     final colorScheme = Theme.of(context).colorScheme;
 
     return DataRow(
@@ -257,7 +252,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
           ),
         ),
         DataCell(_buildText(task.desc)),
-        DataCell(_buildText(instance?.name, isPlaceholder: instance == null)),
+        DataCell(_buildText(instanceName, isPlaceholder: instanceName == null)),
         DataCell(_buildText(schema, isPlaceholder: schema == null)),
         DataCell(Tooltip(
           message: task.createdAt.formatFullDateTime(context),
@@ -337,8 +332,8 @@ class _TaskTableState extends ConsumerState<TaskTable> {
 
   @override
   Widget build(BuildContext context) {
-    final model = ref.watch(tasksNotifierProvider);
-    final notifier = ref.read(tasksNotifierProvider.notifier);
+    final model = ref.watch(exportDataTaskPaginationListNotifierProvider);
+    final notifier = ref.read(exportDataTaskPaginationListNotifierProvider.notifier);
 
     return BodyPageSkeleton(
       bottomSpaceSize: kSpacingSmall,
@@ -377,7 +372,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
                       notifier.changePage(key: value);
                     },
                     onSubmitted: (value) {
-                      notifier.changePage(key: value, pageNumber: 1);
+                      notifier.changePage(key: value);
                     },
                     trailing: const [Icon(Icons.search)],
                   ),
@@ -423,7 +418,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
           TablePaginatedBar(
             count: model.count,
             pageSize: model.pageSize,
-            pageNumber: model.currentPage,
+            pageNumber: model.pageNumber,
             onChange: (pageNumber) {
               notifier.changePage(
                 key: _searchTextController.text,

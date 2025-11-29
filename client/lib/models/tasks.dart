@@ -33,28 +33,6 @@ abstract class TaskId with _$TaskId {
   bool get isEmpty => value == 0;
 }
 
-// 数据导出任务参数
-@freezed
-abstract class ExportDataParameters with _$ExportDataParameters {
-  const factory ExportDataParameters({
-    required InstanceId instanceId, // 数据源实例ID
-    required String schema, // 数据库schema
-    required String query, // SQL查询语句
-    required String fileDir, // 导出文件路径
-    required String fileName, // 导出文件名
-  }) = _ExportDataParameters;
-
-  const ExportDataParameters._();
-
-  /// 获取导出文件路径
-  String get exportFilePath {
-    return '$fileDir/$fileName';
-  }
-
-  factory ExportDataParameters.fromJson(Map<String, dynamic> json) =>
-      _$ExportDataParametersFromJson(json);
-}
-
 // 分页查询结果
 class TaskListResult {
   final List<TaskModel> tasks;
@@ -84,12 +62,12 @@ abstract class TaskRepo {
   TaskModel? getLatestTask({TaskType? type});
 
   // 分页获取任务（返回list和count）
-  TaskListResult getTasks(
-      {String? key,
-      int? pageNumber,
-      int? pageSize,
-      TaskStatus? status,
-      TaskType? type});
+  TaskListResult getTasks({
+    String? key,
+    int? pageNumber,
+    int? pageSize,
+    TaskType? type,
+  });
 }
 
 @freezed
@@ -109,6 +87,28 @@ abstract class TaskModel with _$TaskModel {
     String? result,
     String? desc,
   }) = _TaskModel;
+}
+
+// 数据导出任务参数
+@freezed
+abstract class ExportDataParameters with _$ExportDataParameters {
+  const factory ExportDataParameters({
+    required InstanceId instanceId, // 数据源实例ID
+    required String schema, // 数据库schema
+    required String query, // SQL查询语句
+    required String fileDir, // 导出文件路径
+    required String fileName, // 导出文件名
+  }) = _ExportDataParameters;
+
+  const ExportDataParameters._();
+
+  /// 获取导出文件路径
+  String get exportFilePath {
+    return '$fileDir/$fileName';
+  }
+
+  factory ExportDataParameters.fromJson(Map<String, dynamic> json) =>
+      _$ExportDataParametersFromJson(json);
 }
 
 // todo: TaskModel 与 ExportDataModel 有大量重复字段，后续看有啥好的方式优化
@@ -187,16 +187,40 @@ abstract class ExportDataModel with _$ExportDataModel {
   Duration get duration => updatedAt.difference(createdAt);
 }
 
+// 导出数据任务列表项（仅包含展示所需字段）
 @freezed
-abstract class PaginationExportDataTaskListModel
-    with _$PaginationExportDataTaskListModel {
-  const factory PaginationExportDataTaskListModel({
-    required List<ExportDataModel> tasks,
-    required int currentPage,
-    required int pageSize,
+abstract class ExportDataTaskListItemModel with _$ExportDataTaskListItemModel {
+  const factory ExportDataTaskListItemModel({
+    required TaskId id,
+    required TaskStatus status,
+    required double progress,
+    String? desc,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    String? fileName,
+    String? exportFilePath,
+    String? instanceName,
+    String? schema,
+  }) = _ExportDataTaskListItemModel;
+
+  const ExportDataTaskListItemModel._();
+
+  // 格式化的进度百分比
+  String get progressPercent => '${(progress * 100).round()}%';
+
+  // 任务持续时间
+  Duration get duration => updatedAt.difference(createdAt);
+}
+
+@freezed
+abstract class ExportDataTaskPaginationListModel
+    with _$ExportDataTaskPaginationListModel {
+  const factory ExportDataTaskPaginationListModel({
+    required List<ExportDataTaskListItemModel> tasks,
     required int count,
-    required String key,
-    required int totalCount,
-    TaskStatus? status,
-  }) = _PaginationExportDataTaskListModel;
+    // param for 分页.
+    required int pageNumber,
+    required int pageSize,
+    String? key,
+  }) = _ExportDataTaskPaginationListModel;
 }

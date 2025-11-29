@@ -5,6 +5,7 @@ import 'package:client/repositories/tasks/task.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:client/services/sessions/session_conn.dart';
+import 'package:client/services/instances/instances.dart';
 import 'package:client/models/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:excel/excel.dart' as excel;
@@ -12,7 +13,7 @@ import 'package:client/utils/file_utils.dart';
 
 part 'export_data.g.dart';
 
-@Riverpod()
+@Riverpod(keepAlive: true)
 class ExportDataTasksServices extends _$ExportDataTasksServices {
   TaskRepo get _repo => ref.read(taskRepoProvider);
 
@@ -21,20 +22,25 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
     return 1;
   }
 
+  invalidate() {
+    ref.invalidate(exportDataTaskPaginationListNotifierProvider);
+    ref.invalidate(latestExportTaskProvider);
+  }
+
   ExportDataModel _createTask(ExportDataModel task) {
     final taskModel = _repo.createTask(task.toModel());
-    ref.invalidate(tasksNotifierProvider);
+    invalidate();
     return ExportDataModel.fromModel(taskModel);
   }
 
   void _updateTask(ExportDataModel task) {
     _repo.updateTask(task.toModel());
-    ref.invalidate(tasksNotifierProvider);
+    invalidate();
   }
 
   void deleteTask(TaskId id) {
     _repo.deleteTask(id);
-    ref.invalidate(tasksNotifierProvider);
+    invalidate();
   }
 
   ExportDataModel? getLatestTask() {
@@ -42,36 +48,16 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
     return task != null ? ExportDataModel.fromModel(task) : null;
   }
 
-  PaginationExportDataTaskListModel tasks(
-    String key, {
+  TaskListResult getTasks({
+    String? key,
     int? pageNumber,
     int? pageSize,
-    TaskStatus? status,
   }) {
-    final sanitizedKey = key.trim();
-    final currentPage = (pageNumber != null && pageNumber > 0) ? pageNumber : 1;
-    final size = (pageSize != null && pageSize > 0) ? pageSize : 10;
-
-    final result = _repo.getTasks(
-      key: sanitizedKey.isEmpty ? null : sanitizedKey,
-      pageNumber: currentPage,
-      pageSize: size,
-      status: status,
+    return _repo.getTasks(
+      key: key,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
       type: TaskType.exportData,
-    );
-
-    // 获取总数量（无筛选条件）
-    final totalResult = _repo.getTasks();
-
-    return PaginationExportDataTaskListModel(
-      tasks:
-          result.tasks.map((task) => ExportDataModel.fromModel(task)).toList(),
-      currentPage: currentPage,
-      pageSize: size,
-      count: result.count,
-      key: sanitizedKey,
-      totalCount: totalResult.count,
-      status: status,
     );
   }
 
@@ -137,35 +123,68 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
 }
 
 @Riverpod(keepAlive: true)
-class TasksNotifier extends _$TasksNotifier {
+class ExportDataTaskPaginationListNotifier
+    extends _$ExportDataTaskPaginationListNotifier {
   @override
-  PaginationExportDataTaskListModel build() {
-    return ref
-        .read(exportDataTasksServicesProvider.notifier)
-        .tasks("", pageNumber: 1, pageSize: 10);
+  ExportDataTaskPaginationListModel build() {
+    return _tasks();
+  }
+
+  ExportDataTaskPaginationListModel _tasks({
+    String? key,
+    int pageNumber = 1,
+    int pageSize = 10,
+  }) {
+    final result = ref.read(exportDataTasksServicesProvider.notifier).getTasks(
+          key: key,
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+        );
+
+    return ExportDataTaskPaginationListModel(
+      tasks: result.tasks.map((task) {
+        final exportDataModel = ExportDataModel.fromModel(task);
+        final instanceId = exportDataModel.parameters?.instanceId;
+        final instanceName = instanceId != null
+            ? ref
+                .read(instancesServicesProvider.notifier)
+                .getInstanceById(instanceId)
+                ?.name
+            : null;
+        return ExportDataTaskListItemModel(
+          id: exportDataModel.id,
+          status: exportDataModel.status,
+          progress: exportDataModel.progress,
+          desc: exportDataModel.desc,
+          createdAt: exportDataModel.createdAt,
+          updatedAt: exportDataModel.updatedAt,
+          fileName: exportDataModel.parameters?.fileName,
+          exportFilePath: exportDataModel.parameters?.exportFilePath,
+          instanceName: instanceName,
+          schema: exportDataModel.parameters?.schema,
+        );
+      }).toList(),
+      count: result.count,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      key: key,
+    );
   }
 
   void changePage({
     String? key,
     int? pageNumber,
     int? pageSize,
-    TaskStatus? status,
   }) {
-    state = ref.read(exportDataTasksServicesProvider.notifier).tasks(
-          key ?? state.key,
-          pageNumber: pageNumber ?? state.currentPage,
-          pageSize: pageSize ?? state.pageSize,
-          status: status ?? state.status,
-        );
+    state = _tasks(
+      key: key ?? state.key,
+      pageNumber: pageNumber ?? state.pageNumber,
+      pageSize: pageSize ?? state.pageSize,
+    );
   }
 }
 
 @Riverpod(keepAlive: true)
 ExportDataModel? latestExportTask(Ref ref) {
-  // 监听任务列表变化，当任务更新时自动重新计算
-  ref.watch(tasksNotifierProvider);
-
-  final task =
-      ref.read(exportDataTasksServicesProvider.notifier).getLatestTask();
-  return task;
+  return ref.read(exportDataTasksServicesProvider.notifier).getLatestTask();
 }
