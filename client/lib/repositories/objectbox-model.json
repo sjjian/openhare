@@ -198,9 +198,83 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "11:2888344575085533691",
+      "lastPropertyId": "13:6298012119219326152",
+      "name": "TaskStorage",
+      "properties": [
+        {
+          "id": "1:7299425937798658047",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1196333844085124522",
+          "name": "progress",
+          "type": 8
+        },
+        {
+          "id": "3:4862585763137259704",
+          "name": "currentStep",
+          "type": 9
+        },
+        {
+          "id": "4:5495657418935052604",
+          "name": "progressMessage",
+          "type": 9
+        },
+        {
+          "id": "5:3260670039947493748",
+          "name": "createdAt",
+          "type": 12
+        },
+        {
+          "id": "6:8884644429800963575",
+          "name": "updatedAt",
+          "type": 12
+        },
+        {
+          "id": "7:3644921050186382244",
+          "name": "errorMessage",
+          "type": 9
+        },
+        {
+          "id": "8:7922625903150635948",
+          "name": "errorDetails",
+          "type": 9
+        },
+        {
+          "id": "9:3814331914377463100",
+          "name": "parameters",
+          "type": 9
+        },
+        {
+          "id": "10:5098126763102576323",
+          "name": "result",
+          "type": 9
+        },
+        {
+          "id": "11:4795165139912990837",
+          "name": "desc",
+          "type": 9
+        },
+        {
+          "id": "12:5966449161347064134",
+          "name": "stTaskType",
+          "type": 6
+        },
+        {
+          "id": "13:6298012119219326152",
+          "name": "stStatus",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "10:4873094505739618540",
+  "lastEntityId": "11:2888344575085533691",
   "lastIndexId": "5:4181279812179301982",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

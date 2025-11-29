@@ -47,7 +47,7 @@ class TaskListResult {
 // 任务仓库接口
 abstract class TaskRepo {
   // 创建任务
-  TaskModel createTask(TaskModel task);
+  TaskId createTask(TaskModel task);
 
   // 删除任务
   void deleteTask(TaskId id);
@@ -57,9 +57,6 @@ abstract class TaskRepo {
 
   // 根据ID获取任务
   TaskModel? getTaskById(TaskId id);
-
-  // 获取最近一次任务（可选按类型过滤）
-  TaskModel? getLatestTask({TaskType? type});
 
   // 分页获取任务（返回list和count）
   TaskListResult getTasks({

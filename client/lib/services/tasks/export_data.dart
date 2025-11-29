@@ -28,8 +28,12 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
   }
 
   ExportDataModel _createTask(ExportDataModel task) {
-    final taskModel = _repo.createTask(task.toModel());
+    final taskId = _repo.createTask(task.toModel());
     invalidate();
+    final taskModel = _repo.getTaskById(taskId);
+    if (taskModel == null) {
+      throw Exception('Failed to create task');
+    }
     return ExportDataModel.fromModel(taskModel);
   }
 
@@ -44,7 +48,14 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
   }
 
   ExportDataModel? getLatestTask() {
-    final task = _repo.getLatestTask(type: TaskType.exportData);
+    final task = _repo
+        .getTasks(
+          type: TaskType.exportData,
+          pageNumber: 1,
+          pageSize: 1,
+        )
+        .tasks
+        .firstOrNull;
     return task != null ? ExportDataModel.fromModel(task) : null;
   }
 
