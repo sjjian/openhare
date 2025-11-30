@@ -5,11 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:windows_single_instance/windows_single_instance.dart';
 
-void main() async {
+void main(List<String> args) async {
   // This is required so ObjectBox can get the application directory
   // to store the database in.
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 确保应用只运行一个实例
+  await WindowsSingleInstance.ensureSingleInstance(
+    args,
+    "openhare",
+    onSecondWindow: (args) {},
+  );
 
   await initObjectbox();
 
