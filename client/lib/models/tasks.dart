@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:client/models/instances.dart';
+import 'package:path/path.dart' as p;
 
 part 'tasks.freezed.dart';
 part 'tasks.g.dart';
@@ -99,9 +100,8 @@ abstract class ExportDataParameters with _$ExportDataParameters {
 
   const ExportDataParameters._();
 
-  /// 获取导出文件路径
   String get exportFilePath {
-    return '$fileDir/$fileName';
+    return p.join(fileDir, fileName);
   }
 
   factory ExportDataParameters.fromJson(Map<String, dynamic> json) =>

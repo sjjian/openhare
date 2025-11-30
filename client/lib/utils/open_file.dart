@@ -49,8 +49,17 @@ Future<bool> openFileInFolder(String filePath) async {
     return result.exitCode == 0;
   } else if (Platform.isWindows) {
     // Windows: explorer /select, 会打开文件资源管理器并选中文件
-    final result = await Process.run('explorer', ['/select,', filePath], runInShell: true);
-    return result.exitCode == 0;
+    // 注意：/select, 和路径之间不能有空格
+    // 注意：explorer 是 GUI 程序，即使成功也可能返回非零退出码，所以我们不检查退出码
+    // 只要文件存在，我们就认为命令会成功执行
+    try {
+      // 使用 runInShell: true 让 shell 处理参数解析，确保路径中的空格和特殊字符被正确处理
+      await Process.start('explorer', ['/select,$filePath'], runInShell: true);
+      return true; // 文件存在且已尝试打开，认为成功
+    } catch (e) {
+      // 如果启动进程失败，返回 false
+      return false;
+    }
   } else if (Platform.isLinux) {
     // Linux: 打开文件所在文件夹
     final directory = p.dirname(filePath);
