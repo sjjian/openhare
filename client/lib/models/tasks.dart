@@ -86,9 +86,7 @@ abstract class TaskModel with _$TaskModel {
     required DateTime createdAt,
     DateTime? completedAt,
     String? errorMessage,
-    String? errorDetails,
     String? parameters,
-    String? result,
     String? desc,
   }) = _TaskModel;
 }
@@ -126,9 +124,7 @@ abstract class ExportDataModel with _$ExportDataModel {
     required DateTime createdAt,
     DateTime? completedAt,
     String? errorMessage,
-    String? errorDetails,
     ExportDataParameters? parameters,
-    String? result,
     String? desc,
   }) = _ExportDataModel;
 
@@ -158,9 +154,7 @@ abstract class ExportDataModel with _$ExportDataModel {
       createdAt: model.createdAt,
       completedAt: model.completedAt,
       errorMessage: model.errorMessage,
-      errorDetails: model.errorDetails,
       parameters: parsedParameters,
-      result: model.result,
       desc: model.desc,
     );
   }
@@ -176,9 +170,7 @@ abstract class ExportDataModel with _$ExportDataModel {
       createdAt: createdAt,
       completedAt: completedAt,
       errorMessage: errorMessage,
-      errorDetails: errorDetails,
       parameters: parameters != null ? jsonEncode(parameters!.toJson()) : null,
-      result: result,
       desc: desc,
     );
   }
@@ -204,6 +196,7 @@ abstract class ExportDataTaskListItemModel with _$ExportDataTaskListItemModel {
     String? exportFilePath,
     String? instanceName,
     String? schema,
+    String? errorMessage,
   }) = _ExportDataTaskListItemModel;
 
   const ExportDataTaskListItemModel._();

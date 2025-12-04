@@ -104,14 +104,16 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     }
   }
 
-  Widget _buildStatusChip(BuildContext context, ExportDataTaskListItemModel task) {
+  Widget _buildStatusChip(
+      BuildContext context, ExportDataTaskListItemModel task) {
     final status = task.status;
     final color = _statusColor(context, status);
     final isRunning = status == TaskStatus.running;
     final statusText = isRunning
         ? '${_statusLabel(context, status)} ${task.progressPercent}'
         : _statusLabel(context, status);
-    return Container(
+
+    final statusWidget = Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -145,14 +147,21 @@ class _TaskTableState extends ConsumerState<TaskTable> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ),
         ],
       ),
     );
+
+    if (status == TaskStatus.failed && task.errorMessage != null) {
+      return Tooltip(
+        message: task.errorMessage!,
+        child: statusWidget,
+      );
+    }
+
+    return statusWidget;
   }
 
   Widget _buildText(String? text, {bool isPlaceholder = false}) {
@@ -333,7 +342,8 @@ class _TaskTableState extends ConsumerState<TaskTable> {
   @override
   Widget build(BuildContext context) {
     final model = ref.watch(exportDataTaskPaginationListNotifierProvider);
-    final notifier = ref.read(exportDataTaskPaginationListNotifierProvider.notifier);
+    final notifier =
+        ref.read(exportDataTaskPaginationListNotifierProvider.notifier);
 
     return BodyPageSkeleton(
       bottomSpaceSize: kSpacingSmall,

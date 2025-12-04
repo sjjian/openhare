@@ -41,9 +41,7 @@ class TaskStorage {
   DateTime? completedAt;
 
   String? errorMessage;
-  String? errorDetails;
   String? parameters;
-  String? result;
   String? desc;
 
   TaskStorage({
@@ -56,9 +54,7 @@ class TaskStorage {
     required this.createdAt,
     this.completedAt,
     this.errorMessage,
-    this.errorDetails,
     this.parameters,
-    this.result,
     this.desc,
   })  : taskType = TaskType.values[stTaskType],
         status = TaskStatus.values[stStatus];
@@ -73,9 +69,7 @@ class TaskStorage {
         createdAt = model.createdAt,
         completedAt = model.completedAt,
         errorMessage = model.errorMessage,
-        errorDetails = model.errorDetails,
         parameters = model.parameters,
-        result = model.result,
         desc = model.desc;
 
   TaskModel toModel() => TaskModel(
@@ -88,9 +82,7 @@ class TaskStorage {
         createdAt: createdAt,
         completedAt: completedAt,
         errorMessage: errorMessage,
-        errorDetails: errorDetails,
         parameters: parameters,
-        result: result,
         desc: desc,
       );
 }
@@ -113,9 +105,7 @@ class TaskRepoImpl implements TaskRepo {
       createdAt: now,
       completedAt: task.completedAt,
       errorMessage: task.errorMessage,
-      errorDetails: task.errorDetails,
       parameters: task.parameters,
-      result: task.result,
       desc: task.desc,
     );
     final id = _taskBox.put(storage);

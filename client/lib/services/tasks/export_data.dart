@@ -177,6 +177,7 @@ class ExportDataTaskPaginationListNotifier
           exportFilePath: exportDataModel.parameters?.exportFilePath,
           instanceName: instanceName,
           schema: exportDataModel.parameters?.schema,
+          errorMessage: exportDataModel.errorMessage,
         );
       }).toList(),
       count: result.count,

@@ -118,12 +118,31 @@ class ExportDataTaskOverviewItem extends ConsumerWidget {
                 // 状态・时间・任务详情（状态有颜色，时间和详情灰色，用"・"分隔）
                 Row(
                   children: [
-                    Text(
-                      _getStatusText(context),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _getStatusColor(context, exportData.status),
+                    exportData.status == TaskStatus.failed &&
+                            exportData.errorMessage != null
+                        ? Tooltip(
+                            message: exportData.errorMessage!,
+                            child: Text(
+                              _getStatusText(context),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: _getStatusColor(
+                                        context, exportData.status),
+                                  ),
+                            ),
+                          )
+                        : Text(
+                            _getStatusText(context),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: _getStatusColor(
+                                      context, exportData.status),
+                                ),
                           ),
-                    ),
                     Text(
                       '・${exportData.createdAt.formatDateTime(context)}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
