@@ -1,5 +1,6 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/tasks/export_data.dart';
+import 'package:client/screens/tasks/task_overview.dart';
 import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
@@ -218,6 +219,24 @@ class SessionOpBar extends ConsumerWidget {
     );
   }
 
+  Widget taskOverviewWidget(
+      BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    final l10n = AppLocalizations.of(context)!;
+
+    final childWidget = model.runningTaskCount > 0
+        ? const Loading.medium()
+        : RectangleIconButton.medium(
+            tooltip: l10n.scheduled_task,
+            icon: Icons.schedule,
+            iconColor: Theme.of(context).colorScheme.onSurface,
+            onPressed: null,
+          );
+
+    return TaskOverviewMenu(
+      child: childWidget,
+    );
+  }
+
   Widget saveWidget(
       BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
@@ -272,6 +291,7 @@ class SessionOpBar extends ConsumerWidget {
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
           exportDataWidget(context, model),
+          taskOverviewWidget(context, ref, model),
           divider(context),
           saveWidget(context, ref, model),
           const Expanded(child: SessionDrawerBar()),

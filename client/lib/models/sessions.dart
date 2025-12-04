@@ -118,6 +118,7 @@ abstract class SessionOpBarModel with _$SessionOpBarModel {
     required SQLConnectState? state,
     required String currentSchema,
     required bool isRightPageOpen,
+    required int runningTaskCount,
   }) = _SessionOpBarModel;
 }
 

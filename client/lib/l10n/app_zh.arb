@@ -133,6 +133,8 @@
     "tooltip_open_folder": "打开文件所在目录",
     "tooltip_delete_task": "删除任务",
     "task_no_tasks": "暂无任务",
+    "task_view_more": "查看更多",
+    "task_recent_tasks": "最近任务",
     "export_data_title": "导出数据",
     "export_data_directory_label": "导出的目录",
     "export_data_directory_required": "请选择导出的目录",

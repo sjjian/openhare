@@ -262,7 +262,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
           ),
         )),
         DataCell(Text(
-          task.duration.format(),
+          task.duration?.format() ?? '-',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

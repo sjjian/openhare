@@ -65,7 +65,13 @@ abstract class TaskRepo {
     int? pageNumber,
     int? pageSize,
     TaskType? type,
+    TaskStatus? status,
+    DateTime? completedAtStart,
+    DateTime? completedAtEnd,
   });
+
+  // 获取任务概览
+  TaskOverviewModel getTaskOverview();
 }
 
 @freezed
@@ -78,7 +84,7 @@ abstract class TaskModel with _$TaskModel {
     String? currentStep,
     String? progressMessage,
     required DateTime createdAt,
-    required DateTime updatedAt,
+    DateTime? completedAt,
     String? errorMessage,
     String? errorDetails,
     String? parameters,
@@ -118,7 +124,7 @@ abstract class ExportDataModel with _$ExportDataModel {
     String? currentStep,
     String? progressMessage,
     required DateTime createdAt,
-    required DateTime updatedAt,
+    DateTime? completedAt,
     String? errorMessage,
     String? errorDetails,
     ExportDataParameters? parameters,
@@ -150,7 +156,7 @@ abstract class ExportDataModel with _$ExportDataModel {
       currentStep: model.currentStep,
       progressMessage: model.progressMessage,
       createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
+      completedAt: model.completedAt,
       errorMessage: model.errorMessage,
       errorDetails: model.errorDetails,
       parameters: parsedParameters,
@@ -168,7 +174,7 @@ abstract class ExportDataModel with _$ExportDataModel {
       currentStep: currentStep,
       progressMessage: progressMessage,
       createdAt: createdAt,
-      updatedAt: updatedAt,
+      completedAt: completedAt,
       errorMessage: errorMessage,
       errorDetails: errorDetails,
       parameters: parameters != null ? jsonEncode(parameters!.toJson()) : null,
@@ -181,7 +187,7 @@ abstract class ExportDataModel with _$ExportDataModel {
   String get progressPercent => '${(progress * 100).round()}%';
 
   // 任务持续时间
-  Duration get duration => updatedAt.difference(createdAt);
+  Duration? get duration => completedAt?.difference(createdAt);
 }
 
 // 导出数据任务列表项（仅包含展示所需字段）
@@ -193,7 +199,7 @@ abstract class ExportDataTaskListItemModel with _$ExportDataTaskListItemModel {
     required double progress,
     String? desc,
     required DateTime createdAt,
-    required DateTime updatedAt,
+    DateTime? completedAt,
     String? fileName,
     String? exportFilePath,
     String? instanceName,
@@ -206,7 +212,7 @@ abstract class ExportDataTaskListItemModel with _$ExportDataTaskListItemModel {
   String get progressPercent => '${(progress * 100).round()}%';
 
   // 任务持续时间
-  Duration get duration => updatedAt.difference(createdAt);
+  Duration? get duration => completedAt?.difference(createdAt);
 }
 
 @freezed
@@ -220,4 +226,13 @@ abstract class ExportDataTaskPaginationListModel
     required int pageSize,
     String? key,
   }) = _ExportDataTaskPaginationListModel;
+}
+
+// 任务概览模型
+@freezed
+abstract class TaskOverviewModel with _$TaskOverviewModel {
+  const factory TaskOverviewModel({
+    required List<TaskModel> runningTasks, // 正在运行的任务 top5
+    required List<TaskModel> recentTasks, // 最近的任务 top5，按创建时间排序
+  }) = _TaskOverviewModel;
 }

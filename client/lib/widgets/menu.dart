@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class OverlayMenu extends StatefulWidget {
   final double maxHeight;
+  final double maxWidth;
   final List<OverlayMenuItem> tabs;
+  final OverlayMenuHeader? header;
   final OverlayMenuFooter? footer;
   final Widget child;
   // 支持设置弹窗的位置。在上方或者下方。默认在下方
@@ -16,8 +18,10 @@ class OverlayMenu extends StatefulWidget {
   const OverlayMenu({
     Key? key,
     this.maxHeight = 400,
+    this.maxWidth = 220,
     required this.tabs,
     required this.child,
+    this.header,
     this.footer,
     this.isAbove = false,
     this.spacing = 0,
@@ -60,8 +64,10 @@ class _OverlayMenuState extends State<OverlayMenu> {
 
   Widget _buildMenu(BuildContext context, double maxHeight) {
     return Container(
-      constraints:
-          BoxConstraints(minWidth: 120, maxWidth: 220, maxHeight: maxHeight),
+      constraints: BoxConstraints(
+        maxWidth: widget.maxWidth,
+        maxHeight: maxHeight,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(12),
@@ -76,24 +82,27 @@ class _OverlayMenuState extends State<OverlayMenu> {
       // 上面设置的圆角没作用，被下面的widget覆盖了
       child: Column(
         children: [
+          if (widget.header != null) widget.header!,
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               children: [
                 for (int i = 0; i < widget.tabs.length; i++)
-                  InkWell(
-                    onTap: () {
-                      widget.tabs[i].onTabSelected();
-                      if (widget.closeOnSelectItem) {
-                        setState(() {
-                          _showingMenu = false;
-                        });
-                        _portalController.hide();
-                      }
-                    },
-                    child: widget.tabs[i],
-                  )
+                  widget.tabs[i].onTabSelected != null
+                      ? InkWell(
+                          onTap: () {
+                            widget.tabs[i].onTabSelected?.call();
+                            if (widget.closeOnSelectItem) {
+                              setState(() {
+                                _showingMenu = false;
+                              });
+                              _portalController.hide();
+                            }
+                          },
+                          child: widget.tabs[i],
+                        )
+                      : widget.tabs[i]
               ],
             ),
           ),
@@ -128,6 +137,9 @@ class _OverlayMenuState extends State<OverlayMenu> {
 
               // 计算弹窗的总height
               double menuHeight = 0;
+              if (widget.header != null) {
+                menuHeight += widget.header!.height;
+              }
               for (int i = 0; i < widget.tabs.length; i++) {
                 menuHeight += widget.tabs[i].height;
               }
@@ -146,7 +158,7 @@ class _OverlayMenuState extends State<OverlayMenu> {
               }
 
               // 限制菜单不超出屏幕
-              const double menuWidth = 220;
+              final double menuWidth = widget.maxWidth;
               if (left + menuWidth > screenSize.width) {
                 left = screenSize.width - menuWidth - 8;
               }
@@ -187,13 +199,15 @@ class _OverlayMenuState extends State<OverlayMenu> {
 class OverlayMenuItem extends StatefulWidget {
   final double height;
   final Widget child;
-  final void Function() onTabSelected;
+  final void Function()? onTabSelected;
+  final Color? hoverColor;
 
   const OverlayMenuItem({
     Key? key,
     required this.height,
     required this.child,
-    required this.onTabSelected,
+    this.onTabSelected,
+    this.hoverColor,
   }) : super(key: key);
 
   @override
@@ -205,14 +219,16 @@ class _OverlayMenuItemState extends State<OverlayMenuItem> {
 
   @override
   Widget build(BuildContext context) {
+    final hoverColor = widget.hoverColor ??
+        Theme.of(context).colorScheme.surfaceContainer;
+    
     return MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
       child: SizedBox(
         height: widget.height,
         child: Container(
-          color:
-              _hovering ? Theme.of(context).colorScheme.surfaceContainer : null,
+          color: _hovering ? hoverColor : null,
           child: widget.child,
         ),
       ),
@@ -220,10 +236,10 @@ class _OverlayMenuItemState extends State<OverlayMenuItem> {
   }
 }
 
-class OverlayMenuFooter extends StatelessWidget {
+class OverlayMenuHeader extends StatelessWidget {
   final double height;
   final Widget child;
-  const OverlayMenuFooter({Key? key, required this.height, required this.child})
+  const OverlayMenuHeader({Key? key, required this.height, required this.child})
       : super(key: key);
 
   @override
@@ -231,6 +247,59 @@ class OverlayMenuFooter extends StatelessWidget {
     return SizedBox(
       height: height,
       child: child,
+    );
+  }
+}
+
+class OverlayMenuFooter extends StatefulWidget {
+  final double height;
+  final Widget child;
+  final VoidCallback? onTap;
+  final Color? hoverColor;
+
+  const OverlayMenuFooter({
+    Key? key,
+    required this.height,
+    required this.child,
+    this.onTap,
+    this.hoverColor,
+  }) : super(key: key);
+
+  @override
+  State<OverlayMenuFooter> createState() => _OverlayMenuFooterState();
+}
+
+class _OverlayMenuFooterState extends State<OverlayMenuFooter> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = SizedBox(
+      height: widget.height,
+      child: widget.child,
+    );
+
+    final colorScheme = Theme.of(context).colorScheme;
+    const radius = BorderRadius.only(
+      bottomLeft: Radius.circular(12),
+      bottomRight: Radius.circular(12),
+    );
+    final hoverColor =
+        widget.hoverColor ?? colorScheme.surfaceContainerLow;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _hovering ? hoverColor : Colors.transparent,
+            borderRadius: radius,
+          ),
+          child: base,
+        ),
+      ),
     );
   }
 }

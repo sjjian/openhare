@@ -38,7 +38,7 @@ class TaskStorage {
   DateTime createdAt;
 
   @Property(type: PropertyType.dateNano)
-  DateTime updatedAt;
+  DateTime? completedAt;
 
   String? errorMessage;
   String? errorDetails;
@@ -54,7 +54,7 @@ class TaskStorage {
     this.currentStep,
     this.progressMessage,
     required this.createdAt,
-    required this.updatedAt,
+    this.completedAt,
     this.errorMessage,
     this.errorDetails,
     this.parameters,
@@ -71,7 +71,7 @@ class TaskStorage {
         currentStep = model.currentStep,
         progressMessage = model.progressMessage,
         createdAt = model.createdAt,
-        updatedAt = model.updatedAt,
+        completedAt = model.completedAt,
         errorMessage = model.errorMessage,
         errorDetails = model.errorDetails,
         parameters = model.parameters,
@@ -86,7 +86,7 @@ class TaskStorage {
         currentStep: currentStep,
         progressMessage: progressMessage,
         createdAt: createdAt,
-        updatedAt: updatedAt,
+        completedAt: completedAt,
         errorMessage: errorMessage,
         errorDetails: errorDetails,
         parameters: parameters,
@@ -111,7 +111,7 @@ class TaskRepoImpl implements TaskRepo {
       currentStep: task.currentStep,
       progressMessage: task.progressMessage,
       createdAt: now,
-      updatedAt: now,
+      completedAt: task.completedAt,
       errorMessage: task.errorMessage,
       errorDetails: task.errorDetails,
       parameters: task.parameters,
@@ -129,9 +129,7 @@ class TaskRepoImpl implements TaskRepo {
 
   @override
   void updateTask(TaskModel task) {
-    final storage = TaskStorage.fromModel(
-      task.copyWith(updatedAt: DateTime.now()),
-    );
+    final storage = TaskStorage.fromModel(task);
     _taskBox.put(storage);
   }
 
@@ -146,6 +144,9 @@ class TaskRepoImpl implements TaskRepo {
     int? pageNumber,
     int? pageSize,
     TaskType? type,
+    TaskStatus? status,
+    DateTime? completedAtStart,
+    DateTime? completedAtEnd,
   }) {
     // 构建查询条件
     final sanitizedKey = key?.trim();
@@ -153,6 +154,34 @@ class TaskRepoImpl implements TaskRepo {
 
     if (type != null) {
       condition = TaskStorage_.stTaskType.equals(type.index);
+    }
+
+    if (status != null) {
+      final statusCondition = TaskStorage_.stStatus.equals(status.index);
+      condition =
+          condition == null ? statusCondition : condition.and(statusCondition);
+    }
+
+    if (completedAtStart != null) {
+      // 对于可空的 completedAt 字段，需要同时检查不为 null 且大于等于起始时间
+      // ObjectBox 使用纳秒时间戳，需要将 DateTime 转换为纳秒
+      final startNanos = completedAtStart.microsecondsSinceEpoch * 1000;
+      final startCondition = TaskStorage_.completedAt
+          .notNull()
+          .and(TaskStorage_.completedAt.greaterOrEqual(startNanos));
+      condition =
+          condition == null ? startCondition : condition.and(startCondition);
+    }
+
+    if (completedAtEnd != null) {
+      // 对于可空的 completedAt 字段，需要同时检查不为 null 且小于等于结束时间
+      // ObjectBox 使用纳秒时间戳，需要将 DateTime 转换为纳秒
+      final endNanos = completedAtEnd.microsecondsSinceEpoch * 1000;
+      final endCondition = TaskStorage_.completedAt
+          .notNull()
+          .and(TaskStorage_.completedAt.lessOrEqual(endNanos));
+      condition =
+          condition == null ? endCondition : condition.and(endCondition);
     }
 
     if (sanitizedKey != null && sanitizedKey.isNotEmpty) {
@@ -181,6 +210,35 @@ class TaskRepoImpl implements TaskRepo {
     final paginatedTasks = dataQuery.find().map((e) => e.toModel()).toList();
     dataQuery.close();
     return TaskListResult(tasks: paginatedTasks, count: totalCount);
+  }
+
+  @override
+  TaskOverviewModel getTaskOverview() {
+    // 获取正在运行的任务 top5，按创建时间倒序
+    final runningQuery = _taskBox
+        .query(TaskStorage_.stStatus.equals(TaskStatus.running.index))
+        .order(TaskStorage_.createdAt, flags: Order.descending)
+        .build();
+    runningQuery.limit = 5;
+    final runningTasks =
+        runningQuery.find().map((e) => e.toModel()).toList();
+    runningQuery.close();
+
+    // 获取最近的任务 top5，按创建时间倒序（排除正在运行的任务）
+    final recentStatusCondition = TaskStorage_.stStatus
+        .notEquals(TaskStatus.running.index);
+    final recentQuery = _taskBox
+        .query(recentStatusCondition)
+        .order(TaskStorage_.createdAt, flags: Order.descending)
+        .build();
+    recentQuery.limit = 5;
+    final recentTasks = recentQuery.find().map((e) => e.toModel()).toList();
+    recentQuery.close();
+
+    return TaskOverviewModel(
+      runningTasks: runningTasks,
+      recentTasks: recentTasks,
+    );
   }
 }
 

@@ -11,6 +11,7 @@ import 'package:client/services/sessions/session_metadata_tree.dart';
 import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_controller.dart';
+import 'package:client/services/tasks/overview.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sessions.g.dart';
@@ -237,6 +238,10 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
       return null;
     }
 
+    // Watch task overview to get running task count for auto refresh
+    final taskOverview = ref.watch(taskOverviewServiceProvider);
+    final runningTaskCount = taskOverview.runningTasks.length;
+
     return SessionOpBarModel(
       sessionId: session.sessionId,
       instanceId: session.instanceId,
@@ -244,6 +249,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
       state: session.connState,
       currentSchema: session.currentSchema ?? "",
       isRightPageOpen: sessionDrawer.isRightPageOpen,
+      runningTaskCount: runningTaskCount,
     );
   }
 }

@@ -442,6 +442,14 @@
   "@task_no_tasks": {
     "description": "No tasks message"
   },
+  "task_view_more": "View more",
+  "@task_view_more": {
+    "description": "View more tasks link"
+  },
+  "task_recent_tasks": "Recent Tasks",
+  "@task_recent_tasks": {
+    "description": "Recent tasks header"
+  },
   "export_data_title": "Export Data",
   "@export_data_title": {
     "description": "Export data dialog title"

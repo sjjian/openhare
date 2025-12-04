@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/instances/instances.dart';
+import 'package:client/services/tasks/overview.dart';
 import 'package:client/models/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:excel/excel.dart' as excel;
@@ -25,6 +26,7 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
   invalidate() {
     ref.invalidate(exportDataTaskPaginationListNotifierProvider);
     ref.invalidate(latestExportTaskProvider);
+    ref.invalidate(taskOverviewServiceProvider);
   }
 
   ExportDataModel _createTask(ExportDataModel task) {
@@ -88,7 +90,7 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
       status: TaskStatus.running,
       progress: 0.0,
       createdAt: now,
-      updatedAt: now,
+      completedAt: null,
     ));
 
     final connServices = ref.read(sessionConnsServicesProvider.notifier);
@@ -118,11 +120,13 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
 
       _updateTask(task.copyWith(
         status: TaskStatus.completed,
+        completedAt: DateTime.now(),
       ));
     } catch (e) {
       _updateTask(task.copyWith(
         status: TaskStatus.failed,
         errorMessage: e.toString(),
+        completedAt: DateTime.now(),
       ));
     } finally {
       if (connModel != null) {
@@ -168,7 +172,7 @@ class ExportDataTaskPaginationListNotifier
           progress: exportDataModel.progress,
           desc: exportDataModel.desc,
           createdAt: exportDataModel.createdAt,
-          updatedAt: exportDataModel.updatedAt,
+          completedAt: exportDataModel.completedAt,
           fileName: exportDataModel.parameters?.fileName,
           exportFilePath: exportDataModel.parameters?.exportFilePath,
           instanceName: instanceName,
