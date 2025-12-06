@@ -206,10 +206,11 @@ class SessionConn {
     return (conn2 != null && state == SQLConnectState.connected);
   }
 
+  // todo: 需要一个参数来决定是否限制返回数据量
   Future<BaseQueryResult?> query(String query) async {
     try {
       _setState(SQLConnectState.executing);
-      BaseQueryResult queryResult = await conn2!.query(query);
+      BaseQueryResult queryResult = await conn2!.query(query, limit: 100);
       return queryResult;
     } catch (e) {
       rethrow;

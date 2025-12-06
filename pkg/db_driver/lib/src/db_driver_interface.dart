@@ -98,7 +98,7 @@ abstract class BaseConnection {
   BaseConnection();
 
   Future<void> ping();
-  Future<BaseQueryResult> query(String sql, {int limit = 100});
+  Future<BaseQueryResult> query(String sql, {int? limit});
   Stream<BaseQueryStreamItem> queryStream(String sql, {int? limit});
   Future<void> killQuery();
   Future<void> close();

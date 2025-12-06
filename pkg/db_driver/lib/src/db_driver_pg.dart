@@ -116,7 +116,7 @@ class PGConnection extends BaseConnection {
   }
 
   @override
-  Future<BaseQueryResult> query(String sql, {int limit = 100}) async {
+  Future<BaseQueryResult> query(String sql, {int? limit}) async {
     final queryId = Uuid().v4();
     List<BaseQueryColumn>? resultColumns;
     BigInt? resultAffectedRows;
