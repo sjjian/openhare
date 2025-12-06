@@ -144,6 +144,10 @@ fn wire__crate__api__mysql__ConnWrapper_query_impl(
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ConnWrapper>,
             >>::sse_decode(&mut deserializer);
             let api_query = <String>::sse_decode(&mut deserializer);
+            let api_sink = <StreamSink<
+                crate::api::mysql::QueryStreamItem,
+                flutter_rust_bridge::for_generated::SseCodec,
+            >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -165,9 +169,12 @@ fn wire__crate__api__mysql__ConnWrapper_query_impl(
                             }
                         }
                         let mut api_that_guard = api_that_guard.unwrap();
-                        let output_ok =
-                            crate::api::mysql::ConnWrapper::query(&mut *api_that_guard, &api_query)
-                                .await?;
+                        let output_ok = crate::api::mysql::ConnWrapper::query(
+                            &mut *api_that_guard,
+                            &api_query,
+                            api_sink,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -219,6 +226,14 @@ flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
 
 // Section: dart2rust
 
+impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <String>::sse_decode(deserializer);
+        return flutter_rust_bridge::for_generated::anyhow::anyhow!("{}", inner);
+    }
+}
+
 impl SseDecode for ConnWrapper {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -236,6 +251,16 @@ impl SseDecode
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <usize>::sse_decode(deserializer);
         return decode_rust_opaque_moi(inner);
+    }
+}
+
+impl SseDecode
+    for StreamSink<crate::api::mysql::QueryStreamItem, flutter_rust_bridge::for_generated::SseCodec>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <String>::sse_decode(deserializer);
+        return StreamSink::deserialize(inner);
     }
 }
 
@@ -292,18 +317,6 @@ impl SseDecode for Vec<crate::api::mysql::QueryColumn> {
     }
 }
 
-impl SseDecode for Vec<crate::api::mysql::QueryRow> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = vec![];
-        for idx_ in 0..len_ {
-            ans_.push(<crate::api::mysql::QueryRow>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for Vec<crate::api::mysql::QueryValue> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -328,15 +341,13 @@ impl SseDecode for crate::api::mysql::QueryColumn {
     }
 }
 
-impl SseDecode for crate::api::mysql::QueryResult {
+impl SseDecode for crate::api::mysql::QueryHeader {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_columns = <Vec<crate::api::mysql::QueryColumn>>::sse_decode(deserializer);
-        let mut var_rows = <Vec<crate::api::mysql::QueryRow>>::sse_decode(deserializer);
         let mut var_affectedRows = <u64>::sse_decode(deserializer);
-        return crate::api::mysql::QueryResult {
+        return crate::api::mysql::QueryHeader {
             columns: var_columns,
-            rows: var_rows,
             affected_rows: var_affectedRows,
         };
     }
@@ -347,6 +358,30 @@ impl SseDecode for crate::api::mysql::QueryRow {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_values = <Vec<crate::api::mysql::QueryValue>>::sse_decode(deserializer);
         return crate::api::mysql::QueryRow { values: var_values };
+    }
+}
+
+impl SseDecode for crate::api::mysql::QueryStreamItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 = <crate::api::mysql::QueryHeader>::sse_decode(deserializer);
+                return crate::api::mysql::QueryStreamItem::Header(var_field0);
+            }
+            1 => {
+                let mut var_field0 = <crate::api::mysql::QueryRow>::sse_decode(deserializer);
+                return crate::api::mysql::QueryStreamItem::Row(var_field0);
+            }
+            2 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::api::mysql::QueryStreamItem::Error(var_field0);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -497,24 +532,23 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::mysql::QueryColumn>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::mysql::QueryResult {
+impl flutter_rust_bridge::IntoDart for crate::api::mysql::QueryHeader {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.columns.into_into_dart().into_dart(),
-            self.rows.into_into_dart().into_dart(),
             self.affected_rows.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::mysql::QueryResult
+    for crate::api::mysql::QueryHeader
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::mysql::QueryResult>
-    for crate::api::mysql::QueryResult
+impl flutter_rust_bridge::IntoIntoDart<crate::api::mysql::QueryHeader>
+    for crate::api::mysql::QueryHeader
 {
-    fn into_into_dart(self) -> crate::api::mysql::QueryResult {
+    fn into_into_dart(self) -> crate::api::mysql::QueryHeader {
         self
     }
 }
@@ -529,6 +563,36 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::mysql::QueryRow>
     for crate::api::mysql::QueryRow
 {
     fn into_into_dart(self) -> crate::api::mysql::QueryRow {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::mysql::QueryStreamItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::api::mysql::QueryStreamItem::Header(field0) => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::api::mysql::QueryStreamItem::Row(field0) => {
+                [1.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::api::mysql::QueryStreamItem::Error(field0) => {
+                [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::mysql::QueryStreamItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::mysql::QueryStreamItem>
+    for crate::api::mysql::QueryStreamItem
+{
+    fn into_into_dart(self) -> crate::api::mysql::QueryStreamItem {
         self
     }
 }
@@ -570,6 +634,13 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::mysql::QueryValue>
     }
 }
 
+impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(format!("{:?}", self), serializer);
+    }
+}
+
 impl SseEncode for ConnWrapper {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -585,6 +656,15 @@ impl SseEncode
         let (ptr, size) = self.sse_encode_raw();
         <usize>::sse_encode(ptr, serializer);
         <i32>::sse_encode(size, serializer);
+    }
+}
+
+impl SseEncode
+    for StreamSink<crate::api::mysql::QueryStreamItem, flutter_rust_bridge::for_generated::SseCodec>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        unimplemented!("")
     }
 }
 
@@ -636,16 +716,6 @@ impl SseEncode for Vec<crate::api::mysql::QueryColumn> {
     }
 }
 
-impl SseEncode for Vec<crate::api::mysql::QueryRow> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::api::mysql::QueryRow>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for Vec<crate::api::mysql::QueryValue> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -664,11 +734,10 @@ impl SseEncode for crate::api::mysql::QueryColumn {
     }
 }
 
-impl SseEncode for crate::api::mysql::QueryResult {
+impl SseEncode for crate::api::mysql::QueryHeader {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Vec<crate::api::mysql::QueryColumn>>::sse_encode(self.columns, serializer);
-        <Vec<crate::api::mysql::QueryRow>>::sse_encode(self.rows, serializer);
         <u64>::sse_encode(self.affected_rows, serializer);
     }
 }
@@ -677,6 +746,29 @@ impl SseEncode for crate::api::mysql::QueryRow {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Vec<crate::api::mysql::QueryValue>>::sse_encode(self.values, serializer);
+    }
+}
+
+impl SseEncode for crate::api::mysql::QueryStreamItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::api::mysql::QueryStreamItem::Header(field0) => {
+                <i32>::sse_encode(0, serializer);
+                <crate::api::mysql::QueryHeader>::sse_encode(field0, serializer);
+            }
+            crate::api::mysql::QueryStreamItem::Row(field0) => {
+                <i32>::sse_encode(1, serializer);
+                <crate::api::mysql::QueryRow>::sse_encode(field0, serializer);
+            }
+            crate::api::mysql::QueryStreamItem::Error(field0) => {
+                <i32>::sse_encode(2, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 

@@ -1,5 +1,6 @@
-use mysql_async::{prelude::*, Conn, Opts, OptsBuilder, Value};
+use crate::frb_generated::StreamSink;
 use chrono::NaiveDate;
+use mysql_async::{prelude::*, Conn, Opts, Value};
 
 pub enum DataType {
     Number,
@@ -37,7 +38,7 @@ impl QueryValue {
                     .unwrap();
                 let timestamp = dt.and_utc().timestamp_millis();
                 QueryValue::DateTime(timestamp)
-            },
+            }
             Value::Time(is_neg, d, h, min, s, micros) => {
                 let total_seconds = (d as i64) * 86400 * 1000
                     + (h as i64) * 3600 * 1000
@@ -51,15 +52,20 @@ impl QueryValue {
                     total_seconds
                 };
                 QueryValue::DateTime(timestamp)
-            },
+            }
             Value::NULL => QueryValue::NULL,
         }
     }
 }
 
-pub struct QueryResult {
+pub enum QueryStreamItem {
+    Header(QueryHeader),
+    Row(QueryRow),
+    Error(String),
+}
+
+pub struct QueryHeader {
     pub columns: Vec<QueryColumn>,
-    pub rows: Vec<QueryRow>,
     pub affected_rows: u64,
 }
 
@@ -68,15 +74,18 @@ pub struct QueryColumn {
     pub column_type: u8,
 }
 
-pub struct QueryRow {
-    pub values: Vec<QueryValue>,
-}
-
 impl QueryColumn {
     #[flutter_rust_bridge::frb(ignore)]
     pub fn from_column(col: &mysql_async::Column) -> Self {
-        QueryColumn {name:col.name_str().to_string(), column_type: col.column_type() as u8}
+        QueryColumn {
+            name: col.name_str().to_string(),
+            column_type: col.column_type() as u8,
+        }
     }
+}
+
+pub struct QueryRow {
+    pub values: Vec<QueryValue>,
 }
 
 pub struct ConnWrapper {
@@ -90,36 +99,66 @@ impl ConnWrapper {
         Ok(ConnWrapper { conn })
     }
 
-    pub async fn query(&mut self, query: &str) -> Result<QueryResult, String> {
-        let mut result_set = self
-            .conn
-            .query_iter(query)
-            .await
-            .map_err(|e| e.to_string())?;
+    pub async fn query(
+        &mut self,
+        query: &str,
+        sink: StreamSink<QueryStreamItem>,
+    ) -> Result<(), String> {
+        let mut result_set = match self.conn.query_iter(query).await {
+            Ok(rs) => rs,
+            Err(e) => {
+                let _ = sink.add(QueryStreamItem::Error(format!("{}", e)));
+                return Ok(());
+            }
+        };
 
         // 获取列信息
-        let columns = result_set
-            .columns()
-            .ok_or("Failed to fetch column metadata".to_string())?
-            .iter()
-            .map(QueryColumn::from_column)
-            .collect();
+        let columns = match result_set.columns() {
+            Some(cols) => cols.iter().map(QueryColumn::from_column).collect(),
+            None => {
+                let _ = sink.add(QueryStreamItem::Error("Failed to fetch column".to_string()));
+                return Ok(());
+            }
+        };
 
-        // 解析行数据
-        let mut rows = Vec::new();
-        while let Some(row_result) = result_set.next().await.transpose() {
-            let row = row_result.map_err(|e| e.to_string())?; 
-            let values = row
-                .unwrap() 
-                .into_iter()
-                .map(QueryValue::from_value)
-                .collect();
-            rows.push(QueryRow { values });
-        }
-        
         let affected_rows = result_set.affected_rows();
 
-        Ok(QueryResult { columns, rows, affected_rows })
+        let header: QueryHeader = QueryHeader {
+            columns,
+            affected_rows,
+        };
+        if let Err(e) = sink.add(QueryStreamItem::Header(header)) {
+            let _ = sink.add(QueryStreamItem::Error(format!(
+                "Failed to send header: {}",
+                e
+            )));
+            return Ok(());
+        }
+
+        // 然后处理result_set并发送行数据到stream
+        while let Some(row_result) = result_set.next().await.transpose() {
+            match row_result {
+                Ok(row) => {
+                    let values = row
+                        .unwrap()
+                        .into_iter()
+                        .map(QueryValue::from_value)
+                        .collect();
+                    let query_row = QueryRow { values };
+                    if let Err(e) = sink.add(QueryStreamItem::Row(query_row)) {
+                        let _ =
+                            sink.add(QueryStreamItem::Error(format!("Failed to send row: {}", e)));
+                        return Ok(());
+                    }
+                }
+                Err(e) => {
+                    let _ = sink.add(QueryStreamItem::Error(format!("{}", e)));
+                    return Ok(());
+                }
+            }
+        }
+
+        Ok(())
     }
 
     pub async fn close(self) -> Result<(), String> {

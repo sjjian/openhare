@@ -116,18 +116,49 @@ class PGConnection extends BaseConnection {
   }
 
   @override
-  Future<BaseQueryResult> query(String sql) async {
-    final queryId = Uuid().v4(); // todo: 统一处理
+  Future<BaseQueryResult> query(String sql, {int limit = 100}) async {
+    final queryId = Uuid().v4();
+    List<BaseQueryColumn>? resultColumns;
+    BigInt? resultAffectedRows;
+    List<QueryResultRow> rows = [];
+    
+    await for (final item in queryStream(sql, limit: limit)) {
+      switch (item) {
+        case QueryStreamItemHeader(:final columns, :final affectedRows):
+          resultColumns = columns;
+          resultAffectedRows = affectedRows;
+        case QueryStreamItemRow(:final row):
+          rows.add(row);
+      }
+    }
+    
+    if (resultColumns == null || resultAffectedRows == null) {
+      throw StateError('No metadata received');
+    }
+    
+    return BaseQueryResult(queryId, resultColumns, rows, resultAffectedRows);
+  }
+
+  @override
+  Stream<BaseQueryStreamItem> queryStream(String sql, {int limit = 100}) async* {
+    // todo: 暂时不支持 limit
     final qs = await _conn.query(query: sql);
     final columns = qs.schema.columns
         .map<PGQueryColumn>((qs) => PGQueryColumn(qs))
         .toList();
-    List<QueryResultRow> rows = List.empty(growable: true);
+    
+    // 先发送 header
+    yield QueryStreamItemHeader(
+      columns: columns,
+      affectedRows: BigInt.from(qs.affectedRows),
+    );
+    
+    // 然后发送 rows
     for (final r in qs) {
-      rows.add(QueryResultRow(columns, r.map((v) => PGQueryValue(v)).toList()));
+      yield QueryStreamItemRow(
+        row: QueryResultRow(columns, r.map((v) => PGQueryValue(v)).toList()),
+      );
     }
-    return BaseQueryResult(
-        queryId, columns, rows, BigInt.from(qs.affectedRows));
   }
 
   @override
@@ -162,7 +193,8 @@ class PGConnection extends BaseConnection {
   Future<List<String>> schemas() async {
     List<String> schemas = List.empty(growable: true);
     final results = await query("SELECT nspname FROM pg_namespace;");
-    for (final result in results.rows) {
+    final rows = results.rows;
+    for (final result in rows) {
       schemas.add(result.getString("nspname") ?? "");
     }
     return schemas;

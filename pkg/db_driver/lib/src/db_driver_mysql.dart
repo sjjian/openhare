@@ -153,13 +153,13 @@ class MySQLConnection extends BaseConnection {
 
   @override
   Future<void> ping() async {
-    await _query("SELECT 1");
+    await query("SELECT 1");
   }
 
   Future<void> loadSessionId() async {
-    final results = await _query("SELECT CONNECTION_ID() AS session_id;");
-    final rows = results.rows;
-    _sessionId = rows.first.getString("session_id");
+    final results = await query("SELECT CONNECTION_ID() AS session_id;");
+    final row = results.rows.first;
+    _sessionId = row.getString("session_id");
   }
 
   @override
@@ -169,50 +169,92 @@ class MySQLConnection extends BaseConnection {
     try {
       final tmpConn = await ConnWrapper.open(dsn: _dsn);
       tmp = MySQLConnection(tmpConn, _dsn);
-      await tmp._query("KILL QUERY $_sessionId");
+      await tmp.query("KILL QUERY $_sessionId");
     } finally {
       await tmp?.close();
     }
   }
 
   @override
-  Future<BaseQueryResult> query(String sql) async {
-    BaseQueryResult results;
+  Future<BaseQueryResult> query(String sql, {int limit = 100}) async {
+    final queryId = Uuid().v4();
+    List<BaseQueryColumn>? resultColumns;
+    BigInt? resultAffectedRows;
+    List<QueryResultRow> rows = [];
+    
+    await for (final item in queryStream(sql, limit: limit)) {
+      switch (item) {
+        case QueryStreamItemHeader(:final columns, :final affectedRows):
+          resultColumns = columns;
+          resultAffectedRows = affectedRows;
+        case QueryStreamItemRow(:final row):
+          rows.add(row);
+      }
+    }
+    
+    if (resultColumns == null || resultAffectedRows == null) {
+      throw StateError('No header received');
+    }
+    
+    return BaseQueryResult(queryId, resultColumns, rows, resultAffectedRows);
+  }
+
+  @override
+  Stream<BaseQueryStreamItem> queryStream(String sql, {int limit = 100}) async* {
     // 判断是否是 SELECT 语句, 若是则嵌套一层 LIMIT 限制返回数据量, 暂时为100行. todo: 通用方法处理
     final firstTok = Lexer(sql).firstTrim();
     if (firstTok != null && firstTok.content.toLowerCase() == "select") {
       sql = sql.trimRight();
       if (sql.endsWith(";")) sql = sql.substring(0, sql.length - 1);
-      sql = "SELECT * FROM ($sql) AS dt_1 Limit 100;";
+      sql = "SELECT * FROM ($sql) AS dt_1 Limit $limit;";
     }
-    results = await _query(sql);
+    
+    final queryId = Uuid().v4(); // todo: 统一处理
+    // 加入注释. todo: 通用方法处理
+    sql = "/* call by openhare, uuid: $queryId */ $sql";
+    
+    List<BaseQueryColumn>? columns;
+    
+    try {
+      await for (final item in _conn.query(query: sql)) {
+        switch (item) {
+          case QueryStreamItem_Header(:final field0):
+            columns = field0.columns
+                .map<BaseQueryColumn>((c) => MysqlQueryColumn(c))
+                .toList();
+            yield QueryStreamItemHeader(
+              columns: columns,
+              affectedRows: field0.affectedRows,
+            );
+          case QueryStreamItem_Row(:final field0):
+            if (columns == null) {
+              throw StateError('Received row before header');
+            }
+            yield QueryStreamItemRow(
+              row: QueryResultRow(
+                columns,
+                field0.values.map((v) => MysqlQueryValue(v)).toList(),
+              ),
+            );
+          case QueryStreamItem_Error(:final field0):
+            throw Exception(field0);
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
+    
     // 如果执行的语句包含`use schema`
     if (firstTok != null && firstTok.content.toLowerCase() == "use") {
       final schema = await getCurrentSchema();
       onSchemaChanged(schema ?? "");
     }
-    return results;
-  }
-
-  Future<BaseQueryResult> _query(String sql) async {
-    final queryId = Uuid().v4(); // todo: 统一处理
-    // 加入注释. todo: 通用方法处理
-    sql = "/* call by openhare, uuid: $queryId */ $sql";
-    final qs = await _conn.query(query: sql);
-    final columns =
-        qs.columns.map<BaseQueryColumn>((qs) => MysqlQueryColumn(qs)).toList();
-    List<QueryResultRow> rows = List.empty(growable: true);
-    for (final r in qs.rows) {
-      rows.add(QueryResultRow(
-          columns, r.values.map((v) => MysqlQueryValue(v)).toList()));
-    }
-    return BaseQueryResult(queryId, columns, rows, qs.affectedRows);
   }
 
   @override
   Future<List<MetaDataNode>> metadata() async {
     // ref: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html
-    final results = await _query("""SELECT 
+    final results = await query("""SELECT 
     t.TABLE_SCHEMA,
     t.TABLE_NAME,
     c.COLUMN_NAME,
@@ -266,8 +308,9 @@ ORDER BY
   @override
   Future<List<String>> schemas() async {
     List<String> schemas = List.empty(growable: true);
-    final results = await _query("show databases");
-    for (final result in results.rows) {
+    final results = await query("show databases");
+    final rows = results.rows;
+    for (final result in rows) {
       schemas.add(result.getString("Database") ?? "");
     }
     return schemas;
@@ -275,14 +318,14 @@ ORDER BY
 
   @override
   Future<void> setCurrentSchema(String schema) async {
-    await _query("USE $schema");
+    await query("USE $schema");
     final currentSchema = await getCurrentSchema();
     onSchemaChanged(currentSchema!);
   }
 
   @override
   Future<String?> getCurrentSchema() async {
-    final results = await _query("SELECT DATABASE()");
+    final results = await query("SELECT DATABASE()");
     final rows = results.rows;
     final currentSchema = rows.first.getString("DATABASE()");
     return currentSchema;

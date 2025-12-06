@@ -25,6 +25,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper;
 
   @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw);
+
+  @protected
   ConnWrapper
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper(
           dynamic raw);
@@ -40,7 +43,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
+  RustStreamSink<QueryStreamItem> dco_decode_StreamSink_query_stream_item_Sse(
+      dynamic raw);
+
+  @protected
   String dco_decode_String(dynamic raw);
+
+  @protected
+  QueryHeader dco_decode_box_autoadd_query_header(dynamic raw);
+
+  @protected
+  QueryRow dco_decode_box_autoadd_query_row(dynamic raw);
 
   @protected
   double dco_decode_f_32(dynamic raw);
@@ -58,19 +71,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<QueryColumn> dco_decode_list_query_column(dynamic raw);
 
   @protected
-  List<QueryRow> dco_decode_list_query_row(dynamic raw);
-
-  @protected
   List<QueryValue> dco_decode_list_query_value(dynamic raw);
 
   @protected
   QueryColumn dco_decode_query_column(dynamic raw);
 
   @protected
-  QueryResult dco_decode_query_result(dynamic raw);
+  QueryHeader dco_decode_query_header(dynamic raw);
 
   @protected
   QueryRow dco_decode_query_row(dynamic raw);
+
+  @protected
+  QueryStreamItem dco_decode_query_stream_item(dynamic raw);
 
   @protected
   QueryValue dco_decode_query_value(dynamic raw);
@@ -88,6 +101,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+
+  @protected
   ConnWrapper
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper(
           SseDeserializer deserializer);
@@ -103,7 +119,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  RustStreamSink<QueryStreamItem> sse_decode_StreamSink_query_stream_item_Sse(
+      SseDeserializer deserializer);
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer);
+
+  @protected
+  QueryHeader sse_decode_box_autoadd_query_header(SseDeserializer deserializer);
+
+  @protected
+  QueryRow sse_decode_box_autoadd_query_row(SseDeserializer deserializer);
 
   @protected
   double sse_decode_f_32(SseDeserializer deserializer);
@@ -121,19 +147,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<QueryColumn> sse_decode_list_query_column(SseDeserializer deserializer);
 
   @protected
-  List<QueryRow> sse_decode_list_query_row(SseDeserializer deserializer);
-
-  @protected
   List<QueryValue> sse_decode_list_query_value(SseDeserializer deserializer);
 
   @protected
   QueryColumn sse_decode_query_column(SseDeserializer deserializer);
 
   @protected
-  QueryResult sse_decode_query_result(SseDeserializer deserializer);
+  QueryHeader sse_decode_query_header(SseDeserializer deserializer);
 
   @protected
   QueryRow sse_decode_query_row(SseDeserializer deserializer);
+
+  @protected
+  QueryStreamItem sse_decode_query_stream_item(SseDeserializer deserializer);
 
   @protected
   QueryValue sse_decode_query_value(SseDeserializer deserializer);
@@ -157,6 +183,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  void sse_encode_AnyhowException(
+      AnyhowException self, SseSerializer serializer);
+
+  @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper(
           ConnWrapper self, SseSerializer serializer);
@@ -172,7 +202,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           ConnWrapper self, SseSerializer serializer);
 
   @protected
+  void sse_encode_StreamSink_query_stream_item_Sse(
+      RustStreamSink<QueryStreamItem> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_query_header(
+      QueryHeader self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_query_row(
+      QueryRow self, SseSerializer serializer);
 
   @protected
   void sse_encode_f_32(double self, SseSerializer serializer);
@@ -192,9 +234,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<QueryColumn> self, SseSerializer serializer);
 
   @protected
-  void sse_encode_list_query_row(List<QueryRow> self, SseSerializer serializer);
-
-  @protected
   void sse_encode_list_query_value(
       List<QueryValue> self, SseSerializer serializer);
 
@@ -202,10 +241,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_query_column(QueryColumn self, SseSerializer serializer);
 
   @protected
-  void sse_encode_query_result(QueryResult self, SseSerializer serializer);
+  void sse_encode_query_header(QueryHeader self, SseSerializer serializer);
 
   @protected
   void sse_encode_query_row(QueryRow self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_query_stream_item(
+      QueryStreamItem self, SseSerializer serializer);
 
   @protected
   void sse_encode_query_value(QueryValue self, SseSerializer serializer);

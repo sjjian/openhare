@@ -83,7 +83,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<ConnWrapper> crateApiMysqlConnWrapperOpen({required String dsn});
 
-  Future<QueryResult> crateApiMysqlConnWrapperQuery(
+  Stream<QueryStreamItem> crateApiMysqlConnWrapperQuery(
       {required ConnWrapper that, required String query});
 
   Future<void> crateApiInitInitApp();
@@ -158,31 +158,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<QueryResult> crateApiMysqlConnWrapperQuery(
+  Stream<QueryStreamItem> crateApiMysqlConnWrapperQuery(
       {required ConnWrapper that, required String query}) {
-    return handler.executeNormal(NormalTask(
+    final sink = RustStreamSink<QueryStreamItem>();
+    unawaited(handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper(
             that, serializer);
         sse_encode_String(query, serializer);
+        sse_encode_StreamSink_query_stream_item_Sse(sink, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 3, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_query_result,
+        decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiMysqlConnWrapperQueryConstMeta,
-      argValues: [that, query],
+      argValues: [that, query, sink],
       apiImpl: this,
-    ));
+    )));
+    return sink.stream;
   }
 
   TaskConstMeta get kCrateApiMysqlConnWrapperQueryConstMeta =>
       const TaskConstMeta(
         debugName: "ConnWrapper_query",
-        argNames: ["that", "query"],
+        argNames: ["that", "query", "sink"],
       );
 
   @override
@@ -217,6 +220,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper;
 
   @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AnyhowException(raw as String);
+  }
+
+  @protected
   ConnWrapper
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper(
           dynamic raw) {
@@ -241,9 +250,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RustStreamSink<QueryStreamItem> dco_decode_StreamSink_query_stream_item_Sse(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  QueryHeader dco_decode_box_autoadd_query_header(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_query_header(raw);
+  }
+
+  @protected
+  QueryRow dco_decode_box_autoadd_query_row(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_query_row(raw);
   }
 
   @protected
@@ -277,12 +305,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<QueryRow> dco_decode_list_query_row(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_query_row).toList();
-  }
-
-  @protected
   List<QueryValue> dco_decode_list_query_value(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_query_value).toList();
@@ -301,15 +323,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  QueryResult dco_decode_query_result(dynamic raw) {
+  QueryHeader dco_decode_query_header(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return QueryResult(
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return QueryHeader(
       columns: dco_decode_list_query_column(arr[0]),
-      rows: dco_decode_list_query_row(arr[1]),
-      affectedRows: dco_decode_u_64(arr[2]),
+      affectedRows: dco_decode_u_64(arr[1]),
     );
   }
 
@@ -322,6 +343,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return QueryRow(
       values: dco_decode_list_query_value(arr[0]),
     );
+  }
+
+  @protected
+  QueryStreamItem dco_decode_query_stream_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return QueryStreamItem_Header(
+          dco_decode_box_autoadd_query_header(raw[1]),
+        );
+      case 1:
+        return QueryStreamItem_Row(
+          dco_decode_box_autoadd_query_row(raw[1]),
+        );
+      case 2:
+        return QueryStreamItem_Error(
+          dco_decode_String(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -384,6 +426,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
+  }
+
+  @protected
   ConnWrapper
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper(
           SseDeserializer deserializer) {
@@ -411,10 +460,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RustStreamSink<QueryStreamItem> sse_decode_StreamSink_query_stream_item_Sse(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
     return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  QueryHeader sse_decode_box_autoadd_query_header(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_query_header(deserializer));
+  }
+
+  @protected
+  QueryRow sse_decode_box_autoadd_query_row(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_query_row(deserializer));
   }
 
   @protected
@@ -455,18 +524,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<QueryRow> sse_decode_list_query_row(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <QueryRow>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_query_row(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<QueryValue> sse_decode_list_query_value(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -487,13 +544,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  QueryResult sse_decode_query_result(SseDeserializer deserializer) {
+  QueryHeader sse_decode_query_header(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_columns = sse_decode_list_query_column(deserializer);
-    var var_rows = sse_decode_list_query_row(deserializer);
     var var_affectedRows = sse_decode_u_64(deserializer);
-    return QueryResult(
-        columns: var_columns, rows: var_rows, affectedRows: var_affectedRows);
+    return QueryHeader(columns: var_columns, affectedRows: var_affectedRows);
   }
 
   @protected
@@ -501,6 +556,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_values = sse_decode_list_query_value(deserializer);
     return QueryRow(values: var_values);
+  }
+
+  @protected
+  QueryStreamItem sse_decode_query_stream_item(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_box_autoadd_query_header(deserializer);
+        return QueryStreamItem_Header(var_field0);
+      case 1:
+        var var_field0 = sse_decode_box_autoadd_query_row(deserializer);
+        return QueryStreamItem_Row(var_field0);
+      case 2:
+        var var_field0 = sse_decode_String(deserializer);
+        return QueryStreamItem_Error(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -570,6 +645,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_AnyhowException(
+      AnyhowException self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.message, serializer);
+  }
+
+  @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnWrapper(
           ConnWrapper self, SseSerializer serializer) {
@@ -598,9 +680,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_StreamSink_query_stream_item_Sse(
+      RustStreamSink<QueryStreamItem> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+        self.setupAndSerialize(
+            codec: SseCodec(
+          decodeSuccessData: sse_decode_query_stream_item,
+          decodeErrorData: sse_decode_AnyhowException,
+        )),
+        serializer);
+  }
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_query_header(
+      QueryHeader self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_query_header(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_query_row(
+      QueryRow self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_query_row(self, serializer);
   }
 
   @protected
@@ -640,16 +749,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_query_row(
-      List<QueryRow> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_query_row(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_list_query_value(
       List<QueryValue> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -667,10 +766,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_query_result(QueryResult self, SseSerializer serializer) {
+  void sse_encode_query_header(QueryHeader self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_query_column(self.columns, serializer);
-    sse_encode_list_query_row(self.rows, serializer);
     sse_encode_u_64(self.affectedRows, serializer);
   }
 
@@ -678,6 +776,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_query_row(QueryRow self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_query_value(self.values, serializer);
+  }
+
+  @protected
+  void sse_encode_query_stream_item(
+      QueryStreamItem self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case QueryStreamItem_Header(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_box_autoadd_query_header(field0, serializer);
+      case QueryStreamItem_Row(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_box_autoadd_query_row(field0, serializer);
+      case QueryStreamItem_Error(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(field0, serializer);
+    }
   }
 
   @protected
@@ -766,6 +881,6 @@ class ConnWrapperImpl extends RustOpaque implements ConnWrapper {
         that: this,
       );
 
-  Future<QueryResult> query({required String query}) => RustLib.instance.api
+  Stream<QueryStreamItem> query({required String query}) => RustLib.instance.api
       .crateApiMysqlConnWrapperQuery(that: this, query: query);
 }

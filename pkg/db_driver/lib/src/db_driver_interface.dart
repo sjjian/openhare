@@ -72,13 +72,34 @@ class BaseQueryResult {
   BaseQueryResult(this.queryId, this.columns, this.rows, this.affectedRows);
 }
 
+abstract class BaseQueryStreamItem {
+  const BaseQueryStreamItem();
+}
+
+class QueryStreamItemHeader extends BaseQueryStreamItem {
+  final List<BaseQueryColumn> columns;
+  final BigInt affectedRows;
+
+  const QueryStreamItemHeader({
+    required this.columns,
+    required this.affectedRows,
+  });
+}
+
+class QueryStreamItemRow extends BaseQueryStreamItem {
+  final QueryResultRow row;
+
+  const QueryStreamItemRow({required this.row});
+}
+
 abstract class BaseConnection {
   void Function(String)? onSchemaChangedCallback;
 
   BaseConnection();
 
   Future<void> ping();
-  Future<BaseQueryResult> query(String sql);
+  Future<BaseQueryResult> query(String sql, {int limit = 100});
+  Stream<BaseQueryStreamItem> queryStream(String sql, {int limit = 100});
   Future<void> killQuery();
   Future<void> close();
   Future<List<MetaDataNode>> metadata();

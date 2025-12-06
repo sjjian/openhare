@@ -18,7 +18,7 @@ abstract class ConnWrapper implements RustOpaqueInterface {
   static Future<ConnWrapper> open({required String dsn}) =>
       RustLib.instance.api.crateApiMysqlConnWrapperOpen(dsn: dsn);
 
-  Future<QueryResult> query({required String query});
+  Stream<QueryStreamItem> query({required String query});
 }
 
 class QueryColumn {
@@ -42,27 +42,24 @@ class QueryColumn {
           columnType == other.columnType;
 }
 
-class QueryResult {
+class QueryHeader {
   final List<QueryColumn> columns;
-  final List<QueryRow> rows;
   final BigInt affectedRows;
 
-  const QueryResult({
+  const QueryHeader({
     required this.columns,
-    required this.rows,
     required this.affectedRows,
   });
 
   @override
-  int get hashCode => columns.hashCode ^ rows.hashCode ^ affectedRows.hashCode;
+  int get hashCode => columns.hashCode ^ affectedRows.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QueryResult &&
+      other is QueryHeader &&
           runtimeType == other.runtimeType &&
           columns == other.columns &&
-          rows == other.rows &&
           affectedRows == other.affectedRows;
 }
 
@@ -82,6 +79,21 @@ class QueryRow {
       other is QueryRow &&
           runtimeType == other.runtimeType &&
           values == other.values;
+}
+
+@freezed
+sealed class QueryStreamItem with _$QueryStreamItem {
+  const QueryStreamItem._();
+
+  const factory QueryStreamItem.header(
+    QueryHeader field0,
+  ) = QueryStreamItem_Header;
+  const factory QueryStreamItem.row(
+    QueryRow field0,
+  ) = QueryStreamItem_Row;
+  const factory QueryStreamItem.error(
+    String field0,
+  ) = QueryStreamItem_Error;
 }
 
 @freezed

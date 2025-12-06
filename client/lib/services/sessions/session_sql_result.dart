@@ -5,7 +5,6 @@ import 'package:client/services/sessions/session_controller.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:excel/excel.dart' as excel;
 
 part 'session_sql_result.g.dart';
 
@@ -145,20 +144,5 @@ class SelectedSQLResultNotifier extends _$SelectedSQLResultNotifier {
     return ref
         .read(sQLResultsServicesProvider.notifier)
         .getSQLResult(sqlResultModel.resultId);
-  }
-
-  excel.Excel toExcel() {
-    final data = excel.Excel.createExcel();
-    final sheet = data["Sheet1"];
-    sheet.appendRow(state!.data!.columns
-        .map<excel.TextCellValue>((e) => excel.TextCellValue(e.name))
-        .toList());
-    for (final row in state!.data!.rows) {
-      sheet.appendRow(row.values
-          .map<excel.TextCellValue>(
-              (e) => excel.TextCellValue(e.getString() ?? ''))
-          .toList());
-    }
-    return data;
   }
 }
