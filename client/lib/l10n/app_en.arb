@@ -503,5 +503,35 @@
   "export_data_schema_sql": "schema SQL, SQL as follows:",
   "@export_data_schema_sql": {
     "description": "Export data schema SQL text"
+  },
+  "export_progress_creating_task": "Creating task",
+  "@export_progress_creating_task": {
+    "description": "Export progress message creating task"
+  },
+  "export_progress_connecting": "Connecting database",
+  "@export_progress_connecting": {
+    "description": "Export progress message connecting"
+  },
+  "export_progress_executing_query": "Executing query",
+  "@export_progress_executing_query": {
+    "description": "Export progress message executing query"
+  },
+  "export_progress_opening_file": "Opening file",
+  "@export_progress_opening_file": {
+    "description": "Export progress message opening file"
+  },
+  "export_progress_exporting": "Exported {rows} rows",
+  "@export_progress_exporting": {
+    "description": "Export progress message exporting data",
+    "placeholders": {
+      "rows": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "export_progress_completed": "Completed",
+  "@export_progress_completed": {
+    "description": "Export progress message completed"
   }
 }

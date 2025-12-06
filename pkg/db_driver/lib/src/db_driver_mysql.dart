@@ -19,7 +19,8 @@ class MysqlQueryValue extends BaseQueryValue {
   String? getString() {
     return switch (_value) {
       QueryValue_NULL() => null,
-      QueryValue_Bytes(:final field0) => utf8.decode(field0, allowMalformed: true), // todo: support gbk, latin1?
+      QueryValue_Bytes(:final field0) =>
+        utf8.decode(field0, allowMalformed: true), // todo: support gbk, latin1?
       QueryValue_Int(:final field0) => field0.toString(),
       QueryValue_UInt(:final field0) => field0.toString(),
       QueryValue_Float(:final field0) => field0.toString(),
@@ -181,7 +182,7 @@ class MySQLConnection extends BaseConnection {
     List<BaseQueryColumn>? resultColumns;
     BigInt? resultAffectedRows;
     List<QueryResultRow> rows = [];
-    
+
     await for (final item in queryStream(sql, limit: limit)) {
       switch (item) {
         case QueryStreamItemHeader(:final columns, :final affectedRows):
@@ -191,30 +192,36 @@ class MySQLConnection extends BaseConnection {
           rows.add(row);
       }
     }
-    
+
     if (resultColumns == null || resultAffectedRows == null) {
       throw StateError('No header received');
     }
-    
+
     return BaseQueryResult(queryId, resultColumns, rows, resultAffectedRows);
   }
 
+  String _wrapLimit(String sql, int limit) {
+    sql = sql.trimRight();
+    if (sql.endsWith(";")) sql = sql.substring(0, sql.length - 1);
+    return "SELECT * FROM ($sql) AS dt_1 Limit $limit;";
+  }
+
   @override
-  Stream<BaseQueryStreamItem> queryStream(String sql, {int limit = 100}) async* {
-    // 判断是否是 SELECT 语句, 若是则嵌套一层 LIMIT 限制返回数据量, 暂时为100行. todo: 通用方法处理
+  Stream<BaseQueryStreamItem> queryStream(String sql, {int? limit}) async* {
+    // 判断是否是 SELECT 语句, 若是则根据 limit 参数决定是否嵌套一层 LIMIT 限制返回数据量
     final firstTok = Lexer(sql).firstTrim();
-    if (firstTok != null && firstTok.content.toLowerCase() == "select") {
-      sql = sql.trimRight();
-      if (sql.endsWith(";")) sql = sql.substring(0, sql.length - 1);
-      sql = "SELECT * FROM ($sql) AS dt_1 Limit $limit;";
+    if (limit != null &&
+        firstTok != null &&
+        firstTok.content.toLowerCase() == "select") {
+      sql = _wrapLimit(sql, limit);
     }
-    
+
     final queryId = Uuid().v4(); // todo: 统一处理
     // 加入注释. todo: 通用方法处理
     sql = "/* call by openhare, uuid: $queryId */ $sql";
-    
+
     List<BaseQueryColumn>? columns;
-    
+
     try {
       await for (final item in _conn.query(query: sql)) {
         switch (item) {
@@ -243,7 +250,7 @@ class MySQLConnection extends BaseConnection {
     } catch (e) {
       rethrow;
     }
-    
+
     // 如果执行的语句包含`use schema`
     if (firstTok != null && firstTok.content.toLowerCase() == "use") {
       final schema = await getCurrentSchema();

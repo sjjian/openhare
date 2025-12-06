@@ -41,6 +41,7 @@ abstract class SessionConnRepo {
   Future<List<String>> getSchemas(ConnId connId);
   Future<List<MetaDataNode>> getMetadata(ConnId connId);
   Future<BaseQueryResult?> query(ConnId connId, String query);
+  Stream<BaseQueryStreamItem> queryStream(ConnId connId, String query);
   Future<void> killQuery(ConnId connId);
 }
 

@@ -30,8 +30,6 @@ class TaskStorage {
     status = TaskStatus.values[value];
   }
 
-  double progress;
-  String? currentStep;
   String? progressMessage;
 
   @Property(type: PropertyType.dateNano)
@@ -48,8 +46,6 @@ class TaskStorage {
     this.id = 0,
     required int stTaskType,
     required int stStatus,
-    required this.progress,
-    this.currentStep,
     this.progressMessage,
     required this.createdAt,
     this.completedAt,
@@ -63,8 +59,6 @@ class TaskStorage {
       : id = model.id.value,
         taskType = model.type,
         status = model.status,
-        progress = model.progress,
-        currentStep = model.currentStep,
         progressMessage = model.progressMessage,
         createdAt = model.createdAt,
         completedAt = model.completedAt,
@@ -76,8 +70,6 @@ class TaskStorage {
         id: TaskId(value: id),
         type: taskType,
         status: status,
-        progress: progress,
-        currentStep: currentStep,
         progressMessage: progressMessage,
         createdAt: createdAt,
         completedAt: completedAt,
@@ -99,8 +91,6 @@ class TaskRepoImpl implements TaskRepo {
     final storage = TaskStorage(
       stTaskType: task.type.index,
       stStatus: task.status.index,
-      progress: task.progress,
-      currentStep: task.currentStep,
       progressMessage: task.progressMessage,
       createdAt: now,
       completedAt: task.completedAt,

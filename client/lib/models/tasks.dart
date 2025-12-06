@@ -80,8 +80,6 @@ abstract class TaskModel with _$TaskModel {
     required TaskId id,
     required TaskType type,
     required TaskStatus status,
-    required double progress,
-    String? currentStep,
     String? progressMessage,
     required DateTime createdAt,
     DateTime? completedAt,
@@ -118,8 +116,6 @@ abstract class ExportDataModel with _$ExportDataModel {
   const factory ExportDataModel({
     required TaskId id,
     required TaskStatus status,
-    required double progress,
-    String? currentStep,
     String? progressMessage,
     required DateTime createdAt,
     DateTime? completedAt,
@@ -148,8 +144,6 @@ abstract class ExportDataModel with _$ExportDataModel {
     return ExportDataModel(
       id: model.id,
       status: model.status,
-      progress: model.progress,
-      currentStep: model.currentStep,
       progressMessage: model.progressMessage,
       createdAt: model.createdAt,
       completedAt: model.completedAt,
@@ -164,8 +158,6 @@ abstract class ExportDataModel with _$ExportDataModel {
       id: id,
       type: TaskType.exportData,
       status: status,
-      progress: progress,
-      currentStep: currentStep,
       progressMessage: progressMessage,
       createdAt: createdAt,
       completedAt: completedAt,
@@ -174,9 +166,6 @@ abstract class ExportDataModel with _$ExportDataModel {
       desc: desc,
     );
   }
-
-  // 格式化的进度百分比
-  String get progressPercent => '${(progress * 100).round()}%';
 
   // 任务持续时间
   Duration? get duration => completedAt?.difference(createdAt);
@@ -188,8 +177,8 @@ abstract class ExportDataTaskListItemModel with _$ExportDataTaskListItemModel {
   const factory ExportDataTaskListItemModel({
     required TaskId id,
     required TaskStatus status,
-    required double progress,
     String? desc,
+    String? progressMessage,
     required DateTime createdAt,
     DateTime? completedAt,
     String? fileName,
@@ -200,9 +189,6 @@ abstract class ExportDataTaskListItemModel with _$ExportDataTaskListItemModel {
   }) = _ExportDataTaskListItemModel;
 
   const ExportDataTaskListItemModel._();
-
-  // 格式化的进度百分比
-  String get progressPercent => '${(progress * 100).round()}%';
 
   // 任务持续时间
   Duration? get duration => completedAt?.difference(createdAt);

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:client/models/tasks.dart';
 import 'package:client/repositories/tasks/task.dart';
@@ -9,8 +10,12 @@ import 'package:client/services/instances/instances.dart';
 import 'package:client/services/tasks/overview.dart';
 import 'package:client/models/sessions.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:excel/excel.dart' as excel;
+import 'package:csv/csv.dart';
 import 'package:client/utils/file_utils.dart';
+import 'package:client/services/settings/settings.dart';
+import 'package:client/l10n/app_localizations_en.dart';
+import 'package:client/l10n/app_localizations_zh.dart';
+import 'package:client/l10n/app_localizations.dart';
 
 part 'export_data.g.dart';
 
@@ -27,6 +32,16 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
     ref.invalidate(exportDataTaskPaginationListNotifierProvider);
     ref.invalidate(latestExportTaskProvider);
     ref.invalidate(taskOverviewServiceProvider);
+  }
+
+  // todo: 统一处理
+  AppLocalizations _getLocalizations() {
+    final settings = ref.read(systemSettingServiceProvider);
+    if (settings.language == 'zh') {
+      return AppLocalizationsZh();
+    } else {
+      return AppLocalizationsEn();
+    }
   }
 
   ExportDataModel _createTask(ExportDataModel task) {
@@ -74,12 +89,14 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
     );
   }
 
+  // todo: 导出超大数据时可能会引起UI卡顿，需要优化。
   Future<void> exportData(ExportDataParameters parameters,
       {String? desc}) async {
-    // 获取唯一的文件名，如果文件已存在则自动添加序号
+    final l10n = _getLocalizations();
+
+    // 1. 正在创建任务
     final uniqueFileName =
         getUniqueFileName(parameters.fileDir, parameters.fileName);
-    // 更新参数，使用实际保存的文件名
     final finalParameters = parameters.copyWith(fileName: uniqueFileName);
 
     final now = DateTime.now();
@@ -88,7 +105,7 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
       parameters: finalParameters,
       desc: desc,
       status: TaskStatus.running,
-      progress: 0.0,
+      progressMessage: l10n.export_progress_creating_task,
       createdAt: now,
       completedAt: null,
     ));
@@ -96,32 +113,79 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
     final connServices = ref.read(sessionConnsServicesProvider.notifier);
     SessionConnModel? connModel;
     try {
+      // 2. 正在连接数据
+      task = task.copyWith(progressMessage: l10n.export_progress_connecting);
+      _updateTask(task);
+
       connModel = await connServices.createConn(parameters.instanceId,
           currentSchema: parameters.schema);
       await connServices.connect(connModel.connId);
-      // todo: 使用exportData方法，底层使用流失导出，防止内存占用过多。
-      BaseQueryResult? res =
-          await connServices.query(connModel.connId, parameters.query);
 
-      final data = excel.Excel.createExcel();
-      final sheet = data["Sheet1"];
-      sheet.appendRow(res!.columns
-          .map<excel.TextCellValue>((e) => excel.TextCellValue(e.name))
-          .toList());
-      for (final row in res.rows) {
-        sheet.appendRow(row.values
-            .map<excel.TextCellValue>(
-                (e) => excel.TextCellValue(e.getString() ?? ''))
-            .toList());
-      }
+      // 3. 正在执行语句
+      task =
+          task.copyWith(progressMessage: l10n.export_progress_executing_query);
+      _updateTask(task);
+
+      // 4. 正在打开文件
+      task = task.copyWith(progressMessage: l10n.export_progress_opening_file);
+      _updateTask(task);
 
       File file = File(finalParameters.exportFilePath);
-      await file.writeAsBytes(data.save()!);
+      final sink = file.openWrite(encoding: utf8);
 
-      _updateTask(task.copyWith(
+      int rowCount = 0;
+      int bufferedSize = 0;
+      const int flushThreshold = 1024 * 1024;
+      const csvConverter = ListToCsvConverter();
+      List<String>? columnNames;
+
+      try {
+        await for (final item
+            in connServices.queryStream(connModel.connId, parameters.query)) {
+          switch (item) {
+            case QueryStreamItemHeader(:final columns, affectedRows: _):
+              columnNames = columns.map((e) => e.name).toList();
+              final headerCsv = csvConverter.convert([columnNames]);
+              sink.writeln(headerCsv);
+              await sink.flush();
+
+              // 5. 开始导出数据
+              task = task.copyWith(
+                progressMessage: l10n.export_progress_exporting(0)
+              );
+              _updateTask(task);
+
+            case QueryStreamItemRow(:final row):
+              final rowData =
+                  row.values.map((e) => e.getString() ?? '').toList();
+              final rowCsv = csvConverter.convert([rowData]);
+              sink.writeln(rowCsv);
+              rowCount++;
+
+              bufferedSize += rowCsv.length + 1; // 1 是换行符的长度
+              // 如果缓冲区大小超过阈值，则存一下文件并更新进度
+              if (bufferedSize >= flushThreshold) {
+                await sink.flush();
+                bufferedSize = 0;
+                task = task.copyWith(
+                  progressMessage: l10n.export_progress_exporting(rowCount),
+                );
+                _updateTask(task);
+              }
+          }
+        }
+        await sink.flush();
+      } finally {
+        await sink.close();
+      }
+
+      // 6. 完成
+      task = task.copyWith(
         status: TaskStatus.completed,
+        progressMessage: l10n.export_progress_completed,
         completedAt: DateTime.now(),
-      ));
+      );
+      _updateTask(task);
     } catch (e) {
       _updateTask(task.copyWith(
         status: TaskStatus.failed,
@@ -169,8 +233,8 @@ class ExportDataTaskPaginationListNotifier
         return ExportDataTaskListItemModel(
           id: exportDataModel.id,
           status: exportDataModel.status,
-          progress: exportDataModel.progress,
           desc: exportDataModel.desc,
+          progressMessage: exportDataModel.progressMessage,
           createdAt: exportDataModel.createdAt,
           completedAt: exportDataModel.completedAt,
           fileName: exportDataModel.parameters?.fileName,

@@ -49,6 +49,7 @@ dependencies:
   google_fonts: ^6.2.1
   file_picker: ^10.3.3
   excel: ^4.0.6
+  csv: ^6.0.0
   re_editor: ^0.6.0
   collection: ^1.18.0
   sql_editor:

@@ -58,10 +58,7 @@ class ExportDataTaskOverviewItem extends ConsumerWidget {
   }
 
   String _getStatusText(BuildContext context) {
-    final isRunning = exportData.status == TaskStatus.running;
-    return isRunning
-        ? '${_statusLabel(context, exportData.status)} ${(exportData.progress * 100).round()}%'
-        : _statusLabel(context, exportData.status);
+    return _statusLabel(context, exportData.status);
   }
 
   @override
@@ -149,7 +146,24 @@ class ExportDataTaskOverviewItem extends ConsumerWidget {
                             color: colorScheme.onSurfaceVariant,
                           ),
                     ),
-                    if (exportData.desc != null && exportData.desc!.isNotEmpty)
+                    // 当状态为 running 时，显示 progressMessage；否则显示 desc
+                    if (exportData.status == TaskStatus.running &&
+                        exportData.progressMessage != null &&
+                        exportData.progressMessage!.isNotEmpty)
+                      Flexible(
+                        child: Text(
+                          '・${exportData.progressMessage}',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant
+                                        .withOpacity(0.6),
+                                  ),
+                        ),
+                      )
+                    else if (exportData.desc != null &&
+                        exportData.desc!.isNotEmpty)
                       Flexible(
                         child: Text(
                           '・${exportData.desc}',

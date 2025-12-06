@@ -140,7 +140,7 @@ class PGConnection extends BaseConnection {
   }
 
   @override
-  Stream<BaseQueryStreamItem> queryStream(String sql, {int limit = 100}) async* {
+  Stream<BaseQueryStreamItem> queryStream(String sql, {int? limit}) async* {
     // todo: 暂时不支持 limit
     final qs = await _conn.query(query: sql);
     final columns = qs.schema.columns

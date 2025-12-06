@@ -68,7 +68,7 @@ class _ExportDataDialogContentState
     // 填充文件名
     fileNameController = TextEditingController(
       text:
-          'export-${DateTime.now().toIso8601String().split('.').first.replaceAll(':', '-')}.xlsx',
+          'export-${DateTime.now().toIso8601String().split('.').first.replaceAll(':', '-')}.csv',
     );
     // 自动填充目录
     final latestTask = ref.read(latestExportTaskProvider);
@@ -147,10 +147,10 @@ class _ExportDataDialogContentState
             parameters,
           );
 
-      // 设置文件名，确保带有.xlsx后缀
+      // 设置文件名，确保带有.csv后缀
       String fileName = result.fileName.trim();
-      if (!fileName.toLowerCase().endsWith('.xlsx')) {
-        fileName = '$fileName.xlsx';
+      if (!fileName.toLowerCase().endsWith('.csv')) {
+        fileName = '$fileName.csv';
       }
       fileNameController.text = fileName;
 

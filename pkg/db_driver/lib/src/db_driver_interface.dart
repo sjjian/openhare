@@ -99,7 +99,7 @@ abstract class BaseConnection {
 
   Future<void> ping();
   Future<BaseQueryResult> query(String sql, {int limit = 100});
-  Stream<BaseQueryStreamItem> queryStream(String sql, {int limit = 100});
+  Stream<BaseQueryStreamItem> queryStream(String sql, {int? limit});
   Future<void> killQuery();
   Future<void> close();
   Future<List<MetaDataNode>> metadata();

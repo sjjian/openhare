@@ -93,6 +93,11 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
+  Stream<BaseQueryStreamItem> queryStream(ConnId connId, String query) {
+    return conns[connId.value]!.queryStream(query);
+  }
+
+  @override
   Future<void> killQuery(ConnId connId) async {
     final conn = conns[connId.value];
     if (conn == null) {
@@ -208,6 +213,17 @@ class SessionConn {
       return queryResult;
     } catch (e) {
       rethrow;
+    } finally {
+      _setState(SQLConnectState.connected);
+    }
+  }
+
+  Stream<BaseQueryStreamItem> queryStream(String query) async* {
+    try {
+      _setState(SQLConnectState.executing);
+      await for (final item in conn2!.queryStream(query)) {
+        yield item;
+      }
     } finally {
       _setState(SQLConnectState.connected);
     }

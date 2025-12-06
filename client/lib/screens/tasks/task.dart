@@ -109,9 +109,7 @@ class _TaskTableState extends ConsumerState<TaskTable> {
     final status = task.status;
     final color = _statusColor(context, status);
     final isRunning = status == TaskStatus.running;
-    final statusText = isRunning
-        ? '${_statusLabel(context, status)} ${task.progressPercent}'
-        : _statusLabel(context, status);
+    final statusText = _statusLabel(context, status);
 
     final statusWidget = Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -154,9 +152,18 @@ class _TaskTableState extends ConsumerState<TaskTable> {
       ),
     );
 
-    if (status == TaskStatus.failed && task.errorMessage != null) {
+    // 当状态为 running 且有 progressMessage 时，显示 progressMessage 的 tooltip
+    if (status == TaskStatus.running) {
       return Tooltip(
-        message: task.errorMessage!,
+        message: task.progressMessage ?? "-",
+        child: statusWidget,
+      );
+    }
+
+    // 当状态为 failed 且有 errorMessage 时，显示 errorMessage 的 tooltip
+    if (status == TaskStatus.failed) {
+      return Tooltip(
+        message: task.errorMessage ?? "-",
         child: statusWidget,
       );
     }
