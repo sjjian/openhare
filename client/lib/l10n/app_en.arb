@@ -804,5 +804,52 @@
   "about_more_info": "More info",
   "@about_more_info": {
     "description": "More info section title"
+  },
+  "llm_api_connection_info": "Connection",
+  "@llm_api_connection_info": {
+    "description": "LLM API dialog connection section title"
+  },
+  "llm_api_model_info": "Model",
+  "@llm_api_model_info": {
+    "description": "LLM API dialog model section title"
+  },
+  "llm_api_name": "Name",
+  "@llm_api_name": {
+    "description": "LLM API dialog name field label"
+  },
+  "llm_api_endpoint": "Endpoint URL",
+  "@llm_api_endpoint": {
+    "description": "LLM API dialog endpoint field label"
+  },
+  "llm_api_reset_form": "Reset form",
+  "@llm_api_reset_form": {
+    "description": "LLM API dialog reset whole form button"
+  },
+  "llm_api_models_empty": "No models found, you can still enter one manually",
+  "@llm_api_models_empty": {
+    "description": "LLM API dialog no models found message"
+  },
+  "llm_api_models_found": "Found {count} models",
+  "@llm_api_models_found": {
+    "description": "LLM API dialog models found message",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "llm_api_fetch_failed_but_manual_ok": "Fetch failed, but manual entry is still available",
+  "@llm_api_fetch_failed_but_manual_ok": {
+    "description": "LLM API dialog fetch failed but manual input still okay"
+  },
+  "llm_api_fetch_prerequisite": "Enter endpoint URL and API key first",
+  "@llm_api_fetch_prerequisite": {
+    "description": "LLM API dialog fetch models prerequisites hint"
+  },
+  "llm_api_test_connection": "Test connection",
+  "@llm_api_test_connection": {
+    "description": "LLM API dialog test connection button"
+  },
+  "llm_api_connection_success": "Connection successful, ready to use",
+  "@llm_api_connection_success": {
+    "description": "LLM API dialog connection success message"
   }
 }

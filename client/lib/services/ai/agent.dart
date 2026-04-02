@@ -18,9 +18,10 @@ class LLMAgentService extends _$LLMAgentService {
     return repo.getLLMAgents();
   }
 
-  void create(LLMAgentSettingModel setting) {
-    ref.read(lLMAgentRepoProvider).create(setting);
+  LLMAgentId create(LLMAgentSettingModel setting, {LLMAgentStatusModel? status}) {
+    final id = ref.read(lLMAgentRepoProvider).create(setting, status: status);
     ref.invalidateSelf();
+    return id;
   }
 
   void delete(LLMAgentId id) {
@@ -33,8 +34,8 @@ class LLMAgentService extends _$LLMAgentService {
     ref.invalidateSelf();
   }
 
-  void updateSetting(LLMAgentId id, LLMAgentSettingModel setting) {
-    ref.read(lLMAgentRepoProvider).updateSetting(id, setting);
+  void updateSetting(LLMAgentId id, LLMAgentSettingModel setting, {LLMAgentStatusModel? status}) {
+    ref.read(lLMAgentRepoProvider).updateSetting(id, setting, status: status);
     ref.invalidateSelf();
   }
 
@@ -53,11 +54,17 @@ class LLMAgentService extends _$LLMAgentService {
       repo.updateStatus(id, const LLMAgentStatusModel(state: LLMAgentState.testing));
       ref.invalidateSelf();
       final llmSdk = LLMProvider.create(model.setting, '');
-      final result = await llmSdk.call([
-        AIChatMessageItem.userMessage(
-          AIChatUserMessageModel(id: AIChatMessageId.generate(), content: testTemplate),
-        ),
-      ]);
+      final result = await (() async {
+        try {
+          return await llmSdk.call([
+            AIChatMessageItem.userMessage(
+              AIChatUserMessageModel(id: AIChatMessageId.generate(), content: testTemplate),
+            ),
+          ]);
+        } finally {
+          llmSdk.dispose();
+        }
+      })();
 
       final available = result.content.isNotEmpty;
       repo.updateStatus(
@@ -79,6 +86,31 @@ class LLMAgentService extends _$LLMAgentService {
     } finally {
       ref.invalidateSelf();
     }
+  }
+
+  Future<List<String>> fetchModelsDraft(LLMAgentSettingModel setting) async {
+    if (setting.baseUrl.trim().isEmpty) {
+      throw Exception('Base URL is required');
+    }
+    if (setting.apiKey.trim().isEmpty) {
+      throw Exception('API Key is required');
+    }
+
+    return fetchModelsForSetting(setting);
+  }
+
+  Future<void> pingDraft(LLMAgentSettingModel setting) async {
+    if (setting.baseUrl.trim().isEmpty) {
+      throw Exception('Base URL is required');
+    }
+    if (setting.apiKey.trim().isEmpty) {
+      throw Exception('API Key is required');
+    }
+    if (setting.modelName.trim().isEmpty) {
+      throw Exception('Model is required');
+    }
+
+    await pingDraftSetting(setting);
   }
 
   /// 从AI响应中提取JSON字符串（去掉markdown代码块标记）
@@ -128,11 +160,17 @@ class LLMAgentService extends _$LLMAgentService {
 
     final llmSdk = LLMProvider.create(model.setting, '');
     // 调用AI
-    final chatResult = await llmSdk.call([
-      AIChatMessageItem.userMessage(
-        AIChatUserMessageModel(id: AIChatMessageId.generate(), content: prompt),
-      ),
-    ]);
+    final chatResult = await (() async {
+      try {
+        return await llmSdk.call([
+          AIChatMessageItem.userMessage(
+            AIChatUserMessageModel(id: AIChatMessageId.generate(), content: prompt),
+          ),
+        ]);
+      } finally {
+        llmSdk.dispose();
+      }
+    })();
 
     // 检查响应是否为空
     if (chatResult.content.isEmpty) {

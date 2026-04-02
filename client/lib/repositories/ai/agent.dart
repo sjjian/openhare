@@ -94,7 +94,7 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
   }
 
   @override
-  void create(LLMAgentSettingModel setting) {
+  LLMAgentId create(LLMAgentSettingModel setting, {LLMAgentStatusModel? status}) {
     final model = _llmAgentSettingBox.put(
       LLMApiSettingStorage(
         name: setting.name,
@@ -104,7 +104,9 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
       ),
     );
 
-    _status[LLMAgentId(value: model)] = const LLMAgentStatusModel(state: LLMAgentState.unknown);
+    final id = LLMAgentId(value: model);
+    _status[id] = status ?? const LLMAgentStatusModel(state: LLMAgentState.unknown);
+    return id;
   }
 
   @override
@@ -128,7 +130,7 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
   }
 
   @override
-  void updateSetting(LLMAgentId id, LLMAgentSettingModel setting) {
+  void updateSetting(LLMAgentId id, LLMAgentSettingModel setting, {LLMAgentStatusModel? status}) {
     _llmAgentSettingBox.put(
       LLMApiSettingStorage(
         id: id.value,
@@ -139,8 +141,7 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
       ),
     );
 
-    // 更新setting后，状态重置为unknown
-    _status[id] = const LLMAgentStatusModel(state: LLMAgentState.unknown);
+    _status[id] = status ?? const LLMAgentStatusModel(state: LLMAgentState.unknown);
   }
 }
 

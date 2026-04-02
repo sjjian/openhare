@@ -363,5 +363,52 @@
     "about_more_info": "更多信息",
     "@about_more_info": {
       "description": "更多信息区块标题"
+    },
+    "llm_api_connection_info": "连接信息",
+    "@llm_api_connection_info": {
+      "description": "LLM API 弹窗连接信息区块标题"
+    },
+    "llm_api_model_info": "模型信息",
+    "@llm_api_model_info": {
+      "description": "LLM API 弹窗模型信息区块标题"
+    },
+    "llm_api_name": "Name",
+    "@llm_api_name": {
+      "description": "LLM API 弹窗名称字段标签"
+    },
+    "llm_api_endpoint": "Endpoint URL",
+    "@llm_api_endpoint": {
+      "description": "LLM API 弹窗 endpoint 字段标签"
+    },
+    "llm_api_reset_form": "重置表单",
+    "@llm_api_reset_form": {
+      "description": "LLM API 弹窗重置整个表单按钮"
+    },
+    "llm_api_models_empty": "未发现模型，你仍可手动输入",
+    "@llm_api_models_empty": {
+      "description": "LLM API 弹窗未发现模型提示"
+    },
+    "llm_api_models_found": "已发现 {count} 个模型",
+    "@llm_api_models_found": {
+      "description": "LLM API 弹窗发现模型提示",
+      "placeholders": {
+        "count": { "type": "int" }
+      }
+    },
+    "llm_api_fetch_failed_but_manual_ok": "获取失败，但仍可手动输入模型名",
+    "@llm_api_fetch_failed_but_manual_ok": {
+      "description": "LLM API 弹窗获取失败但仍可手输提示"
+    },
+    "llm_api_fetch_prerequisite": "先填写 Endpoint URL 和 API Key",
+    "@llm_api_fetch_prerequisite": {
+      "description": "LLM API 弹窗获取模型前置条件提示"
+    },
+    "llm_api_test_connection": "测试连接",
+    "@llm_api_test_connection": {
+      "description": "LLM API 弹窗测试连接按钮"
+    },
+    "llm_api_connection_success": "连接成功，可以开始使用",
+    "@llm_api_connection_success": {
+      "description": "LLM API 弹窗连接成功提示"
     }
 }

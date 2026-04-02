@@ -1,9 +1,128 @@
 import 'dart:convert';
 
 import 'package:client/models/ai.dart';
+import 'package:http/http.dart' as http;
 import 'package:openai_dart/openai_dart.dart';
 
 import 'package:client/services/ai/tool.dart';
+
+const String defaultOpenAIBaseUrl = 'https://api.openai.com/v1';
+
+String normalizeLLMBaseUrl(String raw) {
+  var value = raw.trim();
+  if (value.isEmpty) {
+    return value;
+  }
+
+  while (value.endsWith('/')) {
+    value = value.substring(0, value.length - 1);
+  }
+
+  for (final suffix in const ['/chat/completions', '/models']) {
+    if (value.endsWith(suffix)) {
+      value = value.substring(0, value.length - suffix.length);
+    }
+  }
+
+  final uri = Uri.tryParse(value);
+  if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
+    throw const FormatException('Invalid Base URL');
+  }
+
+  if (!value.endsWith('/v1')) {
+    value = '$value/v1';
+  }
+
+  return value;
+}
+
+bool isOfficialOpenAIBaseUrl(String raw) {
+  try {
+    return normalizeLLMBaseUrl(raw) == defaultOpenAIBaseUrl;
+  } on FormatException {
+    return false;
+  }
+}
+
+String buildDefaultLLMAgentName({
+  required String baseUrl,
+  required String modelName,
+}) {
+  final trimmedModelName = modelName.trim();
+  if (trimmedModelName.isEmpty) {
+    return '';
+  }
+
+  return isOfficialOpenAIBaseUrl(baseUrl) ? 'OpenAI / $trimmedModelName' : 'Custom / $trimmedModelName';
+}
+
+Future<List<String>> fetchModelsForSetting(LLMAgentSettingModel setting) async {
+  final normalizedBaseUrl = normalizeLLMBaseUrl(setting.baseUrl);
+  final client = OpenAIClient(
+    apiKey: setting.apiKey.trim(),
+    baseUrl: normalizedBaseUrl,
+  );
+
+  try {
+    try {
+      final response = await client.listModels();
+      return response.data.map((model) => model.id.trim()).where((id) => id.isNotEmpty).toSet().toList()..sort();
+    } catch (_) {
+      final response = await http.get(
+        Uri.parse('$normalizedBaseUrl/models'),
+        headers: {
+          'Authorization': 'Bearer ${setting.apiKey.trim()}',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        throw Exception('Authentication failed');
+      }
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Failed to fetch models (${response.statusCode})');
+      }
+
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      final data = decoded['data'];
+      if (data is! List) {
+        return const [];
+      }
+
+      return data
+          .whereType<Map<String, dynamic>>()
+          .map((item) => (item['id'] ?? '').toString().trim())
+          .where((id) => id.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
+    }
+  } finally {
+    client.endSession();
+  }
+}
+
+Future<void> pingDraftSetting(LLMAgentSettingModel setting) async {
+  final llmSdk = LLMProvider.create(
+    setting.copyWith(baseUrl: normalizeLLMBaseUrl(setting.baseUrl)),
+    '',
+  );
+
+  try {
+    final result = await llmSdk.call([
+      AIChatMessageItem.userMessage(
+        AIChatUserMessageModel(id: AIChatMessageId.generate(), content: 'Reply with OK only.'),
+      ),
+    ]);
+
+    if (result.content.trim().isEmpty) {
+      throw Exception('The selected model returned an empty response');
+    }
+  } finally {
+    llmSdk.dispose();
+  }
+}
 
 /// 跨 Provider 的 usage 统一结构
 class ChatUsage {
@@ -127,7 +246,7 @@ class OpenAIProvider implements LLMProvider {
     List<AITool>? tools,
   }) : _client = OpenAIClient(
          apiKey: setting.apiKey,
-         baseUrl: setting.baseUrl.isNotEmpty ? setting.baseUrl : null,
+         baseUrl: setting.baseUrl.isNotEmpty ? normalizeLLMBaseUrl(setting.baseUrl) : null,
        ),
        modelName = setting.modelName,
        tools = tools?.map((tool) => _convertToolToOpenAI(tool)).toList();
@@ -369,22 +488,23 @@ class OpenAIProvider implements LLMProvider {
 
   @override
   Future<ChatResult> call(List<AIChatMessageItem> messages) async {
-    try {
-      final request = CreateChatCompletionRequest(
-        model: ChatCompletionModel.modelId(modelName),
-        messages: _buildChatMessages(messages),
-        temperature: temperature,
-        tools: tools,
-      );
+    final request = CreateChatCompletionRequest(
+      model: ChatCompletionModel.modelId(modelName),
+      messages: _buildChatMessages(messages),
+      temperature: temperature,
+      tools: tools,
+    );
 
-      final response = await _client.createChatCompletion(request: request);
-      if (response.choices.isNotEmpty) {
-        return _messageToChatResult(response.choices.first.message);
-      }
-      return ChatResult(content: '');
-    } catch (e) {
+    final response = await _client.createChatCompletion(request: request);
+    if (response.choices.isNotEmpty) {
+      return _messageToChatResult(response.choices.first.message);
+    }
+
+    if (response.choices.isEmpty) {
       return ChatResult(content: '');
     }
+
+    return ChatResult(content: '');
   }
 
   @override

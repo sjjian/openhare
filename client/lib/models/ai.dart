@@ -13,11 +13,11 @@ abstract class LLMAgentRepo {
   LLMAgentsModel getLLMAgents();
   LLMAgentModel? getLastUsedLLMAgent();
   void updateLastUsedLLMAgent(LLMAgentId id);
-  void create(LLMAgentSettingModel setting);
+  LLMAgentId create(LLMAgentSettingModel setting, {LLMAgentStatusModel? status});
   void delete(LLMAgentId id);
   LLMAgentModel? getLLMAgentById(LLMAgentId id);
   void updateStatus(LLMAgentId id, LLMAgentStatusModel status);
-  void updateSetting(LLMAgentId id, LLMAgentSettingModel setting);
+  void updateSetting(LLMAgentId id, LLMAgentSettingModel setting, {LLMAgentStatusModel? status});
 }
 
 abstract class AIChatRepo {
