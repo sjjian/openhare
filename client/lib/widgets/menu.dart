@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:client/widgets/const.dart';
 import 'package:flutter/material.dart';
 
+/// 与 [OverlayMenuLayer] 水平/底边留白一致。
+const double _kOverlayMenuScreenEdgePad = 8.0;
+
 class OverlayMenu extends StatefulWidget {
   final double maxHeight;
   final double maxWidth;
@@ -11,8 +14,8 @@ class OverlayMenu extends StatefulWidget {
   final OverlayMenuFooter? footer;
   final Widget child;
 
-  /// 支持设置弹窗的位置。在上方或者下方。默认在下方
-  final bool isAbove;
+  /// 为 null（默认）时按屏幕空间自动选上/下；为 true/false 时强制在目标上方或下方。
+  final bool? isAbove;
 
   /// 支持设置弹窗的间距。默认0
   final double spacing;
@@ -21,7 +24,7 @@ class OverlayMenu extends StatefulWidget {
   final bool closeOnSelectItem;
 
   /// 把弹出菜单对齐到比 [child] 更大一圈的矩形时常用（例如与带 [InputDecoration.contentPadding] 的输入框外框对齐）。
-  final EdgeInsetsGeometry anchorAlignmentInset;
+  final EdgeInsetsGeometry alignmentInset;
 
   const OverlayMenu({
     super.key,
@@ -31,10 +34,10 @@ class OverlayMenu extends StatefulWidget {
     required this.child,
     this.header,
     this.footer,
-    this.isAbove = false,
+    this.isAbove,
     this.spacing = 0,
     this.closeOnSelectItem = true,
-    this.anchorAlignmentInset = EdgeInsets.zero,
+    this.alignmentInset = EdgeInsets.zero,
   });
 
   @override
@@ -71,55 +74,11 @@ class _OverlayMenuState extends State<OverlayMenu> {
     }
   }
 
-  Widget _buildMenu(BuildContext context, double maxHeight, {double? fixedWidth}) {
-    final box = Container(
-      constraints: BoxConstraints(maxWidth: fixedWidth ?? widget.maxWidth, maxHeight: maxHeight),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest, // 菜单库默认背景色
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.outline, // 菜单阴影颜色
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      // 上面设置的圆角没作用，被下面的widget覆盖了
-      child: Column(
-        children: [
-          if (widget.header != null) widget.header!,
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              children: [
-                for (int i = 0; i < widget.tabs.length; i++)
-                  widget.tabs[i].onTabSelected != null
-                      ? InkWell(
-                          onTap: () {
-                            widget.tabs[i].onTabSelected?.call();
-                            if (widget.closeOnSelectItem) {
-                              setState(() {
-                                _showingMenu = false;
-                              });
-                              _portalController.hide();
-                            }
-                          },
-                          child: widget.tabs[i],
-                        )
-                      : widget.tabs[i],
-              ],
-            ),
-          ),
-          if (widget.footer != null) widget.footer!,
-        ],
-      ),
-    );
-    if (fixedWidth != null) {
-      return SizedBox(width: fixedWidth, child: box);
-    }
-    return box;
+  void _dismissFromBarrier() {
+    setState(() {
+      _showingMenu = false;
+    });
+    _portalController.hide();
   }
 
   @override
@@ -129,89 +88,203 @@ class _OverlayMenuState extends State<OverlayMenu> {
       child: Stack(
         children: [
           Builder(
-            builder: (iconContext) => GestureDetector(onTap: () => _toggleMenu(iconContext), child: widget.child),
+            builder: (iconContext) => GestureDetector(
+              onTap: () => _toggleMenu(iconContext),
+              child: widget.child,
+            ),
           ),
           OverlayPortal(
             controller: _portalController,
             overlayChildBuilder: (context) {
-              // 计算弹出菜单的位置
-              final Size screenSize = MediaQuery.of(context).size; // 屏幕大小
-              final Offset position = _childPosition ?? Offset.zero; // 按钮位置
-              final Size childSize = _childSize ?? const Size(40, 40);
-              final outset = widget.anchorAlignmentInset.resolve(Directionality.of(context));
-
-              // 计算弹窗的总height
-              double menuHeight = 0;
-              if (widget.header != null) {
-                menuHeight += widget.header!.height;
-              }
-              for (int i = 0; i < widget.tabs.length; i++) {
-                menuHeight += widget.tabs[i].height;
-              }
-              if (widget.footer != null) {
-                menuHeight += widget.footer!.height;
-              }
-              // 限制菜单高度
-              menuHeight = (menuHeight > widget.maxHeight) ? widget.maxHeight : menuHeight;
-
-              var left = position.dx - outset.left;
-              final double top;
-              if (widget.isAbove) {
-                top = position.dy - outset.top - menuHeight - widget.spacing;
-              } else {
-                top = position.dy + childSize.height + outset.bottom + widget.spacing;
-              }
-
-              double? menuFixedWidth;
-              var menuWidth = widget.maxWidth;
-              if (outset.horizontal > 0 && childSize.width > 0) {
-                menuFixedWidth = childSize.width + outset.left + outset.right;
-                menuWidth = menuFixedWidth;
-              }
-              const screenPad = 8.0;
-              final maxPanel = screenSize.width - screenPad * 2;
-              if (menuWidth > maxPanel) {
-                menuWidth = maxPanel;
-                if (menuFixedWidth != null) {
-                  menuFixedWidth = menuWidth;
-                }
-              }
-
-              if (left + menuWidth > screenSize.width) {
-                left = screenSize.width - menuWidth - screenPad;
-              }
-              if (left < screenPad) {
-                left = screenPad;
-              }
-
-              return Stack(
-                children: [
-                  // 点击遮罩关闭菜单
-                  Positioned.fill(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () {
-                        setState(() {
-                          _showingMenu = false;
-                        });
-                        _portalController.hide();
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    left: left,
-                    top: top,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: _buildMenu(context, menuHeight, fixedWidth: menuFixedWidth),
-                    ),
-                  ),
-                ],
+              final pos = _childPosition ?? Offset.zero;
+              final size = _childSize ?? const Size(40, 40);
+              return OverlayMenuLayer(
+                targetTopLeft: pos,
+                targetSize: size,
+                maxHeight: widget.maxHeight,
+                maxWidth: widget.maxWidth,
+                tabs: widget.tabs,
+                header: widget.header,
+                footer: widget.footer,
+                isAbove: widget.isAbove,
+                spacing: widget.spacing,
+                alignmentInset: widget.alignmentInset,
+                closeOnSelectItem: widget.closeOnSelectItem,
+                onDismissBarrier: _dismissFromBarrier,
               );
             },
           ),
         ],
       ),
+    );
+  }
+}
+
+/// 按 [targetTopLeft] / [targetSize] 定位的弹出菜单（全屏点击关闭）。由 [OverlayMenu] 与选区场景共用。
+class OverlayMenuLayer extends StatelessWidget {
+  final Offset targetTopLeft;
+  final Size targetSize;
+  final double maxHeight;
+  final double maxWidth;
+  final List<OverlayMenuItem> tabs;
+  final OverlayMenuHeader? header;
+  final OverlayMenuFooter? footer;
+
+  final bool? isAbove;
+  final double spacing;
+  final EdgeInsetsGeometry alignmentInset;
+  final bool closeOnSelectItem;
+  final VoidCallback onDismissBarrier;
+
+  const OverlayMenuLayer({
+    super.key,
+    required this.targetTopLeft,
+    this.targetSize = Size.zero,
+    this.maxHeight = 400,
+    this.maxWidth = 220,
+    required this.tabs,
+    this.header,
+    this.footer,
+    this.isAbove,
+    this.spacing = 0,
+    this.alignmentInset = EdgeInsets.zero,
+    this.closeOnSelectItem = true,
+    required this.onDismissBarrier,
+  });
+
+  static bool _prefersOpenAbove(
+    BuildContext context, {
+    required Rect targetRect,
+    required double menuHeight,
+    double spacing = 0,
+    double belowExtra = 0,
+  }) {
+    final screenH = MediaQuery.sizeOf(context).height;
+    final belowTop = targetRect.bottom + belowExtra + spacing;
+    return belowTop + menuHeight > screenH - _kOverlayMenuScreenEdgePad;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.sizeOf(context);
+    final Offset position = targetTopLeft;
+    final Size childSize = targetSize;
+    final outset = alignmentInset.resolve(Directionality.of(context));
+
+    double menuHeight = 0;
+    if (header != null) {
+      menuHeight += header!.height;
+    }
+    for (int i = 0; i < tabs.length; i++) {
+      menuHeight += tabs[i].height;
+    }
+    if (footer != null) {
+      menuHeight += footer!.height;
+    }
+    menuHeight = (menuHeight > maxHeight) ? maxHeight : menuHeight;
+
+    final targetRect = Rect.fromLTWH(position.dx, position.dy, childSize.width, childSize.height);
+    final resolvedIsAbove =
+        isAbove ??
+        _prefersOpenAbove(
+          context,
+          targetRect: targetRect,
+          menuHeight: menuHeight,
+          spacing: spacing,
+          belowExtra: outset.bottom,
+        );
+
+    var left = position.dx - outset.left;
+    final double top;
+    if (resolvedIsAbove) {
+      top = position.dy - outset.top - menuHeight - spacing;
+    } else {
+      top = position.dy + childSize.height + outset.bottom + spacing;
+    }
+
+    double? menuFixedWidth;
+    var menuWidth = maxWidth;
+    if (outset.horizontal > 0 && childSize.width > 0) {
+      menuFixedWidth = childSize.width + outset.left + outset.right;
+      menuWidth = menuFixedWidth;
+    }
+    final maxPanel = screenSize.width - _kOverlayMenuScreenEdgePad * 2;
+    if (menuWidth > maxPanel) {
+      menuWidth = maxPanel;
+      if (menuFixedWidth != null) {
+        menuFixedWidth = menuWidth;
+      }
+    }
+
+    if (left + menuWidth > screenSize.width) {
+      left = screenSize.width - menuWidth - _kOverlayMenuScreenEdgePad;
+    }
+    if (left < _kOverlayMenuScreenEdgePad) {
+      left = _kOverlayMenuScreenEdgePad;
+    }
+
+    final onAfterItemTap = closeOnSelectItem ? onDismissBarrier : null;
+    final menuPanel = Container(
+      constraints: BoxConstraints(
+        maxWidth: menuFixedWidth ?? maxWidth,
+        maxHeight: menuHeight,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.outline,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        // 上面 Container 设置的圆角没作用，被下面的 widget 覆盖了
+        children: [
+          if (header != null) header!,
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              children: [
+                for (int i = 0; i < tabs.length; i++)
+                  tabs[i].onTabSelected != null
+                      ? InkWell(
+                          onTap: () {
+                            tabs[i].onTabSelected?.call();
+                            onAfterItemTap?.call();
+                          },
+                          child: tabs[i],
+                        )
+                      : tabs[i],
+              ],
+            ),
+          ),
+          if (footer != null) footer!,
+        ],
+      ),
+    );
+    final menuWidget = menuFixedWidth != null ? SizedBox(width: menuFixedWidth, child: menuPanel) : menuPanel;
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: onDismissBarrier,
+          ),
+        ),
+        Positioned(
+          left: left,
+          top: top,
+          child: Material(
+            color: Colors.transparent,
+            child: menuWidget,
+          ),
+        ),
+      ],
     );
   }
 }

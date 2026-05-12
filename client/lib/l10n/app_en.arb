@@ -331,6 +331,18 @@
   "@button_tooltip_copy_sql": {
     "description": "Button tooltip copy code text"
   },
+  "sql_editor_menu_select_all": "Select all",
+  "@sql_editor_menu_select_all": {
+    "description": "SQL editor context menu: select all"
+  },
+  "sql_editor_menu_undo": "Undo",
+  "@sql_editor_menu_undo": {
+    "description": "SQL editor context menu: undo"
+  },
+  "sql_editor_menu_redo": "Redo",
+  "@sql_editor_menu_redo": {
+    "description": "SQL editor context menu: redo"
+  },
   "button_tooltip_retry_message": "Retry from current message",
   "@button_tooltip_retry_message": {
     "description": "Button tooltip retry from current message"

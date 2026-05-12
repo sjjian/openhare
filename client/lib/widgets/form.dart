@@ -807,7 +807,7 @@ class _TrackedEnumFormFieldState extends State<TrackedEnumFormField> {
             decoration: _decorationForState(context, fieldState),
             isEmpty: false,
             child: OverlayMenu(
-              anchorAlignmentInset: const EdgeInsets.symmetric(horizontal: kSpacingSmall, vertical: kSpacingSmall),
+              alignmentInset: const EdgeInsets.symmetric(horizontal: kSpacingSmall, vertical: kSpacingSmall),
               maxWidth: 400,
               maxHeight: cappedMenuHeight,
               spacing: kSpacingTiny,

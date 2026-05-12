@@ -24,6 +24,158 @@ import 'package:sql_editor/re_editor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:client/l10n/app_localizations.dart';
 
+/// 与 [SessionOpBar.getQuery] 相同逻辑，供右键菜单等复用。
+String sessionOpBarGetQuery(CodeLineEditingController codeController, SessionOpBarModel model) {
+  var content = codeController.text.toString();
+  List<SQLChunk> querys = splitSQL(
+    model.dbType?.dialectType ?? DialectType.mysql,
+    content,
+    skipWhitespace: true,
+    skipComment: true,
+  );
+  CodeLineSelection s = codeController.selection;
+  String query;
+  if (!s.isCollapsed) {
+    query = codeController.selectedText;
+  } else {
+    Pos cursor = Pos(0, s.baseIndex + 1, s.baseOffset);
+    SQLChunk chunk = querys.firstWhere((chunk) {
+      if (cursor.between(chunk.start, chunk.end)) {
+        return true;
+      }
+      return false;
+    }, orElse: () => SQLChunk.empty());
+    query = chunk.content;
+  }
+  return query.trim();
+}
+
+void sessionOpBarUnhealthReconnectDialog(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+  return doActionDialog(
+    context,
+    AppLocalizations.of(context)!.tip_reconnect,
+    AppLocalizations.of(context)!.tip_reconnect_desc,
+    () async {
+      await ref.read(sessionsServicesProvider.notifier).disconnectSession(model.sessionId);
+      await ref.read(sessionsServicesProvider.notifier).connectSession(model.sessionId);
+    },
+    icon: Icon(Icons.link_rounded, color: Theme.of(context).colorScheme.primary),
+  );
+}
+
+void sessionOpBarConnectDialog(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+  if (SQLConnectState.isBusy(model.state)) {
+    return doActionDialog(
+      context,
+      AppLocalizations.of(context)!.tip_connect_busy,
+      AppLocalizations.of(context)!.tip_connect_busy_desc,
+      () {
+        // do nothing, just close the dialog
+      },
+      icon: Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
+    );
+  }
+  if (SQLConnectState.isUnhealthy(model.state)) {
+    return sessionOpBarUnhealthReconnectDialog(context, ref, model);
+  }
+
+  return doActionDialog(
+    context,
+    AppLocalizations.of(context)!.tip_connect,
+    AppLocalizations.of(context)!.tip_connect_desc,
+    () async {
+      await ref.read(sessionsServicesProvider.notifier).connectSession(model.sessionId);
+    },
+    icon: Icon(Icons.link_rounded, color: Theme.of(context).colorScheme.primary),
+  );
+}
+
+void sessionOpBarRunExecute({
+  required BuildContext context,
+  required WidgetRef ref,
+  required SessionOpBarModel model,
+  required CodeLineEditingController codeController,
+}) {
+  if (!SQLConnectState.isIdle(model.state)) {
+    sessionOpBarConnectDialog(context, ref, model);
+    return;
+  }
+  String query = sessionOpBarGetQuery(codeController, model);
+  if (query.isNotEmpty) {
+    final df = parser(model.dbType?.dialectType ?? DialectType.mysql, query);
+    if (df.isDangerousSQL && model.config.enableQueryCheck) {
+      queryDangerousSQLDialog(
+        context,
+        ref,
+        model.sessionId,
+        model.config,
+        model.dbType?.dialectType ?? DialectType.mysql,
+        query,
+      );
+    } else {
+      ref.read(sQLResultsServicesProvider.notifier).query(model.sessionId, query);
+    }
+  }
+}
+
+void sessionOpBarRunExecuteAdd({
+  required BuildContext context,
+  required WidgetRef ref,
+  required SessionOpBarModel model,
+  required CodeLineEditingController codeController,
+}) {
+  if (!SQLConnectState.isIdle(model.state)) {
+    sessionOpBarConnectDialog(context, ref, model);
+    return;
+  }
+  String query = sessionOpBarGetQuery(codeController, model);
+  if (query.isNotEmpty) {
+    final df = parser(model.dbType?.dialectType ?? DialectType.mysql, query);
+    if (df.isDangerousSQL && model.config.enableQueryCheck) {
+      queryDangerousSQLDialog(
+        context,
+        ref,
+        model.sessionId,
+        model.config,
+        model.dbType?.dialectType ?? DialectType.mysql,
+        query,
+      );
+    } else {
+      ref.read(sQLResultsServicesProvider.notifier).queryAddResult(model.sessionId, query);
+    }
+  }
+}
+
+void sessionOpBarExplain({
+  required BuildContext context,
+  required WidgetRef ref,
+  required SessionOpBarModel model,
+  required CodeLineEditingController codeController,
+}) {
+  if (!SQLConnectState.isIdle(model.state)) {
+    sessionOpBarConnectDialog(context, ref, model);
+    return;
+  }
+  String query = sessionOpBarGetQuery(codeController, model);
+  if (query.isNotEmpty) {
+    ref.read(sQLResultsServicesProvider.notifier).queryAddResult(model.sessionId, "explain $query");
+  }
+}
+
+void sessionOpBarExportDownload({
+  required BuildContext context,
+  required SessionOpBarModel model,
+  required CodeLineEditingController codeController,
+}) {
+  showExportDataDialog(
+    context,
+    instanceId: model.instanceId!,
+    schema: model.currentSchema,
+    query: sessionOpBarGetQuery(codeController, model),
+    dbType: model.dbType ?? DatabaseType.mysql,
+  );
+}
+
 class SessionOpBar extends ConsumerWidget {
   final CodeLineEditingController codeController;
   final double height;
@@ -34,31 +186,7 @@ class SessionOpBar extends ConsumerWidget {
     this.height = 36,
   });
 
-  String getQuery(SessionOpBarModel model) {
-    var content = codeController.text.toString();
-    List<SQLChunk> querys = splitSQL(
-      model.dbType?.dialectType ?? DialectType.mysql,
-      content,
-      skipWhitespace: true,
-      skipComment: true,
-    );
-    CodeLineSelection s = codeController.selection;
-    String query;
-    // 当界面手动选中了文本片段则仅执行该片段，当前还不支持多SQL执行.
-    if (!s.isCollapsed) {
-      query = codeController.selectedText;
-    } else {
-      Pos cursor = Pos(0, s.baseIndex + 1, s.baseOffset);
-      SQLChunk chunk = querys.firstWhere((chunk) {
-        if (cursor.between(chunk.start, chunk.end)) {
-          return true;
-        }
-        return false;
-      }, orElse: () => SQLChunk.empty());
-      query = chunk.content;
-    }
-    return query.trim();
-  }
+  String getQuery(SessionOpBarModel model) => sessionOpBarGetQuery(codeController, model);
 
   void disconnectDialog(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     // 如果正在执行语句，则提示连接繁忙，请稍后执行
@@ -85,45 +213,11 @@ class SessionOpBar extends ConsumerWidget {
   }
 
   void unhealthReconnectDialog(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    return doActionDialog(
-      context,
-      AppLocalizations.of(context)!.tip_reconnect,
-      AppLocalizations.of(context)!.tip_reconnect_desc,
-      () async {
-        await ref.read(sessionsServicesProvider.notifier).disconnectSession(model.sessionId);
-        await ref.read(sessionsServicesProvider.notifier).connectSession(model.sessionId);
-      },
-      icon: Icon(Icons.link_rounded, color: Theme.of(context).colorScheme.primary),
-    );
+    sessionOpBarUnhealthReconnectDialog(context, ref, model);
   }
 
   void connectDialog(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
-    // 如果是connIsBusy，则提示连接繁忙，请稍后执行
-    if (SQLConnectState.isBusy(model.state)) {
-      return doActionDialog(
-        context,
-        AppLocalizations.of(context)!.tip_connect_busy,
-        AppLocalizations.of(context)!.tip_connect_busy_desc,
-        () {
-          // do nothing, just close the dialog
-        },
-        icon: Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
-      );
-    }
-    // 未连接则提示连接；不健康则提示探活失败后重连
-    if (SQLConnectState.isUnhealthy(model.state)) {
-      return unhealthReconnectDialog(context, ref, model);
-    }
-
-    return doActionDialog(
-      context,
-      AppLocalizations.of(context)!.tip_connect,
-      AppLocalizations.of(context)!.tip_connect_desc,
-      () async {
-        await ref.read(sessionsServicesProvider.notifier).connectSession(model.sessionId);
-      },
-      icon: Icon(Icons.link_rounded, color: Theme.of(context).colorScheme.primary),
-    );
+    sessionOpBarConnectDialog(context, ref, model);
   }
 
   Widget connectWidget(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
@@ -165,28 +259,12 @@ class SessionOpBar extends ConsumerWidget {
       tooltip: AppLocalizations.of(context)!.button_tooltip_run_sql,
       icon: Icons.play_circle_outline_rounded,
       iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
-      onPressed: SQLConnectState.isIdle(model.state)
-          ? () {
-              String query = getQuery(model);
-              if (query.isNotEmpty) {
-                final df = parser(model.dbType?.dialectType ?? DialectType.mysql, query);
-                if (df.isDangerousSQL && model.config.enableQueryCheck) {
-                  queryDangerousSQLDialog(
-                    context,
-                    ref,
-                    model.sessionId,
-                    model.config,
-                    model.dbType?.dialectType ?? DialectType.mysql,
-                    query,
-                  );
-                } else {
-                  ref.read(sQLResultsServicesProvider.notifier).query(model.sessionId, query);
-                }
-              }
-            }
-          : () {
-              connectDialog(context, ref, model);
-            },
+      onPressed: () => sessionOpBarRunExecute(
+            context: context,
+            ref: ref,
+            model: model,
+            codeController: codeController,
+          ),
     );
   }
 
@@ -198,28 +276,12 @@ class SessionOpBar extends ConsumerWidget {
           tooltip: AppLocalizations.of(context)!.button_tooltip_run_sql_new_tab,
           icon: Icons.not_started_outlined,
           iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
-          onPressed: SQLConnectState.isIdle(model.state)
-              ? () {
-                  String query = getQuery(model);
-                  if (query.isNotEmpty) {
-                    final df = parser(model.dbType?.dialectType ?? DialectType.mysql, query);
-                    if (df.isDangerousSQL && model.config.enableQueryCheck) {
-                      queryDangerousSQLDialog(
-                        context,
-                        ref,
-                        model.sessionId,
-                        model.config,
-                        model.dbType?.dialectType ?? DialectType.mysql,
-                        query,
-                      );
-                    } else {
-                      ref.read(sQLResultsServicesProvider.notifier).queryAddResult(model.sessionId, query);
-                    }
-                  }
-                }
-              : () {
-                  connectDialog(context, ref, model);
-                },
+          onPressed: () => sessionOpBarRunExecuteAdd(
+                context: context,
+                ref: ref,
+                model: model,
+                codeController: codeController,
+              ),
         ),
       ],
     );
@@ -230,16 +292,12 @@ class SessionOpBar extends ConsumerWidget {
       tooltip: AppLocalizations.of(context)!.button_tooltip_explain_sql,
       icon: Icons.poll_outlined,
       iconColor: SQLConnectState.isIdle(model.state) ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey,
-      onPressed: SQLConnectState.isIdle(model.state)
-          ? () {
-              String query = getQuery(model);
-              if (query.isNotEmpty) {
-                ref.read(sQLResultsServicesProvider.notifier).queryAddResult(model.sessionId, "explain $query");
-              }
-            }
-          : () {
-              connectDialog(context, ref, model);
-            },
+      onPressed: () => sessionOpBarExplain(
+            context: context,
+            ref: ref,
+            model: model,
+            codeController: codeController,
+          ),
     );
   }
 
@@ -249,15 +307,11 @@ class SessionOpBar extends ConsumerWidget {
       icon: Icons.file_download_sharp,
       iconColor: Colors.green,
       verticalOffset: 1,
-      onPressed: () {
-        showExportDataDialog(
-          context,
-          instanceId: model.instanceId!,
-          schema: model.currentSchema,
-          query: getQuery(model),
-          dbType: model.dbType ?? DatabaseType.mysql,
-        );
-      },
+      onPressed: () => sessionOpBarExportDownload(
+            context: context,
+            model: model,
+            codeController: codeController,
+          ),
     );
   }
 
