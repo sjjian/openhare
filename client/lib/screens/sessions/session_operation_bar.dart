@@ -12,6 +12,7 @@ import 'package:client/widgets/menu.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/divider.dart';
+import 'package:client/widgets/keyword.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/sql_highlight.dart';
 import 'package:client/widgets/tooltip.dart';
@@ -256,15 +257,18 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget executeWidget(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
-      tooltip: AppLocalizations.of(context)!.button_tooltip_run_sql,
+      tooltip: keyboardShortcutTooltip(
+        AppLocalizations.of(context)!.button_tooltip_run_sql,
+        KeyboardShortcut.sqlExecute,
+      ),
       icon: Icons.play_circle_outline_rounded,
       iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
       onPressed: () => sessionOpBarRunExecute(
-            context: context,
-            ref: ref,
-            model: model,
-            codeController: codeController,
-          ),
+        context: context,
+        ref: ref,
+        model: model,
+        codeController: codeController,
+      ),
     );
   }
 
@@ -273,15 +277,18 @@ class SessionOpBar extends ConsumerWidget {
       alignment: Alignment.center,
       children: [
         RectangleIconButton.medium(
-          tooltip: AppLocalizations.of(context)!.button_tooltip_run_sql_new_tab,
+          tooltip: keyboardShortcutTooltip(
+            AppLocalizations.of(context)!.button_tooltip_run_sql_new_tab,
+            KeyboardShortcut.sqlExecuteAdd,
+          ),
           icon: Icons.not_started_outlined,
           iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
           onPressed: () => sessionOpBarRunExecuteAdd(
-                context: context,
-                ref: ref,
-                model: model,
-                codeController: codeController,
-              ),
+            context: context,
+            ref: ref,
+            model: model,
+            codeController: codeController,
+          ),
         ),
       ],
     );
@@ -289,29 +296,35 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget explainWidget(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
-      tooltip: AppLocalizations.of(context)!.button_tooltip_explain_sql,
+      tooltip: keyboardShortcutTooltip(
+        AppLocalizations.of(context)!.button_tooltip_explain_sql,
+        KeyboardShortcut.sqlExplain,
+      ),
       icon: Icons.poll_outlined,
       iconColor: SQLConnectState.isIdle(model.state) ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey,
       onPressed: () => sessionOpBarExplain(
-            context: context,
-            ref: ref,
-            model: model,
-            codeController: codeController,
-          ),
+        context: context,
+        ref: ref,
+        model: model,
+        codeController: codeController,
+      ),
     );
   }
 
   Widget exportDataWidget(BuildContext context, SessionOpBarModel model) {
     return RectangleIconButton.medium(
-      tooltip: AppLocalizations.of(context)!.button_tooltip_sql_result_download,
+      tooltip: keyboardShortcutTooltip(
+        AppLocalizations.of(context)!.button_tooltip_sql_result_download,
+        KeyboardShortcut.sqlExport,
+      ),
       icon: Icons.file_download_sharp,
       iconColor: Colors.green,
       verticalOffset: 1,
       onPressed: () => sessionOpBarExportDownload(
-            context: context,
-            model: model,
-            codeController: codeController,
-          ),
+        context: context,
+        model: model,
+        codeController: codeController,
+      ),
     );
   }
 

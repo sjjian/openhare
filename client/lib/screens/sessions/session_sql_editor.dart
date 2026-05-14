@@ -14,6 +14,7 @@ import 'package:client/l10n/app_localizations.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/code_auto_complete.dart';
+import 'package:client/widgets/keyword.dart';
 import 'package:client/widgets/menu.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -70,6 +71,7 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
   @override
   Widget build(BuildContext context) {
     SessionSQLEditorModel model = ref.watch(selectedSessionSQLEditorProvider);
+    final barModel = ref.watch(sessionOpBarProvider);
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords(model.dbType?.dialectType ?? DialectType.mysql)) KeywordPrompt(word: keyword),
@@ -85,48 +87,80 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        Widget editor = CodeAutocomplete(
+          viewBuilder: (context, notifier, onSelected) {
+            return SQLEditorAutoCompleteListView(
+              notifier: notifier,
+              onSelected: onSelected,
+            );
+          },
+          promptsBuilder: SQLEditorAutocompletePromptsBuilder(
+            keywordPrompts: keywordPrompt,
+            directPrompts: [],
+            relatedPrompts: (model.metadata != null)
+                ? SQLEditor.buildRelatePrompts(model.metadata!, model.currentSchema)
+                : const {},
+          ),
+          child: CodeEditor(
+            wordWrap: false,
+            scrollController: widget.scrollController,
+            style: CodeEditorStyle(
+              textStyle: textStyle, // SQL 编辑器文字颜色
+            ),
+            controller: widget.codeController,
+            toolbarController: _toolbarController,
+            indicatorBuilder: (context, editingController, chunkController, notifier) {
+              return Row(
+                children: [
+                  const SizedBox(width: kSpacingTiny),
+                  CodeLineNumber(
+                    model: model,
+                    textStyle: textStyle,
+                    totalHeight: constraints.maxHeight,
+                    notifier: notifier,
+                    codeController: widget.codeController,
+                  ),
+                  const PixelVerticalDivider(),
+                ],
+              );
+            },
+          ),
+        );
+        if (barModel != null) {
+          editor = CallbackShortcuts(
+            bindings: {
+              keyboardShortcutActivator(KeyboardShortcut.sqlExecute): () => sessionOpBarRunExecute(
+                context: context,
+                ref: ref,
+                model: barModel,
+                codeController: widget.codeController,
+              ),
+              keyboardShortcutActivator(KeyboardShortcut.sqlExecuteAdd): () => sessionOpBarRunExecuteAdd(
+                context: context,
+                ref: ref,
+                model: barModel,
+                codeController: widget.codeController,
+              ),
+              keyboardShortcutActivator(KeyboardShortcut.sqlExplain): () => sessionOpBarExplain(
+                context: context,
+                ref: ref,
+                model: barModel,
+                codeController: widget.codeController,
+              ),
+              keyboardShortcutActivator(KeyboardShortcut.sqlExport): () => sessionOpBarExportDownload(
+                context: context,
+                model: barModel,
+                codeController: widget.codeController,
+              ),
+            },
+            child: editor,
+          );
+        }
+
         return Column(
           children: [
             Expanded(
-              child: CodeAutocomplete(
-                viewBuilder: (context, notifier, onSelected) {
-                  return SQLEditorAutoCompleteListView(
-                    notifier: notifier,
-                    onSelected: onSelected,
-                  );
-                },
-                promptsBuilder: SQLEditorAutocompletePromptsBuilder(
-                  keywordPrompts: keywordPrompt,
-                  directPrompts: [],
-                  relatedPrompts: (model.metadata != null)
-                      ? SQLEditor.buildRelatePrompts(model.metadata!, model.currentSchema)
-                      : const {},
-                ),
-                child: CodeEditor(
-                  wordWrap: false,
-                  scrollController: widget.scrollController,
-                  style: CodeEditorStyle(
-                    textStyle: textStyle, // SQL 编辑器文字颜色
-                  ),
-                  controller: widget.codeController,
-                  toolbarController: _toolbarController,
-                  indicatorBuilder: (context, editingController, chunkController, notifier) {
-                    return Row(
-                      children: [
-                        const SizedBox(width: kSpacingTiny),
-                        CodeLineNumber(
-                          model: model,
-                          textStyle: textStyle,
-                          totalHeight: constraints.maxHeight,
-                          notifier: notifier,
-                          codeController: widget.codeController,
-                        ),
-                        const PixelVerticalDivider(),
-                      ],
-                    );
-                  },
-                ),
-              ),
+              child: editor,
             ),
             const PixelDivider(),
           ],
@@ -177,7 +211,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     RectangleIconButton.medium(
-                      tooltip: l10n.button_tooltip_run_sql,
+                      tooltip: keyboardShortcutTooltip(l10n.button_tooltip_run_sql, KeyboardShortcut.sqlExecute),
                       icon: Icons.play_circle_outline_rounded,
                       iconColor: idle ? Colors.green : Colors.grey,
                       onPressed: () {
@@ -192,7 +226,10 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                     ),
                     SizedBox(width: kSpacingTiny),
                     RectangleIconButton.medium(
-                      tooltip: l10n.button_tooltip_run_sql_new_tab,
+                      tooltip: keyboardShortcutTooltip(
+                        l10n.button_tooltip_run_sql_new_tab,
+                        KeyboardShortcut.sqlExecuteAdd,
+                      ),
                       icon: Icons.not_started_outlined,
                       iconColor: idle ? Colors.green : Colors.grey,
                       onPressed: () {
@@ -207,7 +244,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                     ),
                     SizedBox(width: kSpacingTiny),
                     RectangleIconButton.medium(
-                      tooltip: l10n.button_tooltip_explain_sql,
+                      tooltip: keyboardShortcutTooltip(l10n.button_tooltip_explain_sql, KeyboardShortcut.sqlExplain),
                       icon: Icons.poll_outlined,
                       iconColor: idle ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey, // todo: color 统一
                       onPressed: () {
@@ -222,7 +259,10 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                     ),
                     SizedBox(width: kSpacingTiny),
                     RectangleIconButton.medium(
-                      tooltip: l10n.button_tooltip_sql_result_download,
+                      tooltip: keyboardShortcutTooltip(
+                        l10n.button_tooltip_sql_result_download,
+                        KeyboardShortcut.sqlExport,
+                      ),
                       icon: Icons.file_download_sharp,
                       iconColor: Colors.green,
                       verticalOffset: 1,
@@ -250,9 +290,11 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
     BuildContext context, {
     required IconData icon,
     required String label,
+    String? shortcutLabel,
     Color? iconColor,
   }) {
-    final color = iconColor ?? Theme.of(context).colorScheme.onSurfaceVariant;
+    final theme = Theme.of(context);
+    final color = iconColor ?? theme.colorScheme.onSurfaceVariant;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: kSpacingTiny),
       child: Align(
@@ -271,6 +313,16 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (shortcutLabel != null) ...[
+              const SizedBox(width: kSpacingTiny),
+              Text(
+                shortcutLabel,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: kSpacingSmall),
+            ],
           ],
         ),
       ),
@@ -291,13 +343,23 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
         onTabSelected: canCopy ? onCopy : null,
         child: Opacity(
           opacity: canCopy ? 1 : 0.38,
-          child: _sqlContextMenuLeadingRow(context, icon: Icons.content_copy_rounded, label: loc.copyButtonLabel),
+          child: _sqlContextMenuLeadingRow(
+            context,
+            icon: Icons.content_copy_rounded,
+            label: loc.copyButtonLabel,
+            shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.copy),
+          ),
         ),
       ),
       OverlayMenuItem(
         height: rowHeight,
         onTabSelected: onPaste,
-        child: _sqlContextMenuLeadingRow(context, icon: Icons.content_paste_rounded, label: loc.pasteButtonLabel),
+        child: _sqlContextMenuLeadingRow(
+          context,
+          icon: Icons.content_paste_rounded,
+          label: loc.pasteButtonLabel,
+          shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.paste),
+        ),
       ),
     ];
   }
@@ -336,6 +398,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
               overlayContext,
               icon: Icons.select_all_rounded,
               label: l10n.sql_editor_menu_select_all,
+              shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.selectAll),
             ),
           ),
           OverlayMenuItem(
@@ -347,6 +410,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                 overlayContext,
                 icon: Icons.undo_rounded,
                 label: l10n.sql_editor_menu_undo,
+                shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.undo),
               ),
             ),
           ),
@@ -359,6 +423,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                 overlayContext,
                 icon: Icons.redo_rounded,
                 label: l10n.sql_editor_menu_redo,
+                shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.redo),
               ),
             ),
           ),
