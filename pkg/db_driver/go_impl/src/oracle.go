@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql/driver"
 	"errors"
+	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	go_ora "github.com/sijms/go-ora/v2"
@@ -65,12 +67,6 @@ const (
 	oraRESULTSET = "RESULTSET"
 )
 
-type oraConn struct {
-	conn *go_ora.Connection
-}
-
-func (c *oraConn) Close() error { return c.conn.Close() }
-
 func oracleDataType(typeName string) int32 {
 	switch typeName {
 	// Number types
@@ -104,28 +100,93 @@ func oracleDataType(typeName string) int32 {
 	}
 }
 
-func (c *oraConn) OpenQuery(sql string) (rowCursor, error) {
-	stmt := go_ora.NewStmt(sql, c.conn)
-	rows, err := stmt.Query_(nil)
+type oraConn struct {
+	conn          *go_ora.Connection
+	streamMu      sync.Mutex
+	streamCancel  context.CancelFunc
+	isQuerykilled bool
+}
+
+func (c *oraConn) Close() error { return c.conn.Close() }
+
+/*
+这是测试终止SQL的一个可行SQL:
+```sql
+WITH data(n, val) AS (
+  SELECT 1, 0 FROM dual
+  UNION ALL
+  SELECT n+1, val + MOD(n * 12345, 999999) + SQRT(n)
+  FROM data
+  WHERE n < 1500000
+)
+SELECT COUNT(*) AS cnt, SUM(val) AS total_val FROM data
+```
+*/
+
+func (c *oraConn) KillQuery() error {
+	c.streamMu.Lock()
+	c.isQuerykilled = true
+	fn := c.streamCancel
+	c.streamMu.Unlock()
+	if fn != nil {
+		fn()
+	}
+	return nil
+}
+
+func (c *oraConn) OpenQuery(sqlText string) (rowCursor, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	c.streamMu.Lock()
+	c.isQuerykilled = false
+	c.streamCancel = cancel
+	c.streamMu.Unlock()
+
+	cur, err := c.openQuery(ctx, sqlText)
+
+	c.streamMu.Lock()
+	c.streamCancel = nil
+	killed := c.isQuerykilled
+	c.streamMu.Unlock()
+
 	if err != nil {
-		stmt.Close()
+		if killed {
+			return nil, newStreamQueryCancelled(err)
+		}
 		return nil, err
 	}
-	names := rows.Columns()
+	return cur, nil
+}
+
+func (c *oraConn) openQuery(ctx context.Context, sqlText string) (*oraCur, error) {
+	stmt := go_ora.NewStmt(sqlText, c.conn)
+	rows, err := stmt.QueryContext(ctx, nil)
+	if err != nil {
+		_ = stmt.Close()
+		return nil, err
+	}
+	ds, ok := rows.(*go_ora.DataSet)
+	if !ok {
+		_ = rows.Close()
+		_ = stmt.Close()
+		return nil, fmt.Errorf("oracle: unexpected driver.Rows type %T", rows)
+	}
+	names := ds.Columns()
 	columns := make([]dbQueryColumn, 0, len(names))
 	for i, name := range names {
-		typeName := rows.ColumnTypeDatabaseTypeName(i)
+		typeName := ds.ColumnTypeDatabaseTypeName(i)
 		columns = append(columns, dbQueryColumn{
 			name:     name,
 			dataType: oracleDataType(typeName),
 		})
 	}
-	cur := &oraCur{
-		stmt: stmt,
-		rows: rows, columns: columns,
+	return &oraCur{
+		stmt:         stmt,
+		rows:         ds,
+		columns:      columns,
 		affectedRows: stmt.QueryRowsAffected(),
-	}
-	return cur, nil
+	}, nil
 }
 
 type oraCur struct {

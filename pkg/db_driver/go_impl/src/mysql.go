@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql/driver"
 	"errors"
+	"fmt"
+	"io"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -51,13 +54,19 @@ const (
 
 var errNotSupported = errors.New("not supported")
 
+// mysqlErrQueryInterrupted 因 KILL QUERY 等导致语句被中断（见 MySQL ER_QUERY_INTERRUPTED）。
+const mysqlErrQueryInterrupted uint16 = 1317
+
 type mysqlRowsWithAffected interface {
 	driver.Rows
 	RowsAffected() int64
 }
 
 type mysqlConn struct {
-	conn driver.Conn
+	conn       driver.Conn
+	dsn        string
+	connID     int64
+	killIssued atomic.Bool
 }
 
 func (c *mysqlConn) Close() error {
@@ -90,7 +99,72 @@ func mysqlDataType(typeName string) int32 {
 	}
 }
 
+func (c *mysqlConn) mysqlKillInterrupted(err error) bool {
+	if !c.killIssued.Load() {
+		return false
+	}
+	var me *mysql.MySQLError
+	return errors.As(err, &me) && me.Number == mysqlErrQueryInterrupted
+}
+
+func (c *mysqlConn) KillQuery() error {
+	if c.connID == 0 {
+		return nil
+	}
+	c.killIssued.Store(true)
+	connector, err := mysql.MySQLDriver{}.OpenConnector(c.dsn)
+	if err != nil {
+		return err
+	}
+	conn2, err := connector.Connect(context.Background())
+	if err != nil {
+		return err
+	}
+	defer conn2.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	execer, ok := conn2.(driver.ExecerContext)
+	if !ok {
+		return fmt.Errorf("mysql: ExecerContext not available")
+	}
+	_, err = execer.ExecContext(ctx, fmt.Sprintf("KILL QUERY %d", c.connID), nil)
+	return err
+}
+
+func (c *mysqlConn) loadConnID() error {
+	queryer, ok := c.conn.(driver.QueryerContext)
+	if !ok {
+		return fmt.Errorf("mysql: QueryerContext not available")
+	}
+	rows, err := queryer.QueryContext(context.Background(), "SELECT CONNECTION_ID()", nil)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	dest := make([]driver.Value, 1)
+	if err := rows.Next(dest); err != nil {
+		return err
+	}
+	switch v := dest[0].(type) {
+	case int64:
+		c.connID = v
+	case uint64:
+		c.connID = int64(v)
+	case int32:
+		c.connID = int64(v)
+	case []byte:
+		_, err = fmt.Sscanf(string(v), "%d", &c.connID)
+		return err
+	default:
+		_, err = fmt.Sscanf(fmt.Sprint(v), "%d", &c.connID)
+		return err
+	}
+	return nil
+}
+
 func (c *mysqlConn) OpenQuery(sqlText string) (rowCursor, error) {
+	c.killIssued.Store(false)
 	queryer, ok := c.conn.(driver.QueryerContext)
 	if !ok {
 		return nil, errNotSupported
@@ -98,6 +172,9 @@ func (c *mysqlConn) OpenQuery(sqlText string) (rowCursor, error) {
 
 	rows, err := queryer.QueryContext(context.Background(), sqlText, nil)
 	if err != nil {
+		if c.mysqlKillInterrupted(err) {
+			return nil, newStreamQueryCancelled(err)
+		}
 		return nil, err
 	}
 
@@ -120,6 +197,7 @@ func (c *mysqlConn) OpenQuery(sqlText string) (rowCursor, error) {
 	}
 
 	return &mysqlCur{
+		conn:         c,
 		rows:         rows,
 		columns:      columns,
 		affectedRows: affectedRows,
@@ -127,6 +205,7 @@ func (c *mysqlConn) OpenQuery(sqlText string) (rowCursor, error) {
 }
 
 type mysqlCur struct {
+	conn         *mysqlConn
 	rows         driver.Rows
 	columns      []dbQueryColumn
 	affectedRows int64
@@ -146,7 +225,13 @@ func (q *mysqlCur) Header() *dbQueryHeader {
 func (q *mysqlCur) NextRow() (*dbQueryRow, bool, error) {
 	dest := make([]driver.Value, len(q.columns))
 	if err := q.rows.Next(dest); err != nil {
-		return nil, false, nil
+		if errors.Is(err, io.EOF) {
+			return nil, false, nil
+		}
+		if q.conn != nil && q.conn.mysqlKillInterrupted(err) {
+			return nil, false, newStreamQueryCancelled(err)
+		}
+		return nil, false, err
 	}
 
 	values := make([]dbQueryValue, 0, len(dest))
@@ -177,5 +262,10 @@ func openMysqlConn(dsn string) (driverConn, error) {
 		}
 	}
 
-	return &mysqlConn{conn: conn}, nil
+	mc := &mysqlConn{conn: conn, dsn: dsn}
+	if err := mc.loadConnID(); err != nil {
+		_ = conn.Close()
+		return nil, err
+	}
+	return mc, nil
 }

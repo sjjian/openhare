@@ -48,7 +48,11 @@ final class ImplConnection {
           return ImplConnection._(envelope.address);
         case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CONN_ERROR:
           throw Exception(_decodeError(envelope.address));
-        default:
+          case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_KILL_OK:
+            throw StateError('unexpected GO_IMPL_STREAM_EVENT_KILL_OK in conn open');
+          case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CANCEL:
+            throw StateError('unexpected GO_IMPL_STREAM_EVENT_CANCEL in conn open');
+          default:
           throw StateError('unexpected open response: ${envelope.type}');
       }
     } finally {
@@ -93,10 +97,35 @@ final class ImplConnection {
             throw StateError('unexpected GO_IMPL_STREAM_EVENT_CONN_CLOSE_OK in query stream');
           case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CONN_ERROR:
             throw StateError('unexpected GO_IMPL_STREAM_EVENT_CONN_ERROR in query stream');
+          case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_KILL_OK:
+            throw StateError('unexpected GO_IMPL_STREAM_EVENT_KILL_OK in query stream');
+          case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CANCEL:
+            yield const DbQueryCancel();
         }
       }
     } finally {
       malloc.free(sqlPtr);
+      port.close();
+    }
+  }
+
+  Future<void> killQuery() async {
+    final port = ReceivePort();
+    try {
+      _lib.go_impl_conn_kill_async(_handle, port.sendPort.nativePort);
+      final msg = await port.first;
+      final envelope = _decodeQueryStreamMessage(msg);
+      switch (envelope.type) {
+        case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_KILL_OK:
+          return;
+        case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CONN_ERROR:
+          throw Exception(_decodeError(envelope.address));
+        case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CANCEL:
+          throw StateError('unexpected GO_IMPL_STREAM_EVENT_CANCEL in kill_query');
+        default:
+          throw StateError('unexpected kill_query response: ${envelope.type}');
+      }
+    } finally {
       port.close();
     }
   }
@@ -112,6 +141,10 @@ final class ImplConnection {
           return;
         case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CONN_ERROR:
           throw Exception(_decodeError(envelope.address));
+        case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_KILL_OK:
+          throw StateError('unexpected GO_IMPL_STREAM_EVENT_KILL_OK in conn close');
+        case go_impl_stream_event_type_t.GO_IMPL_STREAM_EVENT_CANCEL:
+          throw StateError('unexpected GO_IMPL_STREAM_EVENT_CANCEL in conn close');
         default:
           throw StateError('unexpected conn_close response: ${envelope.type}');
       }
@@ -123,6 +156,10 @@ final class ImplConnection {
 
 sealed class DbQueryEvent {
   const DbQueryEvent();
+}
+
+final class DbQueryCancel extends DbQueryEvent {
+  const DbQueryCancel();
 }
 
 final class DbQueryHeader extends DbQueryEvent {

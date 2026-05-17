@@ -164,6 +164,9 @@ class ExportDataTasksServices extends _$ExportDataTasksServices {
               );
               _updateTask(task);
             }
+          // todo: 处理用户取消导出任务, 状态要展示报错在页面
+          case QueryStreamItemCancel():
+            break;
         }
       }
       await sink.flush();

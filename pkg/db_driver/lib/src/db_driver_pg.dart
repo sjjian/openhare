@@ -9,10 +9,7 @@ import 'db_driver_interface.dart';
 import 'db_driver_metadata.dart';
 
 class PGConnection extends GoImplConnection {
-  final String _dsn;
-  int? _backendPid;
-
-  PGConnection(super._conn, this._dsn);
+  PGConnection(super._conn);
 
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
@@ -68,10 +65,9 @@ class PGConnection extends GoImplConnection {
     ).toString();
 
     final conn = await impl.ImplConnection.openPg(dsn);
-    final pg = PGConnection(conn, dsn);
+    final pg = PGConnection(conn);
 
     await pg.query("SET statement_timeout = '${queryTimeout}s'");
-    await pg._loadBackendPid();
 
     if (schemaToApply != null) {
       await pg.setCurrentSchema(schemaToApply);
@@ -80,28 +76,9 @@ class PGConnection extends GoImplConnection {
     return pg;
   }
 
-  Future<void> _loadBackendPid() async {
-    final results = await query("SELECT pg_backend_pid() AS pid");
-    _backendPid = int.tryParse(results.rows.first.getString("pid") ?? "");
-  }
-
   @override
   Future<void> ping() async {
     await query("SELECT 1");
-  }
-
-  @override
-  Future<void> killQuery() async {
-    if (_backendPid == null) return;
-
-    PGConnection? tmp;
-    try {
-      final tmpConn = await impl.ImplConnection.openPg(_dsn);
-      tmp = PGConnection(tmpConn, _dsn);
-      await tmp.query("SELECT pg_cancel_backend($_backendPid)");
-    } finally {
-      await tmp?.close();
-    }
   }
 
   @override

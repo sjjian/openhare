@@ -54,6 +54,21 @@ class NativeImpl {
   late final _go_impl_conn_open_async = _go_impl_conn_open_asyncPtr
       .asFunction<void Function(int, ffi.Pointer<ffi.Char>, int)>();
 
+  void go_impl_conn_kill_async(
+    int handle,
+    int dartPort,
+  ) {
+    return _go_impl_conn_kill_async(
+      handle,
+      dartPort,
+    );
+  }
+
+  late final _go_impl_conn_kill_asyncPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Int64)>>(
+    'go_impl_conn_kill_async',
+  );
+  late final _go_impl_conn_kill_async = _go_impl_conn_kill_asyncPtr.asFunction<void Function(int, int)>();
+
   void go_impl_conn_close_async(
     int handle,
     int dartPort,
@@ -199,7 +214,9 @@ enum go_impl_stream_event_type_t {
   GO_IMPL_STREAM_EVENT_DONE(3),
   GO_IMPL_STREAM_EVENT_CONN_OPEN_OK(4),
   GO_IMPL_STREAM_EVENT_CONN_CLOSE_OK(5),
-  GO_IMPL_STREAM_EVENT_CONN_ERROR(6)
+  GO_IMPL_STREAM_EVENT_CONN_ERROR(6),
+  GO_IMPL_STREAM_EVENT_KILL_OK(7),
+  GO_IMPL_STREAM_EVENT_CANCEL(8)
   ;
 
   final int value;
@@ -213,6 +230,8 @@ enum go_impl_stream_event_type_t {
     4 => GO_IMPL_STREAM_EVENT_CONN_OPEN_OK,
     5 => GO_IMPL_STREAM_EVENT_CONN_CLOSE_OK,
     6 => GO_IMPL_STREAM_EVENT_CONN_ERROR,
+    7 => GO_IMPL_STREAM_EVENT_KILL_OK,
+    8 => GO_IMPL_STREAM_EVENT_CANCEL,
     _ => throw ArgumentError("Unknown value for go_impl_stream_event_type_t: $value"),
   };
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	mssql "github.com/microsoft/go-mssqldb"
@@ -59,7 +60,9 @@ const (
 
 // mssqlConn 直接使用 go-mssqldb 的 driver.Conn（*mssql.Conn），不经过 database/sql.DB。
 type mssqlConn struct {
-	conn *mssql.Conn
+	conn         *mssql.Conn
+	streamMu     sync.Mutex
+	streamCancel context.CancelFunc
 }
 
 func (c *mssqlConn) Close() error {
@@ -102,8 +105,39 @@ func mssqlDataType(typeName string) int32 {
 	}
 }
 
+func (c *mssqlConn) KillQuery() error {
+	c.streamMu.Lock()
+	fn := c.streamCancel
+	c.streamMu.Unlock()
+	if fn != nil {
+		fn()
+	}
+	return nil
+}
+
 func (c *mssqlConn) OpenQuery(sqlText string) (rowCursor, error) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	c.streamMu.Lock()
+	c.streamCancel = cancel
+	c.streamMu.Unlock()
+
+	var cur rowCursor
+	var err error
+	cur, err = c.openQuery(ctx, sqlText)
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			err = newStreamQueryCancelled(err)
+		}
+	}
+	c.streamMu.Lock()
+	c.streamCancel = nil
+	c.streamMu.Unlock()
+	return cur, err
+}
+
+func (c *mssqlConn) openQuery(ctx context.Context, sqlText string) (*mssqlCur, error) {
 	st, err := c.conn.PrepareContext(ctx, sqlText)
 	if err != nil {
 		return nil, err

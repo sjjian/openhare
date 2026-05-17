@@ -103,6 +103,11 @@ class SessionConnRepoImpl extends SessionConnRepo {
     }
     return conn.killQuery();
   }
+
+  @override
+  bool supportsKillQuery(ConnId connId) {
+    return conns[connId.value]?.supportsKillQuery ?? false;
+  }
 }
 
 class SessionConn {
@@ -231,6 +236,8 @@ class SessionConn {
       debugPrint("Failed to kill query: $e");
     }
   }
+
+  bool get supportsKillQuery => conn2?.supportsKillQuery ?? false;
 
   Future<void> setCurrentSchema(DatabaseRef schema) async {
     await conn2!.setCurrentSchema(schema);

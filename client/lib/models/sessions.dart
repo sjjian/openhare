@@ -42,6 +42,7 @@ abstract class SessionConnRepo {
   Future<BaseQueryResult?> query(ConnId connId, String query, {int? limit});
   Stream<BaseQueryStreamItem> queryStream(ConnId connId, String query);
   Future<void> killQuery(ConnId connId);
+  bool supportsKillQuery(ConnId connId);
 }
 
 abstract class SQLResultRepo {
@@ -179,7 +180,7 @@ enum SQLConnectState {
   }
 }
 
-enum SQLExecuteState { init, executing, done, error }
+enum SQLExecuteState { init, executing, done, error, cancel }
 
 enum DrawerPage {
   metadataTree,
@@ -288,6 +289,8 @@ abstract class SQLResultDetailModel with _$SQLResultDetailModel {
     Duration? executeTime,
     String? error,
     BaseQueryResult? data,
+    ConnId? connId,
+    @Default(false) bool canKill, // 该连接是否支持服务端 kill query；不支持时 UI 不展示「取消」按钮。
   }) = _SQLResultDetailModel;
 }
 

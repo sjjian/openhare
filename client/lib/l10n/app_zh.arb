@@ -39,6 +39,7 @@
     "field_val_msg_value_reqiured": "值不能为空",
     "display_msg_no_data": "暂无数据",
     "display_msg_execution_success": "执行成功",
+    "display_msg_execution_cancelled": "查询已取消",
     "effect_rows": "影响行数",
     "duration": "执行时间",
     "query": "语句",

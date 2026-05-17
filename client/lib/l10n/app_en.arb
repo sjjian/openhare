@@ -159,6 +159,10 @@
   "@display_msg_execution_success": {
     "description": "SQL execution success message"
   },
+  "display_msg_execution_cancelled": "Query was cancelled",
+  "@display_msg_execution_cancelled": {
+    "description": "SQL execution stopped by user (e.g. kill query)"
+  },
   "effect_rows": "Effect rows",
   "@effect_rows": {
     "description": "Effect rows"

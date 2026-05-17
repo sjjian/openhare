@@ -9,10 +9,7 @@ import 'db_driver_interface.dart';
 import 'db_driver_metadata.dart';
 
 class MSSQLConnection extends GoImplConnection {
-  final String _dsn;
-  String? _spid;
-
-  MSSQLConnection(super._conn, this._dsn);
+  MSSQLConnection(super._conn);
 
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
@@ -67,33 +64,13 @@ class MSSQLConnection extends GoImplConnection {
     ).toString();
 
     final conn = await impl.ImplConnection.openMssql(dsn);
-    final mc = MSSQLConnection(conn, dsn);
-    await mc._loadSpid();
+    final mc = MSSQLConnection(conn);
     return mc;
-  }
-
-  Future<void> _loadSpid() async {
-    final results = await query("SELECT @@SPID AS spid;");
-    _spid = results.rows.firstOrNull?.getString("spid");
   }
 
   @override
   Future<void> ping() async {
     await query("SELECT 1");
-  }
-
-  @override
-  Future<void> killQuery() async {
-    if (_spid == null || _spid!.isEmpty) return;
-
-    MSSQLConnection? tmp;
-    try {
-      final tmpConn = await impl.ImplConnection.openMssql(_dsn);
-      tmp = MSSQLConnection(tmpConn, _dsn);
-      await tmp.query("KILL $_spid;");
-    } finally {
-      await tmp?.close();
-    }
   }
 
   @override
