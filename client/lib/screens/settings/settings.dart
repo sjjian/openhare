@@ -6,18 +6,22 @@ import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
-import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/widgets/divider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SettingModel model = ref.watch(settingProvider);
+    final model = ref.watch(settingProvider);
+    final tab = ref.watch(settingTabServiceProvider).selectedSettingType;
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return PageSkeleton(
       key: const Key("settings"),
@@ -25,41 +29,116 @@ class SettingsPage extends ConsumerWidget {
         header: Row(
           children: [
             Text(
-              AppLocalizations.of(context)!.settings,
-              style: Theme.of(context).textTheme.titleLarge,
+              l10n.settings,
+              style: theme.textTheme.titleLarge,
               overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  AppLocalizations.of(context)!.preferences,
-                  style: Theme.of(context).textTheme.titleMedium,
+                _SettingsNavTab(
+                  label: l10n.settings_tab_general,
+                  selected: tab == SettingType.system,
+                  onTap: () => ref.read(settingTabServiceProvider.notifier).setSelectedSettingType(SettingType.system),
+                ),
+                SizedBox(width: kSpacingMedium),
+                _SettingsNavTab(
+                  label: l10n.llm_api,
+                  selected: tab == SettingType.llmApi,
+                  onTap: () => ref.read(settingTabServiceProvider.notifier).setSelectedSettingType(SettingType.llmApi),
                 ),
               ],
             ),
-            const SizedBox(height: kSpacingMedium),
-            SystemSettingPage(model: model.systemSetting),
-            const SizedBox(height: kSpacingMedium),
-            const PixelDivider(),
-            const SizedBox(height: kSpacingMedium),
-            Row(
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.llm_api,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
-            ),
-            const SizedBox(height: kSpacingMedium),
-            const Expanded(
-              child: LLMApiSettingPage(),
+            Expanded(
+              child: IndexedStack(
+                index: tab == SettingType.system ? 0 : 1,
+                sizing: StackFit.expand,
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.only(top: kSpacingMedium),
+                    child: SystemSettingPage(model: model.systemSetting),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: kSpacingMedium),
+                    child: const LLMApiSettingPage(),
+                  ),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsNavTab extends StatefulWidget {
+  const _SettingsNavTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  State<_SettingsNavTab> createState() => _SettingsNavTabState();
+}
+
+class _SettingsNavTabState extends State<_SettingsNavTab> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final muted = theme.colorScheme.onSurfaceVariant;
+
+    final Color labelColor;
+    if (widget.selected) {
+      labelColor = _hovering ? Color.lerp(primary, theme.colorScheme.onSurface, 0.15)! : primary;
+    } else {
+      labelColor = _hovering ? primary : muted;
+    }
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: IntrinsicWidth(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                widget.label,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: labelColor,
+                  fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 6),
+              SizedBox(
+                height: 2,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: widget.selected ? primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -72,9 +151,21 @@ class SystemSettingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            Text(
+              l10n.preferences,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+        const SizedBox(height: kSpacingSmall),
+        const PixelDivider(),
+        const SizedBox(height: kSpacingMedium),
         Row(
           children: [
             SizedBox(
@@ -83,7 +174,7 @@ class SystemSettingPage extends ConsumerWidget {
                 children: [
                   const Icon(Icons.language),
                   const SizedBox(width: kSpacingSmall),
-                  Text(AppLocalizations.of(context)!.language),
+                  Text(l10n.language),
                 ],
               ),
             ),
@@ -116,21 +207,21 @@ class SystemSettingPage extends ConsumerWidget {
                 children: [
                   const Icon(Icons.color_lens),
                   const SizedBox(width: kSpacingSmall),
-                  Text(AppLocalizations.of(context)!.theme),
+                  Text(l10n.theme),
                 ],
               ),
             ),
             Row(
               children: [
                 _SettingRadioOption(
-                  title: Text(AppLocalizations.of(context)!.theme_light),
+                  title: Text(l10n.theme_light),
                   value: "light",
                   selectedValue: model.theme,
                   onTap: () => ref.read(systemSettingServiceProvider.notifier).setTheme("light"),
                 ),
                 const SizedBox(width: 8),
                 _SettingRadioOption(
-                  title: Text(AppLocalizations.of(context)!.theme_dark),
+                  title: Text(l10n.theme_dark),
                   value: "dark",
                   selectedValue: model.theme,
                   onTap: () => ref.read(systemSettingServiceProvider.notifier).setTheme("dark"),
@@ -140,6 +231,305 @@ class SystemSettingPage extends ConsumerWidget {
             const Spacer(),
           ],
         ),
+        const SizedBox(height: kSpacingMedium),
+        Row(
+          children: [
+            Text(
+              l10n.settings_sql_shortcuts_section,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+        const SizedBox(height: kSpacingSmall),
+        const PixelDivider(),
+        const SizedBox(height: kSpacingMedium),
+        _SqlShortcutSettingRow(
+          kind: KeyboardShortcut.sqlExecute,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_run_sql,
+            icon: Icons.play_circle_outline_rounded,
+            iconColor: Colors.green,
+            verticalOffset: 0,
+            onPressed: null,
+          ),
+        ),
+        const SizedBox(height: kSpacingSmall),
+        _SqlShortcutSettingRow(
+          kind: KeyboardShortcut.sqlExecuteAdd,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_run_sql_new_tab,
+            icon: Icons.not_started_outlined,
+            iconColor: Colors.green,
+            verticalOffset: 0,
+            onPressed: null,
+          ),
+        ),
+        const SizedBox(height: kSpacingSmall),
+        _SqlShortcutSettingRow(
+          kind: KeyboardShortcut.sqlExplain,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_explain_sql,
+            icon: Icons.poll_outlined,
+            iconColor: Color.fromARGB(255, 241, 192, 84),
+            verticalOffset: 0,
+            onPressed: null,
+          ),
+        ),
+        const SizedBox(height: kSpacingSmall),
+        _SqlShortcutSettingRow(
+          kind: KeyboardShortcut.sqlExport,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_sql_result_download,
+            icon: Icons.file_download_sharp,
+            iconColor: Colors.green,
+            verticalOffset: 1,
+            onPressed: null,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SqlShortcutKeyCaptureField extends StatefulWidget {
+  const _SqlShortcutKeyCaptureField({
+    required this.displayLabel,
+    required this.tooltipMessage,
+    required this.onCommit,
+    this.onFocusGained,
+  });
+
+  final String displayLabel;
+  final String tooltipMessage;
+
+  final VoidCallback? onFocusGained;
+
+  final bool Function(ShortcutModel? committed) onCommit;
+
+  @override
+  State<_SqlShortcutKeyCaptureField> createState() => _SqlShortcutKeyCaptureFieldState();
+}
+
+class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField> {
+  final FocusNode _focusNode = FocusNode();
+  late final bool Function(KeyEvent) _hardwareHandler;
+  bool _hardwareHandlerAttached = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _hardwareHandler = _onHardwareKeyEvent;
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      widget.onFocusGained?.call();
+      if (!_hardwareHandlerAttached) {
+        HardwareKeyboard.instance.addHandler(_hardwareHandler);
+        _hardwareHandlerAttached = true;
+      }
+    } else {
+      _detachHardwareHandler();
+    }
+    setState(() {});
+  }
+
+  void _detachHardwareHandler() {
+    if (_hardwareHandlerAttached) {
+      HardwareKeyboard.instance.removeHandler(_hardwareHandler);
+      _hardwareHandlerAttached = false;
+    }
+  }
+
+  bool _isModifierLogicalKey(LogicalKeyboardKey key) {
+    return key == LogicalKeyboardKey.shift ||
+        key == LogicalKeyboardKey.shiftLeft ||
+        key == LogicalKeyboardKey.shiftRight ||
+        key == LogicalKeyboardKey.control ||
+        key == LogicalKeyboardKey.controlLeft ||
+        key == LogicalKeyboardKey.controlRight ||
+        key == LogicalKeyboardKey.alt ||
+        key == LogicalKeyboardKey.altLeft ||
+        key == LogicalKeyboardKey.altRight ||
+        key == LogicalKeyboardKey.meta ||
+        key == LogicalKeyboardKey.metaLeft ||
+        key == LogicalKeyboardKey.metaRight ||
+        key == LogicalKeyboardKey.capsLock;
+  }
+
+  ShortcutModel? fromKeyDownEvent(KeyDownEvent event) {
+    if (_isModifierLogicalKey(event.logicalKey)) {
+      return null;
+    }
+    final hw = HardwareKeyboard.instance;
+    return ShortcutModel(
+      keyId: event.logicalKey.keyId,
+      meta: hw.isMetaPressed,
+      control: hw.isControlPressed,
+      alt: hw.isAltPressed,
+      shift: hw.isShiftPressed,
+    );
+  }
+
+  bool _onHardwareKeyEvent(KeyEvent event) {
+    if (!_focusNode.hasFocus) {
+      return false;
+    }
+    if (event is! KeyDownEvent) {
+      return false;
+    }
+
+    // 保留 Tab / Shift+Tab 切换焦点，不在此拦截。
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      return false;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.backspace || event.logicalKey == LogicalKeyboardKey.delete) {
+      final ok = widget.onCommit(null);
+      if (ok) {
+        _focusNode.unfocus();
+      }
+      return true;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _focusNode.unfocus();
+      return true;
+    }
+
+    final stored = fromKeyDownEvent(event);
+    if (stored == null) {
+      return false;
+    }
+
+    final ok = widget.onCommit(stored);
+    if (ok) {
+      _focusNode.unfocus();
+    }
+    return true;
+  }
+
+  @override
+  void dispose() {
+    _detachHardwareHandler();
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final outlineVariant = theme.colorScheme.outlineVariant;
+    final primary = theme.colorScheme.primary;
+    final hasFocus = _focusNode.hasFocus;
+
+    final borderSide = BorderSide(
+      color: hasFocus ? primary : outlineVariant,
+      width: hasFocus ? 2 : 1,
+    );
+    const shortcutFieldRadius = BorderRadius.all(Radius.circular(12));
+
+    return Tooltip(
+      message: widget.tooltipMessage,
+      waitDuration: const Duration(milliseconds: 400),
+      child: Focus(
+        focusNode: _focusNode,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.text,
+          child: GestureDetector(
+            onTap: () => _focusNode.requestFocus(),
+            behavior: HitTestBehavior.opaque,
+            child: InputDecorator(
+              isFocused: hasFocus,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(borderSide: borderSide, borderRadius: shortcutFieldRadius),
+                enabledBorder: OutlineInputBorder(borderSide: borderSide, borderRadius: shortcutFieldRadius),
+                focusedBorder: OutlineInputBorder(borderSide: borderSide, borderRadius: shortcutFieldRadius),
+              ),
+              child: Text(
+                widget.displayLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyLarge,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SqlShortcutSettingRow extends ConsumerStatefulWidget {
+  const _SqlShortcutSettingRow({
+    required this.kind,
+    required this.leading,
+  });
+
+  final KeyboardShortcut kind;
+  final Widget leading;
+
+  @override
+  ConsumerState<_SqlShortcutSettingRow> createState() => _SqlShortcutSettingRowState();
+}
+
+class _SqlShortcutSettingRowState extends ConsumerState<_SqlShortcutSettingRow> {
+  String? _conflictMessage;
+
+  bool _tryApply(BuildContext context, ShortcutModel? committed) {
+    final notifier = ref.read(systemSettingServiceProvider.notifier);
+    final candidateForUpdating = committed ?? defaultShortcutModel(widget.kind);
+    if (notifier.shortcutsConflict(
+      updating: widget.kind,
+      candidateForUpdating: candidateForUpdating,
+    )) {
+      setState(() {
+        _conflictMessage = AppLocalizations.of(context)!.settings_sql_shortcut_conflict;
+      });
+      return false;
+    }
+    setState(() => _conflictMessage = null);
+    ref.read(systemSettingServiceProvider.notifier).setShortcutModel(widget.kind, committed);
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    ref.watch(systemSettingServiceProvider);
+    final notifier = ref.read(systemSettingServiceProvider.notifier);
+    final displayLabel = notifier.getShortcutModel(widget.kind).toDisplayString();
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        widget.leading,
+        const SizedBox(width: kSpacingSmall),
+        SizedBox(
+          width: 240,
+          child: _SqlShortcutKeyCaptureField(
+            displayLabel: displayLabel,
+            tooltipMessage: l10n.settings_sql_shortcut_field_hint,
+            onFocusGained: () => setState(() => _conflictMessage = null),
+            onCommit: (committed) => _tryApply(context, committed),
+          ),
+        ),
+        if (_conflictMessage != null) ...[
+          const SizedBox(width: kSpacingSmall),
+          Expanded(
+            child: Text(
+              _conflictMessage!,
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ],
     );
   }

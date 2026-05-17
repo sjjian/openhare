@@ -13,9 +13,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/code_auto_complete.dart';
-import 'package:client/widgets/keyword.dart';
 import 'package:client/widgets/menu.dart';
+import 'package:client/widgets/tooltip.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SQLEditor extends ConsumerStatefulWidget {
@@ -72,6 +73,8 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
   Widget build(BuildContext context) {
     SessionSQLEditorModel model = ref.watch(selectedSessionSQLEditorProvider);
     final barModel = ref.watch(sessionOpBarProvider);
+    ref.watch(systemSettingServiceProvider);
+    final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords(model.dbType?.dialectType ?? DialectType.mysql)) KeywordPrompt(word: keyword),
@@ -129,29 +132,32 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
         if (barModel != null) {
           editor = CallbackShortcuts(
             bindings: {
-              keyboardShortcutActivator(KeyboardShortcut.sqlExecute): () => sessionOpBarRunExecute(
+              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecute).toSingleActivator()!: () =>
+                  sessionOpBarRunExecute(
+                    context: context,
+                    ref: ref,
+                    model: barModel,
+                    codeController: widget.codeController,
+                  ),
+              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecuteAdd).toSingleActivator()!: () =>
+                  sessionOpBarRunExecuteAdd(
+                    context: context,
+                    ref: ref,
+                    model: barModel,
+                    codeController: widget.codeController,
+                  ),
+              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExplain).toSingleActivator()!: () => sessionOpBarExplain(
                 context: context,
                 ref: ref,
                 model: barModel,
                 codeController: widget.codeController,
               ),
-              keyboardShortcutActivator(KeyboardShortcut.sqlExecuteAdd): () => sessionOpBarRunExecuteAdd(
-                context: context,
-                ref: ref,
-                model: barModel,
-                codeController: widget.codeController,
-              ),
-              keyboardShortcutActivator(KeyboardShortcut.sqlExplain): () => sessionOpBarExplain(
-                context: context,
-                ref: ref,
-                model: barModel,
-                codeController: widget.codeController,
-              ),
-              keyboardShortcutActivator(KeyboardShortcut.sqlExport): () => sessionOpBarExportDownload(
-                context: context,
-                model: barModel,
-                codeController: widget.codeController,
-              ),
+              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExport).toSingleActivator()!: () =>
+                  sessionOpBarExportDownload(
+                    context: context,
+                    model: barModel,
+                    codeController: widget.codeController,
+                  ),
             },
             child: editor,
           );
@@ -194,6 +200,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
     required AppLocalizations l10n,
     required VoidCallback onAfterAction,
   }) {
+    final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
     final idle = SQLConnectState.isIdle(barModel.state);
     final outline = Theme.of(overlayContext).colorScheme.outlineVariant;
 
@@ -211,7 +218,10 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     RectangleIconButton.medium(
-                      tooltip: keyboardShortcutTooltip(l10n.button_tooltip_run_sql, KeyboardShortcut.sqlExecute),
+                      tooltip: tooltipWithShortcutDisplay(
+                        l10n.button_tooltip_run_sql,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecute).toDisplayString(),
+                      ),
                       icon: Icons.play_circle_outline_rounded,
                       iconColor: idle ? Colors.green : Colors.grey,
                       onPressed: () {
@@ -226,9 +236,9 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                     ),
                     SizedBox(width: kSpacingTiny),
                     RectangleIconButton.medium(
-                      tooltip: keyboardShortcutTooltip(
+                      tooltip: tooltipWithShortcutDisplay(
                         l10n.button_tooltip_run_sql_new_tab,
-                        KeyboardShortcut.sqlExecuteAdd,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecuteAdd).toDisplayString(),
                       ),
                       icon: Icons.not_started_outlined,
                       iconColor: idle ? Colors.green : Colors.grey,
@@ -244,7 +254,10 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                     ),
                     SizedBox(width: kSpacingTiny),
                     RectangleIconButton.medium(
-                      tooltip: keyboardShortcutTooltip(l10n.button_tooltip_explain_sql, KeyboardShortcut.sqlExplain),
+                      tooltip: tooltipWithShortcutDisplay(
+                        l10n.button_tooltip_explain_sql,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExplain).toDisplayString(),
+                      ),
                       icon: Icons.poll_outlined,
                       iconColor: idle ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey, // todo: color 统一
                       onPressed: () {
@@ -259,9 +272,9 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                     ),
                     SizedBox(width: kSpacingTiny),
                     RectangleIconButton.medium(
-                      tooltip: keyboardShortcutTooltip(
+                      tooltip: tooltipWithShortcutDisplay(
                         l10n.button_tooltip_sql_result_download,
-                        KeyboardShortcut.sqlExport,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExport).toDisplayString(),
                       ),
                       icon: Icons.file_download_sharp,
                       iconColor: Colors.green,
@@ -330,13 +343,15 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
   }
 
   List<OverlayMenuItem> _sqlContextMenuCopyPasteItems(
-    BuildContext context, {
+    BuildContext context,
+    WidgetRef ref, {
     required VoidCallback onCopy,
     required VoidCallback onPaste,
     double rowHeight = 40,
     bool canCopy = true,
   }) {
     final loc = MaterialLocalizations.of(context);
+    final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
     return [
       OverlayMenuItem(
         height: rowHeight,
@@ -347,7 +362,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
             context,
             icon: Icons.content_copy_rounded,
             label: loc.copyButtonLabel,
-            shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.copy),
+            shortcutLabel: shortcutSvc.getShortcutModel(KeyboardShortcut.copy).toDisplayString(),
           ),
         ),
       ),
@@ -358,7 +373,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
           context,
           icon: Icons.content_paste_rounded,
           label: loc.pasteButtonLabel,
-          shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.paste),
+          shortcutLabel: shortcutSvc.getShortcutModel(KeyboardShortcut.paste).toDisplayString(),
         ),
       ),
     ];
@@ -370,6 +385,8 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
       listenable: controller,
       builder: (lbContext, _) {
         final barModel = ref.watch(sessionOpBarProvider);
+        ref.watch(systemSettingServiceProvider);
+        final shortcutService = ref.read(systemSettingServiceProvider.notifier);
         final l10n = AppLocalizations.of(overlayContext)!;
         final sqlHeader = barModel != null
             ? _sqlContextMenuSqlActionsHeader(
@@ -385,6 +402,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
         final tabs = <OverlayMenuItem>[
           ..._sqlContextMenuCopyPasteItems(
             overlayContext,
+            ref,
             canCopy: !controller.selection.isCollapsed,
             onCopy: () {
               controller.copy();
@@ -398,7 +416,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
               overlayContext,
               icon: Icons.select_all_rounded,
               label: l10n.sql_editor_menu_select_all,
-              shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.selectAll),
+              shortcutLabel: shortcutService.getShortcutModel(KeyboardShortcut.selectAll).toDisplayString(),
             ),
           ),
           OverlayMenuItem(
@@ -410,7 +428,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                 overlayContext,
                 icon: Icons.undo_rounded,
                 label: l10n.sql_editor_menu_undo,
-                shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.undo),
+                shortcutLabel: shortcutService.getShortcutModel(KeyboardShortcut.undo).toDisplayString(),
               ),
             ),
           ),
@@ -423,7 +441,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                 overlayContext,
                 icon: Icons.redo_rounded,
                 label: l10n.sql_editor_menu_redo,
-                shortcutLabel: keyboardShortcutLabel(KeyboardShortcut.redo),
+                shortcutLabel: shortcutService.getShortcutModel(KeyboardShortcut.redo).toDisplayString(),
               ),
             ),
           ),

@@ -7,12 +7,12 @@ import 'package:client/services/sessions/session_sql_result.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_metadata.dart';
 import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/menu.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/divider.dart';
-import 'package:client/widgets/keyword.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/sql_highlight.dart';
 import 'package:client/widgets/tooltip.dart';
@@ -257,9 +257,9 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget executeWidget(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
-      tooltip: keyboardShortcutTooltip(
+      tooltip: tooltipWithShortcutDisplay(
         AppLocalizations.of(context)!.button_tooltip_run_sql,
-        KeyboardShortcut.sqlExecute,
+        ref.read(systemSettingServiceProvider.notifier).getShortcutModel(KeyboardShortcut.sqlExecute).toDisplayString(),
       ),
       icon: Icons.play_circle_outline_rounded,
       iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
@@ -277,9 +277,12 @@ class SessionOpBar extends ConsumerWidget {
       alignment: Alignment.center,
       children: [
         RectangleIconButton.medium(
-          tooltip: keyboardShortcutTooltip(
+          tooltip: tooltipWithShortcutDisplay(
             AppLocalizations.of(context)!.button_tooltip_run_sql_new_tab,
-            KeyboardShortcut.sqlExecuteAdd,
+            ref
+                .read(systemSettingServiceProvider.notifier)
+                .getShortcutModel(KeyboardShortcut.sqlExecuteAdd)
+                .toDisplayString(),
           ),
           icon: Icons.not_started_outlined,
           iconColor: SQLConnectState.isIdle(model.state) ? Colors.green : Colors.grey,
@@ -296,9 +299,9 @@ class SessionOpBar extends ConsumerWidget {
 
   Widget explainWidget(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
-      tooltip: keyboardShortcutTooltip(
+      tooltip: tooltipWithShortcutDisplay(
         AppLocalizations.of(context)!.button_tooltip_explain_sql,
-        KeyboardShortcut.sqlExplain,
+        ref.read(systemSettingServiceProvider.notifier).getShortcutModel(KeyboardShortcut.sqlExplain).toDisplayString(),
       ),
       icon: Icons.poll_outlined,
       iconColor: SQLConnectState.isIdle(model.state) ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey,
@@ -311,11 +314,11 @@ class SessionOpBar extends ConsumerWidget {
     );
   }
 
-  Widget exportDataWidget(BuildContext context, SessionOpBarModel model) {
+  Widget exportDataWidget(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
-      tooltip: keyboardShortcutTooltip(
+      tooltip: tooltipWithShortcutDisplay(
         AppLocalizations.of(context)!.button_tooltip_sql_result_download,
-        KeyboardShortcut.sqlExport,
+        ref.read(systemSettingServiceProvider.notifier).getShortcutModel(KeyboardShortcut.sqlExport).toDisplayString(),
       ),
       icon: Icons.file_download_sharp,
       iconColor: Colors.green,
@@ -364,6 +367,7 @@ class SessionOpBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionOpBarModel? model = ref.watch(sessionOpBarProvider);
+    ref.watch(systemSettingServiceProvider);
 
     if (model == null) {
       return Container(
@@ -385,7 +389,7 @@ class SessionOpBar extends ConsumerWidget {
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
-          exportDataWidget(context, model),
+          exportDataWidget(context, ref, model),
           taskOverviewWidget(context, ref, model),
           SessionConfigBar(model: model),
           saveWidget(context, ref, model),

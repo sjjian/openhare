@@ -39,6 +39,22 @@
   "@theme_light": {
     "description": "Light theme"
   },
+  "settings_sql_shortcuts_section": "SQL editor shortcuts",
+  "@settings_sql_shortcuts_section": {
+    "description": "Settings section title for configurable SQL toolbar shortcuts"
+  },
+  "settings_sql_shortcut_conflict": "This shortcut is already used by another SQL action.",
+  "@settings_sql_shortcut_conflict": {
+    "description": "Shown when two SQL shortcuts resolve to the same key combo"
+  },
+  "settings_sql_shortcut_field_hint": "Click or Tab into this box, then press your shortcut. Backspace/Delete clears it.",
+  "@settings_sql_shortcut_field_hint": {
+    "description": "Explains inline shortcut capture TextField-like control"
+  },
+  "settings_tab_general": "General",
+  "@settings_tab_general": {
+    "description": "Settings tab: general / non-LLM options"
+  },
   "db_instance": "DB instances",
   "@db_instance": {
     "description": "DB instances"
