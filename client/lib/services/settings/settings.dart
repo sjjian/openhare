@@ -1,14 +1,15 @@
-import 'dart:convert';
-
 import 'package:client/models/keyboard.dart';
 import 'package:client/models/settings.dart';
 import 'package:client/repositories/settings/settings.dart';
-import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 export 'package:client/models/keyboard.dart';
 
 part 'settings.g.dart';
+
+class ShortcutBindingConflictException implements Exception {
+  ShortcutBindingConflictException();
+}
 
 @Riverpod(keepAlive: true)
 class SystemSettingService extends _$SystemSettingService {
@@ -27,48 +28,36 @@ class SystemSettingService extends _$SystemSettingService {
     ref.invalidateSelf();
   }
 
-  void setShortcutModel(KeyboardShortcut kind, ShortcutModel? model) {
+  void setShortcutModel(KeyboardShortcut kind, ShortcutModel model) {
+    // precheck
     assert(canUpdateShortcutKinds.contains(kind));
-    final json = model != null ? model.toStorageJson() : '';
-    ref.read(settingsRepoProvider).setShortcut(kind, json);
+
+    // check conflict
+    for (final k in KeyboardShortcut.values) {
+      if (k == kind) {
+        continue;
+      }
+      final stored = getShortcutModel(k);
+      if (stored == model) {
+        throw ShortcutBindingConflictException();
+      }
+    }
+    // save
+    ref.read(settingsRepoProvider).setShortcut(kind, model);
     ref.invalidateSelf();
   }
 
   ShortcutModel getShortcutModel(KeyboardShortcut shortcut) {
+    // 如何快捷键是可配置的，则从存储中获取，否则返回默认值
     if (canUpdateShortcutKinds.contains(shortcut)) {
-      return _shortcutModelResolved(shortcut);
-    }
-    return defaultShortcutModel(shortcut);
-  }
-
-  /// 将 [updating] 设为 [candidateForUpdating] 后，快捷键是否出现重复 [SingleActivator]。
-  bool shortcutsConflict({
-    required KeyboardShortcut updating,
-    required ShortcutModel candidateForUpdating,
-  }) {
-    final seen = <SingleActivator>{};
-    for (final kind in canUpdateShortcutKinds) {
-      final m = kind == updating ? candidateForUpdating : _shortcutModelResolved(kind);
-      if (!seen.add(m.toSingleActivator()!)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  ShortcutModel _shortcutModelResolved(KeyboardShortcut shortcut) {
-    final raw = state.shortcuts[shortcut.name] ?? '';
-    if (raw.isNotEmpty) {
-      try {
-        final parsed = jsonDecode(raw);
-        if (parsed is Map<String, dynamic>) {
-          final decoded = ShortcutModel.fromJson(parsed);
-          final activator = decoded.toSingleActivator();
-          if (activator != null) {
-            return ShortcutModel.fromSingleActivator(activator);
-          }
+      final stored = ref.read(settingsRepoProvider).getShortcut(shortcut);
+      if (stored != null) {
+        final activator = stored.toSingleActivator();
+        if (activator != null) {
+          return ShortcutModel.fromSingleActivator(activator);
         }
-      } catch (_) {}
+      }
+      return defaultShortcutModel(shortcut);
     }
     return defaultShortcutModel(shortcut);
   }

@@ -243,7 +243,7 @@ class SystemSettingPage extends ConsumerWidget {
         const SizedBox(height: kSpacingSmall),
         const PixelDivider(),
         const SizedBox(height: kSpacingMedium),
-        _SqlShortcutSettingRow(
+        ShortcutSettingField(
           kind: KeyboardShortcut.sqlExecute,
           leading: RectangleIconButton.medium(
             tooltip: l10n.button_tooltip_run_sql,
@@ -254,7 +254,7 @@ class SystemSettingPage extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: kSpacingSmall),
-        _SqlShortcutSettingRow(
+        ShortcutSettingField(
           kind: KeyboardShortcut.sqlExecuteAdd,
           leading: RectangleIconButton.medium(
             tooltip: l10n.button_tooltip_run_sql_new_tab,
@@ -265,7 +265,7 @@ class SystemSettingPage extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: kSpacingSmall),
-        _SqlShortcutSettingRow(
+        ShortcutSettingField(
           kind: KeyboardShortcut.sqlExplain,
           leading: RectangleIconButton.medium(
             tooltip: l10n.button_tooltip_explain_sql,
@@ -276,7 +276,7 @@ class SystemSettingPage extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: kSpacingSmall),
-        _SqlShortcutSettingRow(
+        ShortcutSettingField(
           kind: KeyboardShortcut.sqlExport,
           leading: RectangleIconButton.medium(
             tooltip: l10n.button_tooltip_sql_result_download,
@@ -291,26 +291,22 @@ class SystemSettingPage extends ConsumerWidget {
   }
 }
 
-class _SqlShortcutKeyCaptureField extends StatefulWidget {
-  const _SqlShortcutKeyCaptureField({
-    required this.displayLabel,
-    required this.tooltipMessage,
-    required this.onCommit,
-    this.onFocusGained,
+class ShortcutSettingField extends ConsumerStatefulWidget {
+  const ShortcutSettingField({
+    super.key,
+    required this.kind,
+    required this.leading,
   });
 
-  final String displayLabel;
-  final String tooltipMessage;
-
-  final VoidCallback? onFocusGained;
-
-  final bool Function(ShortcutModel? committed) onCommit;
+  final KeyboardShortcut kind;
+  final Widget leading;
 
   @override
-  State<_SqlShortcutKeyCaptureField> createState() => _SqlShortcutKeyCaptureFieldState();
+  ConsumerState<ShortcutSettingField> createState() => ShortcutSettingFieldState();
 }
 
-class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField> {
+class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
+  String? _conflictMessage;
   final FocusNode _focusNode = FocusNode();
   late final bool Function(KeyEvent) _hardwareHandler;
   bool _hardwareHandlerAttached = false;
@@ -324,7 +320,7 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
 
   void _onFocusChange() {
     if (_focusNode.hasFocus) {
-      widget.onFocusGained?.call();
+      setState(() => _conflictMessage = null);
       if (!_hardwareHandlerAttached) {
         HardwareKeyboard.instance.addHandler(_hardwareHandler);
         _hardwareHandlerAttached = true;
@@ -340,6 +336,21 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
       HardwareKeyboard.instance.removeHandler(_hardwareHandler);
       _hardwareHandlerAttached = false;
     }
+  }
+
+  bool _tryApply(ShortcutModel? committed) {
+    final notifier = ref.read(systemSettingServiceProvider.notifier);
+    final attempted = committed ?? defaultShortcutModel(widget.kind);
+    try {
+      notifier.setShortcutModel(widget.kind, attempted);
+    } on ShortcutBindingConflictException {
+      setState(() {
+        _conflictMessage = AppLocalizations.of(context)!.settings_sql_shortcut_conflict(attempted.toDisplayString());
+      });
+      return false;
+    }
+    setState(() => _conflictMessage = null);
+    return true;
   }
 
   bool _isModifierLogicalKey(LogicalKeyboardKey key) {
@@ -358,7 +369,7 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
         key == LogicalKeyboardKey.capsLock;
   }
 
-  ShortcutModel? fromKeyDownEvent(KeyDownEvent event) {
+  ShortcutModel? _shortcutFromKeyDown(KeyDownEvent event) {
     if (_isModifierLogicalKey(event.logicalKey)) {
       return null;
     }
@@ -380,13 +391,12 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
       return false;
     }
 
-    // 保留 Tab / Shift+Tab 切换焦点，不在此拦截。
     if (event.logicalKey == LogicalKeyboardKey.tab) {
       return false;
     }
 
     if (event.logicalKey == LogicalKeyboardKey.backspace || event.logicalKey == LogicalKeyboardKey.delete) {
-      final ok = widget.onCommit(null);
+      final ok = _tryApply(null);
       if (ok) {
         _focusNode.unfocus();
       }
@@ -398,12 +408,12 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
       return true;
     }
 
-    final stored = fromKeyDownEvent(event);
+    final stored = _shortcutFromKeyDown(event);
     if (stored == null) {
       return false;
     }
 
-    final ok = widget.onCommit(stored);
+    final ok = _tryApply(stored);
     if (ok) {
       _focusNode.unfocus();
     }
@@ -420,19 +430,23 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    ref.watch(systemSettingServiceProvider);
+    final notifier = ref.read(systemSettingServiceProvider.notifier);
+    final displayLabel = notifier.getShortcutModel(widget.kind).toDisplayString();
+
     final outlineVariant = theme.colorScheme.outlineVariant;
     final primary = theme.colorScheme.primary;
     final hasFocus = _focusNode.hasFocus;
-
     final borderSide = BorderSide(
       color: hasFocus ? primary : outlineVariant,
       width: hasFocus ? 2 : 1,
     );
     const shortcutFieldRadius = BorderRadius.all(Radius.circular(12));
 
-    return Tooltip(
-      message: widget.tooltipMessage,
+    final captureField = Tooltip(
+      message: l10n.settings_sql_shortcut_field_hint,
       waitDuration: const Duration(milliseconds: 400),
       child: Focus(
         focusNode: _focusNode,
@@ -451,7 +465,7 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
                 focusedBorder: OutlineInputBorder(borderSide: borderSide, borderRadius: shortcutFieldRadius),
               ),
               child: Text(
-                widget.displayLabel,
+                displayLabel,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyLarge,
@@ -461,64 +475,13 @@ class _SqlShortcutKeyCaptureFieldState extends State<_SqlShortcutKeyCaptureField
         ),
       ),
     );
-  }
-}
-
-class _SqlShortcutSettingRow extends ConsumerStatefulWidget {
-  const _SqlShortcutSettingRow({
-    required this.kind,
-    required this.leading,
-  });
-
-  final KeyboardShortcut kind;
-  final Widget leading;
-
-  @override
-  ConsumerState<_SqlShortcutSettingRow> createState() => _SqlShortcutSettingRowState();
-}
-
-class _SqlShortcutSettingRowState extends ConsumerState<_SqlShortcutSettingRow> {
-  String? _conflictMessage;
-
-  bool _tryApply(BuildContext context, ShortcutModel? committed) {
-    final notifier = ref.read(systemSettingServiceProvider.notifier);
-    final candidateForUpdating = committed ?? defaultShortcutModel(widget.kind);
-    if (notifier.shortcutsConflict(
-      updating: widget.kind,
-      candidateForUpdating: candidateForUpdating,
-    )) {
-      setState(() {
-        _conflictMessage = AppLocalizations.of(context)!.settings_sql_shortcut_conflict;
-      });
-      return false;
-    }
-    setState(() => _conflictMessage = null);
-    ref.read(systemSettingServiceProvider.notifier).setShortcutModel(widget.kind, committed);
-    return true;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    ref.watch(systemSettingServiceProvider);
-    final notifier = ref.read(systemSettingServiceProvider.notifier);
-    final displayLabel = notifier.getShortcutModel(widget.kind).toDisplayString();
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         widget.leading,
         const SizedBox(width: kSpacingSmall),
-        SizedBox(
-          width: 240,
-          child: _SqlShortcutKeyCaptureField(
-            displayLabel: displayLabel,
-            tooltipMessage: l10n.settings_sql_shortcut_field_hint,
-            onFocusGained: () => setState(() => _conflictMessage = null),
-            onCommit: (committed) => _tryApply(context, committed),
-          ),
-        ),
+        SizedBox(width: 240, child: captureField),
         if (_conflictMessage != null) ...[
           const SizedBox(width: kSpacingSmall),
           Expanded(

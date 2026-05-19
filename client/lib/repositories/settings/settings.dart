@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:client/models/keyboard.dart';
 import 'package:client/models/settings.dart';
 import 'package:client/repositories/repo.dart';
@@ -18,36 +16,38 @@ class SettingsStorage {
   String theme;
   String language;
 
-  String shortcutsJson;
-
   SettingsStorage({
     this.id = 1,
     required this.theme,
     required this.language,
-    this.shortcutsJson = '{}',
   });
 }
 
-Map<String, String> _decodeShortcutsJson(String raw) {
-  if (raw.isEmpty) {
-    return {};
-  }
-  try {
-    final decoded = jsonDecode(raw);
-    if (decoded is! Map) {
-      return {};
-    }
-    return decoded.map((k, v) => MapEntry(k.toString(), v is String ? v : jsonEncode(v)));
-  } catch (_) {
-    return {};
-  }
+@Entity()
+class ShortcutStorage {
+  @Id(assignable: true)
+  int id;
+
+  @Unique()
+  String kind;
+
+  String bindingJson;
+
+  ShortcutStorage({
+    this.id = 0,
+    required this.kind,
+    this.bindingJson = '',
+  });
 }
 
 class SettingsRepoImpl implements SettingsRepo {
   final ObjectBox ob;
   final Box<SettingsStorage> _settingBox;
+  final Box<ShortcutStorage> _shortcutBox;
 
-  SettingsRepoImpl(this.ob) : _settingBox = ob.store.box();
+  SettingsRepoImpl(this.ob)
+    : _settingBox = ob.store.box<SettingsStorage>(),
+      _shortcutBox = ob.store.box<ShortcutStorage>();
 
   SettingsStorage _getSettings() {
     final settings = _settingBox.get(1);
@@ -58,13 +58,21 @@ class SettingsRepoImpl implements SettingsRepo {
     }
   }
 
+  ShortcutStorage? _findShortcutStorage(String kindName) {
+    final q = _shortcutBox.query(ShortcutStorage_.kind.equals(kindName)).build();
+    try {
+      return q.findFirst();
+    } finally {
+      q.close();
+    }
+  }
+
   @override
   SystemSettingModel getSettings() {
     final settings = _getSettings();
     return SystemSettingModel(
       theme: settings.theme,
       language: settings.language,
-      shortcuts: _decodeShortcutsJson(settings.shortcutsJson),
     );
   }
 
@@ -83,40 +91,32 @@ class SettingsRepoImpl implements SettingsRepo {
   }
 
   @override
-  String getShortcut(KeyboardShortcut kind) {
-    assert(
-      const {
-        KeyboardShortcut.sqlExecute,
-        KeyboardShortcut.sqlExecuteAdd,
-        KeyboardShortcut.sqlExplain,
-        KeyboardShortcut.sqlExport,
-      }.contains(kind),
-    );
-    final settings = _getSettings();
-    final map = _decodeShortcutsJson(settings.shortcutsJson);
-    return map[kind.name] ?? '';
+  ShortcutModel? getShortcut(KeyboardShortcut kind) {
+    assert(canUpdateShortcutKinds.contains(kind));
+    final row = _findShortcutStorage(kind.name);
+    if (row == null) {
+      return null;
+    }
+    return ShortcutModel.fromStorageJson(row.bindingJson);
   }
 
   @override
-  void setShortcut(KeyboardShortcut kind, String json) {
-    assert(
-      const {
-        KeyboardShortcut.sqlExecute,
-        KeyboardShortcut.sqlExecuteAdd,
-        KeyboardShortcut.sqlExplain,
-        KeyboardShortcut.sqlExport,
-      }.contains(kind),
-    );
-    final settings = _getSettings();
-    final map = _decodeShortcutsJson(settings.shortcutsJson);
+  void setShortcut(KeyboardShortcut kind, ShortcutModel? model) {
+    assert(canUpdateShortcutKinds.contains(kind));
     final key = kind.name;
-    if (json.isEmpty) {
-      map.remove(key);
-    } else {
-      map[key] = json;
+    final existing = _findShortcutStorage(key);
+    if (model == null) {
+      if (existing != null) {
+        _shortcutBox.remove(existing.id);
+      }
+      return;
     }
-    settings.shortcutsJson = jsonEncode(map);
-    _settingBox.put(settings);
+    final row = ShortcutStorage(
+      id: existing?.id ?? 0,
+      kind: key,
+      bindingJson: model.toStorageJson(),
+    );
+    _shortcutBox.put(row);
   }
 }
 

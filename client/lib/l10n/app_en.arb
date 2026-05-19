@@ -43,9 +43,14 @@
   "@settings_sql_shortcuts_section": {
     "description": "Settings section title for configurable SQL toolbar shortcuts"
   },
-  "settings_sql_shortcut_conflict": "This shortcut is already used by another SQL action.",
+  "settings_sql_shortcut_conflict": "Shortcut {shortcutDisplay} conflicts with another shortcut.",
   "@settings_sql_shortcut_conflict": {
-    "description": "Shown when two SQL shortcuts resolve to the same key combo"
+    "description": "Shown when a configurable shortcut duplicates another binding; shortcutDisplay is the human-readable combo",
+    "placeholders": {
+      "shortcutDisplay": {
+        "type": "String"
+      }
+    }
   },
   "settings_sql_shortcut_field_hint": "Click or Tab into this box, then press your shortcut. Backspace/Delete clears it.",
   "@settings_sql_shortcut_field_hint": {

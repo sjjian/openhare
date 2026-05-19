@@ -11,7 +11,7 @@
     "theme_dark": "深色",
     "theme_light": "浅色",
     "settings_sql_shortcuts_section": "SQL 编辑器快捷键",
-    "settings_sql_shortcut_conflict": "该快捷键已被其他 SQL 操作占用。",
+    "settings_sql_shortcut_conflict": "快捷键 {shortcutDisplay} 与其它快捷键冲突",
     "settings_sql_shortcut_field_hint": "点击或 Tab 移入框内后按下要使用的组合键即可保存；Backspace/Delete 清空为默认快捷键。",
     "db_instance": "数据库实例",
     "recently_used_db_instance": "最近使用",

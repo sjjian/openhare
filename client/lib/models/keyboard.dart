@@ -18,7 +18,11 @@ enum KeyboardShortcut {
   paste,
   selectAll,
   undo,
-  redo,
+  redo;
+
+  static KeyboardShortcut fromName(String name) {
+    return KeyboardShortcut.values.firstWhere((e) => e.name == name, orElse: () => KeyboardShortcut.values.first);
+  }
 }
 
 const canUpdateShortcutKinds = <KeyboardShortcut>{
@@ -99,6 +103,26 @@ abstract class ShortcutModel with _$ShortcutModel {
       alt: alt,
       shift: shift,
     );
+  }
+
+  static ShortcutModel? fromStorageJson(String raw) {
+    if (raw.isEmpty) {
+      return null;
+    }
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) {
+        return null;
+      }
+      final model = ShortcutModel.fromJson(decoded);
+      final activator = model.toSingleActivator();
+      if (activator == null) {
+        return null;
+      }
+      return ShortcutModel.fromSingleActivator(activator);
+    } catch (_) {
+      return null;
+    }
   }
 
   String toStorageJson() => jsonEncode(toJson());
