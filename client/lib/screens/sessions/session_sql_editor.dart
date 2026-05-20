@@ -73,7 +73,6 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
   Widget build(BuildContext context) {
     SessionSQLEditorModel model = ref.watch(selectedSessionSQLEditorProvider);
     final barModel = ref.watch(sessionOpBarProvider);
-    ref.watch(systemSettingServiceProvider);
     final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
 
     List<CodeKeywordPrompt> keywordPrompt = [
@@ -385,7 +384,6 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
       listenable: controller,
       builder: (lbContext, _) {
         final barModel = ref.watch(sessionOpBarProvider);
-        ref.watch(systemSettingServiceProvider);
         final shortcutService = ref.read(systemSettingServiceProvider.notifier);
         final l10n = AppLocalizations.of(overlayContext)!;
         final sqlHeader = barModel != null

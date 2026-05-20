@@ -367,8 +367,6 @@ class SessionOpBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionOpBarModel? model = ref.watch(sessionOpBarProvider);
-    ref.watch(systemSettingServiceProvider);
-
     if (model == null) {
       return Container(
         constraints: BoxConstraints(maxHeight: height),

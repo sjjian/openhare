@@ -172,7 +172,7 @@ class SystemSettingPage extends ConsumerWidget {
               width: 120,
               child: Row(
                 children: [
-                  const Icon(Icons.language),
+                  const RectangleIconButton.medium(icon: Icons.language),
                   const SizedBox(width: kSpacingSmall),
                   Text(l10n.language),
                 ],
@@ -205,7 +205,7 @@ class SystemSettingPage extends ConsumerWidget {
               width: 120,
               child: Row(
                 children: [
-                  const Icon(Icons.color_lens),
+                  const RectangleIconButton.medium(icon: Icons.color_lens),
                   const SizedBox(width: kSpacingSmall),
                   Text(l10n.theme),
                 ],
@@ -231,11 +231,11 @@ class SystemSettingPage extends ConsumerWidget {
             const Spacer(),
           ],
         ),
-        const SizedBox(height: kSpacingMedium),
+        const SizedBox(height: kSpacingLarge),
         Row(
           children: [
             Text(
-              l10n.settings_sql_shortcuts_section,
+              l10n.settings_shortcuts_section,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
@@ -339,13 +339,12 @@ class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
   }
 
   bool _tryApply(ShortcutModel? committed) {
-    final notifier = ref.read(systemSettingServiceProvider.notifier);
     final attempted = committed ?? defaultShortcutModel(widget.kind);
     try {
-      notifier.setShortcutModel(widget.kind, attempted);
+      ref.read(systemSettingServiceProvider.notifier).setShortcutModel(widget.kind, attempted);
     } on ShortcutBindingConflictException {
       setState(() {
-        _conflictMessage = AppLocalizations.of(context)!.settings_sql_shortcut_conflict(attempted.toDisplayString());
+        _conflictMessage = AppLocalizations.of(context)!.settings_shortcut_conflict(attempted.toDisplayString());
       });
       return false;
     }
@@ -432,7 +431,6 @@ class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    ref.watch(systemSettingServiceProvider);
     final notifier = ref.read(systemSettingServiceProvider.notifier);
     final displayLabel = notifier.getShortcutModel(widget.kind).toDisplayString();
 
@@ -446,7 +444,7 @@ class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
     const shortcutFieldRadius = BorderRadius.all(Radius.circular(12));
 
     final captureField = Tooltip(
-      message: l10n.settings_sql_shortcut_field_hint,
+      message: l10n.settings_shortcut_field_hint,
       waitDuration: const Duration(milliseconds: 400),
       child: Focus(
         focusNode: _focusNode,
@@ -476,24 +474,29 @@ class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
       ),
     );
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        widget.leading,
-        const SizedBox(width: kSpacingSmall),
-        SizedBox(width: 240, child: captureField),
-        if (_conflictMessage != null) ...[
+    return TapRegion(
+      onTapOutside: (_) {
+        _focusNode.unfocus();
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          widget.leading,
           const SizedBox(width: kSpacingSmall),
-          Expanded(
-            child: Text(
-              _conflictMessage!,
-              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          SizedBox(width: 240, child: captureField),
+          if (_conflictMessage != null) ...[
+            const SizedBox(width: kSpacingSmall),
+            Expanded(
+              child: Text(
+                _conflictMessage!,
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
