@@ -300,7 +300,7 @@ class SystemSettingPage extends ConsumerWidget {
 void showSqlEditorShortcutsDialog(BuildContext context, WidgetRef ref) {
   final l10n = AppLocalizations.of(context)!;
   final kinds = sqlEditorBuiltinShortcutKinds;
-  final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
+  final settingService = ref.read(systemSettingServiceProvider.notifier);
   showDialog<void>(
     context: context,
     builder: (dialogContext) {
@@ -325,8 +325,8 @@ void showSqlEditorShortcutsDialog(BuildContext context, WidgetRef ref) {
               for (var i = 0; i < kinds.length; i++) ...[
                 _ShortcutListRow(
                   category: l10n.settings_shortcut_category_sql_editor,
-                  action: _sqlEditorShortcutKindLabel(kinds[i], l10n),
-                  binding: shortcutSvc.getShortcutModel(kinds[i]).toDisplayString(),
+                  action: _shortcutKindLabel(kinds[i], l10n),
+                  binding: settingService.getShortcutModel(kinds[i]).toDisplayString(),
                   color: isSqlEditorShortcutNotYetImplemented(kinds[i])
                       ? Theme.of(
                           dialogContext,
@@ -388,7 +388,7 @@ class _ShortcutListRow extends StatelessWidget {
   }
 }
 
-String _sqlEditorShortcutKindLabel(KeyboardShortcut kind, AppLocalizations l10n) {
+String _shortcutKindLabel(KeyboardShortcut kind, AppLocalizations l10n) {
   return switch (kind) {
     KeyboardShortcut.sqlEditorSelectAll => l10n.settings_shortcut_sql_editor_select_all,
     KeyboardShortcut.sqlEditorCut => l10n.settings_shortcut_sql_editor_cut,
@@ -488,6 +488,11 @@ class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
     final attempted = committed ?? defaultShortcutModel(widget.kind);
     try {
       ref.read(systemSettingServiceProvider.notifier).setShortcutModel(widget.kind, attempted);
+    } on ShortcutCombinationRequiredException {
+      setState(() {
+        _conflictMessage = AppLocalizations.of(context)!.settings_shortcut_requires_combination;
+      });
+      return false;
     } on ShortcutBindingConflictException {
       setState(() {
         _conflictMessage = AppLocalizations.of(context)!.settings_shortcut_conflict(attempted.toDisplayString());
@@ -541,10 +546,7 @@ class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
     }
 
     if (event.logicalKey == LogicalKeyboardKey.backspace || event.logicalKey == LogicalKeyboardKey.delete) {
-      final ok = _tryApply(null);
-      if (ok) {
-        _focusNode.unfocus();
-      }
+      _tryApply(null);
       return true;
     }
 
@@ -558,10 +560,7 @@ class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
       return false;
     }
 
-    final ok = _tryApply(stored);
-    if (ok) {
-      _focusNode.unfocus();
-    }
+    _tryApply(stored);
     return true;
   }
 

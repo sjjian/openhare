@@ -52,7 +52,11 @@
       }
     }
   },
-  "settings_shortcut_field_hint": "Click or Tab into this box, then press your shortcut. Backspace/Delete clears it.",
+  "settings_shortcut_requires_combination": "Use a shortcut with Ctrl, ⌘, Alt, or Shift.",
+  "@settings_shortcut_requires_combination": {
+    "description": "Shown when user tries to bind a single key without modifier for configurable actions"
+  },
+  "settings_shortcut_field_hint": "Click or Tab into this box, then press a shortcut with Ctrl, ⌘, Alt, or Shift. Backspace/Delete clears it.",
   "@settings_shortcut_field_hint": {
     "description": "Explains inline shortcut capture TextField-like control"
   },

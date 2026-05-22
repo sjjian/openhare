@@ -11,6 +11,10 @@ class ShortcutBindingConflictException implements Exception {
   ShortcutBindingConflictException();
 }
 
+class ShortcutCombinationRequiredException implements Exception {
+  ShortcutCombinationRequiredException();
+}
+
 @Riverpod(keepAlive: true)
 class SystemSettingService extends _$SystemSettingService {
   @override
@@ -31,6 +35,10 @@ class SystemSettingService extends _$SystemSettingService {
   void setShortcutModel(KeyboardShortcut kind, ShortcutModel model) {
     // precheck
     assert(canUpdateShortcutKinds.contains(kind));
+
+    if (!model.isCombinationShortcut) {
+      throw ShortcutCombinationRequiredException();
+    }
 
     // check conflict
     for (final k in KeyboardShortcut.values) {

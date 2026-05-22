@@ -78,7 +78,6 @@ const sqlEditorShortcutKindsNotYetImplemented = <KeyboardShortcut>{
   KeyboardShortcut.sqlEditorReplace,
   KeyboardShortcut.sqlEditorSingleLineComment,
   KeyboardShortcut.sqlEditorMultiLineComment,
-  KeyboardShortcut.sqlEditorSave,
 };
 
 bool isSqlEditorShortcutNotYetImplemented(KeyboardShortcut kind) =>
@@ -214,6 +213,8 @@ ShortcutModel defaultShortcutModel(KeyboardShortcut shortcut) {
 @freezed
 abstract class ShortcutModel with _$ShortcutModel {
   const ShortcutModel._();
+
+  bool get isCombinationShortcut => meta || control || alt || shift;
 
   const factory ShortcutModel({
     required int keyId,

@@ -73,7 +73,7 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
   Widget build(BuildContext context) {
     SessionSQLEditorModel model = ref.watch(selectedSessionSQLEditorProvider);
     final barModel = ref.watch(sessionOpBarProvider);
-    final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
+    final settingService = ref.read(systemSettingServiceProvider.notifier);
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords(model.dbType?.dialectType ?? DialectType.mysql)) KeywordPrompt(word: keyword),
@@ -111,6 +111,14 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
             ),
             controller: widget.codeController,
             toolbarController: _toolbarController,
+            shortcutOverrideActions: {
+              CodeShortcutSaveIntent: CallbackAction<CodeShortcutSaveIntent>(
+                onInvoke: (_) {
+                  ref.read(sessionsServicesProvider.notifier).saveCode(model.sessionId);
+                  return null;
+                },
+              ),
+            },
             indicatorBuilder: (context, editingController, chunkController, notifier) {
               return Row(
                 children: [
@@ -131,27 +139,27 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
         if (barModel != null) {
           editor = CallbackShortcuts(
             bindings: {
-              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecute).toSingleActivator()!: () =>
+              settingService.getShortcutModel(KeyboardShortcut.sqlExecute).toSingleActivator()!: () =>
                   sessionOpBarRunExecute(
                     context: context,
                     ref: ref,
                     model: barModel,
                     codeController: widget.codeController,
                   ),
-              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecuteAdd).toSingleActivator()!: () =>
+              settingService.getShortcutModel(KeyboardShortcut.sqlExecuteAdd).toSingleActivator()!: () =>
                   sessionOpBarRunExecuteAdd(
                     context: context,
                     ref: ref,
                     model: barModel,
                     codeController: widget.codeController,
                   ),
-              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExplain).toSingleActivator()!: () => sessionOpBarExplain(
+              settingService.getShortcutModel(KeyboardShortcut.sqlExplain).toSingleActivator()!: () => sessionOpBarExplain(
                 context: context,
                 ref: ref,
                 model: barModel,
                 codeController: widget.codeController,
               ),
-              shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExport).toSingleActivator()!: () =>
+              settingService.getShortcutModel(KeyboardShortcut.sqlExport).toSingleActivator()!: () =>
                   sessionOpBarExportDownload(
                     context: context,
                     model: barModel,
