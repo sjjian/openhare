@@ -238,6 +238,12 @@ class SystemSettingPage extends ConsumerWidget {
               l10n.settings_shortcuts_section,
               style: Theme.of(context).textTheme.titleMedium,
             ),
+            const SizedBox(width: kSpacingSmall),
+            LinkButton(
+              text: l10n.settings_shortcut_view_all,
+              onPressed: () => showSqlEditorShortcutsDialog(context, ref),
+            ),
+            const Spacer(),
           ],
         ),
         const SizedBox(height: kSpacingSmall),
@@ -289,6 +295,146 @@ class SystemSettingPage extends ConsumerWidget {
       ],
     );
   }
+}
+
+void showSqlEditorShortcutsDialog(BuildContext context, WidgetRef ref) {
+  final l10n = AppLocalizations.of(context)!;
+  final kinds = sqlEditorBuiltinShortcutKinds;
+  final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      return CustomDialog(
+        titleIcon: const Icon(Icons.keyboard_rounded),
+        title: l10n.settings_shortcut_all_dialog_title,
+        subtitle: l10n.settings_shortcut_all_dialog_subtitle,
+        maxWidth: 720,
+        maxHeight: 640,
+        actions: [],
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 表头行
+              _ShortcutListRow(
+                category: l10n.settings_shortcut_table_category,
+                action: l10n.settings_shortcut_table_action,
+                binding: l10n.settings_shortcut_table_binding,
+              ),
+              const PixelDivider(),
+              for (var i = 0; i < kinds.length; i++) ...[
+                _ShortcutListRow(
+                  category: l10n.settings_shortcut_category_sql_editor,
+                  action: _sqlEditorShortcutKindLabel(kinds[i], l10n),
+                  binding: shortcutSvc.getShortcutModel(kinds[i]).toDisplayString(),
+                  color: isSqlEditorShortcutNotYetImplemented(kinds[i])
+                      ? Theme.of(
+                          dialogContext,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5) // 未启用的快捷键颜色，onSurfaceVariant 颜色不够灰
+                      : null,
+                ),
+                if (i < kinds.length - 1) const PixelDivider(),
+              ],
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _ShortcutListRow extends StatelessWidget {
+  const _ShortcutListRow({
+    required this.category,
+    required this.action,
+    required this.binding,
+    this.color,
+  });
+
+  static const double _categoryWidth = 112;
+  static const double _bindingMinWidth = 96;
+
+  final String category;
+  final String action;
+  final String binding;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = color == null ? null : TextStyle(color: color);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: kSpacingSmall, vertical: kSpacingSmall),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: _categoryWidth,
+            child: Text(category, style: style),
+          ),
+          const SizedBox(width: kSpacingSmall),
+          Expanded(child: Text(action, style: style)),
+          const SizedBox(width: kSpacingMedium),
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: _bindingMinWidth),
+            child: Text(
+              binding,
+              style: style,
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _sqlEditorShortcutKindLabel(KeyboardShortcut kind, AppLocalizations l10n) {
+  return switch (kind) {
+    KeyboardShortcut.sqlEditorSelectAll => l10n.settings_shortcut_sql_editor_select_all,
+    KeyboardShortcut.sqlEditorCut => l10n.settings_shortcut_sql_editor_cut,
+    KeyboardShortcut.sqlEditorCopy => l10n.settings_shortcut_sql_editor_copy,
+    KeyboardShortcut.sqlEditorPaste => l10n.settings_shortcut_sql_editor_paste,
+    KeyboardShortcut.sqlEditorUndo => l10n.settings_shortcut_sql_editor_undo,
+    KeyboardShortcut.sqlEditorRedo => l10n.settings_shortcut_sql_editor_redo,
+    KeyboardShortcut.sqlEditorLineSelect => l10n.settings_shortcut_sql_editor_line_select,
+    KeyboardShortcut.sqlEditorLineDelete => l10n.settings_shortcut_sql_editor_line_delete,
+    KeyboardShortcut.sqlEditorLineDeleteForward => l10n.settings_shortcut_sql_editor_line_delete_forward,
+    KeyboardShortcut.sqlEditorLineDeleteBackward => l10n.settings_shortcut_sql_editor_line_delete_backward,
+    KeyboardShortcut.sqlEditorLineMoveUp => l10n.settings_shortcut_sql_editor_line_move_up,
+    KeyboardShortcut.sqlEditorLineMoveDown => l10n.settings_shortcut_sql_editor_line_move_down,
+    KeyboardShortcut.sqlEditorCursorMoveLineStart => l10n.settings_shortcut_sql_editor_cursor_move_line_start,
+    KeyboardShortcut.sqlEditorCursorMoveLineEnd => l10n.settings_shortcut_sql_editor_cursor_move_line_end,
+    KeyboardShortcut.sqlEditorCursorMovePageStart => l10n.settings_shortcut_sql_editor_cursor_move_page_start,
+    KeyboardShortcut.sqlEditorCursorMovePageEnd => l10n.settings_shortcut_sql_editor_cursor_move_page_end,
+    KeyboardShortcut.sqlEditorCursorMoveWordBoundaryForward =>
+      l10n.settings_shortcut_sql_editor_cursor_move_word_boundary_forward,
+    KeyboardShortcut.sqlEditorCursorMoveWordBoundaryBackward =>
+      l10n.settings_shortcut_sql_editor_cursor_move_word_boundary_backward,
+    KeyboardShortcut.sqlEditorSelectionExtendUp => l10n.settings_shortcut_sql_editor_selection_extend_up,
+    KeyboardShortcut.sqlEditorSelectionExtendDown => l10n.settings_shortcut_sql_editor_selection_extend_down,
+    KeyboardShortcut.sqlEditorSelectionExtendForward => l10n.settings_shortcut_sql_editor_selection_extend_forward,
+    KeyboardShortcut.sqlEditorSelectionExtendBackward => l10n.settings_shortcut_sql_editor_selection_extend_backward,
+    KeyboardShortcut.sqlEditorSelectionExtendLineStart => l10n.settings_shortcut_sql_editor_selection_extend_line_start,
+    KeyboardShortcut.sqlEditorSelectionExtendLineEnd => l10n.settings_shortcut_sql_editor_selection_extend_line_end,
+    KeyboardShortcut.sqlEditorSelectionExtendPageStart => l10n.settings_shortcut_sql_editor_selection_extend_page_start,
+    KeyboardShortcut.sqlEditorSelectionExtendPageEnd => l10n.settings_shortcut_sql_editor_selection_extend_page_end,
+    KeyboardShortcut.sqlEditorSelectionExtendWordBoundaryForward =>
+      l10n.settings_shortcut_sql_editor_selection_extend_word_boundary_forward,
+    KeyboardShortcut.sqlEditorSelectionExtendWordBoundaryBackward =>
+      l10n.settings_shortcut_sql_editor_selection_extend_word_boundary_backward,
+    KeyboardShortcut.sqlEditorWordDeleteForward => l10n.settings_shortcut_sql_editor_word_delete_forward,
+    KeyboardShortcut.sqlEditorWordDeleteBackward => l10n.settings_shortcut_sql_editor_word_delete_backward,
+    KeyboardShortcut.sqlEditorOutdent => l10n.settings_shortcut_sql_editor_outdent,
+    KeyboardShortcut.sqlEditorTransposeCharacters => l10n.settings_shortcut_sql_editor_transpose_characters,
+    KeyboardShortcut.sqlEditorSingleLineComment => l10n.settings_shortcut_sql_editor_single_line_comment,
+    KeyboardShortcut.sqlEditorMultiLineComment => l10n.settings_shortcut_sql_editor_multi_line_comment,
+    KeyboardShortcut.sqlEditorFind => l10n.settings_shortcut_sql_editor_find,
+    KeyboardShortcut.sqlEditorFindToggleMatchCase => l10n.settings_shortcut_sql_editor_find_toggle_match_case,
+    KeyboardShortcut.sqlEditorFindToggleRegex => l10n.settings_shortcut_sql_editor_find_toggle_regex,
+    KeyboardShortcut.sqlEditorReplace => l10n.settings_shortcut_sql_editor_replace,
+    KeyboardShortcut.sqlEditorSave => l10n.settings_shortcut_sql_editor_save,
+    _ => kind.name,
+  };
 }
 
 class ShortcutSettingField extends ConsumerStatefulWidget {

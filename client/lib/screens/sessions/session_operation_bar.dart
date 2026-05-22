@@ -1,5 +1,6 @@
 import 'package:client/models/instances.dart';
 import 'package:client/models/sessions.dart';
+import 'package:client/screens/settings/settings.dart';
 import 'package:client/screens/tasks/export_data.dart';
 import 'package:client/screens/tasks/task_overview.dart';
 import 'package:client/services/sessions/session_drawer.dart';
@@ -391,6 +392,12 @@ class SessionOpBar extends ConsumerWidget {
           taskOverviewWidget(context, ref, model),
           SessionConfigBar(model: model),
           saveWidget(context, ref, model),
+          // 快捷键查看
+          RectangleIconButton.medium(
+            tooltip: AppLocalizations.of(context)!.settings_shortcut_all_dialog_title,
+            icon: Icons.keyboard_rounded,
+            onPressed: () => showSqlEditorShortcutsDialog(context, ref),
+          ),
           divider(context),
           // schema list
           SchemaBar(
