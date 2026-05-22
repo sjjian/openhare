@@ -16,6 +16,7 @@ import 'package:client/widgets/button.dart';
 import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/sql_highlight.dart';
+import 'package:client/utils/time_format.dart';
 import 'package:client/widgets/tooltip.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -348,9 +349,22 @@ class SessionOpBar extends ConsumerWidget {
     );
   }
 
+  String saveTooltip(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
+    final description = tooltipWithShortcutDisplay(
+      AppLocalizations.of(context)!.button_tooltip_save,
+      ref
+          .read(systemSettingServiceProvider.notifier)
+          .getShortcutModel(KeyboardShortcut.sqlEditorSave)
+          .toDisplayString(),
+    );
+    return '$description\n${AppLocalizations.of(context)!.button_tooltip_save_last_saved(
+      model.codeSaveTime?.formatDateTime(context) ?? "-",
+    )}';
+  }
+
   Widget saveWidget(BuildContext context, WidgetRef ref, SessionOpBarModel model) {
     return RectangleIconButton.medium(
-      tooltip: AppLocalizations.of(context)!.button_tooltip_save,
+      tooltip: saveTooltip(context, ref, model),
       icon: Icons.save,
       onPressed: () {
         ref.read(sessionsServicesProvider.notifier).saveCode(model.sessionId);

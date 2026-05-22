@@ -21,6 +21,7 @@ abstract class SessionRepo {
   void selectSessionByIndex(int index);
   void reorderSession(int oldIndex, int newIndex);
   String? getCode(SessionId sessionId);
+  DateTime? getCodeSaveTime(SessionId sessionId);
   void saveCode(SessionId sessionId, String code);
   void updateSessionConfig(SessionId sessionId, SessionConfigModel config);
   SessionConfigModel getSessionConfig(SessionId sessionId);
@@ -107,6 +108,9 @@ abstract class SessionDetailModel with _$SessionDetailModel {
 
     // config
     required SessionConfigModel config,
+
+    // code save time
+    @Default(null) DateTime? codeSaveTime,
   }) = _SessionDetailModel;
 }
 
@@ -137,6 +141,7 @@ abstract class SessionOpBarModel with _$SessionOpBarModel {
     DatabaseRef? currentSchema,
     required bool isRightPageOpen,
     required int runningTaskCount,
+    DateTime? codeSaveTime,
   }) = _SessionOpBarModel;
 }
 

@@ -540,6 +540,15 @@
   "@button_tooltip_save": {
     "description": "Button tooltip save SQL"
   },
+  "button_tooltip_save_last_saved": "Last saved: {time}",
+  "@button_tooltip_save_last_saved": {
+    "description": "Second line of save button tooltip showing when SQL was last saved",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "button_tooltip_copy_sql": "Copy code text",
   "@button_tooltip_copy_sql": {
     "description": "Button tooltip copy code text"
