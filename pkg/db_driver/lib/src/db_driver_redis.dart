@@ -13,6 +13,9 @@ class RedisConnection extends GoImplConnection {
   int _dbIndex;
 
   @override
+  bool get supportsKillQuery => false;
+
+  @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.databaseMode;
 
@@ -71,6 +74,8 @@ class RedisConnection extends GoImplConnection {
     final wire = _buildQuery(sql);
     await for (final item in implConn.streamQuery(wire)) {
       switch (item) {
+        case impl.DbQueryCancel():
+          yield const QueryStreamItemCancel();
         case impl.DbQueryHeader():
           columns = item.columns
               .map<BaseQueryColumn>((c) => GoImplQueryColumn(c))
@@ -134,9 +139,6 @@ class RedisConnection extends GoImplConnection {
   Future<void> ping() async {
     await query('PING');
   }
-
-  @override
-  Future<void> killQuery() async {}
 
   @override
   Future<String> version() async {

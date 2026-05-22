@@ -36,6 +36,8 @@ typedef enum {
   GO_IMPL_STREAM_EVENT_CONN_OPEN_OK = 4,
   GO_IMPL_STREAM_EVENT_CONN_CLOSE_OK = 5,
   GO_IMPL_STREAM_EVENT_CONN_ERROR = 6,
+  GO_IMPL_STREAM_EVENT_KILL_OK = 7,
+  GO_IMPL_STREAM_EVENT_CANCEL = 8,
 } go_impl_stream_event_type_t;
 
 typedef enum {
@@ -264,6 +266,28 @@ func buildQueryValue(v any) dbQueryValue {
 type driverConn interface {
 	Close() error
 	OpenQuery(sql string) (rowCursor, error)
+	KillQuery() error
+}
+
+type streamQueryCancelledError struct {
+	cause error
+}
+
+func (e *streamQueryCancelledError) Error() string {
+	return "go_impl: stream query cancelled"
+}
+
+func (e *streamQueryCancelledError) Unwrap() error {
+	return e.cause
+}
+
+func newStreamQueryCancelled(cause error) error {
+	return &streamQueryCancelledError{cause: cause}
+}
+
+func streamErrIsCancel(err error) bool {
+	var ce *streamQueryCancelledError
+	return errors.As(err, &ce)
 }
 
 type rowCursor interface {
@@ -315,6 +339,25 @@ func go_impl_conn_open(dbType C.int32_t, dsn *C.char, dartPort C.int64_t) {
 		}
 		cgo.Handle(h).Delete()
 	}
+}
+
+//export go_impl_conn_kill_async
+func go_impl_conn_kill_async(handle C.int64_t, dartPort C.int64_t) {
+	go go_impl_conn_kill(handle, dartPort)
+}
+
+func go_impl_conn_kill(handle C.int64_t, dartPort C.int64_t) {
+	sender := streamSender{port: dartPort}
+	c, ok := initConnFromHandle(handle)
+	if !ok {
+		_ = sender.sendConnError(fmt.Errorf("invalid handle: %d", handle))
+		return
+	}
+	if err := c.KillQuery(); err != nil {
+		_ = sender.sendConnError(err)
+		return
+	}
+	_ = sender.sendKillOk()
 }
 
 //export go_impl_conn_close_async
@@ -369,8 +412,13 @@ func runStream(handle C.int64_t, sql *C.char, dartPort C.int64_t) {
 		_ = sender.sendError(fmt.Errorf("invalid handle: %d", handle))
 		return
 	}
+
 	q, err := c.OpenQuery(C.GoString(sql))
 	if err != nil {
+		if streamErrIsCancel(err) {
+			_ = sender.sendCancel()
+			return
+		}
 		_ = sender.sendError(err)
 		return
 	}
@@ -382,6 +430,10 @@ func runStream(handle C.int64_t, sql *C.char, dartPort C.int64_t) {
 	for {
 		row, ok, err := q.NextRow()
 		if err != nil {
+			if streamErrIsCancel(err) {
+				_ = sender.sendCancel()
+				return
+			}
 			_ = sender.sendError(err)
 			return
 		}
@@ -404,6 +456,14 @@ func (s *streamSender) sendConnOpenOk(h cgo.Handle) bool {
 
 func (s *streamSender) sendConnCloseOk() bool {
 	return s.send(C.GO_IMPL_STREAM_EVENT_CONN_CLOSE_OK, 0)
+}
+
+func (s *streamSender) sendKillOk() bool {
+	return s.send(C.GO_IMPL_STREAM_EVENT_KILL_OK, 0)
+}
+
+func (s *streamSender) sendCancel() bool {
+	return s.send(C.GO_IMPL_STREAM_EVENT_CANCEL, 0)
 }
 
 func (s *streamSender) sendConnError(err error) bool {

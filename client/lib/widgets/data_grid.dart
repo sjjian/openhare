@@ -580,10 +580,6 @@ class _DataGridCell extends StatelessWidget {
             controller.updateSelectedCell(position);
             onCellTap?.call(position);
           },
-          onDoubleTap: () {
-            controller.updateSelectedCell(position);
-            onCellDoubleTap?.call(position);
-          },
           child: Container(
             alignment: alignment ?? Alignment.centerLeft,
             padding: const EdgeInsets.symmetric(horizontal: kSpacingSmall),

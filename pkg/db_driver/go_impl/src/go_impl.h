@@ -56,6 +56,8 @@ typedef enum {
   GO_IMPL_STREAM_EVENT_CONN_OPEN_OK = 4,
   GO_IMPL_STREAM_EVENT_CONN_CLOSE_OK = 5,
   GO_IMPL_STREAM_EVENT_CONN_ERROR = 6,
+  GO_IMPL_STREAM_EVENT_KILL_OK = 7,
+  GO_IMPL_STREAM_EVENT_CANCEL = 8,
 } go_impl_stream_event_type_t;
 
 typedef enum {
@@ -159,6 +161,7 @@ extern "C" {
 #endif
 
 extern void go_impl_conn_open_async(int32_t dbType, char* dsn, int64_t dartPort);
+extern void go_impl_conn_kill_async(int64_t handle, int64_t dartPort);
 extern void go_impl_conn_close_async(int64_t handle, int64_t dartPort);
 extern void go_impl_free_cstr(char* s);
 extern void go_impl_free_query_header(db_query_header_t* header);

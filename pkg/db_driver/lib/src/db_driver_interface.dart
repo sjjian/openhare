@@ -95,6 +95,19 @@ class QueryStreamItemRow extends BaseQueryStreamItem {
   const QueryStreamItemRow({required this.row});
 }
 
+/// 查询被主动取消（如 MySQL KILL QUERY 后 Err 1317），不是一般执行错误。
+class QueryStreamItemCancel extends BaseQueryStreamItem {
+  const QueryStreamItemCancel();
+}
+
+/// [BaseConnection.query] 在收到 [QueryStreamItemCancel] 且尚无结果头时抛出。
+class QueryCancelledException implements Exception {
+  const QueryCancelledException();
+
+  @override
+  String toString() => 'QueryCancelledException';
+}
+
 enum DatabaseModeType {
   singleMode, // 单库模式, 例如 sqlite.
   databaseMode, // 多库模式, 例如 pg.
@@ -164,6 +177,9 @@ abstract class BaseConnection {
 
   BaseConnection();
 
+  /// 是否支持服务端中止当前查询
+  bool get supportsKillQuery => true;
+
   Future<void> ping();
   Future<void> killQuery();
   Stream<BaseQueryStreamItem> queryStreamInternal(String sql);
@@ -203,6 +219,16 @@ abstract class BaseConnection {
           } else {
             rows.add(row);
           }
+        case QueryStreamItemCancel():
+          if (resultColumns == null) {
+            throw const QueryCancelledException();
+          }
+          return BaseQueryResult(
+            queryId,
+            resultColumns,
+            rows,
+            resultAffectedRows!,
+          );
       }
     }
 
@@ -281,7 +307,7 @@ class GoImplConnection extends BaseConnection {
 
   @override
   Future<void> killQuery() async {
-    throw UnimplementedError();
+    await _conn.killQuery();
   }
 
   @override
@@ -330,6 +356,8 @@ class GoImplConnection extends BaseConnection {
 
     await for (final item in _conn.streamQuery(sql)) {
       switch (item) {
+        case impl.DbQueryCancel():
+          yield const QueryStreamItemCancel();
         case impl.DbQueryHeader():
           columns = item.columns
               .map<BaseQueryColumn>((c) => GoImplQueryColumn(c))

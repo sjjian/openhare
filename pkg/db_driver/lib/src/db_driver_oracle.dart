@@ -45,11 +45,6 @@ class OracleConnection extends GoImplConnection {
   }
 
   @override
-  Future<void> killQuery() async {
-    return;
-  }
-
-  @override
   Future<String> version() async {
     try {
       final results = await query(

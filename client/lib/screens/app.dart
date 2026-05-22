@@ -81,6 +81,7 @@ class App extends HookConsumerWidget {
       return null;
     }, []);
 
+    // 顶层订阅设置, 其他容器里不需要再订阅
     final model = ref.watch(systemSettingProvider);
 
     return MaterialApp.router(

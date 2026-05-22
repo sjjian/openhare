@@ -21,6 +21,7 @@ abstract class SessionRepo {
   void selectSessionByIndex(int index);
   void reorderSession(int oldIndex, int newIndex);
   String? getCode(SessionId sessionId);
+  DateTime? getCodeSaveTime(SessionId sessionId);
   void saveCode(SessionId sessionId, String code);
   void updateSessionConfig(SessionId sessionId, SessionConfigModel config);
   SessionConfigModel getSessionConfig(SessionId sessionId);
@@ -42,6 +43,7 @@ abstract class SessionConnRepo {
   Future<BaseQueryResult?> query(ConnId connId, String query, {int? limit});
   Stream<BaseQueryStreamItem> queryStream(ConnId connId, String query);
   Future<void> killQuery(ConnId connId);
+  bool supportsKillQuery(ConnId connId);
 }
 
 abstract class SQLResultRepo {
@@ -106,6 +108,9 @@ abstract class SessionDetailModel with _$SessionDetailModel {
 
     // config
     required SessionConfigModel config,
+
+    // code save time
+    @Default(null) DateTime? codeSaveTime,
   }) = _SessionDetailModel;
 }
 
@@ -136,6 +141,7 @@ abstract class SessionOpBarModel with _$SessionOpBarModel {
     DatabaseRef? currentSchema,
     required bool isRightPageOpen,
     required int runningTaskCount,
+    DateTime? codeSaveTime,
   }) = _SessionOpBarModel;
 }
 
@@ -179,7 +185,7 @@ enum SQLConnectState {
   }
 }
 
-enum SQLExecuteState { init, executing, done, error }
+enum SQLExecuteState { init, executing, done, error, cancel }
 
 enum DrawerPage {
   metadataTree,
@@ -288,6 +294,8 @@ abstract class SQLResultDetailModel with _$SQLResultDetailModel {
     Duration? executeTime,
     String? error,
     BaseQueryResult? data,
+    ConnId? connId,
+    @Default(false) bool canKill, // 该连接是否支持服务端 kill query；不支持时 UI 不展示「取消」按钮。
   }) = _SQLResultDetailModel;
 }
 

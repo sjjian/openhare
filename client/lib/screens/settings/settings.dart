@@ -6,18 +6,22 @@ import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
-import 'package:client/widgets/divider.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/widgets/divider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SettingModel model = ref.watch(settingProvider);
+    final model = ref.watch(settingProvider);
+    final tab = ref.watch(settingTabServiceProvider).selectedSettingType;
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return PageSkeleton(
       key: const Key("settings"),
@@ -25,41 +29,116 @@ class SettingsPage extends ConsumerWidget {
         header: Row(
           children: [
             Text(
-              AppLocalizations.of(context)!.settings,
-              style: Theme.of(context).textTheme.titleLarge,
+              l10n.settings,
+              style: theme.textTheme.titleLarge,
               overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  AppLocalizations.of(context)!.preferences,
-                  style: Theme.of(context).textTheme.titleMedium,
+                _SettingsNavTab(
+                  label: l10n.settings_tab_general,
+                  selected: tab == SettingType.system,
+                  onTap: () => ref.read(settingTabServiceProvider.notifier).setSelectedSettingType(SettingType.system),
+                ),
+                SizedBox(width: kSpacingMedium),
+                _SettingsNavTab(
+                  label: l10n.llm_api,
+                  selected: tab == SettingType.llmApi,
+                  onTap: () => ref.read(settingTabServiceProvider.notifier).setSelectedSettingType(SettingType.llmApi),
                 ),
               ],
             ),
-            const SizedBox(height: kSpacingMedium),
-            SystemSettingPage(model: model.systemSetting),
-            const SizedBox(height: kSpacingMedium),
-            const PixelDivider(),
-            const SizedBox(height: kSpacingMedium),
-            Row(
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.llm_api,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
-            ),
-            const SizedBox(height: kSpacingMedium),
-            const Expanded(
-              child: LLMApiSettingPage(),
+            Expanded(
+              child: IndexedStack(
+                index: tab == SettingType.system ? 0 : 1,
+                sizing: StackFit.expand,
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.only(top: kSpacingMedium),
+                    child: SystemSettingPage(model: model.systemSetting),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: kSpacingMedium),
+                    child: const LLMApiSettingPage(),
+                  ),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsNavTab extends StatefulWidget {
+  const _SettingsNavTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  State<_SettingsNavTab> createState() => _SettingsNavTabState();
+}
+
+class _SettingsNavTabState extends State<_SettingsNavTab> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final muted = theme.colorScheme.onSurfaceVariant;
+
+    final Color labelColor;
+    if (widget.selected) {
+      labelColor = _hovering ? Color.lerp(primary, theme.colorScheme.onSurface, 0.15)! : primary;
+    } else {
+      labelColor = _hovering ? primary : muted;
+    }
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: IntrinsicWidth(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                widget.label,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: labelColor,
+                  fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 6),
+              SizedBox(
+                height: 2,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: widget.selected ? primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -72,18 +151,30 @@ class SystemSettingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            Text(
+              l10n.preferences,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+        const SizedBox(height: kSpacingSmall),
+        const PixelDivider(),
+        const SizedBox(height: kSpacingMedium),
         Row(
           children: [
             SizedBox(
               width: 120,
               child: Row(
                 children: [
-                  const Icon(Icons.language),
+                  const RectangleIconButton.medium(icon: Icons.language),
                   const SizedBox(width: kSpacingSmall),
-                  Text(AppLocalizations.of(context)!.language),
+                  Text(l10n.language),
                 ],
               ),
             ),
@@ -114,23 +205,23 @@ class SystemSettingPage extends ConsumerWidget {
               width: 120,
               child: Row(
                 children: [
-                  const Icon(Icons.color_lens),
+                  const RectangleIconButton.medium(icon: Icons.color_lens),
                   const SizedBox(width: kSpacingSmall),
-                  Text(AppLocalizations.of(context)!.theme),
+                  Text(l10n.theme),
                 ],
               ),
             ),
             Row(
               children: [
                 _SettingRadioOption(
-                  title: Text(AppLocalizations.of(context)!.theme_light),
+                  title: Text(l10n.theme_light),
                   value: "light",
                   selectedValue: model.theme,
                   onTap: () => ref.read(systemSettingServiceProvider.notifier).setTheme("light"),
                 ),
                 const SizedBox(width: 8),
                 _SettingRadioOption(
-                  title: Text(AppLocalizations.of(context)!.theme_dark),
+                  title: Text(l10n.theme_dark),
                   value: "dark",
                   selectedValue: model.theme,
                   onTap: () => ref.read(systemSettingServiceProvider.notifier).setTheme("dark"),
@@ -140,7 +231,417 @@ class SystemSettingPage extends ConsumerWidget {
             const Spacer(),
           ],
         ),
+        const SizedBox(height: kSpacingLarge),
+        Row(
+          children: [
+            Text(
+              l10n.settings_shortcuts_section,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(width: kSpacingSmall),
+            LinkButton(
+              text: l10n.settings_shortcut_view_all,
+              onPressed: () => showSqlEditorShortcutsDialog(context, ref),
+            ),
+            const Spacer(),
+          ],
+        ),
+        const SizedBox(height: kSpacingSmall),
+        const PixelDivider(),
+        const SizedBox(height: kSpacingMedium),
+        ShortcutSettingField(
+          kind: KeyboardShortcut.sqlExecute,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_run_sql,
+            icon: Icons.play_circle_outline_rounded,
+            iconColor: Colors.green,
+            verticalOffset: 0,
+            onPressed: null,
+          ),
+        ),
+        const SizedBox(height: kSpacingSmall),
+        ShortcutSettingField(
+          kind: KeyboardShortcut.sqlExecuteAdd,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_run_sql_new_tab,
+            icon: Icons.not_started_outlined,
+            iconColor: Colors.green,
+            verticalOffset: 0,
+            onPressed: null,
+          ),
+        ),
+        const SizedBox(height: kSpacingSmall),
+        ShortcutSettingField(
+          kind: KeyboardShortcut.sqlExplain,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_explain_sql,
+            icon: Icons.poll_outlined,
+            iconColor: Color.fromARGB(255, 241, 192, 84),
+            verticalOffset: 0,
+            onPressed: null,
+          ),
+        ),
+        const SizedBox(height: kSpacingSmall),
+        ShortcutSettingField(
+          kind: KeyboardShortcut.sqlExport,
+          leading: RectangleIconButton.medium(
+            tooltip: l10n.button_tooltip_sql_result_download,
+            icon: Icons.file_download_sharp,
+            iconColor: Colors.green,
+            verticalOffset: 1,
+            onPressed: null,
+          ),
+        ),
       ],
+    );
+  }
+}
+
+void showSqlEditorShortcutsDialog(BuildContext context, WidgetRef ref) {
+  final l10n = AppLocalizations.of(context)!;
+  final kinds = sqlEditorBuiltinShortcutKinds;
+  final settingService = ref.read(systemSettingServiceProvider.notifier);
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      return CustomDialog(
+        titleIcon: const Icon(Icons.keyboard_rounded),
+        title: l10n.settings_shortcut_all_dialog_title,
+        subtitle: l10n.settings_shortcut_all_dialog_subtitle,
+        maxWidth: 720,
+        maxHeight: 640,
+        actions: [],
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 表头行
+              _ShortcutListRow(
+                category: l10n.settings_shortcut_table_category,
+                action: l10n.settings_shortcut_table_action,
+                binding: l10n.settings_shortcut_table_binding,
+              ),
+              const PixelDivider(),
+              for (var i = 0; i < kinds.length; i++) ...[
+                _ShortcutListRow(
+                  category: l10n.settings_shortcut_category_sql_editor,
+                  action: _shortcutKindLabel(kinds[i], l10n),
+                  binding: settingService.getShortcutModel(kinds[i]).toDisplayString(),
+                  color: isSqlEditorShortcutNotYetImplemented(kinds[i])
+                      ? Theme.of(
+                          dialogContext,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5) // 未启用的快捷键颜色，onSurfaceVariant 颜色不够灰
+                      : null,
+                ),
+                if (i < kinds.length - 1) const PixelDivider(),
+              ],
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _ShortcutListRow extends StatelessWidget {
+  const _ShortcutListRow({
+    required this.category,
+    required this.action,
+    required this.binding,
+    this.color,
+  });
+
+  static const double _categoryWidth = 112;
+  static const double _bindingMinWidth = 96;
+
+  final String category;
+  final String action;
+  final String binding;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = color == null ? null : TextStyle(color: color);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: kSpacingSmall, vertical: kSpacingSmall),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: _categoryWidth,
+            child: Text(category, style: style),
+          ),
+          const SizedBox(width: kSpacingSmall),
+          Expanded(child: Text(action, style: style)),
+          const SizedBox(width: kSpacingMedium),
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: _bindingMinWidth),
+            child: Text(
+              binding,
+              style: style,
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _shortcutKindLabel(KeyboardShortcut kind, AppLocalizations l10n) {
+  return switch (kind) {
+    KeyboardShortcut.sqlEditorSelectAll => l10n.settings_shortcut_sql_editor_select_all,
+    KeyboardShortcut.sqlEditorCut => l10n.settings_shortcut_sql_editor_cut,
+    KeyboardShortcut.sqlEditorCopy => l10n.settings_shortcut_sql_editor_copy,
+    KeyboardShortcut.sqlEditorPaste => l10n.settings_shortcut_sql_editor_paste,
+    KeyboardShortcut.sqlEditorUndo => l10n.settings_shortcut_sql_editor_undo,
+    KeyboardShortcut.sqlEditorRedo => l10n.settings_shortcut_sql_editor_redo,
+    KeyboardShortcut.sqlEditorLineSelect => l10n.settings_shortcut_sql_editor_line_select,
+    KeyboardShortcut.sqlEditorLineDelete => l10n.settings_shortcut_sql_editor_line_delete,
+    KeyboardShortcut.sqlEditorLineDeleteForward => l10n.settings_shortcut_sql_editor_line_delete_forward,
+    KeyboardShortcut.sqlEditorLineDeleteBackward => l10n.settings_shortcut_sql_editor_line_delete_backward,
+    KeyboardShortcut.sqlEditorLineMoveUp => l10n.settings_shortcut_sql_editor_line_move_up,
+    KeyboardShortcut.sqlEditorLineMoveDown => l10n.settings_shortcut_sql_editor_line_move_down,
+    KeyboardShortcut.sqlEditorCursorMoveLineStart => l10n.settings_shortcut_sql_editor_cursor_move_line_start,
+    KeyboardShortcut.sqlEditorCursorMoveLineEnd => l10n.settings_shortcut_sql_editor_cursor_move_line_end,
+    KeyboardShortcut.sqlEditorCursorMovePageStart => l10n.settings_shortcut_sql_editor_cursor_move_page_start,
+    KeyboardShortcut.sqlEditorCursorMovePageEnd => l10n.settings_shortcut_sql_editor_cursor_move_page_end,
+    KeyboardShortcut.sqlEditorCursorMoveWordBoundaryForward =>
+      l10n.settings_shortcut_sql_editor_cursor_move_word_boundary_forward,
+    KeyboardShortcut.sqlEditorCursorMoveWordBoundaryBackward =>
+      l10n.settings_shortcut_sql_editor_cursor_move_word_boundary_backward,
+    KeyboardShortcut.sqlEditorSelectionExtendUp => l10n.settings_shortcut_sql_editor_selection_extend_up,
+    KeyboardShortcut.sqlEditorSelectionExtendDown => l10n.settings_shortcut_sql_editor_selection_extend_down,
+    KeyboardShortcut.sqlEditorSelectionExtendForward => l10n.settings_shortcut_sql_editor_selection_extend_forward,
+    KeyboardShortcut.sqlEditorSelectionExtendBackward => l10n.settings_shortcut_sql_editor_selection_extend_backward,
+    KeyboardShortcut.sqlEditorSelectionExtendLineStart => l10n.settings_shortcut_sql_editor_selection_extend_line_start,
+    KeyboardShortcut.sqlEditorSelectionExtendLineEnd => l10n.settings_shortcut_sql_editor_selection_extend_line_end,
+    KeyboardShortcut.sqlEditorSelectionExtendPageStart => l10n.settings_shortcut_sql_editor_selection_extend_page_start,
+    KeyboardShortcut.sqlEditorSelectionExtendPageEnd => l10n.settings_shortcut_sql_editor_selection_extend_page_end,
+    KeyboardShortcut.sqlEditorSelectionExtendWordBoundaryForward =>
+      l10n.settings_shortcut_sql_editor_selection_extend_word_boundary_forward,
+    KeyboardShortcut.sqlEditorSelectionExtendWordBoundaryBackward =>
+      l10n.settings_shortcut_sql_editor_selection_extend_word_boundary_backward,
+    KeyboardShortcut.sqlEditorWordDeleteForward => l10n.settings_shortcut_sql_editor_word_delete_forward,
+    KeyboardShortcut.sqlEditorWordDeleteBackward => l10n.settings_shortcut_sql_editor_word_delete_backward,
+    KeyboardShortcut.sqlEditorOutdent => l10n.settings_shortcut_sql_editor_outdent,
+    KeyboardShortcut.sqlEditorTransposeCharacters => l10n.settings_shortcut_sql_editor_transpose_characters,
+    KeyboardShortcut.sqlEditorSingleLineComment => l10n.settings_shortcut_sql_editor_single_line_comment,
+    KeyboardShortcut.sqlEditorMultiLineComment => l10n.settings_shortcut_sql_editor_multi_line_comment,
+    KeyboardShortcut.sqlEditorFind => l10n.settings_shortcut_sql_editor_find,
+    KeyboardShortcut.sqlEditorFindToggleMatchCase => l10n.settings_shortcut_sql_editor_find_toggle_match_case,
+    KeyboardShortcut.sqlEditorFindToggleRegex => l10n.settings_shortcut_sql_editor_find_toggle_regex,
+    KeyboardShortcut.sqlEditorReplace => l10n.settings_shortcut_sql_editor_replace,
+    KeyboardShortcut.sqlEditorSave => l10n.settings_shortcut_sql_editor_save,
+    _ => kind.name,
+  };
+}
+
+class ShortcutSettingField extends ConsumerStatefulWidget {
+  const ShortcutSettingField({
+    super.key,
+    required this.kind,
+    required this.leading,
+  });
+
+  final KeyboardShortcut kind;
+  final Widget leading;
+
+  @override
+  ConsumerState<ShortcutSettingField> createState() => ShortcutSettingFieldState();
+}
+
+class ShortcutSettingFieldState extends ConsumerState<ShortcutSettingField> {
+  String? _conflictMessage;
+  final FocusNode _focusNode = FocusNode();
+  late final bool Function(KeyEvent) _hardwareHandler;
+  bool _hardwareHandlerAttached = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _hardwareHandler = _onHardwareKeyEvent;
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      setState(() => _conflictMessage = null);
+      if (!_hardwareHandlerAttached) {
+        HardwareKeyboard.instance.addHandler(_hardwareHandler);
+        _hardwareHandlerAttached = true;
+      }
+    } else {
+      _detachHardwareHandler();
+    }
+    setState(() {});
+  }
+
+  void _detachHardwareHandler() {
+    if (_hardwareHandlerAttached) {
+      HardwareKeyboard.instance.removeHandler(_hardwareHandler);
+      _hardwareHandlerAttached = false;
+    }
+  }
+
+  bool _tryApply(ShortcutModel? committed) {
+    final attempted = committed ?? defaultShortcutModel(widget.kind);
+    try {
+      ref.read(systemSettingServiceProvider.notifier).setShortcutModel(widget.kind, attempted);
+    } on ShortcutCombinationRequiredException {
+      setState(() {
+        _conflictMessage = AppLocalizations.of(context)!.settings_shortcut_requires_combination;
+      });
+      return false;
+    } on ShortcutBindingConflictException {
+      setState(() {
+        _conflictMessage = AppLocalizations.of(context)!.settings_shortcut_conflict(attempted.toDisplayString());
+      });
+      return false;
+    }
+    setState(() => _conflictMessage = null);
+    return true;
+  }
+
+  bool _isModifierLogicalKey(LogicalKeyboardKey key) {
+    return key == LogicalKeyboardKey.shift ||
+        key == LogicalKeyboardKey.shiftLeft ||
+        key == LogicalKeyboardKey.shiftRight ||
+        key == LogicalKeyboardKey.control ||
+        key == LogicalKeyboardKey.controlLeft ||
+        key == LogicalKeyboardKey.controlRight ||
+        key == LogicalKeyboardKey.alt ||
+        key == LogicalKeyboardKey.altLeft ||
+        key == LogicalKeyboardKey.altRight ||
+        key == LogicalKeyboardKey.meta ||
+        key == LogicalKeyboardKey.metaLeft ||
+        key == LogicalKeyboardKey.metaRight ||
+        key == LogicalKeyboardKey.capsLock;
+  }
+
+  ShortcutModel? _shortcutFromKeyDown(KeyDownEvent event) {
+    if (_isModifierLogicalKey(event.logicalKey)) {
+      return null;
+    }
+    final hw = HardwareKeyboard.instance;
+    return ShortcutModel(
+      keyId: event.logicalKey.keyId,
+      meta: hw.isMetaPressed,
+      control: hw.isControlPressed,
+      alt: hw.isAltPressed,
+      shift: hw.isShiftPressed,
+    );
+  }
+
+  bool _onHardwareKeyEvent(KeyEvent event) {
+    if (!_focusNode.hasFocus) {
+      return false;
+    }
+    if (event is! KeyDownEvent) {
+      return false;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      return false;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.backspace || event.logicalKey == LogicalKeyboardKey.delete) {
+      _tryApply(null);
+      return true;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _focusNode.unfocus();
+      return true;
+    }
+
+    final stored = _shortcutFromKeyDown(event);
+    if (stored == null) {
+      return false;
+    }
+
+    _tryApply(stored);
+    return true;
+  }
+
+  @override
+  void dispose() {
+    _detachHardwareHandler();
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final notifier = ref.read(systemSettingServiceProvider.notifier);
+    final displayLabel = notifier.getShortcutModel(widget.kind).toDisplayString();
+
+    final outlineVariant = theme.colorScheme.outlineVariant;
+    final primary = theme.colorScheme.primary;
+    final hasFocus = _focusNode.hasFocus;
+    final borderSide = BorderSide(
+      color: hasFocus ? primary : outlineVariant,
+      width: hasFocus ? 2 : 1,
+    );
+    const shortcutFieldRadius = BorderRadius.all(Radius.circular(12));
+
+    final captureField = Tooltip(
+      message: l10n.settings_shortcut_field_hint,
+      waitDuration: const Duration(milliseconds: 400),
+      child: Focus(
+        focusNode: _focusNode,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.text,
+          child: GestureDetector(
+            onTap: () => _focusNode.requestFocus(),
+            behavior: HitTestBehavior.opaque,
+            child: InputDecorator(
+              isFocused: hasFocus,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(borderSide: borderSide, borderRadius: shortcutFieldRadius),
+                enabledBorder: OutlineInputBorder(borderSide: borderSide, borderRadius: shortcutFieldRadius),
+                focusedBorder: OutlineInputBorder(borderSide: borderSide, borderRadius: shortcutFieldRadius),
+              ),
+              child: Text(
+                displayLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyLarge,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return TapRegion(
+      onTapOutside: (_) {
+        _focusNode.unfocus();
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          widget.leading,
+          const SizedBox(width: kSpacingSmall),
+          SizedBox(width: 240, child: captureField),
+          if (_conflictMessage != null) ...[
+            const SizedBox(width: kSpacingSmall),
+            Expanded(
+              child: Text(
+                _conflictMessage!,
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

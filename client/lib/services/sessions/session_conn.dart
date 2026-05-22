@@ -64,4 +64,8 @@ class SessionConnsServices extends _$SessionConnsServices {
   Future<void> killQuery(ConnId connId) async {
     await ref.read(sessionConnRepoProvider).killQuery(connId);
   }
+
+  bool supportsKillQuery(ConnId connId) {
+    return ref.read(sessionConnRepoProvider).supportsKillQuery(connId);
+  }
 }

@@ -67,6 +67,10 @@ func (c *redisConn) Close() error {
 	return c.client.Close()
 }
 
+func (c *redisConn) KillQuery() error {
+	return nil
+}
+
 func (c *redisConn) OpenQuery(sql string) (rowCursor, error) {
 	var query redisQuery
 	if err := json.Unmarshal([]byte(sql), &query); err != nil {

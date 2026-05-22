@@ -1,6 +1,7 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/widgets/const.dart';
+import 'package:client/widgets/button.dart';
 import 'package:client/widgets/divider.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
@@ -9,15 +10,22 @@ import 'package:sql_editor/re_editor.dart';
 import 'dart:math';
 import 'package:sql_parser/parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/l10n/app_localizations.dart';
+import 'package:client/screens/sessions/session_operation_bar.dart';
+import 'package:client/services/sessions/sessions.dart';
+import 'package:client/services/settings/settings.dart';
 import 'package:client/widgets/code_auto_complete.dart';
+import 'package:client/widgets/menu.dart';
+import 'package:client/widgets/tooltip.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SQLEditor extends ConsumerWidget {
+class SQLEditor extends ConsumerStatefulWidget {
   final CodeLineEditingController codeController;
   final CodeScrollController? scrollController;
 
   const SQLEditor({super.key, required this.codeController, this.scrollController});
 
-  List<DBObjectPrompt> buildMetadataKeyword(List<MetaDataNode> metadata) {
+  static List<DBObjectPrompt> buildMetadataKeyword(List<MetaDataNode> metadata) {
     List<DBObjectPrompt> keywordPrompt = List.empty(growable: true);
     for (final node in metadata) {
       node.visitor((node, parent) {
@@ -28,7 +36,7 @@ class SQLEditor extends ConsumerWidget {
     return keywordPrompt;
   }
 
-  Map<String, List<CodePrompt>> buildRelatePrompts(List<MetaDataNode> metadata, DatabaseRef? currentSchema) {
+  static Map<String, List<CodePrompt>> buildRelatePrompts(List<MetaDataNode> metadata, DatabaseRef? currentSchema) {
     Map<String, List<CodePrompt>> relatedPrompts = {};
     // todo: 有一个缺陷，有下划线的变量无法relate, 当存在类似的prefix时，例如: 存在`t1`时, `t1_1`无法关联。
     for (final node in metadata) {
@@ -49,14 +57,29 @@ class SQLEditor extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SQLEditor> createState() => _SQLEditorState();
+}
+
+class _SQLEditorState extends ConsumerState<SQLEditor> {
+  late final ToolbarController _toolbarController = ToolbarController();
+
+  @override
+  void dispose() {
+    _toolbarController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     SessionSQLEditorModel model = ref.watch(selectedSessionSQLEditorProvider);
+    final barModel = ref.watch(sessionOpBarProvider);
+    final settingService = ref.read(systemSettingServiceProvider.notifier);
 
     List<CodeKeywordPrompt> keywordPrompt = [
       for (final keyword in keywords(model.dbType?.dialectType ?? DialectType.mysql)) KeywordPrompt(word: keyword),
     ];
     if (model.metadata != null) {
-      keywordPrompt.addAll(buildMetadataKeyword(model.metadata!));
+      keywordPrompt.addAll(SQLEditor.buildMetadataKeyword(model.metadata!));
     }
 
     final textStyle = GoogleFonts.robotoMono(
@@ -66,53 +89,445 @@ class SQLEditor extends ConsumerWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        Widget editor = CodeAutocomplete(
+          viewBuilder: (context, notifier, onSelected) {
+            return SQLEditorAutoCompleteListView(
+              notifier: notifier,
+              onSelected: onSelected,
+            );
+          },
+          promptsBuilder: SQLEditorAutocompletePromptsBuilder(
+            keywordPrompts: keywordPrompt,
+            directPrompts: [],
+            relatedPrompts: (model.metadata != null)
+                ? SQLEditor.buildRelatePrompts(model.metadata!, model.currentSchema)
+                : const {},
+          ),
+          child: CodeEditor(
+            wordWrap: false,
+            scrollController: widget.scrollController,
+            style: CodeEditorStyle(
+              textStyle: textStyle, // SQL 编辑器文字颜色
+            ),
+            controller: widget.codeController,
+            toolbarController: _toolbarController,
+            shortcutOverrideActions: {
+              CodeShortcutSaveIntent: CallbackAction<CodeShortcutSaveIntent>(
+                onInvoke: (_) {
+                  ref.read(sessionsServicesProvider.notifier).saveCode(model.sessionId);
+                  return null;
+                },
+              ),
+            },
+            indicatorBuilder: (context, editingController, chunkController, notifier) {
+              return Row(
+                children: [
+                  const SizedBox(width: kSpacingTiny),
+                  CodeLineNumber(
+                    model: model,
+                    textStyle: textStyle,
+                    totalHeight: constraints.maxHeight,
+                    notifier: notifier,
+                    codeController: widget.codeController,
+                  ),
+                  const PixelVerticalDivider(),
+                ],
+              );
+            },
+          ),
+        );
+        if (barModel != null) {
+          editor = CallbackShortcuts(
+            bindings: {
+              settingService.getShortcutModel(KeyboardShortcut.sqlExecute).toSingleActivator()!: () =>
+                  sessionOpBarRunExecute(
+                    context: context,
+                    ref: ref,
+                    model: barModel,
+                    codeController: widget.codeController,
+                  ),
+              settingService.getShortcutModel(KeyboardShortcut.sqlExecuteAdd).toSingleActivator()!: () =>
+                  sessionOpBarRunExecuteAdd(
+                    context: context,
+                    ref: ref,
+                    model: barModel,
+                    codeController: widget.codeController,
+                  ),
+              settingService.getShortcutModel(KeyboardShortcut.sqlExplain).toSingleActivator()!: () => sessionOpBarExplain(
+                context: context,
+                ref: ref,
+                model: barModel,
+                codeController: widget.codeController,
+              ),
+              settingService.getShortcutModel(KeyboardShortcut.sqlExport).toSingleActivator()!: () =>
+                  sessionOpBarExportDownload(
+                    context: context,
+                    model: barModel,
+                    codeController: widget.codeController,
+                  ),
+            },
+            child: editor,
+          );
+        }
+
         return Column(
           children: [
             Expanded(
-              child: CodeAutocomplete(
-                viewBuilder: (context, notifier, onSelected) {
-                  return SQLEditorAutoCompleteListView(
-                    notifier: notifier,
-                    onSelected: onSelected,
-                  );
-                },
-                promptsBuilder: SQLEditorAutocompletePromptsBuilder(
-                  keywordPrompts: keywordPrompt,
-                  directPrompts: [],
-                  relatedPrompts: (model.metadata != null)
-                      ? buildRelatePrompts(model.metadata!, model.currentSchema)
-                      : const {},
-                ),
-                child: CodeEditor(
-                  wordWrap: false,
-                  scrollController: scrollController,
-                  style: CodeEditorStyle(
-                    textStyle: textStyle, // SQL 编辑器文字颜色
-                  ),
-                  controller: codeController,
-                  indicatorBuilder: (context, editingController, chunkController, notifier) {
-                    return Row(
-                      children: [
-                        const SizedBox(width: kSpacingTiny),
-                        CodeLineNumber(
-                          model: model,
-                          textStyle: textStyle,
-                          totalHeight: constraints.maxHeight,
-                          notifier: notifier,
-                          codeController: codeController,
-                        ),
-                        const PixelVerticalDivider(),
-                      ],
-                    );
-                  },
-                ),
-              ),
+              child: editor,
             ),
             const PixelDivider(),
           ],
         );
       },
     );
+  }
+}
+
+/// SQL 编辑器选区工具栏在 [OverlayEntry] 中的内容（订阅 [sessionOpBarProvider] 与 [controller]）。
+class _SqlEditorSelectionToolbar extends ConsumerWidget {
+  const _SqlEditorSelectionToolbar({
+    required this.overlayContext,
+    required this.controller,
+    required this.anchors,
+    required this.visibility,
+    required this.onDismissBarrier,
+  });
+
+  final BuildContext overlayContext;
+  final CodeLineEditingController controller;
+  final TextSelectionToolbarAnchors anchors;
+  final ValueNotifier<bool> visibility;
+  final VoidCallback onDismissBarrier;
+
+  OverlayMenuHeader? _sqlContextMenuSqlActionsHeader({
+    required BuildContext overlayContext,
+    required WidgetRef ref,
+    required SessionOpBarModel barModel,
+    required CodeLineEditingController controller,
+    required AppLocalizations l10n,
+    required VoidCallback onAfterAction,
+  }) {
+    final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
+    final idle = SQLConnectState.isIdle(barModel.state);
+    final outline = Theme.of(overlayContext).colorScheme.outlineVariant;
+
+    return OverlayMenuHeader(
+      height: 42,
+      child: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(kSpacingTiny, 0, 0, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    RectangleIconButton.medium(
+                      tooltip: tooltipWithShortcutDisplay(
+                        l10n.button_tooltip_run_sql,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecute).toDisplayString(),
+                      ),
+                      icon: Icons.play_circle_outline_rounded,
+                      iconColor: idle ? Colors.green : Colors.grey,
+                      onPressed: () {
+                        sessionOpBarRunExecute(
+                          context: overlayContext,
+                          ref: ref,
+                          model: barModel,
+                          codeController: controller,
+                        );
+                        onAfterAction();
+                      },
+                    ),
+                    SizedBox(width: kSpacingTiny),
+                    RectangleIconButton.medium(
+                      tooltip: tooltipWithShortcutDisplay(
+                        l10n.button_tooltip_run_sql_new_tab,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExecuteAdd).toDisplayString(),
+                      ),
+                      icon: Icons.not_started_outlined,
+                      iconColor: idle ? Colors.green : Colors.grey,
+                      onPressed: () {
+                        sessionOpBarRunExecuteAdd(
+                          context: overlayContext,
+                          ref: ref,
+                          model: barModel,
+                          codeController: controller,
+                        );
+                        onAfterAction();
+                      },
+                    ),
+                    SizedBox(width: kSpacingTiny),
+                    RectangleIconButton.medium(
+                      tooltip: tooltipWithShortcutDisplay(
+                        l10n.button_tooltip_explain_sql,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExplain).toDisplayString(),
+                      ),
+                      icon: Icons.poll_outlined,
+                      iconColor: idle ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey, // todo: color 统一
+                      onPressed: () {
+                        sessionOpBarExplain(
+                          context: overlayContext,
+                          ref: ref,
+                          model: barModel,
+                          codeController: controller,
+                        );
+                        onAfterAction();
+                      },
+                    ),
+                    SizedBox(width: kSpacingTiny),
+                    RectangleIconButton.medium(
+                      tooltip: tooltipWithShortcutDisplay(
+                        l10n.button_tooltip_sql_result_download,
+                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExport).toDisplayString(),
+                      ),
+                      icon: Icons.file_download_sharp,
+                      iconColor: Colors.green,
+                      verticalOffset: 1,
+                      onPressed: () {
+                        sessionOpBarExportDownload(
+                          context: overlayContext,
+                          model: barModel,
+                          codeController: controller,
+                        );
+                        onAfterAction();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Divider(height: 1, thickness: 1, color: outline),
+        ],
+      ),
+    );
+  }
+
+  Widget _sqlContextMenuLeadingRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    String? shortcutLabel,
+    Color? iconColor,
+  }) {
+    final theme = Theme.of(context);
+    final color = iconColor ?? theme.colorScheme.onSurfaceVariant;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: kSpacingTiny),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          children: [
+            RectangleIconButton.medium(
+              icon: icon,
+              iconColor: color,
+              onPressed: null,
+            ),
+            const SizedBox(width: kSpacingTiny),
+            Expanded(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (shortcutLabel != null) ...[
+              const SizedBox(width: kSpacingTiny),
+              Text(
+                shortcutLabel,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: kSpacingSmall),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<OverlayMenuItem> _sqlContextMenuCopyPasteItems(
+    BuildContext context,
+    WidgetRef ref, {
+    required VoidCallback onCopy,
+    required VoidCallback onPaste,
+    double rowHeight = 40,
+    bool canCopy = true,
+  }) {
+    final loc = MaterialLocalizations.of(context);
+    final shortcutSvc = ref.read(systemSettingServiceProvider.notifier);
+    return [
+      OverlayMenuItem(
+        height: rowHeight,
+        onTabSelected: canCopy ? onCopy : null,
+        child: Opacity(
+          opacity: canCopy ? 1 : 0.38,
+          child: _sqlContextMenuLeadingRow(
+            context,
+            icon: Icons.content_copy_rounded,
+            label: loc.copyButtonLabel,
+            shortcutLabel: shortcutSvc.getShortcutModel(KeyboardShortcut.sqlEditorCopy).toDisplayString(),
+          ),
+        ),
+      ),
+      OverlayMenuItem(
+        height: rowHeight,
+        onTabSelected: onPaste,
+        child: _sqlContextMenuLeadingRow(
+          context,
+          icon: Icons.content_paste_rounded,
+          label: loc.pasteButtonLabel,
+          shortcutLabel: shortcutSvc.getShortcutModel(KeyboardShortcut.sqlEditorPaste).toDisplayString(),
+        ),
+      ),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (lbContext, _) {
+        final barModel = ref.watch(sessionOpBarProvider);
+        final shortcutService = ref.read(systemSettingServiceProvider.notifier);
+        final l10n = AppLocalizations.of(overlayContext)!;
+        final sqlHeader = barModel != null
+            ? _sqlContextMenuSqlActionsHeader(
+                overlayContext: overlayContext,
+                ref: ref,
+                barModel: barModel,
+                controller: controller,
+                l10n: l10n,
+                onAfterAction: onDismissBarrier,
+              )
+            : null;
+
+        final tabs = <OverlayMenuItem>[
+          ..._sqlContextMenuCopyPasteItems(
+            overlayContext,
+            ref,
+            canCopy: !controller.selection.isCollapsed,
+            onCopy: () {
+              controller.copy();
+            },
+            onPaste: controller.paste,
+          ),
+          OverlayMenuItem(
+            height: 40,
+            onTabSelected: () => controller.selectAll(),
+            child: _sqlContextMenuLeadingRow(
+              overlayContext,
+              icon: Icons.select_all_rounded,
+              label: l10n.sql_editor_menu_select_all,
+              shortcutLabel: shortcutService.getShortcutModel(KeyboardShortcut.sqlEditorSelectAll).toDisplayString(),
+            ),
+          ),
+          OverlayMenuItem(
+            height: 40,
+            onTabSelected: controller.canUndo ? () => controller.undo() : null,
+            child: Opacity(
+              opacity: controller.canUndo ? 1 : 0.38,
+              child: _sqlContextMenuLeadingRow(
+                overlayContext,
+                icon: Icons.undo_rounded,
+                label: l10n.sql_editor_menu_undo,
+                shortcutLabel: shortcutService.getShortcutModel(KeyboardShortcut.sqlEditorUndo).toDisplayString(),
+              ),
+            ),
+          ),
+          OverlayMenuItem(
+            height: 40,
+            onTabSelected: controller.canRedo ? () => controller.redo() : null,
+            child: Opacity(
+              opacity: controller.canRedo ? 1 : 0.38,
+              child: _sqlContextMenuLeadingRow(
+                overlayContext,
+                icon: Icons.redo_rounded,
+                label: l10n.sql_editor_menu_redo,
+                shortcutLabel: shortcutService.getShortcutModel(KeyboardShortcut.sqlEditorRedo).toDisplayString(),
+              ),
+            ),
+          ),
+        ];
+        final secondary = anchors.secondaryAnchor;
+        final targetRect = secondary == null
+            ? Rect.fromLTWH(anchors.primaryAnchor.dx, anchors.primaryAnchor.dy, 0, 0)
+            : Rect.fromPoints(anchors.primaryAnchor, secondary);
+        return CodeEditorTapRegion(
+          child: Directionality(
+            textDirection: Directionality.of(overlayContext),
+            child: ListenableBuilder(
+              listenable: visibility,
+              builder: (context, _) {
+                final visible = visibility.value;
+                return IgnorePointer(
+                  ignoring: !visible,
+                  child: Opacity(
+                    opacity: visible ? 1 : 0,
+                    child: OverlayMenuLayer(
+                      targetTopLeft: targetRect.topLeft,
+                      targetSize: targetRect.size,
+                      maxWidth: 250,
+                      header: sqlHeader,
+                      footer: OverlayMenuFooter(height: 10, child: SizedBox.shrink()),
+                      tabs: tabs,
+                      closeOnSelectItem: true,
+                      onDismissBarrier: onDismissBarrier,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ToolbarController implements SelectionToolbarController {
+  OverlayEntry? _entry;
+
+  void dispose() {
+    _entry?.remove();
+    _entry = null;
+  }
+
+  @override
+  void hide(BuildContext context) {
+    _entry?.remove();
+    _entry = null;
+  }
+
+  @override
+  void show({
+    required BuildContext context,
+    required CodeLineEditingController controller,
+    required TextSelectionToolbarAnchors anchors,
+    Rect? renderRect,
+    required LayerLink layerLink,
+    required ValueNotifier<bool> visibility,
+  }) {
+    hide(context);
+    final overlay = Overlay.maybeOf(context, rootOverlay: true);
+    if (overlay == null) {
+      return;
+    }
+    void close() => hide(context);
+
+    _entry = OverlayEntry(
+      builder: (overlayContext) => _SqlEditorSelectionToolbar(
+        overlayContext: overlayContext,
+        controller: controller,
+        anchors: anchors,
+        visibility: visibility,
+        onDismissBarrier: close,
+      ),
+    );
+    overlay.insert(_entry!);
   }
 }
 

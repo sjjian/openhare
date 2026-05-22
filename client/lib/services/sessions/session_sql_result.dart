@@ -50,18 +50,26 @@ class SQLResultsServices extends _$SQLResultsServices {
     final repo = ref.read(sqlResultsRepoProvider);
     // todo: remove sql result controller 不确认全局cache controller 是不是好的设计，导致两处维护状态.
     SQLResultController.removeSQLResultController(resultId);
+
+    final sessionModel = ref.read(sessionsServicesProvider.notifier).getSession(resultId.sessionId);
+    final connServices = ref.read(sessionConnsServicesProvider.notifier);
+    final ConnId? connId = sessionModel?.connId;
+    final bool canKill = connId != null && connServices.supportsKillQuery(connId);
+
     repo.updateSQLResult(
       resultId,
-      SQLResultDetailModel(resultId: resultId, query: query, state: SQLExecuteState.init),
+      SQLResultDetailModel(
+        resultId: resultId,
+        query: query,
+        state: SQLExecuteState.init,
+        connId: connId,
+        canKill: canKill,
+      ),
     );
     ref.invalidateSelf();
 
-    // todo
-    final sessionModel = ref.read(sessionsServicesProvider.notifier).getSession(resultId.sessionId);
-
     try {
       DateTime start = DateTime.now();
-      final connServices = ref.read(sessionConnsServicesProvider.notifier);
       BaseQueryResult? queryResult = await connServices.query(
         sessionModel!.connId!,
         query,
@@ -79,6 +87,19 @@ class SQLResultsServices extends _$SQLResultsServices {
           data: queryResult,
           executeTime: end.difference(start),
           state: SQLExecuteState.done,
+          connId: connId,
+          canKill: canKill,
+        ),
+      );
+    } on QueryCancelledException {
+      repo.updateSQLResult(
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          state: SQLExecuteState.cancel,
+          connId: connId,
+          canKill: canKill,
         ),
       );
     } catch (e) {
@@ -89,6 +110,8 @@ class SQLResultsServices extends _$SQLResultsServices {
           query: query,
           state: SQLExecuteState.error,
           error: e.toString(),
+          connId: connId,
+          canKill: canKill,
         ),
       );
     } finally {

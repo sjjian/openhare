@@ -208,6 +208,7 @@ class SelectedSessionDetailNotifier extends _$SelectedSessionDetailNotifier {
       connErrorMsg: conns.conns[session.connId]?.errorMsg,
       currentSchema: session.currentSchema,
       config: session.config,
+      codeSaveTime: ref.read(sessionRepoProvider).getCodeSaveTime(session.sessionId),
     );
   }
 }
@@ -275,6 +276,7 @@ class SessionOpBarNotifier extends _$SessionOpBarNotifier {
       currentSchema: session.currentSchema,
       isRightPageOpen: sessionDrawer.isRightPageOpen,
       runningTaskCount: runningTaskCount,
+      codeSaveTime: session.codeSaveTime,
     );
   }
 }

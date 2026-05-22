@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+String tooltipWithShortcutDisplay(String description, String shortcutDisplay) {
+  return '$description ($shortcutDisplay)';
+}
+
 class TooltipText extends StatelessWidget {
   final String text;
   final TextStyle? style;

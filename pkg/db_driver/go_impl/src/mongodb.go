@@ -76,6 +76,10 @@ type mongoQueryWire struct {
 	MaxRows int64  `json:"maxRows"`
 }
 
+func (c *mongoConn) KillQuery() error {
+	return nil
+}
+
 func (c *mongoConn) OpenQuery(sql string) (rowCursor, error) {
 	sql = strings.TrimSpace(sql)
 	if sql == "" {

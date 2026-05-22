@@ -2,7 +2,6 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/sessions/session_conn.dart';
 import 'package:client/services/sessions/session_drawer.dart';
 import 'package:client/services/sessions/session_sql_result.dart';
-import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/data_grid.dart';
 import 'package:client/widgets/empty.dart';
@@ -172,7 +171,37 @@ class SqlResultTable extends ConsumerWidget {
     );
   }
 
+  Widget buildCancelBody(BuildContext context, SQLResultDetailModel model) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(kSpacingLarge, kSpacingSmall, kSpacingLarge, kSpacingSmall),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error,
+              size: 48,
+              color: const Color.fromARGB(255, 241, 192, 84), // todo: 颜色统一放, 目前和 explain 按钮使用同样颜色
+            ),
+            const SizedBox(height: kSpacingMedium),
+            Text(
+              l10n.display_msg_execution_cancelled,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildWaitingBody(BuildContext context, WidgetRef ref, SQLResultDetailModel model) {
+    final ConnId? connId = model.connId;
+    final bool canKill = connId != null && model.canKill;
+
     return Container(
       alignment: Alignment.topLeft,
       child: Center(
@@ -181,22 +210,15 @@ class SqlResultTable extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Loading.large(),
-            const SizedBox(height: kSpacingMedium),
-            FilledButton(
-              onPressed: () async {
-                SessionModel? sessionModel = ref
-                    .read(sessionsServicesProvider.notifier)
-                    .getSession(
-                      model.resultId.sessionId,
-                    );
-
-                if (sessionModel == null || sessionModel.connId == null) {
-                  return;
-                }
-                await ref.read(sessionConnsServicesProvider.notifier).killQuery(sessionModel.connId!);
-              },
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
+            if (canKill) ...[
+              const SizedBox(height: kSpacingMedium),
+              FilledButton(
+                onPressed: () async {
+                  await ref.read(sessionConnsServicesProvider.notifier).killQuery(connId);
+                },
+                child: Text(AppLocalizations.of(context)!.cancel),
+              ),
+            ],
           ],
         ),
       ),
@@ -236,6 +258,8 @@ class SqlResultTable extends ConsumerWidget {
       );
     } else if (model.state == SQLExecuteState.error) {
       return buildErrorBody(context, model);
+    } else if (model.state == SQLExecuteState.cancel) {
+      return buildCancelBody(context, model);
     } else {
       return buildWaitingBody(context, ref, model);
     }

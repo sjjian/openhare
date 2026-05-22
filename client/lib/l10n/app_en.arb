@@ -39,6 +39,215 @@
   "@theme_light": {
     "description": "Light theme"
   },
+  "settings_shortcuts_section": "Shortcuts",
+  "@settings_shortcuts_section": {
+    "description": "Settings section title for user-configurable keyboard shortcuts"
+  },
+  "settings_shortcut_conflict": "Shortcut {shortcutDisplay} conflicts with another shortcut.",
+  "@settings_shortcut_conflict": {
+    "description": "Shown when a configurable shortcut duplicates another binding; shortcutDisplay is the human-readable combo",
+    "placeholders": {
+      "shortcutDisplay": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_shortcut_requires_combination": "Use a shortcut with Ctrl, ⌘, Alt, or Shift.",
+  "@settings_shortcut_requires_combination": {
+    "description": "Shown when user tries to bind a single key without modifier for configurable actions"
+  },
+  "settings_shortcut_field_hint": "Click or Tab into this box, then press a shortcut with Ctrl, ⌘, Alt, or Shift. Backspace/Delete clears it.",
+  "@settings_shortcut_field_hint": {
+    "description": "Explains inline shortcut capture TextField-like control"
+  },
+  "settings_shortcut_view_all": "View all",
+  "@settings_shortcut_view_all": {
+    "description": "Opens the dialog listing all built-in SQL editor shortcuts"
+  },
+  "settings_shortcut_all_dialog_title": "Shortcuts",
+  "@settings_shortcut_all_dialog_title": {
+    "description": "Title of the dialog that lists built-in shortcuts"
+  },
+  "settings_shortcut_all_dialog_subtitle": "Not customizable. Gray rows: reserved, not implemented.",
+  "@settings_shortcut_all_dialog_subtitle": {
+    "description": "Subtitle under the shortcuts list dialog: read-only list and meaning of gray rows"
+  },
+  "settings_shortcut_table_category": "Category",
+  "@settings_shortcut_table_category": {
+    "description": "Column header: shortcut source category in the shortcuts table"
+  },
+  "settings_shortcut_table_action": "Action",
+  "@settings_shortcut_table_action": {
+    "description": "Column header: shortcut action name in the shortcuts table"
+  },
+  "settings_shortcut_table_binding": "Shortcut",
+  "@settings_shortcut_table_binding": {
+    "description": "Column header: key binding in the shortcuts table"
+  },
+  "settings_shortcut_category_sql_editor": "SQL editor",
+  "@settings_shortcut_category_sql_editor": {
+    "description": "Category label for shortcuts provided by the SQL editor"
+  },
+  "settings_shortcut_sql_editor_select_all": "Select all",
+  "@settings_shortcut_sql_editor_select_all": {
+    "description": "Built-in SQL editor shortcut action: select all"
+  },
+  "settings_shortcut_sql_editor_cut": "Cut",
+  "@settings_shortcut_sql_editor_cut": {
+    "description": "Built-in SQL editor shortcut action: cut"
+  },
+  "settings_shortcut_sql_editor_copy": "Copy",
+  "@settings_shortcut_sql_editor_copy": {
+    "description": "Built-in SQL editor shortcut action: copy"
+  },
+  "settings_shortcut_sql_editor_paste": "Paste",
+  "@settings_shortcut_sql_editor_paste": {
+    "description": "Built-in SQL editor shortcut action: paste"
+  },
+  "settings_shortcut_sql_editor_undo": "Undo",
+  "@settings_shortcut_sql_editor_undo": {
+    "description": "Built-in SQL editor shortcut action: undo"
+  },
+  "settings_shortcut_sql_editor_redo": "Redo",
+  "@settings_shortcut_sql_editor_redo": {
+    "description": "Built-in SQL editor shortcut action: redo"
+  },
+  "settings_shortcut_sql_editor_line_select": "Select line",
+  "@settings_shortcut_sql_editor_line_select": {
+    "description": "Built-in SQL editor shortcut action: select line"
+  },
+  "settings_shortcut_sql_editor_line_delete": "Delete line",
+  "@settings_shortcut_sql_editor_line_delete": {
+    "description": "Built-in SQL editor shortcut action: delete line"
+  },
+  "settings_shortcut_sql_editor_line_delete_forward": "Delete to end of line",
+  "@settings_shortcut_sql_editor_line_delete_forward": {
+    "description": "Built-in SQL editor shortcut action: delete to end of line"
+  },
+  "settings_shortcut_sql_editor_line_delete_backward": "Delete to start of line",
+  "@settings_shortcut_sql_editor_line_delete_backward": {
+    "description": "Built-in SQL editor shortcut action: delete to start of line"
+  },
+  "settings_shortcut_sql_editor_line_move_up": "Move line up",
+  "@settings_shortcut_sql_editor_line_move_up": {
+    "description": "Built-in SQL editor shortcut action: move line up"
+  },
+  "settings_shortcut_sql_editor_line_move_down": "Move line down",
+  "@settings_shortcut_sql_editor_line_move_down": {
+    "description": "Built-in SQL editor shortcut action: move line down"
+  },
+  "settings_shortcut_sql_editor_cursor_move_line_start": "Move to line start",
+  "@settings_shortcut_sql_editor_cursor_move_line_start": {
+    "description": "Built-in SQL editor shortcut action: move to line start"
+  },
+  "settings_shortcut_sql_editor_cursor_move_line_end": "Move to line end",
+  "@settings_shortcut_sql_editor_cursor_move_line_end": {
+    "description": "Built-in SQL editor shortcut action: move to line end"
+  },
+  "settings_shortcut_sql_editor_cursor_move_page_start": "Move to document start",
+  "@settings_shortcut_sql_editor_cursor_move_page_start": {
+    "description": "Built-in SQL editor shortcut action: move to document start"
+  },
+  "settings_shortcut_sql_editor_cursor_move_page_end": "Move to document end",
+  "@settings_shortcut_sql_editor_cursor_move_page_end": {
+    "description": "Built-in SQL editor shortcut action: move to document end"
+  },
+  "settings_shortcut_sql_editor_cursor_move_word_boundary_forward": "Move to next word",
+  "@settings_shortcut_sql_editor_cursor_move_word_boundary_forward": {
+    "description": "Built-in SQL editor shortcut action: move to next word"
+  },
+  "settings_shortcut_sql_editor_cursor_move_word_boundary_backward": "Move to previous word",
+  "@settings_shortcut_sql_editor_cursor_move_word_boundary_backward": {
+    "description": "Built-in SQL editor shortcut action: move to previous word"
+  },
+  "settings_shortcut_sql_editor_selection_extend_up": "Extend selection up",
+  "@settings_shortcut_sql_editor_selection_extend_up": {
+    "description": "Built-in SQL editor shortcut action: extend selection up"
+  },
+  "settings_shortcut_sql_editor_selection_extend_down": "Extend selection down",
+  "@settings_shortcut_sql_editor_selection_extend_down": {
+    "description": "Built-in SQL editor shortcut action: extend selection down"
+  },
+  "settings_shortcut_sql_editor_selection_extend_forward": "Extend selection right",
+  "@settings_shortcut_sql_editor_selection_extend_forward": {
+    "description": "Built-in SQL editor shortcut action: extend selection right"
+  },
+  "settings_shortcut_sql_editor_selection_extend_backward": "Extend selection left",
+  "@settings_shortcut_sql_editor_selection_extend_backward": {
+    "description": "Built-in SQL editor shortcut action: extend selection left"
+  },
+  "settings_shortcut_sql_editor_selection_extend_line_start": "Extend selection to line start",
+  "@settings_shortcut_sql_editor_selection_extend_line_start": {
+    "description": "Built-in SQL editor shortcut action: extend selection to line start"
+  },
+  "settings_shortcut_sql_editor_selection_extend_line_end": "Extend selection to line end",
+  "@settings_shortcut_sql_editor_selection_extend_line_end": {
+    "description": "Built-in SQL editor shortcut action: extend selection to line end"
+  },
+  "settings_shortcut_sql_editor_selection_extend_page_start": "Extend selection to document start",
+  "@settings_shortcut_sql_editor_selection_extend_page_start": {
+    "description": "Built-in SQL editor shortcut action: extend selection to document start"
+  },
+  "settings_shortcut_sql_editor_selection_extend_page_end": "Extend selection to document end",
+  "@settings_shortcut_sql_editor_selection_extend_page_end": {
+    "description": "Built-in SQL editor shortcut action: extend selection to document end"
+  },
+  "settings_shortcut_sql_editor_selection_extend_word_boundary_forward": "Extend selection to next word",
+  "@settings_shortcut_sql_editor_selection_extend_word_boundary_forward": {
+    "description": "Built-in SQL editor shortcut action: extend selection to next word"
+  },
+  "settings_shortcut_sql_editor_selection_extend_word_boundary_backward": "Extend selection to previous word",
+  "@settings_shortcut_sql_editor_selection_extend_word_boundary_backward": {
+    "description": "Built-in SQL editor shortcut action: extend selection to previous word"
+  },
+  "settings_shortcut_sql_editor_word_delete_forward": "Delete word forward",
+  "@settings_shortcut_sql_editor_word_delete_forward": {
+    "description": "Built-in SQL editor shortcut action: delete word forward"
+  },
+  "settings_shortcut_sql_editor_word_delete_backward": "Delete word backward",
+  "@settings_shortcut_sql_editor_word_delete_backward": {
+    "description": "Built-in SQL editor shortcut action: delete word backward"
+  },
+  "settings_shortcut_sql_editor_outdent": "Outdent",
+  "@settings_shortcut_sql_editor_outdent": {
+    "description": "Built-in SQL editor shortcut action: outdent"
+  },
+  "settings_shortcut_sql_editor_transpose_characters": "Transpose characters",
+  "@settings_shortcut_sql_editor_transpose_characters": {
+    "description": "Built-in SQL editor shortcut action: transpose characters"
+  },
+  "settings_shortcut_sql_editor_single_line_comment": "Toggle line comment",
+  "@settings_shortcut_sql_editor_single_line_comment": {
+    "description": "Built-in SQL editor shortcut action: toggle line comment"
+  },
+  "settings_shortcut_sql_editor_multi_line_comment": "Toggle block comment",
+  "@settings_shortcut_sql_editor_multi_line_comment": {
+    "description": "Built-in SQL editor shortcut action: toggle block comment"
+  },
+  "settings_shortcut_sql_editor_find": "Find",
+  "@settings_shortcut_sql_editor_find": {
+    "description": "Built-in SQL editor shortcut action: find"
+  },
+  "settings_shortcut_sql_editor_find_toggle_match_case": "Toggle match case",
+  "@settings_shortcut_sql_editor_find_toggle_match_case": {
+    "description": "Built-in SQL editor shortcut action: toggle find match case"
+  },
+  "settings_shortcut_sql_editor_find_toggle_regex": "Toggle regex",
+  "@settings_shortcut_sql_editor_find_toggle_regex": {
+    "description": "Built-in SQL editor shortcut action: toggle find regex"
+  },
+  "settings_shortcut_sql_editor_replace": "Replace",
+  "@settings_shortcut_sql_editor_replace": {
+    "description": "Built-in SQL editor shortcut action: replace"
+  },
+  "settings_shortcut_sql_editor_save": "Save",
+  "@settings_shortcut_sql_editor_save": {
+    "description": "Built-in SQL editor shortcut action: save"
+  },
+  "settings_tab_general": "General",
+  "@settings_tab_general": {
+    "description": "Settings tab: general / non-LLM options"
+  },
   "db_instance": "DB instances",
   "@db_instance": {
     "description": "DB instances"
@@ -158,6 +367,10 @@
   "display_msg_execution_success": "Execution successful",
   "@display_msg_execution_success": {
     "description": "SQL execution success message"
+  },
+  "display_msg_execution_cancelled": "Query was cancelled",
+  "@display_msg_execution_cancelled": {
+    "description": "SQL execution stopped by user (e.g. kill query)"
   },
   "effect_rows": "Effect rows",
   "@effect_rows": {
@@ -327,9 +540,30 @@
   "@button_tooltip_save": {
     "description": "Button tooltip save SQL"
   },
+  "button_tooltip_save_last_saved": "Last saved: {time}",
+  "@button_tooltip_save_last_saved": {
+    "description": "Second line of save button tooltip showing when SQL was last saved",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "button_tooltip_copy_sql": "Copy code text",
   "@button_tooltip_copy_sql": {
     "description": "Button tooltip copy code text"
+  },
+  "sql_editor_menu_select_all": "Select all",
+  "@sql_editor_menu_select_all": {
+    "description": "SQL editor context menu: select all"
+  },
+  "sql_editor_menu_undo": "Undo",
+  "@sql_editor_menu_undo": {
+    "description": "SQL editor context menu: undo"
+  },
+  "sql_editor_menu_redo": "Redo",
+  "@sql_editor_menu_redo": {
+    "description": "SQL editor context menu: redo"
   },
   "button_tooltip_retry_message": "Retry from current message",
   "@button_tooltip_retry_message": {

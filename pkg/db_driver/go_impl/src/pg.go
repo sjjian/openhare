@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const (
@@ -53,11 +57,25 @@ const (
 )
 
 type pgConn struct {
-	conn *pgx.Conn
+	conn          *pgx.Conn
+	dsn           string
+	backendPID    int32
+	isQueryKilled atomic.Bool
 }
 
 func (c *pgConn) Close() error {
 	return c.conn.Close(context.Background())
+}
+
+func (c *pgConn) pgKillInterrupted(err error) bool {
+	if !c.isQueryKilled.Load() {
+		return false
+	}
+	var pe *pgconn.PgError
+	// pgErrCodeQueryCanceled 是 PostgreSQL 查询被服务端 cancel 时返回的 SQLSTATE
+	// （对应 ErrorResponse: "canceling statement due to user request"）。
+	// 参考：https://www.postgresql.org/docs/current/errcodes-appendix.html
+	return errors.As(err, &pe) && pe.Code == "57014"
 }
 
 func pgDataType(typeName string) int32 {
@@ -92,9 +110,35 @@ func pgDataType(typeName string) int32 {
 	}
 }
 
+func (c *pgConn) KillQuery() error {
+	if c.backendPID == 0 {
+		return nil
+	}
+	c.isQueryKilled.Store(true)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	conn2, err := pgx.Connect(ctx, c.dsn)
+	if err != nil {
+		return err
+	}
+	defer conn2.Close(context.Background())
+	var ok bool
+	if err := conn2.QueryRow(ctx, "SELECT pg_cancel_backend($1)", c.backendPID).Scan(&ok); err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("pg_cancel_backend returned false for pid %d", c.backendPID)
+	}
+	return nil
+}
+
 func (c *pgConn) OpenQuery(sqlText string) (rowCursor, error) {
+	c.isQueryKilled.Store(false)
 	rows, err := c.conn.Query(context.Background(), sqlText)
 	if err != nil {
+		if c.pgKillInterrupted(err) {
+			return nil, newStreamQueryCancelled(err)
+		}
 		return nil, err
 	}
 
@@ -116,17 +160,20 @@ func (c *pgConn) OpenQuery(sqlText string) (rowCursor, error) {
 		}
 		if err := rows.Err(); err != nil {
 			rows.Close()
+			if c.pgKillInterrupted(err) {
+				return nil, newStreamQueryCancelled(err)
+			}
 			return nil, err
 		}
 		affectedRows = rows.CommandTag().RowsAffected()
 	}
 
-	cur := &pgCur{
+	return &pgCur{
+		conn:         c,
 		rows:         rows,
 		columns:      columns,
 		affectedRows: affectedRows,
-	}
-	return cur, nil
+	}, nil
 }
 
 func (c *pgConn) getTypeName(oid uint32) string {
@@ -137,6 +184,7 @@ func (c *pgConn) getTypeName(oid uint32) string {
 }
 
 type pgCur struct {
+	conn         *pgConn
 	rows         pgx.Rows
 	columns      []dbQueryColumn
 	affectedRows int64
@@ -157,6 +205,9 @@ func (q *pgCur) Header() *dbQueryHeader {
 func (q *pgCur) NextRow() (*dbQueryRow, bool, error) {
 	if !q.rows.Next() {
 		if err := q.rows.Err(); err != nil {
+			if q.conn != nil && q.conn.pgKillInterrupted(err) {
+				return nil, false, newStreamQueryCancelled(err)
+			}
 			return nil, false, err
 		}
 		return nil, false, nil
@@ -169,6 +220,9 @@ func (q *pgCur) NextRow() (*dbQueryRow, bool, error) {
 	}
 
 	if err := q.rows.Scan(raw...); err != nil {
+		if q.conn != nil && q.conn.pgKillInterrupted(err) {
+			return nil, false, newStreamQueryCancelled(err)
+		}
 		return nil, false, err
 	}
 
@@ -194,5 +248,12 @@ func openPgConn(dsn string) (driverConn, error) {
 		return nil, err
 	}
 
-	return &pgConn{conn: conn}, nil
+	pc := &pgConn{conn: conn, dsn: dsn}
+	var pid int32
+	if err := conn.QueryRow(ctx, "SELECT pg_backend_pid()").Scan(&pid); err != nil {
+		_ = conn.Close(context.Background())
+		return nil, err
+	}
+	pc.backendPID = pid
+	return pc, nil
 }

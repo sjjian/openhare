@@ -8,10 +8,7 @@ import 'package:sql_parser/parser.dart' as sp;
 import 'package:db_driver/src/db_driver_conn_meta.dart';
 
 class MySQLConnection extends GoImplConnection {
-  final String _dsn;
-  String? _sessionId;
-
-  MySQLConnection(super._conn, this._dsn);
+  MySQLConnection(super._conn);
 
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
@@ -31,33 +28,13 @@ class MySQLConnection extends GoImplConnection {
     final dsn = '$user:$password@tcp($host:$port)/$database';
 
     final conn = await impl.ImplConnection.openMysql(dsn);
-    final mc = MySQLConnection(conn, dsn);
-    await mc._loadSessionId();
+    final mc = MySQLConnection(conn);
     return mc;
   }
 
   @override
   Future<void> ping() async {
     await query("SELECT 1");
-  }
-
-  Future<void> _loadSessionId() async {
-    final results = await query("SELECT CONNECTION_ID() AS session_id");
-    _sessionId = results.rows.first.getString("session_id");
-  }
-
-  @override
-  Future<void> killQuery() async {
-    if (_sessionId == null) return;
-
-    MySQLConnection? tmp;
-    try {
-      final tmpConn = await impl.ImplConnection.openMysql(_dsn);
-      tmp = MySQLConnection(tmpConn, _dsn);
-      await tmp.query("KILL QUERY $_sessionId");
-    } finally {
-      await tmp?.close();
-    }
   }
 
   @override

@@ -15,6 +15,9 @@ class MongoConnection extends GoImplConnection {
   DatabaseRef _currentDb;
 
   @override
+  bool get supportsKillQuery => false;
+
+  @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.databaseMode;
 
@@ -104,6 +107,8 @@ class MongoConnection extends GoImplConnection {
           resultAffectedRows = affectedRows;
         case QueryStreamItemRow(:final row):
           rows.add(row);
+        case QueryStreamItemCancel():
+          throw const QueryCancelledException();
       }
     }
 
@@ -122,9 +127,6 @@ class MongoConnection extends GoImplConnection {
   Future<void> ping() async {
     await query('db.version()');
   }
-
-  @override
-  Future<void> killQuery() async {}
 
   @override
   Future<String> version() async {

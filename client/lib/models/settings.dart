@@ -1,11 +1,15 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:client/models/keyboard.dart';
+
 part 'settings.freezed.dart';
 
 abstract class SettingsRepo {
   SystemSettingModel getSettings();
   void setLanguage(String language);
   void setTheme(String theme);
+  ShortcutModel? getShortcut(KeyboardShortcut kind);
+  void setShortcut(KeyboardShortcut kind, ShortcutModel? model);
 }
 
 @freezed

@@ -34,11 +34,6 @@ class SQLiteConnection extends GoImplConnection {
   }
 
   @override
-  Future<void> killQuery() async {
-    return;
-  }
-
-  @override
   Future<String> version() async {
     final results = await query("SELECT sqlite_version() AS version");
     return results.rows.first.getString("version") ?? "";

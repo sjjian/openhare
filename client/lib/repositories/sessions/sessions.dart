@@ -41,6 +41,15 @@ class SessionCodeStorage {
   });
 }
 
+// session 的临时变量缓存
+class SessionTmp {
+  DateTime? codeSaveTime;
+
+  SessionTmp({
+    this.codeSaveTime,
+  });
+}
+
 class SessionRepoImpl extends SessionRepo {
   final ObjectBox ob;
   final Box<SessionStorage> _sessionBox;
@@ -50,6 +59,8 @@ class SessionRepoImpl extends SessionRepo {
   final Map<int, SessionConfigModel> _sessionConfigMap = {};
 
   final Map<int, ConnId> _connIdMap = {};
+
+  final Map<int, SessionTmp> _sessionTmpMap = {};
 
   SessionRepoImpl(this.ob) : _sessionBox = ob.store.box(), _sessionCodeBox = ob.store.box();
 
@@ -106,6 +117,8 @@ class SessionRepoImpl extends SessionRepo {
     if (sessionCache != null) {
       _sessions.replace(sessionCache, session);
     }
+    // 更新临时变量缓存
+    _sessionTmpMap.remove(sessionId.value);
   }
 
   @override
@@ -149,6 +162,8 @@ class SessionRepoImpl extends SessionRepo {
     }
     // 从配置中移除
     _sessionConfigMap.remove(sessionId.value);
+    // 从临时变量缓存中移除
+    _sessionTmpMap.remove(sessionId.value);
   }
 
   SessionStorage? _getSession(SessionId sessionId) {
@@ -214,6 +229,11 @@ class SessionRepoImpl extends SessionRepo {
   }
 
   @override
+  DateTime? getCodeSaveTime(SessionId sessionId) {
+    return _sessionTmpMap[sessionId.value]?.codeSaveTime;
+  }
+
+  @override
   void saveCode(SessionId sessionId, String code) {
     final codeStorage = _getCode(sessionId);
     if (codeStorage == null) {
@@ -221,6 +241,8 @@ class SessionRepoImpl extends SessionRepo {
     }
     codeStorage.text = code;
     _sessionCodeBox.put(codeStorage);
+    // 更新临时变量缓存
+    _sessionTmpMap[sessionId.value] = SessionTmp(codeSaveTime: DateTime.now());
   }
 }
 
