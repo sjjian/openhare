@@ -1,5 +1,9 @@
+import 'package:sql_parser/parser.dart';
+
 import 'db_driver_interface.dart';
 import 'db_driver_conn_meta.dart';
+import 'db_driver_metadata.dart';
+import 'ssh_tunnel.dart';
 import 'db_driver_mysql.dart';
 import 'db_driver_oracle.dart';
 import 'db_driver_mssql.dart';
@@ -8,39 +12,144 @@ import 'db_driver_pg.dart';
 import 'db_driver_redis.dart';
 import 'db_driver_mongodb.dart';
 
-class ConnectionFactory {
-  static Future<BaseConnection> open(
-      {required DatabaseType type,
-      required ConnectValue meta,
-      DatabaseRef? schema,
-      Function(DatabaseRef)? onSchemaChangedCallback}) async {
-    BaseConnection? conn;
+/// 封装具体 [BaseConnection]，并统一管理 SSH 隧道生命周期。
+class ConnectionWrapper extends BaseConnection {
+  ConnectionWrapper(this._inner, {SshTunnel? sshTunnel})
+      : _sshTunnel = sshTunnel;
+
+  final BaseConnection _inner;
+  final SshTunnel? _sshTunnel;
+  bool _closed = false;
+
+  BaseConnection get inner => _inner;
+
+  SshTunnel? get sshTunnel => _sshTunnel;
+
+  static Future<ConnectionWrapper> open({
+    required DatabaseType type,
+    required ConnectValue meta,
+    DatabaseRef? schema,
+    Function(DatabaseRef)? onSchemaChangedCallback,
+  }) async {
+    ConnectionWrapper? wrapper;
+    SshTunnel? tunnel;
     try {
-      conn = switch (type) {
+      late final ConnectValue wireMeta;
+      if (type == DatabaseType.sqlite) {
+        wireMeta = meta;
+      } else {
+        final sshConfig = meta.sshTunnel;
+        if (sshConfig != null && sshConfig.enabled) {
+          tunnel = SshTunnel(
+            config: sshConfig,
+            targetHost: meta.getHost(),
+            targetPort: meta.getPort()!,
+          );
+          await tunnel.open();
+        }
+        final wireHost = tunnel?.host ?? meta.getHost();
+        final wirePort = tunnel?.port ?? meta.getPort()!;
+        wireMeta = ConnectValue(
+          name: meta.name,
+          target: ConnectTarget.network(host: wireHost, port: wirePort),
+          user: meta.user,
+          password: meta.password,
+          desc: meta.desc,
+          custom: Map<String, String>.from(meta.custom),
+          initQuerys: meta.initQuerys,
+        );
+      }
+      final inner = switch (type) {
         DatabaseType.mysql =>
-          await MySQLConnection.open(meta: meta, schema: schema),
-        DatabaseType.pg => await PGConnection.open(meta: meta, schema: schema),
+          await MySQLConnection.open(meta: wireMeta, schema: schema),
+        DatabaseType.pg =>
+          await PGConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.oracle =>
-          await OracleConnection.open(meta: meta, schema: schema),
+          await OracleConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.mssql =>
-          await MSSQLConnection.open(meta: meta, schema: schema),
+          await MSSQLConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.sqlite =>
-          await SQLiteConnection.open(meta: meta, schema: schema),
+          await SQLiteConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.redis =>
-          await RedisConnection.open(meta: meta, schema: schema),
+          await RedisConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.mongodb =>
-          await MongoConnection.open(meta: meta, schema: schema),
+          await MongoConnection.open(meta: wireMeta, schema: schema),
       };
-      conn.listen(onSchemaChangedCallback: onSchemaChangedCallback);
+      final opened = ConnectionWrapper(inner, sshTunnel: tunnel);
+      opened.listen(onSchemaChangedCallback: onSchemaChangedCallback);
 
       for (var sql in meta.initQuerys) {
-        await conn.query(sql);
+        await opened.query(sql);
       }
+      wrapper = opened;
     } catch (e) {
-      conn?.close();
+      await wrapper?.close();
+      if (wrapper == null) {
+        await tunnel?.close();
+      }
       rethrow;
     }
-    return conn;
+    return wrapper;
+  }
+
+  @override
+  bool get supportsKillQuery => _inner.supportsKillQuery;
+
+  @override
+  void listen({
+    Function()? onCloseCallback,
+    Function(DatabaseRef)? onSchemaChangedCallback,
+  }) {
+    _inner.listen(
+      onCloseCallback: onCloseCallback,
+      onSchemaChangedCallback: onSchemaChangedCallback,
+    );
+    super.listen(
+      onCloseCallback: onCloseCallback,
+      onSchemaChangedCallback: onSchemaChangedCallback,
+    );
+  }
+
+  @override
+  Future<void> ping() => _inner.ping();
+
+  @override
+  Future<void> killQuery() => _inner.killQuery();
+
+  @override
+  Stream<BaseQueryStreamItem> queryStreamInternal(String sql) =>
+      _inner.queryStreamInternal(sql);
+
+  @override
+  Future<DatabaseModeType> getDatabaseMode() => _inner.getDatabaseMode();
+
+  @override
+  Future<List<MetaDataNode>> metadata() => _inner.metadata();
+
+  @override
+  Future<List<DatabaseRef>> schemas() => _inner.schemas();
+
+  @override
+  Future<DatabaseRef?> getCurrentSchema() => _inner.getCurrentSchema();
+
+  @override
+  Future<void> setCurrentSchema(DatabaseRef schema) =>
+      _inner.setCurrentSchema(schema);
+
+  @override
+  Future<String> version() => _inner.version();
+
+  @override
+  SQLDefiner parser(String sql) => _inner.parser(sql);
+
+  @override
+  Future<void> close() async {
+    if (_closed) {
+      return;
+    }
+    _closed = true;
+    await _inner.close();
+    await _sshTunnel?.close();
   }
 }
 
@@ -52,6 +161,7 @@ List<ConnectionMeta> connectionMetas = [
     connMeta: [
       NameMeta(),
       TargetNetworkMeta(defaultPort: "3306"),
+      SshTunnelMeta(group: settingMetaGroupSshTunnel),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
@@ -70,6 +180,7 @@ List<ConnectionMeta> connectionMetas = [
       connMeta: [
         NameMeta(),
         TargetNetworkMeta(defaultPort: "5432"),
+        SshTunnelMeta(group: settingMetaGroupSshTunnel),
         UserMeta(),
         PasswordMeta(),
         DescMeta(),
@@ -103,6 +214,7 @@ List<ConnectionMeta> connectionMetas = [
     connMeta: [
       NameMeta(),
       TargetNetworkMeta(defaultPort: "1521"),
+      SshTunnelMeta(group: settingMetaGroupSshTunnel),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
@@ -122,6 +234,7 @@ List<ConnectionMeta> connectionMetas = [
     connMeta: [
       NameMeta(),
       TargetNetworkMeta(defaultPort: "1433"),
+      SshTunnelMeta(group: settingMetaGroupSshTunnel),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
@@ -176,6 +289,7 @@ List<ConnectionMeta> connectionMetas = [
     connMeta: [
       NameMeta(),
       TargetNetworkMeta(defaultPort: "6379"),
+      SshTunnelMeta(group: settingMetaGroupSshTunnel),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),
@@ -208,6 +322,7 @@ The connection driver uses mongosh-compatible shell syntax and leverages the gom
     connMeta: [
       NameMeta(),
       TargetNetworkMeta(defaultPort: '27017'),
+      SshTunnelMeta(group: settingMetaGroupSshTunnel),
       UserMeta(),
       PasswordMeta(),
       DescMeta(),

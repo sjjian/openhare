@@ -288,6 +288,70 @@
   "@db_instance_port": {
     "description": "DB instance Port"
   },
+  "db_instance_ssh_tunnel": "SSH Tunnel",
+  "@db_instance_ssh_tunnel": {
+    "description": "SSH tunnel section title"
+  },
+  "db_instance_ssh_tunnel_summary": "Connect to the database through a bastion host",
+  "@db_instance_ssh_tunnel_summary": {
+    "description": "SSH tunnel section subtitle"
+  },
+  "db_instance_ssh_tunnel_jump_host": "Bastion",
+  "@db_instance_ssh_tunnel_jump_host": {
+    "description": "SSH bastion host section label"
+  },
+  "db_instance_ssh_tunnel_auth_section": "Authentication",
+  "@db_instance_ssh_tunnel_auth_section": {
+    "description": "SSH authentication section label"
+  },
+  "db_instance_ssh_tunnel_auth_hint": "Provide a password or a private key",
+  "@db_instance_ssh_tunnel_auth_hint": {
+    "description": "SSH auth validation hint"
+  },
+  "db_instance_ssh_tunnel_or": "or",
+  "@db_instance_ssh_tunnel_or": {
+    "description": "Separator between SSH password and private key"
+  },
+  "db_instance_ssh_tunnel_enabled": "Enable SSH tunnel",
+  "@db_instance_ssh_tunnel_enabled": {
+    "description": "Whether to connect via SSH tunnel"
+  },
+  "db_instance_ssh_tunnel_host": "SSH host",
+  "@db_instance_ssh_tunnel_host": {
+    "description": "SSH bastion host"
+  },
+  "db_instance_ssh_tunnel_port": "SSH port",
+  "@db_instance_ssh_tunnel_port": {
+    "description": "SSH bastion port"
+  },
+  "db_instance_ssh_tunnel_user": "SSH user",
+  "@db_instance_ssh_tunnel_user": {
+    "description": "SSH login user"
+  },
+  "db_instance_ssh_tunnel_auth_method": "Authentication",
+  "@db_instance_ssh_tunnel_auth_method": {
+    "description": "SSH authentication method selector"
+  },
+  "db_instance_ssh_tunnel_auth_password": "Password",
+  "@db_instance_ssh_tunnel_auth_password": {
+    "description": "SSH password authentication"
+  },
+  "db_instance_ssh_tunnel_auth_private_key": "Public key",
+  "@db_instance_ssh_tunnel_auth_private_key": {
+    "description": "SSH public key authentication"
+  },
+  "db_instance_ssh_tunnel_password": "SSH password",
+  "@db_instance_ssh_tunnel_password": {
+    "description": "SSH password auth"
+  },
+  "db_instance_ssh_tunnel_private_key": "SSH private key path",
+  "@db_instance_ssh_tunnel_private_key": {
+    "description": "SSH private key file path"
+  },
+  "db_instance_ssh_tunnel_private_key_passphrase": "SSH key passphrase",
+  "@db_instance_ssh_tunnel_private_key_passphrase": {
+    "description": "Passphrase for encrypted SSH private key"
+  },
   "db_instance_user": "User",
   "@db_instance_user": {
     "description": "DB instance User"
@@ -348,13 +412,25 @@
   "@db_base_config": {
     "description": "DB base config"
   },
+  "db_base_config_desc": "Instance name, database type, and host connection settings",
+  "@db_base_config_desc": {
+    "description": "DB base config section description"
+  },
   "db_conn_params": "Params",
   "@db_conn_params": {
     "description": "DB connection variables tab label"
   },
+  "db_conn_params_desc": "Additional driver parameters as key-value pairs",
+  "@db_conn_params_desc": {
+    "description": "DB connection parameters section description"
+  },
   "db_conn_init_query": "Initialize query",
   "@db_conn_init_query": {
     "description": "DB connection initialization SQL tab label"
+  },
+  "db_conn_init_query_desc": "SQL executed once after connecting, before opening a session",
+  "@db_conn_init_query_desc": {
+    "description": "DB connection initialization SQL section description"
   },
   "field_val_msg_value_reqiured": "Value is required",
   "@field_val_msg_value_reqiured": {
@@ -847,6 +923,10 @@
   "tooltip_select_directory": "Select directory",
   "@tooltip_select_directory": {
     "description": "Tooltip select directory"
+  },
+  "tooltip_select_private_key_file": "Select private key file",
+  "@tooltip_select_private_key_file": {
+    "description": "Tooltip for SSH private key file picker"
   },
   "tooltip_ai_generate_file_name": "Use AI to auto-generate file name and description",
   "@tooltip_ai_generate_file_name": {

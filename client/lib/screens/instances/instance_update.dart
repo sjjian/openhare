@@ -32,6 +32,12 @@ class UpdateInstanceController extends AddInstanceController {
               .getHost();
           selectedDatabaseFormController.fieldControllers[settingMetaNameTargetNetworkPort]!.text =
               connectValue.getPort()?.toString() ?? "";
+        case SshTunnelMeta():
+          applySshTunnelFields(
+            selectedDatabaseFormController.fieldControllers,
+            meta: meta,
+            config: connectValue.sshTunnel,
+          );
         case TargetDBFileMeta():
           selectedDatabaseFormController.fieldControllers[meta.name]!.text = connectValue.getDbFile();
         case UserMeta():
@@ -44,7 +50,7 @@ class UpdateInstanceController extends AddInstanceController {
           selectedDatabaseFormController.fieldControllers[meta.name]!.text = connectValue.getValue(meta.name);
       }
     }
-    selectedDatabaseFormController.initQueryCodeController.text = connectValue.initQueryText();
+    selectedDatabaseFormController.initQueryController.text = connectValue.initQueryText();
   }
 
   void tryUpdateInstance(InstanceModel instance) {
@@ -64,6 +70,7 @@ class UpdateInstanceController extends AddInstanceController {
       dbType: selectedDatabaseType,
       name: connectValue.name,
       target: connectValue.target,
+      sshTunnel: connectValue.sshTunnel,
       user: connectValue.user,
       password: connectValue.password,
       desc: connectValue.desc,
@@ -152,10 +159,9 @@ class _UpdateInstanceDialogState extends ConsumerState<_UpdateInstanceDialog> {
       content: ListenableBuilder(
         listenable: updateInstanceController,
         builder: (context, _) => ListenableBuilder(
-          listenable: updateInstanceController.selectedDatabaseFormController.connectForm,
+          listenable: updateInstanceController.selectedDatabaseFormController.formValidation,
           builder: (context, _) => InstanceFormWidget(
             controller: updateInstanceController,
-            codeController: updateInstanceController.selectedDatabaseFormController.initQueryCodeController,
           ),
         ),
       ),

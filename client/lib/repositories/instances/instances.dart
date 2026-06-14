@@ -30,6 +30,9 @@ class InstanceStorage {
   /// 目的地址：目前支持 host:port 和 dbFile 两种类型
   String targetJson;
 
+  /// SSH 隧道配置，与 [targetJson] 分离存储
+  String sshTunnelJson;
+
   /// 弃用，现在都存在 target 中
   String host;
 
@@ -73,6 +76,7 @@ class InstanceStorage {
     required int stDbType,
     required this.name,
     required this.targetJson,
+    this.sshTunnelJson = "",
     required this.host,
     this.port,
     required this.user,
@@ -93,6 +97,7 @@ class InstanceStorage {
       dbType = model.dbType,
       name = model.name,
       targetJson = jsonEncode(model.connectValue.target.toJson()),
+      sshTunnelJson = model.sshTunnel != null ? jsonEncode(model.sshTunnel!.toJson()) : "",
       host = "deprecated",
       user = model.user,
       password = model.password,
@@ -118,6 +123,17 @@ class InstanceStorage {
     return ConnectTarget.network(host: "", port: 0);
   }
 
+  SshTunnelConfig? _parseSshTunnel() {
+    if (sshTunnelJson.trim().isEmpty) {
+      return null;
+    }
+    try {
+      return SshTunnelConfig.fromJson(Map<String, dynamic>.from(jsonDecode(sshTunnelJson)));
+    } catch (_) {
+      return null;
+    }
+  }
+
   InstanceModel toModel() {
     final target = _parseTarget();
     return InstanceModel(
@@ -125,6 +141,7 @@ class InstanceStorage {
       dbType: dbType,
       name: name,
       target: target,
+      sshTunnel: _parseSshTunnel(),
       user: user,
       password: password,
       desc: desc,
