@@ -175,7 +175,6 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
             Expanded(
               child: editor,
             ),
-            const PixelDivider(),
           ],
         );
       },

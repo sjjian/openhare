@@ -44,7 +44,7 @@ void main(List<String> args) async {
 
     doWhenWindowReady(() {
       log.i('window initializing');
-      const initialSize = Size(1400, 1000);
+      const initialSize = Size(1600, 1000);
       appWindow.minSize = const Size(950, 600);
       appWindow.size = initialSize;
       appWindow.alignment = Alignment.center;

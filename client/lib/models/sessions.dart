@@ -188,7 +188,6 @@ enum SQLConnectState {
 enum SQLExecuteState { init, executing, done, error, cancel }
 
 enum DrawerPage {
-  metadataTree,
   sqlResult,
   aiChat,
 }
@@ -202,6 +201,7 @@ abstract class SessionDrawerModel with _$SessionDrawerModel {
     required BaseQueryColumn? sqlColumn,
     required bool showRecord,
     required bool isRightPageOpen,
+    required bool isMetadataTreeOpen,
   }) = _SessionDrawerModel;
 }
 

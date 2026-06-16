@@ -11,12 +11,25 @@ class SessionDrawerServices extends _$SessionDrawerServices {
   SessionDrawerModel build(SessionId sessionId) {
     return SessionDrawerModel(
       sessionId: sessionId,
-      drawerPage: DrawerPage.metadataTree,
+      drawerPage: DrawerPage.aiChat,
       sqlResult: null,
       sqlColumn: null,
       showRecord: false,
       isRightPageOpen: true,
+      isMetadataTreeOpen: true,
     );
+  }
+
+  void showMetadataTree() {
+    state = state.copyWith(isMetadataTreeOpen: true);
+  }
+
+  void hideMetadataTree() {
+    state = state.copyWith(isMetadataTreeOpen: false);
+  }
+
+  void toggleMetadataTree() {
+    state = state.copyWith(isMetadataTreeOpen: !state.isMetadataTreeOpen);
   }
 
   void showRightPage() {
@@ -33,10 +46,6 @@ class SessionDrawerServices extends _$SessionDrawerServices {
       sqlColumn: column ?? state.sqlColumn,
       sqlResult: result ?? state.sqlResult,
     );
-  }
-
-  void goToTree() {
-    state = state.copyWith(drawerPage: DrawerPage.metadataTree);
   }
 
   void showChat() {

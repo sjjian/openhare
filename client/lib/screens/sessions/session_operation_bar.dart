@@ -382,6 +382,7 @@ class SessionOpBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionOpBarModel? model = ref.watch(sessionOpBarProvider);
+    final sessionDrawer = ref.watch(sessionDrawerProvider);
     if (model == null) {
       return Container(
         constraints: BoxConstraints(maxHeight: height),
@@ -395,10 +396,33 @@ class SessionOpBar extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(width: 2), // 将分割线与code editor linenumber 的分割线对齐
+          RectangleIconButton(
+            size: kIconButtonSizeMedium,
+            iconSize: kIconSizeMedium - 2, // 将icon调小点，与其他icon视觉上大小类似
+            padding: 4,
+            tooltip: AppLocalizations.of(context)!.button_tooltip_metadata_tree,
+            icon: Icons.account_tree_outlined,
+            backgroundColor: sessionDrawer.isMetadataTreeOpen
+                ? Theme.of(context)
+                      .colorScheme
+                      .primaryContainer // 元数据tree页面 icon 背景色
+                : null,
+            onPressed: () {
+              ref.read(sessionDrawerServicesProvider(sessionDrawer.sessionId).notifier).toggleMetadataTree();
+            },
+          ),
+          divider(context),
+          // schema list
+          SchemaBar(
+            instanceId: model.instanceId,
+            connId: model.connId,
+            disable: !SQLConnectState.isIdle(model.state),
+            currentSchema: model.currentSchema,
+          ),
           // connect
           connectWidget(context, ref, model),
-          SizedBox(width: 2), // 将分割线与code editor linenumber 的分割线对齐
-          divider(context),
+          // execute
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
           explainWidget(context, ref, model),
@@ -412,15 +436,6 @@ class SessionOpBar extends ConsumerWidget {
             icon: Icons.keyboard_rounded,
             onPressed: () => showSqlEditorShortcutsDialog(context, ref),
           ),
-          divider(context),
-          // schema list
-          SchemaBar(
-            instanceId: model.instanceId,
-            connId: model.connId,
-            disable: !SQLConnectState.isIdle(model.state),
-            currentSchema: model.currentSchema,
-          ),
-          // divider(context),
           const Expanded(child: SessionDrawerBar()),
         ],
       ),
@@ -790,18 +805,6 @@ class SessionDrawerBar extends ConsumerWidget {
         const Spacer(),
         if (model.isRightPageOpen) ...[
           RectangleIconButton.medium(
-            tooltip: AppLocalizations.of(context)!.button_tooltip_metadata_tree,
-            icon: Icons.account_tree_outlined,
-            backgroundColor: (model.drawerPage == DrawerPage.metadataTree)
-                ? Theme.of(context)
-                      .colorScheme
-                      .primaryContainer // 元数据tree页面 icon 背景色
-                : null,
-            onPressed: () {
-              services.goToTree();
-            },
-          ),
-          RectangleIconButton.medium(
             tooltip: AppLocalizations.of(context)!.button_tooltip_sql_result,
             icon: Icons.article_outlined,
             backgroundColor: (model.drawerPage == DrawerPage.sqlResult)
@@ -814,7 +817,10 @@ class SessionDrawerBar extends ConsumerWidget {
             },
           ),
           // AI chat
-          RectangleIconButton.medium(
+          RectangleIconButton(
+            size: kIconButtonSizeMedium,
+            iconSize: kIconSizeMedium - 2, // 将icon调小点，与其他icon视觉上大小类似
+            padding: 4,
             tooltip: AppLocalizations.of(context)!.button_tooltip_ai_chat,
             icon: Icons.auto_awesome,
             iconColor: Colors.purple[600]!,

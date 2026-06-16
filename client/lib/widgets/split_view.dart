@@ -1,3 +1,4 @@
+import 'package:client/widgets/divider.dart';
 import 'package:flutter/material.dart';
 
 /// 分割视图控制器
@@ -49,12 +50,16 @@ class SplitView extends StatefulWidget {
   final Widget second;
   final Axis axis;
 
+  /// 为 true 时 second 区域固定在 leading 侧（水平时为左侧，垂直时为顶部）
+  final bool reverse;
+
   const SplitView({
     super.key,
     required this.controller,
     required this.first,
     required this.second,
     this.axis = Axis.horizontal,
+    this.reverse = false,
   });
 
   @override
@@ -74,7 +79,7 @@ class _SplitViewState extends State<SplitView> {
 
   void _onPanUpdate(double totalSize, DragUpdateDetails details) {
     final double delta = _isHorizontal ? details.delta.dx : details.delta.dy;
-    widget.controller.applyPanSecondDelta(totalSize, delta);
+    widget.controller.applyPanSecondDelta(totalSize, widget.reverse ? -delta : delta);
   }
 
   void _onPanEnd() {
@@ -96,47 +101,47 @@ class _SplitViewState extends State<SplitView> {
 
             widget.controller.syncSecondToLayoutTotalSize(totalSize);
             final double dividerThickness = widget.controller.dividerThickness;
-            final body = [
-              // first 区域
-              Expanded(
-                child: RepaintBoundary(
-                  child: IgnorePointer(
-                    ignoring: _isDragging,
-                    child: widget.first,
+            final firstPane = Expanded(
+              child: RepaintBoundary(
+                child: IgnorePointer(
+                  ignoring: _isDragging,
+                  child: widget.first,
+                ),
+              ),
+            );
+            final divider = RepaintBoundary(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque, // 阻止事件穿透到底层
+                onPanStart: (details) => _onPanStart(),
+                onPanUpdate: (details) => _onPanUpdate(totalSize, details),
+                onPanEnd: (details) => _onPanEnd(),
+                child: SizedBox(
+                  width: _isHorizontal ? dividerThickness : double.infinity,
+                  height: _isHorizontal ? double.infinity : dividerThickness,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      _isHorizontal ? const PixelVerticalDivider() : const PixelDivider(),
+                      MouseRegion(
+                        cursor: _isHorizontal ? SystemMouseCursors.resizeColumn : SystemMouseCursors.resizeRow,
+                        child: const SizedBox.expand(),
+                      ),
+                    ],
                   ),
                 ),
               ),
-
-              // 拖动的分割线
-              RepaintBoundary(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque, // 阻止事件穿透到底层
-                  onPanStart: (details) => _onPanStart(),
-                  onPanUpdate: (details) => _onPanUpdate(totalSize, details),
-                  onPanEnd: (details) => _onPanEnd(),
-                  child: SizedBox(
-                    width: _isHorizontal ? dividerThickness : double.infinity,
-                    height: _isHorizontal ? double.infinity : dividerThickness,
-                    child: MouseRegion(
-                      cursor: _isHorizontal ? SystemMouseCursors.resizeColumn : SystemMouseCursors.resizeRow,
-                      child: const SizedBox.expand(),
-                    ),
-                  ),
+            );
+            final secondPane = SizedBox(
+              width: _isHorizontal ? widget.controller.secondSize : null,
+              height: _isHorizontal ? null : widget.controller.secondSize,
+              child: RepaintBoundary(
+                child: IgnorePointer(
+                  ignoring: _isDragging,
+                  child: widget.second,
                 ),
               ),
-
-              // second 区域
-              SizedBox(
-                width: _isHorizontal ? widget.controller.secondSize : null,
-                height: _isHorizontal ? null : widget.controller.secondSize,
-                child: RepaintBoundary(
-                  child: IgnorePointer(
-                    ignoring: _isDragging,
-                    child: widget.second,
-                  ),
-                ),
-              ),
-            ];
+            );
+            final body = widget.reverse ? [secondPane, divider, firstPane] : [firstPane, divider, secondPane];
             return _isHorizontal ? Row(children: body) : Column(children: body);
           },
         );

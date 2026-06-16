@@ -51,7 +51,7 @@ class SessionDrawerMetadata extends ConsumerWidget {
     SessionController sessionController = ref.watch(selectedSessionControllerProvider);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(kSpacingSmall - 5, kSpacingTiny, kSpacingSmall, 0),
+      padding: const EdgeInsets.fromLTRB(kSpacingTiny, kSpacingTiny, kSpacingTiny -2, 0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
