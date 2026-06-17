@@ -37,10 +37,14 @@ class SplitViewController extends ChangeNotifier {
 
   double _applySecondPanDelta(double totalSize, double delta) {
     if (totalSize <= 0) return _secondSize;
-    // 计算最大second size, 必须确保留下最小的first size.
-    final double secondMaxSize = totalSize - dividerThickness - firstMinSize;
-    final double newSecondSize = _secondSize - delta;
-    return newSecondSize.clamp(secondMinSize, secondMaxSize);
+    final double minSecond = secondMinSize;
+    final double maxSecond = totalSize - dividerThickness - firstMinSize;
+    final double requestedSecond = _secondSize - delta;
+
+    // 空间不足以同时满足 firstMinSize 与 secondMinSize
+    if (maxSecond < minSecond) return _secondSize;
+
+    return requestedSecond.clamp(minSecond, maxSecond);
   }
 }
 
@@ -53,6 +57,9 @@ class SplitView extends StatefulWidget {
   /// 为 true 时 second 区域固定在 leading 侧（水平时为左侧，垂直时为顶部）
   final bool reverse;
 
+  /// 为 false 时隐藏 second 区域与分割条，first 子树保持挂载。
+  final bool showSecond;
+
   const SplitView({
     super.key,
     required this.controller,
@@ -60,6 +67,7 @@ class SplitView extends StatefulWidget {
     required this.second,
     this.axis = Axis.horizontal,
     this.reverse = false,
+    this.showSecond = true,
   });
 
   @override
@@ -99,8 +107,12 @@ class _SplitViewState extends State<SplitView> {
             final double totalSize = (widget.axis == Axis.horizontal) ? constraints.maxWidth : constraints.maxHeight;
             if (totalSize <= 0) return const SizedBox.shrink();
 
-            widget.controller.syncSecondToLayoutTotalSize(totalSize);
-            final double dividerThickness = widget.controller.dividerThickness;
+            final showSecond = widget.showSecond;
+            if (showSecond) {
+              widget.controller.syncSecondToLayoutTotalSize(totalSize);
+            }
+            final double effectiveSecondSize = showSecond ? widget.controller.secondSize : 0;
+            final double dividerThickness = showSecond ? widget.controller.dividerThickness : 0;
             final firstPane = Expanded(
               child: RepaintBoundary(
                 child: IgnorePointer(
@@ -132,8 +144,8 @@ class _SplitViewState extends State<SplitView> {
               ),
             );
             final secondPane = SizedBox(
-              width: _isHorizontal ? widget.controller.secondSize : null,
-              height: _isHorizontal ? null : widget.controller.secondSize,
+              width: _isHorizontal ? effectiveSecondSize : null,
+              height: _isHorizontal ? null : effectiveSecondSize,
               child: RepaintBoundary(
                 child: IgnorePointer(
                   ignoring: _isDragging,
@@ -141,7 +153,11 @@ class _SplitViewState extends State<SplitView> {
                 ),
               ),
             );
-            final body = widget.reverse ? [secondPane, divider, firstPane] : [firstPane, divider, secondPane];
+            final body = !showSecond
+                ? [firstPane]
+                : widget.reverse
+                ? [secondPane, divider, firstPane]
+                : [firstPane, divider, secondPane];
             return _isHorizontal ? Row(children: body) : Column(children: body);
           },
         );

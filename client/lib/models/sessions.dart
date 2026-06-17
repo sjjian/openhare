@@ -208,8 +208,9 @@ abstract class SessionDrawerModel with _$SessionDrawerModel {
 @freezed
 abstract class SessionSplitViewModel with _$SessionSplitViewModel {
   const factory SessionSplitViewModel({
-    required SplitViewController multiSplitViewCtrl,
-    required SplitViewController metaDataSplitViewCtrl,
+    required SplitViewController editorResultSplitViewCtrl,
+    required SplitViewController rightSidebarSplitViewCtrl,
+    required SplitViewController leftSidebarSplitViewCtrl,
   }) = _SessionSplitViewModel;
 }
 

@@ -18,9 +18,9 @@ part 'session_controller.g.dart';
 
 class SessionController {
   // split
-  final SplitViewController multiSplitViewCtrl;
-  final SplitViewController metaDataSplitViewCtrl;
-  final SplitViewController metadataTreeSplitViewCtrl;
+  final SplitViewController editorResultSplitViewCtrl;
+  final SplitViewController rightSidebarSplitViewCtrl;
+  final SplitViewController leftSidebarSplitViewCtrl;
 
   // sql editor
   final CodeLineEditingController sqlEditorController;
@@ -36,9 +36,9 @@ class SessionController {
   final KeepOffestScrollController metadataTreeScrollController;
 
   SessionController({
-    required this.multiSplitViewCtrl,
-    required this.metaDataSplitViewCtrl,
-    required this.metadataTreeSplitViewCtrl,
+    required this.editorResultSplitViewCtrl,
+    required this.rightSidebarSplitViewCtrl,
+    required this.leftSidebarSplitViewCtrl,
     required this.aiChatSearchTextController,
     required this.aiChatModelSearchTextController,
     required this.chatInputController,
@@ -62,9 +62,9 @@ class SessionController {
     sqlEditorController.text = code;
 
     final controller = SessionController(
-      multiSplitViewCtrl: SplitViewController(secondSize: 500, firstMinSize: 100, secondMinSize: 140),
-      metaDataSplitViewCtrl: SplitViewController(secondSize: 400, firstMinSize: 140, secondMinSize: 360),
-      metadataTreeSplitViewCtrl: SplitViewController(secondSize: 220, firstMinSize: 200, secondMinSize: 200),
+      editorResultSplitViewCtrl: SplitViewController(secondSize: 500, firstMinSize: 100, secondMinSize: 140),
+      rightSidebarSplitViewCtrl: SplitViewController(secondSize: 400, firstMinSize: 300, secondMinSize: 360),
+      leftSidebarSplitViewCtrl: SplitViewController(secondSize: 220, firstMinSize: 720, secondMinSize: 200),
       // sql editor
       sqlEditorController: sqlEditorController,
       sqlEditorScrollController: CodeScrollController(
@@ -90,9 +90,9 @@ class SessionController {
 
   static void removeSessionController(SessionId sessionId) {
     if (cache.containsKey(sessionId)) {
-      cache[sessionId]!.multiSplitViewCtrl.dispose();
-      cache[sessionId]!.metaDataSplitViewCtrl.dispose();
-      cache[sessionId]!.metadataTreeSplitViewCtrl.dispose();
+      cache[sessionId]!.editorResultSplitViewCtrl.dispose();
+      cache[sessionId]!.rightSidebarSplitViewCtrl.dispose();
+      cache[sessionId]!.leftSidebarSplitViewCtrl.dispose();
       // sql editor
       cache[sessionId]!.sqlEditorScrollController.verticalScroller.dispose();
       cache[sessionId]!.sqlEditorScrollController.horizontalScroller.dispose();
