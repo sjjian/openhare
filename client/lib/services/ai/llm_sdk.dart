@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:client/models/ai.dart';
 import 'package:openai_dart/openai_dart.dart';
-
 import 'package:client/services/ai/tool.dart';
 
 /// 跨 Provider 的 usage 统一结构
@@ -112,7 +109,7 @@ class OpenAIProvider implements LLMProvider {
   final String systemMessage;
   final String modelName;
   final double temperature;
-  final List<ChatCompletionTool>? tools;
+  final List<Tool>? tools;
 
   /// 初始化 OpenAI Provider
   ///
@@ -125,58 +122,41 @@ class OpenAIProvider implements LLMProvider {
     this.systemMessage, {
     this.temperature = 0.7,
     List<AITool>? tools,
-  }) : _client = OpenAIClient(
-         apiKey: setting.apiKey,
+  }) : _client = OpenAIClient.withApiKey(
+         setting.apiKey,
          baseUrl: setting.baseUrl.isNotEmpty ? setting.baseUrl : null,
        ),
        modelName = setting.modelName,
-       tools = tools?.map((tool) => _convertToolToOpenAI(tool)).toList();
+       tools = tools
+           ?.map(
+             (tool) => Tool.function(
+               name: tool.name,
+               description: tool.description,
+               parameters: tool.inputJsonSchema,
+             ),
+           )
+           .toList();
 
-  /// 将 AITool 转换为 OpenAI 的 ChatCompletionTool 对象
-  ///
-  /// 这是 OpenAI Provider 特有的转换逻辑，不应该放在 AITool 接口中
-  /// 这样可以避免 AITool 依赖 OpenAI 的具体类型，符合依赖倒置原则
-  static ChatCompletionTool _convertToolToOpenAI(AITool tool) {
-    return ChatCompletionTool(
-      type: ChatCompletionToolType.function,
-      function: FunctionObject(
-        name: tool.name,
-        description: tool.description,
-        parameters: tool.inputJsonSchema,
-      ),
-    );
-  }
-
-  /// 将 AIChatMessageItem 列表转换为 ChatCompletionMessage 列表
-  ///
-  /// 使用各个模型类型的 toMessage 方法进行转换
-  List<ChatCompletionMessage> _buildChatMessages(Iterable<AIChatMessageItem> items) {
-    final chatMessages = <ChatCompletionMessage>[];
+  /// 将 AIChatMessageItem 列表转换为 ChatMessage 列表
+  List<ChatMessage> _buildChatMessages(Iterable<AIChatMessageItem> items) {
+    final chatMessages = <ChatMessage>[];
     if (systemMessage.trim().isNotEmpty) {
-      chatMessages.add(ChatCompletionMessage.system(content: systemMessage));
+      chatMessages.add(ChatMessage.system(systemMessage));
     }
     for (final item in items) {
       item.map(
         userMessage: (v) {
           final s = v.message.toMessage();
-          chatMessages.add(
-            ChatCompletionMessage.user(
-              content: ChatCompletionUserMessageContent.string(s),
-            ),
-          );
+          chatMessages.add(ChatMessage.user(s));
         },
         assistantMessage: (v) {
           final s = v.message.toMessage();
-          chatMessages.add(ChatCompletionMessage.assistant(content: s));
+          chatMessages.add(ChatMessage.assistant(content: s));
         },
         toolsResult: (v) {
           final s = v.toolsResult.toMessage();
           if (s.isNotEmpty) {
-            chatMessages.add(
-              ChatCompletionMessage.user(
-                content: ChatCompletionUserMessageContent.string(s),
-              ),
-            );
+            chatMessages.add(ChatMessage.user(s));
           }
         },
       );
@@ -184,202 +164,114 @@ class OpenAIProvider implements LLMProvider {
     return chatMessages;
   }
 
-  /// 处理工具调用累积并转换为 AIChatMessageToolCall 列表
-  ///
-  /// [toolCalls] 流式响应中的工具调用 chunk 列表
-  /// [toolCallAccumulators] 工具调用累积器 Map，key 是 index，value 是包含 id、name、arguments 的 Map
-  ///
-  /// 返回转换后的工具调用列表，如果没有完成的工具调用则返回 null
-  List<AIChatMessageToolCall>? _buildToolCalls(
-    dynamic toolCalls,
-    Map<int, Map<String, String>> toolCallAccumulators,
-  ) {
-    if (toolCalls == null || toolCalls.isEmpty) {
+  List<AIChatMessageToolCall>? _convertToolCalls(List<ToolCall> toolCalls) {
+    if (toolCalls.isEmpty) {
       return null;
     }
-
-    // 累积工具调用数据
-    for (final toolCallChunk in toolCalls) {
-      final index = toolCallChunk.index ?? 0;
-
-      if (!toolCallAccumulators.containsKey(index)) {
-        toolCallAccumulators[index] = {
-          'id': '',
-          'name': '',
-          'arguments': '',
-        };
+    final converted = toolCalls.map((tc) {
+      try {
+        return AIChatMessageToolCall(
+          name: tc.function.name,
+          arguments: tc.function.argumentsMap,
+        );
+      } catch (_) {
+        return AIChatMessageToolCall(
+          name: tc.function.name,
+          arguments: <String, dynamic>{},
+        );
       }
-
-      final accumulator = toolCallAccumulators[index]!;
-
-      // 累积工具调用数据
-      if (toolCallChunk.id != null) {
-        accumulator['id'] = toolCallChunk.id!;
-      }
-      if (toolCallChunk.function?.name != null) {
-        accumulator['name'] = toolCallChunk.function!.name!;
-      }
-      if (toolCallChunk.function?.arguments != null) {
-        accumulator['arguments'] = accumulator['arguments']! + toolCallChunk.function!.arguments!;
-      }
-    }
-
-    // 如果有工具调用数据，转换为 AIChatMessageToolCall
-    if (toolCallAccumulators.isEmpty) {
-      return null;
-    }
-
-    final convertedToolCalls = toolCallAccumulators.values
-        .where((acc) => acc['name']!.isNotEmpty) // 只包含已完成的工具调用
-        .map((acc) {
-          try {
-            final arguments = jsonDecode(acc['arguments']!) as Map<String, dynamic>;
-            return AIChatMessageToolCall(
-              name: acc['name']!,
-              arguments: arguments,
-            );
-          } catch (e) {
-            // 如果解析失败，返回空 arguments
-            return AIChatMessageToolCall(
-              name: acc['name']!,
-              arguments: {},
-            );
-          }
-        })
-        .toList();
-
-    return convertedToolCalls.isNotEmpty ? convertedToolCalls : null;
+    }).toList();
+    return converted.isNotEmpty ? converted : null;
   }
 
-  /// 从流式响应的 delta 构建增量 ChatResult
-  ///
-  /// [delta] 流式响应的增量数据
-  /// [toolCallAccumulators] 工具调用累积器 Map，key 是 index，value 是包含 id、name、arguments 的 Map
-  ///
-  /// 返回增量 ChatResult，如果没有新数据则返回 null
-  ChatResult? _buildChatResult(
-    ChatCompletionStreamResponseDelta delta,
-    Map<int, Map<String, String>> toolCallAccumulators,
-  ) {
-    // 提取增量内容
-    String? incrementalContent;
-    String? incrementalThinking;
-
-    // 累积思考过程：可能来自 reasoning_content（DeepSeek R1、vLLM）或 reasoning（OpenRouter）
-    incrementalThinking = delta.reasoningContent ?? delta.reasoning;
-
-    // 累积内容
-    if (delta.content != null) {
-      incrementalContent = delta.content!;
-    }
-
-    // 处理工具调用
-    final convertedToolCalls = _buildToolCalls(delta.toolCalls, toolCallAccumulators);
-
-    // 只要有新的 delta（content、thinking 或 toolCalls），就返回增量结果
-    final hasNewData =
-        incrementalContent != null ||
-        incrementalThinking != null ||
-        (delta.toolCalls != null && delta.toolCalls!.isNotEmpty);
-
-    if (!hasNewData) {
+  ChatUsage? _toChatUsage(Usage? usage) {
+    if (usage == null) {
       return null;
     }
+    return ChatUsage(
+      promptTokens: usage.promptTokens,
+      completionTokens: usage.completionTokens,
+      totalTokens: usage.totalTokens,
+    );
+  }
 
+  String? _extractThinking(AssistantMessage msg) {
+    return msg.reasoningContent ?? msg.reasoning;
+  }
+
+  String? _extractThinkingFromAccumulator(ChatStreamAccumulator accumulator) {
+    if (accumulator.hasReasoningContent) {
+      final reasoning = accumulator.reasoningContent;
+      if (reasoning.isNotEmpty) {
+        return reasoning;
+      }
+      final summary = accumulator.reasoning;
+      if (summary.isNotEmpty) {
+        return summary;
+      }
+    }
+    return null;
+  }
+
+  ChatResult _accumulatorToChatResult(ChatStreamAccumulator accumulator) {
     return ChatResult(
-      content: incrementalContent ?? '',
-      toolCalls: convertedToolCalls,
-      thinking: incrementalThinking,
+      content: accumulator.content,
+      toolCalls: accumulator.hasToolCalls ? _convertToolCalls(accumulator.toolCalls) : null,
+      thinking: _extractThinkingFromAccumulator(accumulator),
+      usage: _toChatUsage(accumulator.usage),
+    );
+  }
+
+  ChatResult _messageToChatResult(AssistantMessage msg) {
+    return ChatResult(
+      content: msg.content ?? '',
+      toolCalls: msg.hasToolCalls ? _convertToolCalls(msg.toolCalls!) : null,
+      thinking: _extractThinking(msg),
+    );
+  }
+
+  ChatCompletionCreateRequest _buildRequest(
+    Iterable<AIChatMessageItem> messages, {
+    bool includeStreamUsage = false,
+  }) {
+    return ChatCompletionCreateRequest(
+      model: modelName,
+      messages: _buildChatMessages(messages),
+      temperature: temperature,
+      tools: tools,
+      streamOptions: includeStreamUsage ? const StreamOptions(includeUsage: true) : null,
     );
   }
 
   @override
   Stream<ChatResult> stream(Iterable<AIChatMessageItem> messages) async* {
     try {
-      final request = CreateChatCompletionRequest(
-        model: ChatCompletionModel.modelId(modelName),
-        messages: _buildChatMessages(messages),
-        temperature: temperature,
-        tools: tools,
-        stream: true,
-        streamOptions: const ChatCompletionStreamOptions(includeUsage: true),
+      final stream = _client.chat.completions.createStream(
+        _buildRequest(messages, includeStreamUsage: true),
       );
+      final accumulator = ChatStreamAccumulator();
 
-      final stream = _client.createChatCompletionStream(request: request);
-
-      // 累积的完整结果
-      ChatResult accumulatedResult = ChatResult(content: '');
-      // 用于累积工具调用的 Map，key 是 index，value 是包含 id、name、arguments 的 Map
-      final Map<int, Map<String, String>> toolCallAccumulators = {};
-
-      await for (final response in stream) {
-        // usage：当 include_usage=true 时，最后会额外推一个仅含 usage 的 chunk（choices 为空）
-        if (response.usage != null) {
-          accumulatedResult = accumulatedResult.concat(
-            ChatResult(
-              content: '',
-              usage: ChatUsage(
-                promptTokens: response.usage?.promptTokens,
-                completionTokens: response.usage?.completionTokens,
-                totalTokens: response.usage?.totalTokens,
-              ),
-            ),
-          );
-          yield accumulatedResult;
-        }
-
-        if (response.choices != null && response.choices!.isNotEmpty) {
-          final choice = response.choices!.first;
-
-          if (choice.delta != null) {
-            // 使用 _buildChatResult 方法构建增量结果
-            final incrementalResult = _buildChatResult(choice.delta!, toolCallAccumulators);
-
-            if (incrementalResult != null) {
-              // 使用 concat 合并增量结果（会自动处理 content、thinking 和 toolCalls 的累积）
-              accumulatedResult = accumulatedResult.concat(incrementalResult);
-
-              yield accumulatedResult;
-            }
-          }
-        }
+      await for (final event in stream) {
+        accumulator.add(event);
+        yield _accumulatorToChatResult(accumulator);
       }
     } catch (e, st) {
       yield* Stream.error(e, st);
     }
   }
 
-  /// 将非流式响应的 message 转为 ChatResult
-  ChatResult _messageToChatResult(ChatCompletionAssistantMessage msg) {
-    final toolCalls = msg.toolCalls?.map((tc) {
-      try {
-        final args = jsonDecode(tc.function.arguments) as Map<String, dynamic>;
-        return AIChatMessageToolCall(name: tc.function.name, arguments: args);
-      } catch (_) {
-        return AIChatMessageToolCall(name: tc.function.name, arguments: <String, dynamic>{});
-      }
-    }).toList();
-    return ChatResult(
-      content: msg.content ?? '',
-      toolCalls: toolCalls?.isNotEmpty == true ? toolCalls : null,
-      // 思考过程可能来自 reasoning_content（DeepSeek R1、vLLM）或 reasoning（OpenRouter）
-      thinking: msg.reasoningContent ?? msg.reasoning,
-    );
-  }
-
   @override
   Future<ChatResult> call(Iterable<AIChatMessageItem> messages) async {
     try {
-      final request = CreateChatCompletionRequest(
-        model: ChatCompletionModel.modelId(modelName),
-        messages: _buildChatMessages(messages),
-        temperature: temperature,
-        tools: tools,
-      );
-
-      final response = await _client.createChatCompletion(request: request);
+      final response = await _client.chat.completions.create(_buildRequest(messages));
       if (response.choices.isNotEmpty) {
-        return _messageToChatResult(response.choices.first.message);
+        final result = _messageToChatResult(response.choices.first.message);
+        return ChatResult(
+          content: result.content,
+          toolCalls: result.toolCalls,
+          thinking: result.thinking,
+          usage: _toChatUsage(response.usage),
+        );
       }
       return ChatResult(content: '');
     } catch (e) {
@@ -389,6 +281,6 @@ class OpenAIProvider implements LLMProvider {
 
   @override
   void dispose() {
-    _client.endSession();
+    _client.close();
   }
 }
