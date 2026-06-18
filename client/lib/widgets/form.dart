@@ -184,11 +184,11 @@ class TrackedTextFormField extends TrackedFormFieldWidget {
     final radius = BorderRadius.circular(4);
     final enabledBorder = OutlineInputBorder(
       borderRadius: radius,
-      borderSide: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.85)),
+      borderSide: BorderSide(color: cs.outlineVariant),
     );
     final focusedBorder = OutlineInputBorder(
       borderRadius: radius,
-      borderSide: BorderSide(color: cs.primary, width: 1.2),
+      borderSide: BorderSide(color: cs.primary),
     );
     final errorBorder = OutlineInputBorder(
       borderRadius: radius,
@@ -198,23 +198,11 @@ class TrackedTextFormField extends TrackedFormFieldWidget {
       isDense: true,
       isCollapsed: false,
       filled: true,
-      fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.28),
+      fillColor: cs.surfaceContainerLow,
       hintText: hintText,
-      contentPadding:
-          contentPadding ??
-          (suffixIcon != null
-              ? const EdgeInsets.fromLTRB(10, 8, 4, 8)
-              : const EdgeInsets.symmetric(horizontal: 10, vertical: 10)),
+      contentPadding: contentPadding,
       helperText: helperText,
       suffixIcon: suffixIcon,
-      suffixIconConstraints: suffixIcon != null
-          ? const BoxConstraints(
-              minWidth: kIconButtonSizeTiny,
-              maxWidth: kIconButtonSizeTiny,
-              minHeight: kIconButtonSizeTiny,
-              maxHeight: kIconButtonSizeTiny,
-            )
-          : null,
       border: enabledBorder,
       enabledBorder: enabledBorder,
       focusedBorder: focusedBorder,
@@ -383,7 +371,10 @@ class TrackedFilePathFormField extends TrackedTextFormField {
     if (readOnly) {
       return null;
     }
-    return RectangleIconButton.tiny(
+    return RectangleIconButton(
+      size: kIconButtonSizeSmall,
+      iconSize: kIconSizeSmall,
+      padding: 6,
       icon: Icons.folder_open,
       tooltip: pickTooltip,
       iconColor: Theme.of(context).colorScheme.primary,
