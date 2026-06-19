@@ -26,11 +26,11 @@ openhare is an AI-powered, cross-platform desktop SQL client with multi-database
 1. [How to Install and Update the Application](https://github.com/sjjian/openhare/discussions/76)
 
 ## Key Features
-- **AI-Powered Assistance**: Now with enhanced AI features to help you write, optimize, and understand SQL queries.
-- **Cross-Platform**: Seamlessly runs on Windows, macOS, and Linux.
-- **Fully Open Source**: Licensed under the [Apache License 2.0](./LICENSE), openhare is transparent and community-driven.
-- **Simple & Intuitive UI**: Modern interface focused on ease of use and productivity.
-- **Multi-Database Support**: Effortlessly connect to and manage various SQL databases.
+- **Lightweight & Native**: Download, install, and run in seconds — no WebView or bundled browser engine. Built with Flutter for a native desktop UI and a lean memory footprint.
+- **AI-Powered Assistance**: Write, optimize, and understand SQL with built-in AI — high-risk statements are flagged and require your confirmation before execution.
+- **Multi-Database Support**: Connect to MySQL, PostgreSQL, SQL Server, SQLite, Oracle, MongoDB, Redis, and more.
+- **Cross-Platform**: Native experience on Windows, macOS, and Linux.
+- **Fully Open Source**: Licensed under the [Apache License 2.0](./LICENSE) — transparent and community-driven.
 
 ## Database
 

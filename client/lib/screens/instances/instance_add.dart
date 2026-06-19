@@ -7,28 +7,109 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sql_editor/re_editor.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sql_parser/parser.dart';
-import 'package:client/widgets/sql_highlight.dart';
 import 'package:client/l10n/app_localizations.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:client/widgets/anchor_tab_scroll.dart';
 import 'package:client/widgets/form.dart';
+import 'package:client/widgets/sql_highlight.dart';
+
+const _sshTunnelFieldNames = [
+  settingMetaNameSshTunnel,
+  settingMetaNameSshTunnelHost,
+  settingMetaNameSshTunnelPort,
+  settingMetaNameSshTunnelUser,
+  settingMetaNameSshTunnelAuthMethod,
+  settingMetaNameSshTunnelPassword,
+  settingMetaNameSshTunnelPrivateKeyPath,
+  settingMetaNameSshTunnelPrivateKeyPassphrase,
+];
+
+Map<String, String> fieldToGroupFor(DatabaseType type) {
+  final map = <String, String>{};
+  for (final meta in getConnMetas(type)) {
+    switch (meta) {
+      case NameMeta():
+        map[settingMetaNameName] = meta.group;
+      case TargetNetworkMeta():
+        map[settingMetaNameTargetNetworkHost] = meta.group;
+        map[settingMetaNameTargetNetworkPort] = meta.group;
+      case SshTunnelMeta():
+        for (final name in _sshTunnelFieldNames) {
+          map[name] = meta.group;
+        }
+      case TargetDBFileMeta():
+        map[settingMetaNameTargetDBFile] = meta.group;
+      case UserMeta():
+        map[settingMetaNameUser] = meta.group;
+      case PasswordMeta():
+        map[settingMetaNamePassword] = meta.group;
+      case DescMeta():
+        map[settingMetaNameDesc] = meta.group;
+      case CustomMeta():
+        map[meta.name] = meta.group;
+    }
+  }
+  map[settingMetaGroupInitQuery] = settingMetaGroupInitQuery;
+  return map;
+}
+
+void applySshTunnelFields(
+  Map<String, TextEditingController> fields, {
+  required SshTunnelMeta meta,
+  SshTunnelConfig? config,
+}) {
+  final template = config ?? meta.template;
+  fields[settingMetaNameSshTunnel]?.text = template.enabled ? "true" : "false";
+  fields[settingMetaNameSshTunnelHost]?.text = template.host;
+  fields[settingMetaNameSshTunnelPort]?.text = template.port.toString();
+  fields[settingMetaNameSshTunnelUser]?.text = template.user;
+  fields[settingMetaNameSshTunnelAuthMethod]?.text = sshTunnelAuthMethodToValue(resolveSshTunnelAuthMethod(template));
+  fields[settingMetaNameSshTunnelPassword]?.text = template.password ?? "";
+  fields[settingMetaNameSshTunnelPrivateKeyPath]?.text = template.privateKeyPath ?? "";
+  fields[settingMetaNameSshTunnelPrivateKeyPassphrase]?.text = template.privateKeyPassphrase ?? "";
+}
 
 class DatabaseFormController {
   final DatabaseType databaseType;
+  final Map<String, String> fieldToGroup;
   final Map<String, TextEditingController> fieldControllers = {};
-  final TrackedFormController connectForm = TrackedFormController();
-  late final CodeLineEditingController initQueryCodeController;
+  final TrackedFormValidationController formValidation = TrackedFormValidationController();
+  late final SqlHighlightTextEditingController initQueryController;
+
+  DatabaseFormController(this.databaseType) : fieldToGroup = fieldToGroupFor(databaseType) {
+    for (final meta in connectionMetaMap[databaseType]!.connMeta) {
+      if (meta is TargetNetworkMeta) {
+        fieldControllers[settingMetaNameTargetNetworkHost] = TextEditingController(text: meta.defaultValue ?? "");
+        fieldControllers[settingMetaNameTargetNetworkPort] = TextEditingController(text: meta.defaultPort ?? "");
+      } else if (meta is SshTunnelMeta) {
+        fieldControllers[settingMetaNameSshTunnel] = TextEditingController();
+        fieldControllers[settingMetaNameSshTunnelHost] = TextEditingController();
+        fieldControllers[settingMetaNameSshTunnelPort] = TextEditingController();
+        fieldControllers[settingMetaNameSshTunnelUser] = TextEditingController();
+        fieldControllers[settingMetaNameSshTunnelAuthMethod] = TextEditingController();
+        fieldControllers[settingMetaNameSshTunnelPassword] = TextEditingController();
+        fieldControllers[settingMetaNameSshTunnelPrivateKeyPath] = TextEditingController();
+        fieldControllers[settingMetaNameSshTunnelPrivateKeyPassphrase] = TextEditingController();
+        applySshTunnelFields(fieldControllers, meta: meta);
+      } else {
+        fieldControllers[meta.name] = TextEditingController(text: meta.defaultValue ?? "");
+      }
+    }
+    initQueryController = SqlHighlightTextEditingController(
+      dialectType: databaseType.dialectType,
+      text: connectionMetaMap[databaseType]!.initQueryText(),
+    );
+  }
 
   void dispose() {
     for (final c in fieldControllers.values) {
       c.dispose();
     }
-    initQueryCodeController.dispose();
-    connectForm.dispose();
+    initQueryController.dispose();
+    formValidation.dispose();
   }
 
   void reset() {
@@ -36,34 +117,17 @@ class DatabaseFormController {
       if (meta is TargetNetworkMeta) {
         fieldControllers[settingMetaNameTargetNetworkHost]?.text = meta.defaultValue ?? "";
         fieldControllers[settingMetaNameTargetNetworkPort]?.text = meta.defaultPort ?? "";
+      } else if (meta is SshTunnelMeta) {
+        applySshTunnelFields(fieldControllers, meta: meta);
       } else {
         fieldControllers[meta.name]?.text = meta.defaultValue ?? "";
       }
     }
-    initQueryCodeController.text = connectionMetaMap[databaseType]!.initQueryText();
-    connectForm.resetInvalidGroups();
+    initQueryController.text = connectionMetaMap[databaseType]!.initQueryText();
+    formValidation.clearInvalidFields();
   }
 
-  DatabaseFormController(this.databaseType) {
-    for (final meta in connectionMetaMap[databaseType]!.connMeta) {
-      if (meta is TargetNetworkMeta) {
-        fieldControllers[settingMetaNameTargetNetworkHost] = TextEditingController(text: meta.defaultValue ?? "");
-        fieldControllers[settingMetaNameTargetNetworkPort] = TextEditingController(text: meta.defaultPort ?? "");
-      } else {
-        fieldControllers[meta.name] = TextEditingController(text: meta.defaultValue ?? "");
-      }
-    }
-    initQueryCodeController = CodeLineEditingController(
-      spanBuilder: ({required codeLines, required context, required style}) {
-        return getSQLHighlightTextSpan(
-          databaseType.dialectType,
-          codeLines.asString(TextLineBreak.lf),
-          defalutStyle: style,
-        );
-      },
-    );
-    initQueryCodeController.text = connectionMetaMap[databaseType]!.initQueryText();
-  }
+  bool isGroupInvalid(String groupId) => formValidation.invalidFieldNames.any((name) => fieldToGroup[name] == groupId);
 }
 
 class AddInstanceController extends ChangeNotifier {
@@ -73,7 +137,7 @@ class AddInstanceController extends ChangeNotifier {
 
   DatabaseFormController get selectedDatabaseFormController => databaseFormControllers[selectedDatabaseType]!;
 
-  bool validateForm() => selectedDatabaseFormController.connectForm.validate();
+  bool validateForm() => selectedDatabaseFormController.formValidation.validate();
 
   @override
   void dispose() {
@@ -123,6 +187,31 @@ class AddInstanceController extends ChangeNotifier {
     notifyListeners();
   }
 
+  SshTunnelConfig? _parseSshTunnel(
+    Map<String, TextEditingController> fields, {
+    SshTunnelMeta? meta,
+  }) {
+    final template = meta?.template ?? kDefaultSshTunnelTemplate;
+    final authMethod = sshTunnelAuthMethodFromValue(
+      fields[settingMetaNameSshTunnelAuthMethod]?.text,
+    );
+    final password = fields[settingMetaNameSshTunnelPassword]?.text ?? "";
+    final privateKeyPath = fields[settingMetaNameSshTunnelPrivateKeyPath]?.text.trim() ?? "";
+    final privateKeyPassphrase = fields[settingMetaNameSshTunnelPrivateKeyPassphrase]?.text ?? "";
+    return SshTunnelConfig(
+      enabled: fields[settingMetaNameSshTunnel]?.text.trim().toLowerCase() == "true",
+      host: fields[settingMetaNameSshTunnelHost]?.text.trim() ?? template.host,
+      port: int.tryParse(fields[settingMetaNameSshTunnelPort]?.text.trim() ?? "") ?? template.port,
+      user: fields[settingMetaNameSshTunnelUser]?.text.trim() ?? template.user,
+      authMethod: authMethod,
+      password: authMethod == SshTunnelAuthMethod.password && password.isNotEmpty ? password : null,
+      privateKeyPath: authMethod == SshTunnelAuthMethod.privateKey && privateKeyPath.isNotEmpty ? privateKeyPath : null,
+      privateKeyPassphrase: authMethod == SshTunnelAuthMethod.privateKey && privateKeyPassphrase.isNotEmpty
+          ? privateKeyPassphrase
+          : null,
+    );
+  }
+
   ConnectValue getConnectValue() {
     String name = "";
     String addr = "";
@@ -134,7 +223,7 @@ class AddInstanceController extends ChangeNotifier {
     Map<String, String> custom = {};
 
     final controller = selectedDatabaseFormController;
-    final initCode = controller.initQueryCodeController;
+    final initQuery = controller.initQueryController;
     final fields = controller.fieldControllers;
     for (final meta in getConnMetas(selectedDatabaseType)) {
       switch (meta) {
@@ -147,6 +236,8 @@ class AddInstanceController extends ChangeNotifier {
           final text = fields[meta.name]!.text;
           dbFile = text;
           addr = dbFile;
+        case SshTunnelMeta():
+          break;
         case UserMeta():
           user = fields[meta.name]!.text;
         case PasswordMeta():
@@ -159,8 +250,10 @@ class AddInstanceController extends ChangeNotifier {
     }
     List<String> querys = splitSQL(
       selectedDatabaseType.dialectType,
-      initCode.text.trim(),
+      initQuery.text.trim(),
     ).map((e) => e.content.trim()).whereNot((e) => e.trim() == "").toList();
+    final sshMeta = getConnMetas(selectedDatabaseType).whereType<SshTunnelMeta>().firstOrNull;
+    final sshTunnel = dbFile.isEmpty ? _parseSshTunnel(fields, meta: sshMeta) : null;
     final target = dbFile.isNotEmpty
         ? ConnectTarget.dbFile(dbFile: dbFile)
         : ConnectTarget.network(host: addr, port: port ?? 0);
@@ -172,6 +265,7 @@ class AddInstanceController extends ChangeNotifier {
       desc: desc,
       custom: custom,
       initQuerys: querys,
+      sshTunnel: sshTunnel,
     );
   }
 
@@ -181,7 +275,7 @@ class AddInstanceController extends ChangeNotifier {
     try {
       isDatabasePingDoing = true;
       notifyListeners();
-      conn = await ConnectionFactory.open(type: selectedDatabaseType, meta: connectValue);
+      conn = await ConnectionWrapper.open(type: selectedDatabaseType, meta: connectValue);
       isDatabaseConnectable = true;
       databaseConnectError = null;
       conn.close();
@@ -202,6 +296,7 @@ class AddInstanceController extends ChangeNotifier {
       dbType: selectedDatabaseType,
       name: connectValue.name,
       target: connectValue.target,
+      sshTunnel: connectValue.sshTunnel,
       user: connectValue.user,
       password: connectValue.password,
       desc: connectValue.desc,
@@ -362,7 +457,7 @@ class _AddInstanceWizardStep2 extends ConsumerWidget {
       body: ListenableBuilder(
         listenable: addInstanceController,
         builder: (context, _) => ListenableBuilder(
-          listenable: addInstanceController.selectedDatabaseFormController.connectForm,
+          listenable: addInstanceController.selectedDatabaseFormController.formValidation,
           builder: (context, _) => InstanceFormWidget.forAddInstanceWizard(),
         ),
       ),
@@ -437,44 +532,57 @@ class _DatabaseTypeCardState extends State<DatabaseTypeCard> {
 
 class InstanceFormWidget extends StatelessWidget {
   final AddInstanceController controller;
-  final CodeLineEditingController codeController;
 
   const InstanceFormWidget({
     super.key,
     required this.controller,
-    required this.codeController,
   });
 
   factory InstanceFormWidget.forAddInstanceWizard() {
-    final c = addInstanceController;
-    return InstanceFormWidget(
-      controller: c,
-      codeController: c.selectedDatabaseFormController.initQueryCodeController,
-    );
+    return InstanceFormWidget(controller: addInstanceController);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = controller;
-    // Tab 顺序由 [groupId] 首次出现顺序决定；每个 meta 一行；初始化 SQL 固定追加在末尾。
-    final children = <Widget>[];
+    final fc = c.selectedDatabaseFormController;
+    final sections = <String, List<Widget>>{};
+    void addSectionWidget(String sectionId, Widget widget) {
+      sections.putIfAbsent(sectionId, () => []);
+      sections[sectionId]!.add(widget);
+    }
+
+    final sectionTabLabels = {
+      settingMetaGroupBase: l10n.db_base_config,
+      settingMetaGroupSshTunnel: l10n.db_instance_ssh_tunnel,
+      settingMetaGroupParams: l10n.db_conn_params,
+      settingMetaGroupInitQuery: l10n.db_conn_init_query,
+    };
+    final sectionTabDescriptions = {
+      settingMetaGroupBase: l10n.db_base_config_desc,
+      settingMetaGroupSshTunnel: l10n.db_instance_ssh_tunnel_summary,
+      settingMetaGroupParams: l10n.db_conn_params_desc,
+      settingMetaGroupInitQuery: l10n.db_conn_init_query_desc,
+    };
     for (final meta in getConnMetas(c.selectedDatabaseType)) {
       switch (meta) {
         case NameMeta():
-          children.add(
+          addSectionWidget(
+            meta.group,
             TrackedTextFormField(
+              validationController: fc.formValidation,
               fieldName: settingMetaNameName,
-              groupId: meta.group,
               label: l10n.db_instance_name,
               isRequired: true,
               controller: c.selectedDatabaseFormController.fieldControllers[settingMetaNameName]!,
             ),
           );
         case TargetNetworkMeta():
-          children.add(
+          addSectionWidget(
+            meta.group,
             TrackedHostPortFields(
-              groupId: meta.group,
+              validationController: fc.formValidation,
               hostFieldName: settingMetaNameTargetNetworkHost,
               hostController: c.selectedDatabaseFormController.fieldControllers[settingMetaNameTargetNetworkHost]!,
               hostLabel: l10n.db_instance_host,
@@ -485,11 +593,20 @@ class InstanceFormWidget extends StatelessWidget {
               portRequired: true,
             ),
           );
+        case SshTunnelMeta():
+          addSectionWidget(
+            meta.group,
+            _InstanceSshTunnelFields(
+              validationController: fc.formValidation,
+              fields: c.selectedDatabaseFormController.fieldControllers,
+            ),
+          );
         case TargetDBFileMeta():
-          children.add(
+          addSectionWidget(
+            meta.group,
             TrackedFilePathFormField(
+              validationController: fc.formValidation,
               fieldName: settingMetaNameTargetDBFile,
-              groupId: meta.group,
               isRequired: true,
               label: 'Path',
               controller: c.selectedDatabaseFormController.fieldControllers[settingMetaNameTargetDBFile]!,
@@ -497,28 +614,31 @@ class InstanceFormWidget extends StatelessWidget {
             ),
           );
         case UserMeta():
-          children.add(
+          addSectionWidget(
+            meta.group,
             TrackedTextFormField(
+              validationController: fc.formValidation,
               fieldName: settingMetaNameUser,
-              groupId: meta.group,
               label: l10n.db_instance_user,
               controller: c.selectedDatabaseFormController.fieldControllers[settingMetaNameUser]!,
             ),
           );
         case PasswordMeta():
-          children.add(
+          addSectionWidget(
+            meta.group,
             TrackedPasswordFormField(
+              validationController: fc.formValidation,
               fieldName: settingMetaNamePassword,
-              groupId: meta.group,
               label: l10n.db_instance_password,
               controller: c.selectedDatabaseFormController.fieldControllers[settingMetaNamePassword]!,
             ),
           );
         case DescMeta():
-          children.add(
+          addSectionWidget(
+            meta.group,
             TrackedDescFormField(
+              validationController: fc.formValidation,
               fieldName: settingMetaNameDesc,
-              groupId: meta.group,
               label: l10n.db_instance_desc,
               controller: c.selectedDatabaseFormController.fieldControllers[settingMetaNameDesc]!,
             ),
@@ -526,11 +646,12 @@ class InstanceFormWidget extends StatelessWidget {
         case CustomMeta():
           final useEnum =
               meta.type == SettingMetaType.enumValue && meta.enumValues != null && meta.enumValues!.isNotEmpty;
-          children.add(
+          addSectionWidget(
+            meta.group,
             useEnum
                 ? TrackedEnumFormField(
+                    validationController: fc.formValidation,
                     fieldName: meta.name,
-                    groupId: meta.group,
                     isRequired: meta.isRequired,
                     label: meta.name,
                     controller: c.selectedDatabaseFormController.fieldControllers[meta.name]!,
@@ -539,8 +660,8 @@ class InstanceFormWidget extends StatelessWidget {
                     helperText: meta.comment,
                   )
                 : TrackedTextFormField(
+                    validationController: fc.formValidation,
                     fieldName: meta.name,
-                    groupId: meta.group,
                     isRequired: meta.isRequired,
                     label: meta.name,
                     controller: c.selectedDatabaseFormController.fieldControllers[meta.name]!,
@@ -548,52 +669,172 @@ class InstanceFormWidget extends StatelessWidget {
           );
       }
     }
-    children.add(
-      TrackedCodeEditorFormField(
+    addSectionWidget(
+      settingMetaGroupInitQuery,
+      TrackedTextFormField(
+        validationController: fc.formValidation,
         fieldName: settingMetaGroupInitQuery,
-        groupId: settingMetaGroupInitQuery,
-        codeController: codeController,
-        child: Padding(
-          padding: const EdgeInsets.all(kSpacingSmall),
-          child: SizedBox(
-            height: 420,
-            child: Container(
-              constraints: const BoxConstraints(maxHeight: 430),
-              child: CodeEditor(
-                borderRadius: BorderRadius.circular(10),
-                style: CodeEditorStyle(
-                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                  textStyle: GoogleFonts.robotoMono(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                indicatorBuilder: (context, editingController, chunkController, notifier) {
-                  return Row(
-                    children: [
-                      DefaultCodeLineNumber(
-                        controller: editingController,
-                        notifier: notifier,
-                      ),
-                      DefaultCodeChunkIndicator(width: 20, controller: chunkController, notifier: notifier),
-                    ],
-                  );
-                },
-                controller: codeController,
-                wordWrap: false,
-              ),
-            ),
-          ),
-        ),
+        label: l10n.db_conn_init_query,
+        controller: fc.initQueryController,
+        maxLines: 24,
+        minHeight: 360,
+        contentPadding: const EdgeInsets.all(kSpacingSmall),
       ),
     );
-    return TrackedForm.tabbed(
-      controller: c.selectedDatabaseFormController.connectForm,
-      tabLabels: {
-        settingMetaGroupBase: l10n.db_base_config,
-        settingMetaGroupParams: l10n.db_conn_params,
-        settingMetaGroupInitQuery: l10n.db_conn_init_query,
-      },
-      children: children,
+    final cs = Theme.of(context).colorScheme;
+    return AnchorTabScrollLayout(
+      sections: [
+        for (final id in sections.keys)
+          AnchorTabSection(
+            id: id,
+            label: sectionTabLabels[id]!,
+            description: sectionTabDescriptions[id],
+            labelColor: fc.isGroupInvalid(id) ? cs.error : null,
+            children: sections[id]!,
+          ),
+      ],
+    );
+  }
+}
+
+class _InstanceSshTunnelFields extends StatefulWidget {
+  const _InstanceSshTunnelFields({
+    required this.validationController,
+    required this.fields,
+  });
+
+  final TrackedFormValidationController validationController;
+  final Map<String, TextEditingController> fields;
+
+  @override
+  State<_InstanceSshTunnelFields> createState() => _InstanceSshTunnelFieldsState();
+}
+
+class _InstanceSshTunnelFieldsState extends State<_InstanceSshTunnelFields> {
+  late final TextEditingController _enabledCtrl;
+  late final TextEditingController _authMethodCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _enabledCtrl = widget.fields[settingMetaNameSshTunnel]!;
+    _authMethodCtrl = widget.fields[settingMetaNameSshTunnelAuthMethod]!;
+    _enabledCtrl.addListener(_onInteractionChanged);
+    _authMethodCtrl.addListener(_onInteractionChanged);
+  }
+
+  @override
+  void dispose() {
+    _enabledCtrl.removeListener(_onInteractionChanged);
+    _authMethodCtrl.removeListener(_onInteractionChanged);
+    super.dispose();
+  }
+
+  void _onInteractionChanged() => setState(() {});
+
+  bool get _sshEnabled => _enabledCtrl.text.trim().toLowerCase() == "true";
+
+  bool get _sshPasswordAuth => sshTunnelAuthMethodFromValue(_authMethodCtrl.text) == SshTunnelAuthMethod.password;
+
+  bool get _sshKeyAuth => !_sshPasswordAuth;
+
+  String? _sshRequired(dynamic value) =>
+      _sshEnabled ? FormFieldValidators.requiredValue(context, value as String?) : null;
+
+  String? _sshPasswordRequired(dynamic value) =>
+      _sshEnabled && _sshPasswordAuth ? FormFieldValidators.requiredValue(context, value as String?) : null;
+
+  String? _sshKeyPathRequired(dynamic value) =>
+      _sshEnabled && _sshKeyAuth ? FormFieldValidators.requiredValue(context, value as String?) : null;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final fields = widget.fields;
+    final validationController = widget.validationController;
+    final sshReadOnly = !_sshEnabled;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TrackedSwitchFormField(
+          validationController: validationController,
+          fieldName: settingMetaNameSshTunnel,
+          label: l10n.db_instance_ssh_tunnel_enabled,
+          controller: _enabledCtrl,
+          revalidateFieldNamesOnChange: const [
+            settingMetaNameSshTunnelHost,
+            settingMetaNameSshTunnelPort,
+            settingMetaNameSshTunnelUser,
+            settingMetaNameSshTunnelAuthMethod,
+            settingMetaNameSshTunnelPassword,
+            settingMetaNameSshTunnelPrivateKeyPath,
+            settingMetaNameSshTunnelPrivateKeyPassphrase,
+          ],
+        ),
+        TrackedHostPortFields(
+          validationController: validationController,
+          readOnly: sshReadOnly,
+          hostFieldName: settingMetaNameSshTunnelHost,
+          hostController: fields[settingMetaNameSshTunnelHost]!,
+          hostLabel: l10n.db_instance_ssh_tunnel_host,
+          hostValidator: _sshRequired,
+          portFieldName: settingMetaNameSshTunnelPort,
+          portController: fields[settingMetaNameSshTunnelPort]!,
+          portLabel: l10n.db_instance_ssh_tunnel_port,
+          portValidator: _sshRequired,
+        ),
+        TrackedTextFormField(
+          validationController: validationController,
+          fieldName: settingMetaNameSshTunnelUser,
+          label: l10n.db_instance_ssh_tunnel_user,
+          validator: _sshRequired,
+          controller: fields[settingMetaNameSshTunnelUser]!,
+          readOnly: sshReadOnly,
+        ),
+        TrackedEnumFormField(
+          validationController: validationController,
+          fieldName: settingMetaNameSshTunnelAuthMethod,
+          label: l10n.db_instance_ssh_tunnel_auth_method,
+          controller: _authMethodCtrl,
+          enumValues: const [kSshTunnelAuthMethodPassword, kSshTunnelAuthMethodPrivateKey],
+          labels: {
+            kSshTunnelAuthMethodPassword: l10n.db_instance_ssh_tunnel_auth_password,
+            kSshTunnelAuthMethodPrivateKey: l10n.db_instance_ssh_tunnel_auth_private_key,
+          },
+          defaultValue: kSshTunnelAuthMethodPassword,
+          validator: _sshRequired,
+          readOnly: sshReadOnly,
+        ),
+        if (_sshPasswordAuth)
+          TrackedPasswordFormField(
+            validationController: validationController,
+            fieldName: settingMetaNameSshTunnelPassword,
+            label: l10n.db_instance_ssh_tunnel_password,
+            validator: _sshPasswordRequired,
+            controller: fields[settingMetaNameSshTunnelPassword]!,
+            readOnly: sshReadOnly,
+          ),
+        if (_sshKeyAuth) ...[
+          TrackedFilePathFormField(
+            validationController: validationController,
+            fieldName: settingMetaNameSshTunnelPrivateKeyPath,
+            label: l10n.db_instance_ssh_tunnel_private_key,
+            controller: fields[settingMetaNameSshTunnelPrivateKeyPath]!,
+            pickTooltip: l10n.tooltip_select_private_key_file,
+            allowedExtensions: const ['pem', 'key', 'ppk', 'rsa', 'ed25519'],
+            validator: _sshKeyPathRequired,
+            readOnly: sshReadOnly,
+          ),
+          TrackedPasswordFormField(
+            validationController: validationController,
+            fieldName: settingMetaNameSshTunnelPrivateKeyPassphrase,
+            label: l10n.db_instance_ssh_tunnel_private_key_passphrase,
+            controller: fields[settingMetaNameSshTunnelPrivateKeyPassphrase]!,
+            readOnly: sshReadOnly,
+          ),
+        ],
+      ],
     );
   }
 }

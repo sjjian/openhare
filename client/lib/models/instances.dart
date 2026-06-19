@@ -38,6 +38,7 @@ abstract class InstanceModel with _$InstanceModel {
     required DatabaseType dbType,
     required String name,
     required ConnectTarget target,
+    SshTunnelConfig? sshTunnel,
     required String user,
     required String password,
     required String desc,
@@ -59,6 +60,7 @@ abstract class InstanceModel with _$InstanceModel {
       desc: desc,
       custom: custom,
       initQuerys: initQuerys,
+      sshTunnel: sshTunnel,
     );
   }
 }

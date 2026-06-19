@@ -1,5 +1,6 @@
 import 'package:client/models/sessions.dart';
 import 'package:client/screens/sessions/session_drawer_body.dart';
+import 'package:client/screens/sessions/session_drawer_metadata.dart';
 import 'package:client/screens/sessions/session_operation_bar.dart';
 import 'package:client/screens/sessions/session_sql_editor.dart';
 import 'package:client/screens/sessions/session_sql_results.dart';
@@ -18,23 +19,6 @@ class SessionBodyPage extends ConsumerWidget {
     SessionDrawerModel sessionDrawer = ref.watch(sessionDrawerProvider);
     SessionController sessionController = ref.watch(selectedSessionControllerProvider);
 
-    final Widget left = Row(
-      children: [
-        Expanded(
-          child: SplitView(
-            controller: sessionController.multiSplitViewCtrl,
-            axis: Axis.vertical,
-            first: SQLEditor(
-              key: ValueKey(sessionController.sqlEditorController),
-              codeController: sessionController.sqlEditorController,
-              scrollController: sessionController.sqlEditorScrollController,
-            ),
-            second: const SqlResultTables(),
-          ),
-        ),
-        const PixelVerticalDivider(),
-      ],
-    );
     return Column(
       children: [
         SessionOpBar(codeController: sessionController.sqlEditorController),
@@ -42,14 +26,27 @@ class SessionBodyPage extends ConsumerWidget {
         Expanded(
           child: Container(
             alignment: Alignment.topLeft,
-            child: sessionDrawer.isRightPageOpen
-                ? SplitView(
-                    axis: Axis.horizontal,
-                    controller: sessionController.metaDataSplitViewCtrl,
-                    first: left,
-                    second: const SessionDrawerBody(),
-                  )
-                : left,
+            child: SplitView(
+              controller: sessionController.leftSidebarSplitViewCtrl,
+              reverse: true,
+              showSecond: sessionDrawer.isMetadataTreeOpen,
+              second: const SessionDrawerMetadata(),
+              first: SplitView(
+                controller: sessionController.rightSidebarSplitViewCtrl,
+                showSecond: sessionDrawer.isRightPageOpen,
+                second: const SessionDrawerBody(),
+                first: SplitView(
+                  controller: sessionController.editorResultSplitViewCtrl,
+                  axis: Axis.vertical,
+                  second: const SqlResultTables(),
+                  first: SQLEditor(
+                    key: ValueKey(sessionController.sqlEditorController),
+                    codeController: sessionController.sqlEditorController,
+                    scrollController: sessionController.sqlEditorScrollController,
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ],

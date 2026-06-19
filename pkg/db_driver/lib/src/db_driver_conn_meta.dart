@@ -38,8 +38,10 @@ enum ConnectTargetType { network, dbFile }
 @Freezed(toStringOverride: false)
 abstract class ConnectTarget with _$ConnectTarget {
   const ConnectTarget._();
-  const factory ConnectTarget.network(
-      {required String host, required int port}) = _ConnectTargetNetwork;
+  const factory ConnectTarget.network({
+    required String host,
+    required int port,
+  }) = _ConnectTargetNetwork;
   const factory ConnectTarget.dbFile({required String dbFile}) =
       _ConnectTargetDbFile;
 
@@ -57,6 +59,7 @@ abstract class ConnectTarget with _$ConnectTarget {
 
 const String settingMetaGroupBase = "base";
 const String settingMetaGroupParams = "params";
+const String settingMetaGroupSshTunnel = "ssh_tunnel";
 const String settingMetaGroupInitQuery = 'init_query';
 
 const String settingMetaNameName = "name";
@@ -65,6 +68,16 @@ const String settingMetaNamePassword = "password";
 const String settingMetaNameTargetDBFile = "tartget_db_file";
 const String settingMetaNameTargetNetworkHost = "tartget_network_host";
 const String settingMetaNameTargetNetworkPort = "tartget_network_port";
+const String settingMetaNameSshTunnel = "ssh_tunnel";
+const String settingMetaNameSshTunnelHost = "ssh_tunnel_host";
+const String settingMetaNameSshTunnelPort = "ssh_tunnel_port";
+const String settingMetaNameSshTunnelUser = "ssh_tunnel_user";
+const String settingMetaNameSshTunnelAuthMethod = "ssh_tunnel_auth_method";
+const String settingMetaNameSshTunnelPassword = "ssh_tunnel_password";
+const String settingMetaNameSshTunnelPrivateKeyPath =
+    "ssh_tunnel_private_key_path";
+const String settingMetaNameSshTunnelPrivateKeyPassphrase =
+    "ssh_tunnel_private_key_passphrase";
 const String settingMetaNameDesc = "desc";
 
 class ConnectionMeta {
@@ -122,6 +135,33 @@ class NameMeta extends SettingMeta {
   String get name => settingMetaNameName;
 }
 
+enum SshTunnelAuthMethod {
+  password,
+  privateKey,
+}
+
+const String kSshTunnelAuthMethodPassword = "password";
+const String kSshTunnelAuthMethodPrivateKey = "private_key";
+
+String sshTunnelAuthMethodToValue(SshTunnelAuthMethod method) =>
+    switch (method) {
+      SshTunnelAuthMethod.privateKey => kSshTunnelAuthMethodPrivateKey,
+      SshTunnelAuthMethod.password => kSshTunnelAuthMethodPassword,
+    };
+
+SshTunnelAuthMethod sshTunnelAuthMethodFromValue(String? value) =>
+    value?.trim() == kSshTunnelAuthMethodPrivateKey
+        ? SshTunnelAuthMethod.privateKey
+        : SshTunnelAuthMethod.password;
+
+SshTunnelAuthMethod resolveSshTunnelAuthMethod(SshTunnelConfig config) {
+  if (config.privateKeyPath?.trim().isNotEmpty == true &&
+      (config.password == null || config.password!.trim().isEmpty)) {
+    return SshTunnelAuthMethod.privateKey;
+  }
+  return config.authMethod;
+}
+
 class TargetNetworkMeta extends SettingMeta {
   final String? defaultPort;
 
@@ -129,6 +169,45 @@ class TargetNetworkMeta extends SettingMeta {
 
   @override
   String get name => settingMetaNameTargetNetworkHost;
+}
+
+@Freezed(toStringOverride: false)
+abstract class SshTunnelConfig with _$SshTunnelConfig {
+  const SshTunnelConfig._();
+  const factory SshTunnelConfig({
+    @Default(false) bool enabled,
+    required String host,
+    required int port,
+    required String user,
+    @Default(SshTunnelAuthMethod.password) SshTunnelAuthMethod authMethod,
+    String? password,
+    String? privateKeyPath,
+    String? privateKeyPassphrase,
+  }) = _SshTunnelConfig;
+
+  factory SshTunnelConfig.fromJson(Map<String, dynamic> json) =>
+      _$SshTunnelConfigFromJson(json);
+
+  @override
+  String toString() => "$user@${host.trim()}:$port";
+}
+
+const SshTunnelConfig kDefaultSshTunnelTemplate = SshTunnelConfig(
+  enabled: false,
+  host: '',
+  port: 22,
+  user: '',
+);
+
+class SshTunnelMeta extends SettingMeta {
+  final SshTunnelConfig? value;
+
+  SshTunnelMeta({this.value, super.group});
+
+  SshTunnelConfig get template => value ?? kDefaultSshTunnelTemplate;
+
+  @override
+  String get name => settingMetaNameSshTunnel;
 }
 
 class UserMeta extends SettingMeta {
@@ -193,15 +272,20 @@ class ConnectValue {
   String desc;
   Map<String, String> custom = {};
   List<String> initQuerys;
+  SshTunnelConfig? sshTunnel;
 
-  ConnectValue(
-      {required this.name,
-      required this.target,
-      required this.user,
-      required this.password,
-      required this.desc,
-      required this.custom,
-      this.initQuerys = const []});
+  ConnectValue({
+    required this.name,
+    required this.target,
+    required this.user,
+    required this.password,
+    required this.desc,
+    required this.custom,
+    this.initQuerys = const [],
+    this.sshTunnel,
+  });
+
+  SshTunnelConfig? getSshTunnel() => sshTunnel;
 
   String getHost() {
     return target.when(
@@ -222,10 +306,6 @@ class ConnectValue {
       dbFile: (dbFile) => dbFile.trim(),
       network: (host, port) => "",
     );
-  }
-
-  String endpointText() {
-    return target.toString();
   }
 
   String getValue(String name, [String defaultValue = ""]) {

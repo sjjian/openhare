@@ -42,3 +42,21 @@ TextSpan getSQLHighlightTextSpan(DialectType dialectType, String text, {TextStyl
         .toList(),
   );
 }
+
+class SqlHighlightTextEditingController extends TextEditingController {
+  SqlHighlightTextEditingController({
+    super.text,
+    required this.dialectType,
+  });
+
+  final DialectType dialectType;
+
+  @override
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    required bool withComposing,
+  }) {
+    return getSQLHighlightTextSpan(dialectType, text, defalutStyle: style);
+  }
+}

@@ -139,7 +139,7 @@ class SessionConn {
         await conn2!.close();
       }
       _setState(SQLConnectState.connecting);
-      conn2 = await ConnectionFactory.open(
+      conn2 = await ConnectionWrapper.open(
         type: model.dbType,
         meta: model.connectValue,
         schema: currentSchema,

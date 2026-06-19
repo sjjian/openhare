@@ -26,11 +26,11 @@ openhare 是一款 AI 驱动的跨平台桌面 SQL 客户端，支持多数据�
 1. [如何安装和更新应用程序](https://github.com/sjjian/openhare/discussions/75)
 
 ## 核心特性
-- **AI 智能辅助**：帮助你编写、优化并理解 SQL 查询。
-- **跨平台支持**：无缝运行于 Windows、macOS 和 Linux。
+- **轻量原生**：下载即用、安装便捷，无 WebView、无内嵌浏览器；基于 Flutter 原生桌面 UI，内存占用低。
+- **AI 智能辅助**：内置 AI 帮助你编写、优化并理解 SQL；高危语句执行前会征求确认，保障数据安全。
+- **多数据库支持**：支持 MySQL、PostgreSQL、SQL Server、SQLite、Oracle、MongoDB、Redis 等。
+- **跨平台支持**：在 Windows、macOS 和 Linux 上提供原生体验。
 - **完全开源**：基于 [Apache License 2.0](./LICENSE) 开源，透明且社区驱动。
-- **简洁直观的界面**：现代化 UI，聚焦效率与易用性。
-- **多数据库支持**：轻松连接并管理多种 SQL 数据库。
 
 ## 数据库
 

@@ -181,7 +181,7 @@
     },
     {
       "id": "14:1293500312684785835",
-      "lastPropertyId": "19:7075410201430543980",
+      "lastPropertyId": "20:2981022534545283141",
       "name": "InstanceStorage",
       "properties": [
         {
@@ -253,6 +253,11 @@
         {
           "id": "18:7840590185814166600",
           "name": "targetJson",
+          "type": 9
+        },
+        {
+          "id": "20:2981022534545283141",
+          "name": "sshTunnelJson",
           "type": 9
         }
       ],
