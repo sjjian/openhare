@@ -172,7 +172,7 @@ class TrackedTextFormField extends TrackedFormFieldWidget {
 
   Widget? buildSuffix(BuildContext context) => suffixIcon ?? suffixIconBuilder?.call(context);
 
-  /// 紧凑输入框装饰（标签由左侧 [_labeledRow] 承担）。
+  /// 紧凑输入框装饰（标签由左侧 [labeledRow] 承担）。
   static InputDecoration _denseInputDecoration(
     BuildContext context, {
     EdgeInsetsGeometry? contentPadding,
@@ -211,7 +211,7 @@ class TrackedTextFormField extends TrackedFormFieldWidget {
     );
   }
 
-  static Widget _labeledRow({
+  static Widget labeledRow({
     required BuildContext context,
     required String label,
     required bool isRequired,
@@ -279,7 +279,7 @@ class TrackedTextFormField extends TrackedFormFieldWidget {
     final multiline = maxLines > 1;
     final row = hideLabel
         ? field
-        : _labeledRow(
+        : labeledRow(
             context: context,
             label: label,
             isRequired: isRequired,
@@ -323,6 +323,7 @@ class TrackedDescFormField extends TrackedTextFormField {
     required super.label,
     super.isRequired,
     required super.controller,
+    super.readOnly,
   }) : super(
          maxLength: 100,
          maxLines: 2,
@@ -456,7 +457,7 @@ class TrackedEnumFormField extends TrackedFormFieldWidget {
     final menuMaxHeight = opts.length * itemHeight + kSpacingSmall * 2;
     final cappedMenuHeight = menuMaxHeight > 280 ? 280.0 : menuMaxHeight;
 
-    return TrackedTextFormField._labeledRow(
+    return TrackedTextFormField.labeledRow(
       context: context,
       label: label,
       isRequired: isRequired,
@@ -594,7 +595,7 @@ class TrackedHostPortFields extends StatelessWidget {
       hideLabel: true,
       hintText: hostLabel,
     );
-    return TrackedTextFormField._labeledRow(
+    return TrackedTextFormField.labeledRow(
       context: context,
       label: hostLabel,
       isRequired: hostRequired || portRequired,
@@ -681,7 +682,7 @@ class TrackedSwitchFormField extends TrackedFormFieldWidget {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: resolveValidator(context),
           builder: (state) {
-            return TrackedTextFormField._labeledRow(
+            return TrackedTextFormField.labeledRow(
               context: context,
               label: label,
               isRequired: isRequired,

@@ -9,6 +9,7 @@ import 'package:client/utils/file_utils.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/dialog.dart';
+import 'package:client/widgets/form.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/sql_highlight.dart';
 import 'package:db_driver/db_driver.dart';
@@ -60,13 +61,16 @@ class _ExportDataDialogContent extends ConsumerStatefulWidget {
 }
 
 class _ExportDataDialogContentState extends ConsumerState<_ExportDataDialogContent> {
+  static const _fieldDir = 'exportDir';
+  static const _fieldFileName = 'fileName';
+  static const _fieldDesc = 'desc';
+
   bool _isGenerating = false;
   String? _errorMessage;
   late final TextEditingController dirController;
   late final TextEditingController fileNameController;
   late final TextEditingController descController;
-  final _formKey = GlobalKey<FormState>();
-  final _dirFieldKey = GlobalKey<FormFieldState<String>>();
+  final _formValidation = TrackedFormValidationController();
 
   @override
   void initState() {
@@ -92,6 +96,7 @@ class _ExportDataDialogContentState extends ConsumerState<_ExportDataDialogConte
     dirController.dispose();
     fileNameController.dispose();
     descController.dispose();
+    _formValidation.dispose();
     super.dispose();
   }
 
@@ -101,8 +106,28 @@ class _ExportDataDialogContentState extends ConsumerState<_ExportDataDialogConte
     );
     if (directory != null) {
       dirController.text = directory;
-      // 触发验证
-      _dirFieldKey.currentState?.validate();
+      _formValidation.revalidateFields([_fieldDir]);
+    }
+  }
+
+  String? _validateDirectory(dynamic value) {
+    final trimmed = value is String ? value.trim() : '';
+    if (trimmed.isEmpty) {
+      return null;
+    }
+    final error = checkDirectoryAccessible(trimmed);
+    if (error == null) {
+      return null;
+    }
+    final localizations = AppLocalizations.of(context)!;
+    switch (error) {
+      case DirectoryAccessError.notExists:
+        return localizations.error_directory_not_exists;
+      case DirectoryAccessError.noPermission:
+        if (Platform.isMacOS) {
+          return localizations.error_directory_no_permission_macos;
+        }
+        return localizations.error_directory_no_permission;
     }
   }
 
@@ -117,7 +142,7 @@ class _ExportDataDialogContentState extends ConsumerState<_ExportDataDialogConte
   }
 
   void _handleSubmit() {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formValidation.validate()) {
       return;
     }
 
@@ -187,61 +212,70 @@ class _ExportDataDialogContentState extends ConsumerState<_ExportDataDialogConte
     }
   }
 
-  Widget _buildTaskInfoCard() {
-    final textStyle = Theme.of(context).textTheme.bodyMedium;
+  Widget _buildSqlSectionSubtitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final textStyle = theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant);
 
-    return Row(
+    return RichText(
+      text: TextSpan(
+        style: textStyle,
+        children: [
+          TextSpan(text: l10n.export_data_exporting),
+          const TextSpan(text: ' '),
+          TextSpan(
+            text: '`${widget.schema}`',
+            style: textStyle?.copyWith(color: cs.primary),
+          ),
+          TextSpan(text: ' ${l10n.export_data_schema_sql}'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _buildSqlSectionSubtitle(context),
+        const SizedBox(height: kSpacingMedium),
         Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: kSpacingSmall,
-              vertical: kSpacingMedium,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Theme.of(context).colorScheme.outline), // 导出任务SQL信息卡片边框颜色
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: textStyle,
-                    children: [
-                      TextSpan(text: AppLocalizations.of(context)!.export_data_exporting),
-                      const TextSpan(text: ' '),
-                      TextSpan(
-                        text: '`${widget.schema}`',
-                        style: textStyle?.copyWith(
-                          color: Theme.of(context).colorScheme.primary, // 导出任务SQL信息卡片schema高亮颜色
-                        ),
-                      ),
-                      TextSpan(text: ' ${AppLocalizations.of(context)!.export_data_schema_sql}'),
-                    ],
-                  ),
+          child: SizedBox.expand(
+            child: TrackedTextFormField.labeledRow(
+              context: context,
+              label: l10n.export_data_sql_label,
+              isRequired: false,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(kSpacingSmall),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: cs.outlineVariant),
                 ),
-                const SizedBox(height: kSpacingMedium),
-                Expanded(
-                  child: ScrollConfiguration(
-                    behavior: _NoScrollbarBehavior(),
+                child: ScrollConfiguration(
+                  behavior: _NoScrollbarBehavior(),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
                     child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: SelectableText.rich(
-                          getSQLHighlightTextSpan(
-                            widget.dbType.dialectType,
-                            widget.query,
-                            defalutStyle: GoogleFonts.robotoMono(textStyle: Theme.of(context).textTheme.bodySmall),
+                      scrollDirection: Axis.horizontal,
+                      child: SelectableText.rich(
+                        getSQLHighlightTextSpan(
+                          widget.dbType.dialectType,
+                          widget.query,
+                          defalutStyle: GoogleFonts.robotoMono(
+                            textStyle: Theme.of(context).textTheme.bodySmall,
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -275,138 +309,62 @@ class _ExportDataDialogContentState extends ConsumerState<_ExportDataDialogConte
     );
   }
 
-  InputDecoration _buildInputDecoration({
-    required String labelText,
-    Widget? suffixIcon,
-    bool required = false,
-  }) {
-    final defaultBorder = OutlineInputBorder(
-      borderSide: BorderSide(
-        color: Theme.of(context).colorScheme.outline, // 输入框边框颜色
-      ),
-    );
-    final errorBorderStyle = OutlineInputBorder(
-      borderSide: BorderSide(
-        color: Theme.of(context).colorScheme.error,
-      ),
-    );
-
-    return InputDecoration(
-      label: required
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(labelText),
-                Text('*', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-              ],
-            )
-          : Text(labelText),
-      border: defaultBorder,
-      enabledBorder: defaultBorder,
-      disabledBorder: defaultBorder,
-      focusedBorder: defaultBorder,
-      errorBorder: errorBorderStyle,
-      focusedErrorBorder: errorBorderStyle,
-      suffixIcon: suffixIcon,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return CustomDialog(
-      title: AppLocalizations.of(context)!.export_data_title,
+      title: l10n.export_data_title,
       titleIcon: const Icon(Icons.file_download, color: Colors.green),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 目录选择
-            TextFormField(
-              key: _dirFieldKey,
-              controller: dirController,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return AppLocalizations.of(context)!.export_data_directory_required;
-                }
-                // 使用工具函数验证目录路径
-                final error = checkDirectoryAccessible(value.trim());
-                if (error == null) {
-                  return null;
-                }
-                // 根据错误类型返回国际化消息
-                final localizations = AppLocalizations.of(context)!;
-                switch (error) {
-                  case DirectoryAccessError.notExists:
-                    return localizations.error_directory_not_exists;
-                  case DirectoryAccessError.noPermission:
-                    // macOS 需要用户自己选择授权，使用不同的提示消息
-                    if (Platform.isMacOS) {
-                      return localizations.error_directory_no_permission_macos;
-                    } else {
-                      return localizations.error_directory_no_permission;
-                    }
-                }
-              },
-              decoration: _buildInputDecoration(
-                labelText: AppLocalizations.of(context)!.export_data_directory_label,
-                required: true,
-                suffixIcon: Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: RectangleIconButton.medium(
-                    icon: Icons.folder_open,
-                    tooltip: AppLocalizations.of(context)!.tooltip_select_directory,
-                    iconColor: Theme.of(context).colorScheme.primary, // 导出任务的目录选择按钮颜色
-                    onPressed: _selectDirectory,
-                  ),
-                ),
-              ),
+      maxWidth: 960,
+      content: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TrackedTextFormField(
+            validationController: _formValidation,
+            fieldName: _fieldDir,
+            label: l10n.export_data_directory_label,
+            isRequired: true,
+            controller: dirController,
+            validator: _validateDirectory,
+            suffixIconBuilder: (context) => RectangleIconButton(
+              size: kIconButtonSizeSmall,
+              iconSize: kIconSizeSmall,
+              padding: 6,
+              icon: Icons.folder_open,
+              tooltip: l10n.tooltip_select_directory,
+              iconColor: Theme.of(context).colorScheme.primary,
+              onPressed: _selectDirectory,
             ),
-            const SizedBox(height: kSpacingMedium),
-            // 文件名输入
-            TextFormField(
-              controller: fileNameController,
-              enabled: !_isGenerating,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return AppLocalizations.of(context)!.export_data_file_name_required;
-                }
-                return null;
-              },
-              decoration: _buildInputDecoration(
-                labelText: AppLocalizations.of(context)!.task_column_file_name,
-                required: true,
-                suffixIcon: _buildFileNameSuffixIcons(),
-              ),
-            ),
-            const SizedBox(height: kSpacingMedium),
-            // 备注
-            TextField(
-              controller: descController,
-              enabled: !_isGenerating,
-              decoration: _buildInputDecoration(
-                labelText: AppLocalizations.of(context)!.db_instance_desc,
-              ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: kSpacingMedium),
-            // 任务信息卡片
-            Expanded(child: _buildTaskInfoCard()),
-          ],
-        ),
+          ),
+          TrackedTextFormField(
+            validationController: _formValidation,
+            fieldName: _fieldFileName,
+            label: l10n.task_column_file_name,
+            isRequired: true,
+            controller: fileNameController,
+            readOnly: _isGenerating,
+            suffixIconBuilder: (context) => _buildFileNameSuffixIcons(),
+          ),
+          TrackedDescFormField(
+            validationController: _formValidation,
+            fieldName: _fieldDesc,
+            label: l10n.db_instance_desc,
+            controller: descController,
+            readOnly: _isGenerating,
+          ),
+          Expanded(child: _buildTaskInfoCard()),
+        ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(AppLocalizations.of(context)!.cancel),
+          child: Text(l10n.cancel),
         ),
         const SizedBox(width: kSpacingSmall),
         TextButton(
           onPressed: _handleSubmit,
-          child: Text(AppLocalizations.of(context)!.submit),
+          child: Text(l10n.submit),
         ),
       ],
     );

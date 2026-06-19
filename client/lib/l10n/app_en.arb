@@ -920,6 +920,10 @@
   "@export_data_file_name_required": {
     "description": "Export data file name required error message"
   },
+  "export_data_sql_label": "SQL",
+  "@export_data_sql_label": {
+    "description": "Export data dialog SQL field label"
+  },
   "tooltip_select_directory": "Select directory",
   "@tooltip_select_directory": {
     "description": "Tooltip select directory"

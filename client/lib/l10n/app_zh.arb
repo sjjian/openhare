@@ -250,6 +250,7 @@
     "export_data_directory_label": "导出的目录",
     "export_data_directory_required": "请选择导出的目录",
     "export_data_file_name_required": "请输入文件名",
+    "export_data_sql_label": "SQL",
     "tooltip_select_directory": "选择目录",
     "tooltip_select_private_key_file": "选择私钥文件",
     "tooltip_ai_generate_file_name": "使用AI自动生成文件名和描述",
