@@ -12,6 +12,9 @@ class MSSQLConnection extends GoImplConnection {
   MSSQLConnection(super._conn);
 
   @override
+  bool get supportsExplain => false;
+
+  @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.databaseMode;
 

@@ -180,6 +180,9 @@ abstract class BaseConnection {
   /// 是否支持服务端中止当前查询
   bool get supportsKillQuery => true;
 
+  /// 是否支持 explain
+  bool get supportsExplain => true;
+
   Future<void> ping();
   Future<void> killQuery();
   Stream<BaseQueryStreamItem> queryStreamInternal(String sql);
@@ -237,6 +240,10 @@ abstract class BaseConnection {
     }
 
     return BaseQueryResult(queryId, resultColumns, rows, resultAffectedRows);
+  }
+
+  Future<BaseQueryResult> explain(String sql) {
+    throw UnsupportedError('Explain is not supported');
   }
 
   Stream<BaseQueryStreamItem> queryStream(String sql, {int? limit}) async* {

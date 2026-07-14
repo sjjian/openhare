@@ -161,8 +161,16 @@ void sessionOpBarExplain({
   }
   String query = sessionOpBarGetQuery(codeController, model);
   if (query.isNotEmpty) {
-    ref.read(sQLResultsServicesProvider.notifier).queryAddResult(model.sessionId, "explain $query");
+    ref.read(sQLResultsServicesProvider.notifier).explainAddResult(model.sessionId, query);
   }
+}
+
+bool sessionOpBarSupportsExplain(WidgetRef ref, SessionOpBarModel model) {
+  final connId = model.connId;
+  if (connId == null) {
+    return false;
+  }
+  return ref.read(sessionConnsServicesProvider.notifier).supportsExplain(connId);
 }
 
 void sessionOpBarExportDownload({
@@ -425,7 +433,7 @@ class SessionOpBar extends ConsumerWidget {
           // execute
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
-          explainWidget(context, ref, model),
+          if (sessionOpBarSupportsExplain(ref, model)) explainWidget(context, ref, model),
           exportDataWidget(context, ref, model),
           taskOverviewWidget(context, ref, model),
           SessionConfigBar(model: model),

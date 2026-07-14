@@ -93,6 +93,11 @@ class SessionConnRepoImpl extends SessionConnRepo {
   }
 
   @override
+  Future<BaseQueryResult?> explain(ConnId connId, String query) {
+    return conns[connId.value]!.explain(query);
+  }
+
+  @override
   Future<void> killQuery(ConnId connId) async {
     final conn = conns[connId.value];
     if (conn == null) {
@@ -107,6 +112,11 @@ class SessionConnRepoImpl extends SessionConnRepo {
   @override
   bool supportsKillQuery(ConnId connId) {
     return conns[connId.value]?.supportsKillQuery ?? false;
+  }
+
+  @override
+  bool supportsExplain(ConnId connId) {
+    return conns[connId.value]?.supportsExplain ?? false;
   }
 }
 
@@ -218,6 +228,15 @@ class SessionConn {
     }
   }
 
+  Future<BaseQueryResult?> explain(String query) async {
+    try {
+      _setState(SQLConnectState.executing);
+      return await conn2!.explain(query);
+    } finally {
+      _setState(SQLConnectState.connected);
+    }
+  }
+
   Stream<BaseQueryStreamItem> queryStream(String query) async* {
     try {
       _setState(SQLConnectState.executing);
@@ -238,6 +257,8 @@ class SessionConn {
   }
 
   bool get supportsKillQuery => conn2?.supportsKillQuery ?? false;
+
+  bool get supportsExplain => conn2?.supportsExplain ?? false;
 
   Future<void> setCurrentSchema(DatabaseRef schema) async {
     await conn2!.setCurrentSchema(schema);

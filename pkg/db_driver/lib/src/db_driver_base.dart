@@ -96,6 +96,9 @@ class ConnectionWrapper extends BaseConnection {
   bool get supportsKillQuery => _inner.supportsKillQuery;
 
   @override
+  bool get supportsExplain => _inner.supportsExplain;
+
+  @override
   void listen({
     Function()? onCloseCallback,
     Function(DatabaseRef)? onSchemaChangedCallback,
@@ -141,6 +144,9 @@ class ConnectionWrapper extends BaseConnection {
 
   @override
   SQLDefiner parser(String sql) => _inner.parser(sql);
+
+  @override
+  Future<BaseQueryResult> explain(String sql) => _inner.explain(sql);
 
   @override
   Future<void> close() async {

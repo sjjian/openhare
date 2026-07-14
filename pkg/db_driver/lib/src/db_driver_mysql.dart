@@ -17,6 +17,12 @@ class MySQLConnection extends GoImplConnection {
   @override
   sp.SQLDefiner parser(String sql) => sp.parser(sp.DialectType.mysql, sql);
 
+  @override
+  Future<BaseQueryResult> explain(String sql) {
+    sql = parser(sql).trimDelimiter(sql);
+    return query('EXPLAIN $sql');
+  }
+
   static Future<BaseConnection> open(
       {required ConnectValue meta, DatabaseRef? schema}) async {
     final database = schema?.databaseName() ?? meta.getValue("database", "");

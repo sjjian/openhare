@@ -16,6 +16,12 @@ class SQLiteConnection extends GoImplConnection {
   @override
   sp.SQLDefiner parser(String sql) => sp.parser(sp.DialectType.sqlite, sql);
 
+  @override
+  Future<BaseQueryResult> explain(String sql) {
+    sql = parser(sql).trimDelimiter(sql);
+    return query('EXPLAIN QUERY PLAN $sql');
+  }
+
   static Future<BaseConnection> open(
       {required ConnectValue meta, DatabaseRef? schema}) async {
     var dsn = meta.getDbFile();

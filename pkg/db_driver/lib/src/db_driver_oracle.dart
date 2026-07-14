@@ -18,6 +18,14 @@ class OracleConnection extends GoImplConnection {
   @override
   sp.SQLDefiner parser(String sql) => sp.parser(sp.DialectType.oracle, sql);
 
+  /// Oracle 的 EXPLAIN PLAN FOR 只写入计划表，需再查 DBMS_XPLAN 才能拿到可读结果。
+  @override
+  Future<BaseQueryResult> explain(String sql) async {
+    sql = parser(sql).trimDelimiter(sql);
+    await query('EXPLAIN PLAN FOR $sql');
+    return query("SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY())");
+  }
+
   static Future<BaseConnection> open(
       {required ConnectValue meta, DatabaseRef? schema}) async {
     final service = meta.getValue("service", "FREEPDB1");

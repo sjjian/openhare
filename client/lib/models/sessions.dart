@@ -42,8 +42,10 @@ abstract class SessionConnRepo {
   Future<void> setCurrentSchema(ConnId connId, DatabaseRef schema);
   Future<BaseQueryResult?> query(ConnId connId, String query, {int? limit});
   Stream<BaseQueryStreamItem> queryStream(ConnId connId, String query);
+  Future<BaseQueryResult?> explain(ConnId connId, String query);
   Future<void> killQuery(ConnId connId);
   bool supportsKillQuery(ConnId connId);
+  bool supportsExplain(ConnId connId);
 }
 
 abstract class SQLResultRepo {

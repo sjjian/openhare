@@ -153,12 +153,17 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
                     model: barModel,
                     codeController: widget.codeController,
                   ),
-              settingService.getShortcutModel(KeyboardShortcut.sqlExplain).toSingleActivator()!: () => sessionOpBarExplain(
-                context: context,
-                ref: ref,
-                model: barModel,
-                codeController: widget.codeController,
-              ),
+              settingService.getShortcutModel(KeyboardShortcut.sqlExplain).toSingleActivator()!: () {
+                if (!sessionOpBarSupportsExplain(ref, barModel)) {
+                  return;
+                }
+                sessionOpBarExplain(
+                  context: context,
+                  ref: ref,
+                  model: barModel,
+                  codeController: widget.codeController,
+                );
+              },
               settingService.getShortcutModel(KeyboardShortcut.sqlExport).toSingleActivator()!: () =>
                   sessionOpBarExportDownload(
                     context: context,
@@ -259,23 +264,24 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                       },
                     ),
                     SizedBox(width: kSpacingTiny),
-                    RectangleIconButton.medium(
-                      tooltip: tooltipWithShortcutDisplay(
-                        l10n.button_tooltip_explain_sql,
-                        shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExplain).toDisplayString(),
+                    if (sessionOpBarSupportsExplain(ref, barModel))
+                      RectangleIconButton.medium(
+                        tooltip: tooltipWithShortcutDisplay(
+                          l10n.button_tooltip_explain_sql,
+                          shortcutSvc.getShortcutModel(KeyboardShortcut.sqlExplain).toDisplayString(),
+                        ),
+                        icon: Icons.poll_outlined,
+                        iconColor: idle ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey, // todo: color 统一
+                        onPressed: () {
+                          sessionOpBarExplain(
+                            context: overlayContext,
+                            ref: ref,
+                            model: barModel,
+                            codeController: controller,
+                          );
+                          onAfterAction();
+                        },
                       ),
-                      icon: Icons.poll_outlined,
-                      iconColor: idle ? const Color.fromARGB(255, 241, 192, 84) : Colors.grey, // todo: color 统一
-                      onPressed: () {
-                        sessionOpBarExplain(
-                          context: overlayContext,
-                          ref: ref,
-                          model: barModel,
-                          codeController: controller,
-                        );
-                        onAfterAction();
-                      },
-                    ),
                     SizedBox(width: kSpacingTiny),
                     RectangleIconButton.medium(
                       tooltip: tooltipWithShortcutDisplay(
