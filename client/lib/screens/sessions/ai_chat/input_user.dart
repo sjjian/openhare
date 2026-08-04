@@ -11,13 +11,13 @@ import 'package:client/widgets/const.dart';
 import 'package:client/widgets/menu.dart';
 import 'package:client/widgets/mention_text.dart';
 import 'package:client/widgets/sql_highlight.dart';
-import 'package:client/utils/fuzzy_match.dart';
 import 'package:client/widgets/tooltip.dart';
 import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:sql_complete/sql_complete.dart';
 
 class SessionChatInputCard extends ConsumerStatefulWidget {
   final SessionAIChatModel model;

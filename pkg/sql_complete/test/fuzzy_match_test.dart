@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:client/utils/fuzzy_match.dart';
+import 'package:sql_complete/sql_complete.dart';
 
 void main() {
   group('FuzzyMatch.match', () {
@@ -23,9 +23,14 @@ void main() {
       expect(FuzzyMatch.match('gebi', 'getElementById'), isTrue);
     });
 
-    test('exact match returns false', () {
-      expect(FuzzyMatch.match('abc', 'abc'), isFalse);
-      expect(FuzzyMatch.match('hello', 'hello'), isFalse);
+    test('exact match returns true', () {
+      expect(FuzzyMatch.match('abc', 'abc'), isTrue);
+      expect(FuzzyMatch.match('hello', 'hello'), isTrue);
+    });
+
+    test('exact match is case insensitive', () {
+      expect(FuzzyMatch.match('abc', 'ABC'), isTrue);
+      expect(FuzzyMatch.match('ABC', 'abc'), isTrue);
     });
 
     test('no match returns false', () {
@@ -59,8 +64,9 @@ void main() {
       expect(result1.matchType, MatchType.fuzzy);
 
       final result2 = FuzzyMatch.matchWithResult('abc', 'abc');
-      // result2 should be exact match, not fuzzy
+      expect(result2.matched, isTrue);
       expect(result2.matchType, MatchType.exact);
+      expect(result2.score, 1.0);
 
       final result3 = FuzzyMatch.matchWithResult('a', 'abcdef');
       expect(result3.matchType, MatchType.fuzzy);
@@ -223,18 +229,20 @@ void main() {
   });
 
   group('FuzzyMatch.matchWithResult - Exact Match', () {
-    test('exact match returns exact type but not matched', () {
+    test('exact match returns exact type and matched', () {
       final result = FuzzyMatch.matchWithResult('abc', 'abc');
-      expect(result.matched, isFalse);
+      expect(result.matched, isTrue);
       expect(result.matchType, MatchType.exact);
       expect(result.score, 1.0);
-      expect(result.matchPositions, isNull);
+      expect(result.matchPositions, [0, 1, 2]);
     });
 
-    test('exact match is case sensitive for exact comparison', () {
+    test('exact match is case insensitive', () {
       final result = FuzzyMatch.matchWithResult('abc', 'ABC');
-      // 由于大小写差异，不应该是完全匹配
-      expect(result.matchType, isNot(MatchType.exact));
+      expect(result.matched, isTrue);
+      expect(result.matchType, MatchType.exact);
+      expect(result.score, 1.0);
+      expect(result.matchPositions, [0, 1, 2]);
     });
   });
 
@@ -296,7 +304,9 @@ void main() {
 
     test('single character target', () {
       final result1 = FuzzyMatch.matchWithResult('a', 'a');
+      expect(result1.matched, isTrue);
       expect(result1.matchType, MatchType.exact);
+      expect(result1.matchPositions, [0]);
 
       final result2 = FuzzyMatch.matchWithResult('a', 'b');
       expect(result2.matched, isFalse);
@@ -338,7 +348,7 @@ void main() {
 
     test('exact constructor creates correct result', () {
       const result = FuzzyMatchResult.exact();
-      expect(result.matched, isFalse);
+      expect(result.matched, isTrue);
       expect(result.matchType, MatchType.exact);
       expect(result.score, 1.0);
       expect(result.matchPositions, isNull);
@@ -363,8 +373,9 @@ void main() {
 
     test('prefix score decreases with target length', () {
       final result1 = FuzzyMatch.matchWithResult('abc', 'abc');
-      // 这是完全匹配，所以逻辑不同
+      expect(result1.matched, isTrue);
       expect(result1.matchType, MatchType.exact);
+      expect(result1.score, 1.0);
 
       final result2 = FuzzyMatch.matchWithResult('abc', 'abcdef');
       expect(result2.score, lessThan(1.0));
@@ -499,10 +510,11 @@ void main() {
       }
     });
 
-    test('exact match returns null matchPositions', () {
+    test('exact match returns contiguous matchPositions', () {
       final result = FuzzyMatch.matchWithResult('abc', 'abc');
+      expect(result.matched, isTrue);
       expect(result.matchType, MatchType.exact);
-      expect(result.matchPositions, isNull);
+      expect(result.matchPositions, [0, 1, 2]);
     });
 
     test('no match returns null matchPositions', () {

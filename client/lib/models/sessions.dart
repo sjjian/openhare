@@ -243,6 +243,13 @@ abstract class SessionSQLEditorModel with _$SessionSQLEditorModel {
   }) = _SessionSQLEditorModel;
 }
 
+@freezed
+abstract class SessionSQLCompletionModel with _$SessionSQLCompletionModel {
+  const factory SessionSQLCompletionModel({
+    required Map<String, Map<MetaDataPropType, MetaDataProp>> objectProps,
+  }) = _SessionSQLCompletionModel;
+}
+
 // sessions conn model
 
 @freezed

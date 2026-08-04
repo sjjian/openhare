@@ -1,0 +1,19 @@
+# https://dart.dev/guides/libraries/private-files
+.dart_tool/
+.packages
+build/
+pubspec.lock
+*.iml
+.idea/
+*.checkpoint
+*.model.json
+*.checkpoint.json
+
+# 整棵 data/ 由 tool/build_trainset.py 下载/构建，不入 git
+# （体积 + 上游授权：MultiSQL 无 license、BIRD CC BY-SA 4.0 等）
+data/
+
+# 本地训练产物 / 虚拟环境
+*.log
+out/
+.venv/

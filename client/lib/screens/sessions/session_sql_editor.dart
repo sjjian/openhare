@@ -3,7 +3,6 @@ import 'package:client/services/sessions/session_sql_editor.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/divider.dart';
-import 'package:db_driver/db_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sql_editor/re_editor.dart';
@@ -25,37 +24,6 @@ class SQLEditor extends ConsumerStatefulWidget {
 
   const SQLEditor({super.key, required this.codeController, this.scrollController});
 
-  static List<DBObjectPrompt> buildMetadataKeyword(List<MetaDataNode> metadata) {
-    List<DBObjectPrompt> keywordPrompt = List.empty(growable: true);
-    for (final node in metadata) {
-      node.visitor((node, parent) {
-        keywordPrompt.add(DBObjectPrompt(word: node.value, type: node.type, props: node.props));
-        return true;
-      });
-    }
-    return keywordPrompt;
-  }
-
-  static Map<String, List<CodePrompt>> buildRelatePrompts(List<MetaDataNode> metadata, DatabaseRef? currentSchema) {
-    Map<String, List<CodePrompt>> relatedPrompts = {};
-    // todo: 有一个缺陷，有下划线的变量无法relate, 当存在类似的prefix时，例如: 存在`t1`时, `t1_1`无法关联。
-    for (final node in metadata) {
-      node.visitor((node, parent) {
-        if (parent == null) {
-          return true;
-        }
-        if (parent.value == "") {
-          return true;
-        }
-        final ps = relatedPrompts.putIfAbsent(parent.value, () => List.empty(growable: true));
-
-        ps.add(DBObjectPrompt(word: node.value, type: node.type, props: node.props));
-        return true;
-      });
-    }
-    return relatedPrompts;
-  }
-
   @override
   ConsumerState<SQLEditor> createState() => _SQLEditorState();
 }
@@ -74,17 +42,13 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
     SessionSQLEditorModel model = ref.watch(selectedSessionSQLEditorProvider);
     final barModel = ref.watch(sessionOpBarProvider);
     final settingService = ref.read(systemSettingServiceProvider.notifier);
-
-    List<CodeKeywordPrompt> keywordPrompt = [
-      for (final keyword in keywords(model.dbType?.dialectType ?? DialectType.mysql)) KeywordPrompt(word: keyword),
-    ];
-    if (model.metadata != null) {
-      keywordPrompt.addAll(SQLEditor.buildMetadataKeyword(model.metadata!));
-    }
+    final completion = ref.watch(sessionSqlCompletionProvider);
+    final completionCtrl = ref.read(sessionSqlCompletionProvider.notifier);
 
     final textStyle = GoogleFonts.robotoMono(
       textStyle: Theme.of(context).textTheme.bodyMedium,
-      color: Theme.of(context).colorScheme.onSurface, // SQL 编辑器文字颜色
+      color: Theme.of(context).colorScheme.onSurface,
+      letterSpacing: 0,
     );
 
     return LayoutBuilder(
@@ -94,14 +58,14 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
             return SQLEditorAutoCompleteListView(
               notifier: notifier,
               onSelected: onSelected,
+              textStyle: textStyle,
             );
           },
           promptsBuilder: SQLEditorAutocompletePromptsBuilder(
-            keywordPrompts: keywordPrompt,
-            directPrompts: [],
-            relatedPrompts: (model.metadata != null)
-                ? SQLEditor.buildRelatePrompts(model.metadata!, model.currentSchema)
-                : const {},
+            controller: widget.codeController,
+            catalog: completionCtrl.catalog,
+            dialect: completionCtrl.dialect,
+            objectProps: completion.objectProps,
           ),
           child: CodeEditor(
             wordWrap: false,
