@@ -3,6 +3,7 @@ import 'package:client/screens/app.dart';
 import 'package:client/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
@@ -14,6 +15,15 @@ void main(List<String> args) async {
 
   await bootLogger.init();
   log.i('flutter binding initialized, args=$args');
+
+  // 加载字体，防止异步换入时字距跳变。
+  try {
+    GoogleFonts.config.allowRuntimeFetching = false;
+    await GoogleFonts.pendingFonts([GoogleFonts.robotoMono(), GoogleFonts.notoSansSc()]);
+    log.i('fonts preloaded');
+  } catch (e, st) {
+    log.e('fonts preload failed, falling back to system fonts', error: e, stackTrace: st);
+  }
 
   try {
     log.i('single instance ensuring');
