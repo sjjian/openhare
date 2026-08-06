@@ -22,6 +22,8 @@ import 'src/dialect/redis/lexer.dart';
 import 'src/dialect/redis/parser.dart';
 import 'src/dialect/mongodb/lexer.dart';
 import 'src/dialect/mongodb/parser.dart';
+import 'src/dialect/duckdb/lexer.dart';
+import 'src/dialect/duckdb/parser.dart';
 import 'src/lexer/lexer.dart';
 import 'src/parser/parser.dart';
 import 'src/dialect/mysql/keyword.dart' as mysql_keywords;
@@ -31,9 +33,10 @@ import 'src/dialect/pg/keyword.dart' as pg_keywords;
 import 'src/dialect/sqlite/keyword.dart' as sqlite_keywords;
 import 'src/dialect/redis/keyword.dart' as redis_keywords;
 import 'src/dialect/mongodb/keyword.dart' as mongodb_keywords;
+import 'src/dialect/duckdb/keyword.dart' as duckdb_keywords;
 
 // 定义方言类型枚举
-enum DialectType { mysql, oracle, pg, mssql, sqlite, redis, mongodb }
+enum DialectType { mysql, oracle, pg, mssql, sqlite, redis, mongodb, duckdb }
 
 Lexer createLexer(DialectType dialect, String content) {
   switch (dialect) {
@@ -51,6 +54,8 @@ Lexer createLexer(DialectType dialect, String content) {
       return RedisLexer(content);
     case DialectType.mongodb:
       return MongoLexer(content);
+    case DialectType.duckdb:
+      return DuckdbLexer(content);
   }
 }
 
@@ -71,6 +76,8 @@ List<SQLChunk> splitSQL(DialectType dialect, String content,
       return RedisSplitter(content).split(skipWhitespace: skipWhitespace, skipComment: skipComment);
     case DialectType.mongodb:
       return MongoSplitter(content).split(skipWhitespace: skipWhitespace, skipComment: skipComment);
+    case DialectType.duckdb:
+      return DuckdbSplitter(content).split(skipWhitespace: skipWhitespace, skipComment: skipComment);
   }
 }
 
@@ -89,6 +96,8 @@ bool match(DialectType dialect, String content, String pattern) {
     case DialectType.redis:
       return Matcher(createLexer(dialect, content)).match(pattern);
     case DialectType.mongodb:
+      return Matcher(createLexer(dialect, content)).match(pattern);
+    case DialectType.duckdb:
       return Matcher(createLexer(dialect, content)).match(pattern);
   }
 }
@@ -109,6 +118,8 @@ SQLDefiner parser(DialectType dialect, String content) {
       return RedisSQLDefiner(content);
     case DialectType.mongodb:
       return MongoSQLDefiner(content);
+    case DialectType.duckdb:
+      return DuckdbSQLDefiner(content);
   }
 }
 
@@ -128,5 +139,7 @@ Set<String> keywords(DialectType dialect) {
       return redis_keywords.keywords;
     case DialectType.mongodb:
       return mongodb_keywords.keywords;
+    case DialectType.duckdb:
+      return duckdb_keywords.keywords;
   }
 }

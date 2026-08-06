@@ -342,7 +342,7 @@ class TrackedFilePathFormField extends TrackedTextFormField {
     required super.label,
     required super.controller,
     required this.pickTooltip,
-    this.allowedExtensions = const ['db', 'sqlite', 'sqlite3'],
+    this.allowedExtensions = const ['db', 'sqlite', 'sqlite3', 'duckdb'],
     super.readOnly,
   });
 

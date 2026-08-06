@@ -269,3 +269,57 @@ class BracketValueTokenBuilder implements TokenBuilder {
     return (false, null);
   }
 }
+
+/// dollar-quoted string: `$tag$...$tag$` or `$$...$$`.
+class DollarQuotedTokenBuilder implements TokenBuilder {
+  DollarQuotedTokenBuilder();
+
+  bool _isTagStart(int char) {
+    return Char.isLowercaseLatin(char) ||
+        Char.isUppercaseLatin(char) ||
+        char == Char.$_;
+  }
+
+  bool _isTagPart(int char) {
+    return _isTagStart(char) || Char.isDigit(char);
+  }
+
+  @override
+  (bool, TokenType?) matchToken(LexerContext ctx) {
+    if (ctx.scanner.curChar() != Char.$$) {
+      return (false, null);
+    }
+
+    final openStart = ctx.startPos.copy();
+
+    if (!ctx.scanner.hasNext() || !ctx.scanner.next()) {
+      return (false, null);
+    }
+
+    if (ctx.scanner.curChar() != Char.$$) {
+      if (!_isTagStart(ctx.scanner.curChar())) {
+        return (false, null);
+      }
+      while (true) {
+        if (ctx.scanner.curChar() == Char.$$) {
+          break;
+        }
+        if (!_isTagPart(ctx.scanner.curChar())) {
+          return (false, null);
+        }
+        if (!ctx.scanner.hasNext() || !ctx.scanner.next()) {
+          return (false, null);
+        }
+      }
+    }
+
+    final delimiter = ctx.scanner.subString(openStart, ctx.scanner.pos);
+    while (ctx.scanner.hasNext() && ctx.scanner.next()) {
+      if (ctx.scanner.startWith(delimiter)) {
+        ctx.scanner.nextN(delimiter.length - 1);
+        return (true, TokenType.singleQValue);
+      }
+    }
+    return (false, null);
+  }
+}

@@ -46,6 +46,7 @@ typedef enum {
   GO_IMPL_DB_SQLITE = 4,
   GO_IMPL_DB_REDIS = 5,
   GO_IMPL_DB_MONGODB = 6,
+  GO_IMPL_DB_DUCKDB = 7,
 } go_impl_db_type_t;
 
 typedef enum {

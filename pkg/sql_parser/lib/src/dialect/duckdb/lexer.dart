@@ -2,7 +2,7 @@ import 'package:sql_parser/src/lexer/lexer.dart';
 import 'package:sql_parser/src/lexer/token_builder.dart';
 import 'keyword.dart';
 
-class PgLexer extends Lexer {
+class DuckdbLexer extends Lexer {
   static final TokenBuilder _builder = TokenRooter(<TokenBuilder>[
     EOFTokenBuilder(),
     SpaceTokenBuilder(),
@@ -15,5 +15,5 @@ class PgLexer extends Lexer {
     PunctuationTokenBuilder(),
   ]);
 
-  PgLexer(String content) : super(_builder, content);
+  DuckdbLexer(String content) : super(_builder, content);
 }

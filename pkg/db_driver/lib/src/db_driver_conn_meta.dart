@@ -11,7 +11,8 @@ enum DatabaseType {
   mssql,
   sqlite,
   redis,
-  mongodb;
+  mongodb,
+  duckdb;
 
   DialectType get dialectType {
     switch (this) {
@@ -29,6 +30,8 @@ enum DatabaseType {
         return DialectType.redis;
       case DatabaseType.mongodb:
         return DialectType.mongodb;
+      case DatabaseType.duckdb:
+        return DialectType.duckdb;
     }
   }
 }
