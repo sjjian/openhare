@@ -1,0 +1,190 @@
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+// Package duckdb implements a database/sql driver for the DuckDB database.
+package duckdb
+
+import (
+	"context"
+	"database/sql"
+	"database/sql/driver"
+	"errors"
+	"fmt"
+	"net/url"
+	"strings"
+	"sync"
+
+	"github.com/duckdb/duckdb-go/v2/mapping"
+)
+
+var GetInstanceCache = sync.OnceValue(
+	func() mapping.InstanceCache {
+		return mapping.CreateInstanceCache()
+	})
+
+func init() {
+	sql.Register("duckdb", Driver{})
+}
+
+type Driver struct{}
+
+func (d Driver) Open(dsn string) (driver.Conn, error) {
+	c, err := d.OpenConnector(dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Connect(context.Background())
+}
+
+func (Driver) OpenConnector(dsn string) (driver.Connector, error) {
+	return NewConnector(dsn, func(execerContext driver.ExecerContext) error {
+		return nil
+	})
+}
+
+type Connector struct {
+	// The internal DuckDB database.
+	db mapping.Database
+	// Callback to perform additional initialization steps.
+	connInitFn func(execer driver.ExecerContext) error
+	// ctxStore stores the context of the current query/exec/etc. of a connection.
+	ctxStore *contextStore
+	// True, if the connector has been closed, else false.
+	closed bool
+}
+
+// NewConnector opens a new Connector for a DuckDB database.
+// The user must close the Connector, if it is not passed to the sql.OpenDB function.
+// Otherwise, sql.DB closes the Connector when calling sql.DB.Close().
+func NewConnector(dsn string, connInitFn func(execer driver.ExecerContext) error) (*Connector, error) {
+	inMemory := false
+	const inMemoryName = ":memory:"
+
+	// If necessary, trim the in-memory prefix, and determine if this is an in-memory database.
+	if dsn == inMemoryName || strings.HasPrefix(dsn, inMemoryName+"?") {
+		dsn = dsn[len(inMemoryName):]
+		inMemory = true
+	} else if dsn == "" || strings.HasPrefix(dsn, "?") {
+		inMemory = true
+	}
+
+	parsedDSN, err := url.Parse(dsn)
+	if err != nil {
+		return nil, getError(errParseDSN, err)
+	}
+
+	config, err := prepareConfig(parsedDSN)
+	if err != nil {
+		return nil, err
+	}
+	defer mapping.DestroyConfig(&config)
+
+	var db mapping.Database
+	var errMsg string
+	var state mapping.State
+
+	if inMemory {
+		// Open an in-memory database.
+		state = mapping.OpenExt("", &db, config, &errMsg)
+	} else {
+		// Open a file-backed database.
+		state = mapping.GetOrCreateFromCache(GetInstanceCache(), getDBPath(dsn), &db, config, &errMsg)
+	}
+	if state == mapping.StateError {
+		mapping.Close(&db)
+		return nil, getError(errConnect, getDuckDBError(errMsg))
+	}
+
+	return &Connector{
+		db:         db,
+		connInitFn: connInitFn,
+		ctxStore:   newContextStore(),
+	}, nil
+}
+
+func (*Connector) Driver() driver.Driver {
+	return Driver{}
+}
+
+func (c *Connector) Connect(ctx context.Context) (driver.Conn, error) {
+	var mc mapping.Connection
+	if mapping.Connect(c.db, &mc) == mapping.StateError {
+		return nil, getError(errConnect, nil)
+	}
+
+	conn := newConn(mc, c.ctxStore)
+	cleanupCtx := conn.setContext(ctx)
+	defer cleanupCtx()
+
+	if c.connInitFn == nil {
+		return conn, nil
+	}
+	if err := c.connInitFn(conn); err != nil {
+		// Close the fresh connection so a failed initializer does not leak the
+		// native handle. Return err directly when cleanup succeeds so callers
+		// that compare the initializer error by identity keep working.
+		closeErr := conn.Close()
+		if closeErr == nil || errors.Is(closeErr, errClosedCon) {
+			return nil, err
+		}
+		return nil, errors.Join(err, closeErr)
+	}
+
+	return conn, nil
+}
+
+func (c *Connector) Close() error {
+	if c.closed {
+		return nil
+	}
+	mapping.Close(&c.db)
+	c.closed = true
+
+	return nil
+}
+
+func getDBPath(dsn string) string {
+	idx := strings.Index(dsn, "?")
+	if idx < 0 {
+		idx = len(dsn)
+	}
+	return dsn[0:idx]
+}
+
+func prepareConfig(parsedDSN *url.URL) (mapping.Config, error) {
+	var config mapping.Config
+	if mapping.CreateConfig(&config) == mapping.StateError {
+		mapping.DestroyConfig(&config)
+		return config, getError(errCreateConfig, nil)
+	}
+
+	if err := setConfigOption(config, "duckdb_api", "go"); err != nil {
+		return config, err
+	}
+
+	// Early-out, if the DSN does not contain configuration options.
+	if len(parsedDSN.RawQuery) == 0 {
+		return config, nil
+	}
+
+	for k, v := range parsedDSN.Query() {
+		if len(v) == 0 {
+			continue
+		}
+		if err := setConfigOption(config, k, v[0]); err != nil {
+			return config, err
+		}
+	}
+
+	return config, nil
+}
+
+func setConfigOption(config mapping.Config, name, option string) error {
+	if mapping.SetConfig(config, name, option) == mapping.StateError {
+		mapping.DestroyConfig(&config)
+		return getError(errSetConfig, fmt.Errorf("%s=%s", name, option))
+	}
+
+	return nil
+}
