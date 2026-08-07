@@ -653,6 +653,11 @@ class _MentionTextFieldState extends State<MentionTextField> {
   }
 
   bool handleEnter() {
+    // IME 组字确认依赖 Enter，组字中不抢键，否则会出现回车无响应/内容被清掉。
+    final composing = widget.controller.value.composing;
+    if (composing.isValid && !composing.isCollapsed) {
+      return false;
+    }
     if (_overlayVisible && _candidates.isNotEmpty) {
       return _tryConfirmSelection();
     }
