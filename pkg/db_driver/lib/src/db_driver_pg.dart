@@ -11,6 +11,11 @@ import 'db_driver_metadata.dart';
 class PGConnection extends GoImplConnection {
   PGConnection(super._conn);
 
+  static const bool supportsExplainCapability = true;
+
+  @override
+  bool get supportsExplain => supportsExplainCapability;
+
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.schemaMode;

@@ -95,6 +95,19 @@ class ConnectionWrapper extends BaseConnection {
     return wrapper;
   }
 
+  static bool supportsExplainOf(DatabaseType type) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.supportsExplainCapability,
+      DatabaseType.pg => PGConnection.supportsExplainCapability,
+      DatabaseType.oracle => OracleConnection.supportsExplainCapability,
+      DatabaseType.mssql => MSSQLConnection.supportsExplainCapability,
+      DatabaseType.sqlite => SQLiteConnection.supportsExplainCapability,
+      DatabaseType.redis => RedisConnection.supportsExplainCapability,
+      DatabaseType.mongodb => MongoConnection.supportsExplainCapability,
+      DatabaseType.duckdb => DuckDBConnection.supportsExplainCapability,
+    };
+  }
+
   @override
   bool get supportsKillQuery => _inner.supportsKillQuery;
 

@@ -118,7 +118,7 @@ class _SQLEditorState extends ConsumerState<SQLEditor> {
                     codeController: widget.codeController,
                   ),
               settingService.getShortcutModel(KeyboardShortcut.sqlExplain).toSingleActivator()!: () {
-                if (!sessionOpBarSupportsExplain(ref, barModel)) {
+                if (!sessionOpBarSupportsExplain(barModel)) {
                   return;
                 }
                 sessionOpBarExplain(
@@ -228,7 +228,7 @@ class _SqlEditorSelectionToolbar extends ConsumerWidget {
                       },
                     ),
                     SizedBox(width: kSpacingTiny),
-                    if (sessionOpBarSupportsExplain(ref, barModel))
+                    if (sessionOpBarSupportsExplain(barModel))
                       RectangleIconButton.medium(
                         tooltip: tooltipWithShortcutDisplay(
                           l10n.button_tooltip_explain_sql,

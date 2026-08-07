@@ -9,6 +9,11 @@ import 'db_driver_metadata.dart';
 class SQLiteConnection extends GoImplConnection {
   SQLiteConnection(super._conn);
 
+  static const bool supportsExplainCapability = true;
+
+  @override
+  bool get supportsExplain => supportsExplainCapability;
+
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.singleMode;

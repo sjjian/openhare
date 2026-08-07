@@ -165,12 +165,12 @@ void sessionOpBarExplain({
   }
 }
 
-bool sessionOpBarSupportsExplain(WidgetRef ref, SessionOpBarModel model) {
-  final connId = model.connId;
-  if (connId == null) {
+bool sessionOpBarSupportsExplain(SessionOpBarModel model) {
+  final dbType = model.dbType;
+  if (dbType == null) {
     return false;
   }
-  return ref.read(sessionConnsServicesProvider.notifier).supportsExplain(connId);
+  return ConnectionWrapper.supportsExplainOf(dbType);
 }
 
 void sessionOpBarExportDownload({
@@ -433,7 +433,7 @@ class SessionOpBar extends ConsumerWidget {
           // execute
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
-          if (sessionOpBarSupportsExplain(ref, model)) explainWidget(context, ref, model),
+          if (sessionOpBarSupportsExplain(model)) explainWidget(context, ref, model),
           exportDataWidget(context, ref, model),
           taskOverviewWidget(context, ref, model),
           SessionConfigBar(model: model),
