@@ -500,16 +500,17 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
   }
 
   Widget _schemaBarTriggerContent(BuildContext context) {
+    final canOpen = !widget.disable;
     return Padding(
       padding: const EdgeInsets.all(kSpacingTiny),
       child: MouseRegion(
-        onEnter: (_) => setState(() => isEnter = true),
-        onExit: (_) => setState(() => isEnter = false),
+        onEnter: canOpen ? (_) => setState(() => isEnter = true) : null,
+        onExit: canOpen ? (_) => setState(() => isEnter = false) : null,
         child: Container(
           height: 26,
           padding: const EdgeInsets.fromLTRB(kSpacingTiny, 0, kSpacingTiny, 0),
           decoration: BoxDecoration(
-            color: isEnter ? Theme.of(context).colorScheme.surfaceContainerLow : null, // schema 框鼠标移入的颜色
+            color: (canOpen && isEnter) ? Theme.of(context).colorScheme.surfaceContainerLow : null, // schema 框鼠标移入的颜色
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: Theme.of(context).colorScheme.outlineVariant,
@@ -655,7 +656,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
           child: RectangleIconButton.small(
             tooltip: AppLocalizations.of(context)!.button_tooltip_refresh_metadata,
             icon: Icons.refresh,
-            onPressed: () async {
+            onPressed: () {
               ref.read(selectedSessionMetadataProvider.notifier).refreshMetadata();
             },
           ),
@@ -695,17 +696,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
             return _buildSchemaBarRefMenu(context, data);
         }
       },
-      loading: () => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: SizedBox(
-          height: 24,
-          width: 132,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Loading.medium(),
-          ),
-        ),
-      ),
+      loading: () => _schemaBarTriggerContent(context),
       error: (_, _) => const SizedBox.shrink(),
     );
   }
