@@ -28,7 +28,7 @@ openhare 是一款 AI 驱动的跨平台桌面 SQL 客户端，支持多数据�
 ## 核心特性
 - **轻量原生**：下载即用、安装便捷，无 WebView、无内嵌浏览器；基于 Flutter 原生桌面 UI，内存占用低。
 - **AI 智能辅助**：内置 AI 帮助你编写、优化并理解 SQL；高危语句执行前会征求确认，保障数据安全。
-- **多数据库支持**：支持 MySQL、PostgreSQL、SQL Server、SQLite、Oracle、MongoDB、Redis 等。
+- **多数据库支持**：支持 MySQL、PostgreSQL、SQL Server、SQLite、DuckDB、Oracle、MongoDB、Redis 等。
 - **跨平台支持**：在 Windows、macOS 和 Linux 上提供原生体验。
 - **完全开源**：基于 [Apache License 2.0](./LICENSE) 开源，透明且社区驱动。
 
@@ -42,6 +42,7 @@ openhare 是一款 AI 驱动的跨平台桌面 SQL 客户端，支持多数据�
 | <img src="./client/assets/icons/pg_icon.png" width="28" alt="PostgreSQL"> | PostgreSQL | [jackc/pgx](https://github.com/jackc/pgx) |
 | <img src="./client/assets/icons/mssql_icon.png" width="28" alt="SQL Server"> | SQL Server | [microsoft/go-mssqldb](https://github.com/microsoft/go-mssqldb) |
 | <img src="./client/assets/icons/sqlite_icon.png" width="28" alt="SQLite"> | SQLite | [mattn/go-sqlite3](https://github.com/mattn/go-sqlite3) |
+| <img src="./client/assets/icons/duckdb_icon.png" width="28" alt="DuckDB"> | DuckDB | [duckdb/duckdb-go](https://github.com/duckdb/duckdb-go) |
 | <img src="./client/assets/icons/oracle_icon.png" width="28" alt="Oracle"> | Oracle | [sijms/go-ora](https://github.com/sijms/go-ora) |
 | <img src="./client/assets/icons/mongodb_icon.png" width="28" alt="MongoDB"> | MongoDB | [bytebase/gomongo](https://github.com/bytebase/gomongo), [mongodb/mongo-go-driver](https://github.com/mongodb/mongo-go-driver) |
 | <img src="./client/assets/icons/redis_icon.png" width="28" alt="Redis"> | Redis | [redis/go-redis](https://github.com/redis/go-redis) |
