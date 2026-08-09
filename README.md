@@ -28,7 +28,7 @@ openhare is an AI-powered, cross-platform desktop SQL client with multi-database
 ## Key Features
 - **Lightweight & Native**: Download, install, and run in seconds — no WebView or bundled browser engine. Built with Flutter for a native desktop UI and a lean memory footprint.
 - **AI-Powered Assistance**: Write, optimize, and understand SQL with built-in AI — high-risk statements are flagged and require your confirmation before execution.
-- **Multi-Database Support**: Connect to MySQL, PostgreSQL, SQL Server, SQLite, Oracle, MongoDB, Redis, and more.
+- **Multi-Database Support**: Connect to MySQL, PostgreSQL, SQL Server, SQLite, DuckDB, Oracle, MongoDB, Redis, and more.
 - **Cross-Platform**: Native experience on Windows, macOS, and Linux.
 - **Fully Open Source**: Licensed under the [Apache License 2.0](./LICENSE) — transparent and community-driven.
 
@@ -42,6 +42,7 @@ Database drivers are implemented in [`pkg/db_driver/go_impl`](./pkg/db_driver/go
 | <img src="./client/assets/icons/pg_icon.png" width="28" alt="PostgreSQL"> | PostgreSQL | [jackc/pgx](https://github.com/jackc/pgx) |
 | <img src="./client/assets/icons/mssql_icon.png" width="28" alt="SQL Server"> | SQL Server | [microsoft/go-mssqldb](https://github.com/microsoft/go-mssqldb) |
 | <img src="./client/assets/icons/sqlite_icon.png" width="28" alt="SQLite"> | SQLite | [mattn/go-sqlite3](https://github.com/mattn/go-sqlite3) |
+| <img src="./client/assets/icons/duckdb_icon.png" width="28" alt="DuckDB"> | DuckDB | [duckdb/duckdb-go](https://github.com/duckdb/duckdb-go) |
 | <img src="./client/assets/icons/oracle_icon.png" width="28" alt="Oracle"> | Oracle | [sijms/go-ora](https://github.com/sijms/go-ora) |
 | <img src="./client/assets/icons/mongodb_icon.png" width="28" alt="MongoDB"> | MongoDB | [bytebase/gomongo](https://github.com/bytebase/gomongo), [mongodb/mongo-go-driver](https://github.com/mongodb/mongo-go-driver) |
 | <img src="./client/assets/icons/redis_icon.png" width="28" alt="Redis"> | Redis | [redis/go-redis](https://github.com/redis/go-redis) |
