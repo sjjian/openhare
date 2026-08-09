@@ -17,6 +17,11 @@ class MongoConnection extends GoImplConnection {
   @override
   bool get supportsKillQuery => false;
 
+  static const bool supportsExplainCapability = false;
+
+  @override
+  bool get supportsExplain => supportsExplainCapability;
+
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.databaseMode;

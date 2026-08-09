@@ -11,6 +11,7 @@ import 'db_driver_sqlite.dart';
 import 'db_driver_pg.dart';
 import 'db_driver_redis.dart';
 import 'db_driver_mongodb.dart';
+import 'db_driver_duckdb.dart';
 
 /// 封装具体 [BaseConnection]，并统一管理 SSH 隧道生命周期。
 class ConnectionWrapper extends BaseConnection {
@@ -35,7 +36,7 @@ class ConnectionWrapper extends BaseConnection {
     SshTunnel? tunnel;
     try {
       late final ConnectValue wireMeta;
-      if (type == DatabaseType.sqlite) {
+      if (type == DatabaseType.sqlite || type == DatabaseType.duckdb) {
         wireMeta = meta;
       } else {
         final sshConfig = meta.sshTunnel;
@@ -74,6 +75,8 @@ class ConnectionWrapper extends BaseConnection {
           await RedisConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.mongodb =>
           await MongoConnection.open(meta: wireMeta, schema: schema),
+        DatabaseType.duckdb =>
+          await DuckDBConnection.open(meta: wireMeta, schema: schema),
       };
       final opened = ConnectionWrapper(inner, sshTunnel: tunnel);
       opened.listen(onSchemaChangedCallback: onSchemaChangedCallback);
@@ -92,8 +95,24 @@ class ConnectionWrapper extends BaseConnection {
     return wrapper;
   }
 
+  static bool supportsExplainOf(DatabaseType type) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.supportsExplainCapability,
+      DatabaseType.pg => PGConnection.supportsExplainCapability,
+      DatabaseType.oracle => OracleConnection.supportsExplainCapability,
+      DatabaseType.mssql => MSSQLConnection.supportsExplainCapability,
+      DatabaseType.sqlite => SQLiteConnection.supportsExplainCapability,
+      DatabaseType.redis => RedisConnection.supportsExplainCapability,
+      DatabaseType.mongodb => MongoConnection.supportsExplainCapability,
+      DatabaseType.duckdb => DuckDBConnection.supportsExplainCapability,
+    };
+  }
+
   @override
   bool get supportsKillQuery => _inner.supportsKillQuery;
+
+  @override
+  bool get supportsExplain => _inner.supportsExplain;
 
   @override
   void listen({
@@ -141,6 +160,9 @@ class ConnectionWrapper extends BaseConnection {
 
   @override
   SQLDefiner parser(String sql) => _inner.parser(sql);
+
+  @override
+  Future<BaseQueryResult> explain(String sql) => _inner.explain(sql);
 
   @override
   Future<void> close() async {
@@ -357,6 +379,19 @@ The connection driver uses mongosh-compatible shell syntax and leverages the gom
         enumValues: ['true', 'false'],
         // comment: '为 true 时只连当前主机端口，不解析副本集拓扑（URI 参数 directConnection）',
       ),
+    ],
+    initQuerys: const [],
+  ),
+  ConnectionMeta(
+    displayName: "DuckDB",
+    type: DatabaseType.duckdb,
+    logoAssertPath: "assets/icons/duckdb_icon.png",
+    description:
+        "DuckDB is an in-process analytical database. Connect via a local .duckdb file or leave empty for an in-memory database.",
+    connMeta: [
+      NameMeta(),
+      TargetDBFileMeta(),
+      DescMeta(),
     ],
     initQuerys: const [],
   ),

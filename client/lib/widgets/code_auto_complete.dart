@@ -1,4 +1,3 @@
-import 'package:client/utils/fuzzy_match.dart';
 import 'package:client/widgets/const.dart';
 import 'package:client/widgets/data_type_icon.dart';
 import 'package:client/widgets/sql_highlight.dart';
@@ -7,10 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:sql_editor/re_editor.dart';
+import 'package:sql_parser/parser.dart';
+import 'package:sql_complete/sql_complete.dart';
 import 'dart:math';
 
 class FuzzyMatchCodePrompt extends CodeKeywordPrompt {
-  const FuzzyMatchCodePrompt({required super.word});
+  final List<int>? matchPositions;
+
+  const FuzzyMatchCodePrompt({required super.word, this.matchPositions});
+
   @override
   bool match(String input) {
     return FuzzyMatch.match(input, word);
@@ -28,33 +32,34 @@ class FuzzyMatchCodePrompt extends CodeKeywordPrompt {
   int get hashCode => word.hashCode;
 
   /// Builds a TextSpan with highlighted match positions.
-  TextSpan getTextSpan(BuildContext context, String input, [FuzzyMatchResult? cachedResult]) {
-    final matchResult = cachedResult ?? FuzzyMatch.matchWithResult(input, word);
-    final baseStyle = GoogleFonts.robotoMono(
-      textStyle: Theme.of(context).textTheme.bodyMedium,
-      color: Theme.of(context).colorScheme.onSurface, // 代码补全提示词文字默认颜色
-    );
+  TextSpan getTextSpan(BuildContext context, String input, {TextStyle? style}) {
+    List<int>? positions = matchPositions;
+    if (positions == null) {
+      final matchResult = FuzzyMatch.matchWithResult(input, word);
+      if (matchResult.matched) positions = matchResult.matchPositions;
+    }
+    final baseStyle =
+        style ??
+        GoogleFonts.robotoMono(
+          textStyle: Theme.of(context).textTheme.bodyMedium,
+          color: Theme.of(context).colorScheme.onSurface,
+          letterSpacing: 0,
+        );
 
     // If no match or no matchPositions, return plain text
-    if (!matchResult.matched || matchResult.matchPositions == null || matchResult.matchPositions!.isEmpty) {
+    if (positions == null || positions.isEmpty) {
       return TextSpan(text: word, style: baseStyle);
     }
 
-    final matchPositionsSet = matchResult.matchPositions!.toSet();
+    final matchPositionsSet = positions.toSet();
     final List<TextSpan> spans = [];
 
-    // Build TextSpan by checking each character's position
     for (int i = 0; i < word.length; i++) {
       final isMatch = matchPositionsSet.contains(i);
       spans.add(
         TextSpan(
           text: word[i],
-          style: isMatch
-              ? baseStyle.copyWith(
-                  color: SQLHighlightColor.keyword,
-                  fontWeight: FontWeight.bold,
-                )
-              : baseStyle,
+          style: isMatch ? baseStyle.copyWith(color: SQLHighlightColor.keyword) : baseStyle,
         ),
       );
     }
@@ -64,7 +69,7 @@ class FuzzyMatchCodePrompt extends CodeKeywordPrompt {
 }
 
 class KeywordPrompt extends FuzzyMatchCodePrompt {
-  const KeywordPrompt({required super.word});
+  const KeywordPrompt({required super.word, super.matchPositions});
 
   @override
   bool operator ==(Object other) {
@@ -81,7 +86,12 @@ class KeywordPrompt extends FuzzyMatchCodePrompt {
 class DBObjectPrompt extends FuzzyMatchCodePrompt {
   final MetaType type;
   final Map<MetaDataPropType, MetaDataProp>? props;
-  const DBObjectPrompt({required super.word, required this.type, this.props});
+  const DBObjectPrompt({
+    required super.word,
+    required this.type,
+    this.props,
+    super.matchPositions,
+  });
 
   @override
   bool operator ==(Object other) {
@@ -95,161 +105,108 @@ class DBObjectPrompt extends FuzzyMatchCodePrompt {
   int get hashCode => word.hashCode;
 }
 
-extension _CodeAutocompleteStringExtension on String {
-  bool get isValidVariablePart {
-    final int char = codeUnits.first;
-    return (char >= 65 && char <= 90) || // A–Z
-        (char >= 97 && char <= 122) || // a–z
-        (char >= 48 && char <= 57) || // 0–9
-        char == 95; // _
-  }
-
-  bool get isNumeric {
-    if (isEmpty) return false;
-    for (var codeUnit in codeUnits) {
-      if (codeUnit < 48 || codeUnit > 57) return false; // '0'~'9'
-    }
-    return true;
-  }
-}
-
-extension _CodeAutocompleteCharactersExtension on Characters {
-  bool containsSymbols(List<String> symbols) {
-    for (int i = length - 1; i >= 0; i--) {
-      if (symbols.contains(elementAt(i))) {
-        return true;
-      }
-    }
-    return false;
-  }
-}
-
 class SQLEditorAutocompletePromptsBuilder implements DefaultCodeAutocompletePromptsBuilder {
-  final List<CodeKeywordPrompt> keywordPrompts;
-  final List<CodePrompt> directPrompts;
-  final Map<String, List<CodePrompt>> relatedPrompts;
+  final CodeLineEditingController controller;
+  final SqlCompleteCatalog catalog;
+  final DialectType dialect;
 
-  final Set<CodePrompt> _allKeywordPrompts = {};
+  /// 对象名 → metadata props。
+  final Map<String, Map<MetaDataPropType, MetaDataProp>> objectProps;
 
   SQLEditorAutocompletePromptsBuilder({
-    required this.keywordPrompts,
-    required this.directPrompts,
-    required this.relatedPrompts,
-  }) {
-    _allKeywordPrompts.addAll(keywordPrompts);
-    _allKeywordPrompts.addAll(directPrompts);
+    required this.controller,
+    required this.catalog,
+    this.dialect = DialectType.mysql,
+    this.objectProps = const {},
+  });
+
+  CodePrompt _promptFromItem(SqlCompleteItem item) {
+    switch (item.kind) {
+      case SqlCompleteKind.keyword:
+        return KeywordPrompt(
+          word: item.text,
+          matchPositions: item.matchPositions,
+        );
+      case SqlCompleteKind.database:
+        return _objectPrompt(item, MetaType.database);
+      case SqlCompleteKind.table:
+      case SqlCompleteKind.alias:
+        return _objectPrompt(item, MetaType.table);
+      case SqlCompleteKind.column:
+      // object 是模型未细分的对象名，列图标最中性。
+      case SqlCompleteKind.object:
+        return _objectPrompt(item, MetaType.column);
+    }
   }
 
-  bool _isInsideString(Characters before, Characters after) {
-    // Check whether the position is inside a string
-    return before.containsSymbols(const ['\'', '"']) && after.containsSymbols(const ['\'', '"']);
-  }
-
-  String _extractWordBeforePosition(Characters characters, int endOffset) {
-    int start = endOffset - 1;
-    for (; start >= 0; start--) {
-      if (!characters.elementAt(start).isValidVariablePart) {
-        break;
-      }
-    }
-    return characters.getRange(start + 1, endOffset).string;
-  }
-
-  String _extractInput(Characters charactersBefore) {
-    // Handle dot notation (e.g., table.column)
-    if (charactersBefore.takeLast(1).string == '.') {
-      return '';
-    }
-    // Handle regular input extraction
-    final input = _extractWordBeforePosition(charactersBefore, charactersBefore.length);
-
-    // If input is empty and not a dot notation, no autocomplete needed
-    if (input.isEmpty && charactersBefore.takeLast(1).string != '.') {
-      return '';
-    }
-    return input;
-  }
-
-  Iterable<CodePrompt> _getPromptsForInput(String input, Characters charactersBefore) {
-    // Handle dot notation (e.g., table.column)
-    if (charactersBefore.takeLast(1).string == '.') {
-      final target = _extractWordBeforePosition(charactersBefore, charactersBefore.length - 1);
-      return relatedPrompts[target] ?? const [];
-    }
-
-    // Check if this is a qualified name (e.g., table.column)
-    if (charactersBefore.length > 1 && charactersBefore.elementAt(charactersBefore.length - 2) == '.') {
-      final target = _extractWordBeforePosition(charactersBefore, charactersBefore.length - 1);
-      final allPrompts = relatedPrompts[target]?.where((prompt) => prompt.match(input)) ?? const [];
-      return _sortAndLimitPrompts(allPrompts, input);
-    }
-
-    // Handle keyword/direct prompts
-    final allPrompts = _allKeywordPrompts.where((prompt) => prompt.match(input));
-    return _sortAndLimitPrompts(allPrompts, input);
+  DBObjectPrompt _objectPrompt(SqlCompleteItem item, MetaType type) {
+    return DBObjectPrompt(
+      word: item.text,
+      type: type,
+      props: objectProps[item.text],
+      matchPositions: item.matchPositions,
+    );
   }
 
   @override
   CodeAutocompleteEditingValue? build(BuildContext context, CodeLine codeLine, CodeLineSelection selection) {
-    final String text = codeLine.text;
-    final Characters charactersBefore = text.substring(0, selection.extentOffset).characters;
-    if (charactersBefore.isEmpty) {
-      return null;
-    }
-    final Characters charactersAfter = text.substring(selection.extentOffset).characters;
+    final text = codeLine.text;
+    final before = text.substring(0, selection.extentOffset);
+    final after = text.substring(selection.extentOffset);
+    final sqlPrefix = prefixBeforeCursor(controller, dialect: dialect);
 
-    if (_isInsideString(charactersBefore, charactersAfter)) {
-      return null;
-    }
+    final engine = SqlCompletionEngine(catalog: catalog, dialect: dialect);
+    final result = engine.complete(
+      SqlCompletionRequest(
+        sqlPrefix: sqlPrefix,
+        lineBefore: before,
+        lineAfter: after,
+      ),
+    );
+    if (result.isEmpty) return null;
 
-    final input = _extractInput(charactersBefore);
-    // skip number;
-    if (input.isNumeric) {
-      return null;
-    }
-    final prompts = _getPromptsForInput(input, charactersBefore);
-
-    if (input.isEmpty && prompts.isEmpty) {
-      return null;
-    }
-
-    if (prompts.isEmpty) {
-      return null;
-    }
-
-    return CodeAutocompleteEditingValue(input: input, prompts: prompts.toList(), index: 0);
+    return CodeAutocompleteEditingValue(
+      input: result.input,
+      prompts: [for (final item in result.items) _promptFromItem(item)],
+      index: 0,
+    );
   }
+}
 
-  /// Sorts prompts by match score and limits the result count for performance.
-  ///
-  /// Limits to top 100 matches to prevent UI lag when there are many candidates.
-  static const int _maxPrompts = 100;
-
-  List<CodePrompt> _sortAndLimitPrompts(Iterable<CodePrompt> prompts, String input) {
-    if (input.isEmpty) {
-      return prompts.take(_maxPrompts).toList();
+/// 光标所在 SQL block 内、到光标为止的前缀（与行号条 / 执行当前语句同一套 [splitSQL]）。
+String prefixBeforeCursor(
+  CodeLineEditingController controller, {
+  DialectType dialect = DialectType.mysql,
+}) {
+  final content = controller.text;
+  final chunks = splitSQL(
+    dialect,
+    content,
+    skipWhitespace: true,
+    skipComment: true,
+  );
+  final abs = _absoluteCursorOffset(controller);
+  SQLChunk? chunk;
+  for (final c in chunks) {
+    // end.cursor 含尾字符；abs == end.cursor + 1 表示停在语句末尾之后。
+    if (abs >= c.start.cursor && abs <= c.end.cursor + 1) {
+      chunk = c;
+      break;
     }
-
-    // For FuzzyMatchCodePrompt, calculate scores and sort
-    final List<(CodePrompt, double)> scoredPrompts = [];
-    for (final prompt in prompts) {
-      if (prompt is FuzzyMatchCodePrompt) {
-        final result = FuzzyMatch.matchWithResult(input, prompt.word);
-        if (result.matched) {
-          scoredPrompts.add((prompt, result.score));
-        }
-      } else {
-        // For other prompts, use a default score based on word length
-        // Shorter words get higher scores (better for autocomplete)
-        final score = 1.0 / (prompt.word.length + 1);
-        scoredPrompts.add((prompt, score));
-      }
-    }
-
-    // Sort by score (descending) and limit
-    scoredPrompts.sort((a, b) => b.$2.compareTo(a.$2));
-    return scoredPrompts.take(_maxPrompts).map((item) => item.$1).toList();
   }
+  if (chunk == null || chunk.start.cursor < 0) return '';
+  final end = abs.clamp(chunk.start.cursor, chunk.end.cursor + 1);
+  return content.substring(chunk.start.cursor, end);
+}
+
+/// 与 `controller.text`（默认 LF）对齐的绝对下标。
+int _absoluteCursorOffset(CodeLineEditingController controller) {
+  final selection = controller.selection;
+  var offset = selection.extentOffset;
+  for (var i = 0; i < selection.extentIndex; i++) {
+    offset += controller.codeLines[i].charCount + 1;
+  }
+  return offset;
 }
 
 class SQLEditorAutoCompleteListView extends StatefulWidget implements PreferredSizeWidget {
@@ -258,10 +215,13 @@ class SQLEditorAutoCompleteListView extends StatefulWidget implements PreferredS
   final ValueNotifier<CodeAutocompleteEditingValue> notifier;
   final ValueChanged<CodeAutocompleteResult> onSelected;
 
+  final TextStyle textStyle;
+
   const SQLEditorAutoCompleteListView({
     super.key,
     required this.notifier,
     required this.onSelected,
+    required this.textStyle,
   });
 
   @override
@@ -278,8 +238,7 @@ class SQLEditorAutoCompleteListView extends StatefulWidget implements PreferredS
       final fullTextPainter = TextPainter(
         text: TextSpan(
           text: maxLengthPrompt.word,
-          // todo: 这里未指定字体大小，可能会导致调整了字体之后计算不匹配的问题
-          style: GoogleFonts.robotoMono(),
+          style: textStyle,
         ),
         textDirection: TextDirection.ltr,
       );
@@ -315,22 +274,17 @@ class _SQLEditorAutoCompleteListViewState extends State<SQLEditorAutoCompleteLis
   }
 
   Widget _buildPromptText(BuildContext context, CodePrompt prompt) {
-    final baseStyle = GoogleFonts.robotoMono(
-      textStyle: Theme.of(context).textTheme.bodyMedium,
-      color: Theme.of(context).colorScheme.onSurface, // 代码补全提示词文字默认颜色
-    );
-
     if (prompt is FuzzyMatchCodePrompt) {
       final input = widget.notifier.value.input;
       return Text.rich(
-        prompt.getTextSpan(context, input),
+        prompt.getTextSpan(context, input, style: widget.textStyle),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       );
     } else {
       return Text(
         prompt.word,
-        style: baseStyle,
+        style: widget.textStyle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       );

@@ -10,45 +10,37 @@ Go-based shared native library for Dart FFI: Oracle (go-ora), SQL Server (go-mss
   s.author           = { 'Your Company' => 'email@example.com' }
 
   s.source           = { :path => '.' }
+  # CocoaPods 需要可编译目标才能产出 framework；真实二进制由下方脚本覆盖。
   s.source_files     = 'Classes/dummy.c'
   s.dependency 'FlutterMacOS'
   s.platform         = :osx, '10.11'
 
+  # Go 编译在 ../src/CMakeLists.txt；此处只调 cmake 并写入 framework。
   s.script_phase = {
-    :name => 'Build Go static library (go_impl)',
+    :name => 'Build and embed go_impl (cmake c-shared)',
     :script => <<-SCRIPT,
 set -e
-cd "$PODS_TARGET_SRCROOT/../src"
+BUILD_DIR="${DERIVED_FILE_DIR}/go_impl_cmake"
+cmake -S "$PODS_TARGET_SRCROOT/../src" -B "$BUILD_DIR" -DGO_IMPL_OSX_ARCHS="$ARCHS"
+cmake --build "$BUILD_DIR"
 
-# Use DERIVED_FILE_DIR so the Run Script output path matches OTHER_LDFLAGS at link time.
-# BUILT_PRODUCTS_DIR for the pod target can differ from where -force_load resolves, which
-# caused undefined symbols for go_impl_* despite dummy.c referencing them.
-OUT_A="${DERIVED_FILE_DIR}/libgo_impl.a"
-
-LIPO_INPUTS=""
-for arch in $ARCHS; do
-  case "$arch" in
-    arm64)  goarch=arm64 ;;
-    x86_64) goarch=amd64 ;;
-    *) echo "Unsupported architecture: $arch" >&2; exit 1 ;;
-  esac
-  CGO_ENABLED=1 GOOS=darwin GOARCH=$goarch go build -buildmode=c-archive -o "${OUT_A}.${arch}" .
-  LIPO_INPUTS="$LIPO_INPUTS ${OUT_A}.${arch}"
-done
-lipo -create -output "$OUT_A" $LIPO_INPUTS
-rm -f "${OUT_A}".*
+FW="${BUILT_PRODUCTS_DIR}/go_impl.framework"
+FW_BIN="${FW}/Versions/A/go_impl"
+INSTALL_ID="@rpath/go_impl.framework/Versions/A/go_impl"
+if [ ! -e "$FW_BIN" ]; then
+  FW_BIN="${FW}/go_impl"
+  INSTALL_ID="@rpath/go_impl.framework/go_impl"
+fi
+cp "${BUILD_DIR}/libgo_impl.dylib" "$FW_BIN"
+chmod u+w "$FW_BIN"
+install_name_tool -id "$INSTALL_ID" "$FW_BIN"
 SCRIPT
-    :execution_position => :before_compile,
-    # 每次构建都跑 go build（vendor 等依赖无法用 input 列全）；不必再维护 input_files。
+    :execution_position => :after_compile,
     :always_out_of_date => '1',
-    :output_files => ['${DERIVED_FILE_DIR}/libgo_impl.a'],
   }
 
-  # -force_load entire archive: ld64 link order can skip .a members; Dart-only symbols need dummy.c too.
-  # Must match OUT_A in the Run Script above (DERIVED_FILE_DIR).
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    'OTHER_LDFLAGS' => '$(inherited) -force_load $(DERIVED_FILE_DIR)/libgo_impl.a',
   }
   s.swift_version = '5.0'
 end

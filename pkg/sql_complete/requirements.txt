@@ -1,0 +1,2 @@
+sqlglot>=25.0.0
+huggingface_hub>=0.20.0

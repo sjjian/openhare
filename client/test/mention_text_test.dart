@@ -649,6 +649,40 @@ void main() {
       expect(submitCount, 1);
     });
 
+    testWidgets('IME composing 时 Enter 不触发发送', (WidgetTester tester) async {
+      final controller = MentionTextEditingController(text: '');
+      int submitCount = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MentionTextField(
+              controller: controller,
+              maxLines: 5,
+              onSubmitted: (_) => submitCount++,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(TextField));
+      await tester.pump();
+
+      // 模拟中文输入法组字中：text 已有拼音，composing 未提交
+      controller.value = const TextEditingValue(
+        text: 'nihao',
+        selection: TextSelection.collapsed(offset: 5),
+        composing: TextRange(start: 0, end: 5),
+      );
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(submitCount, 0);
+      expect(controller.displayText, 'nihao');
+    });
+
     testWidgets('表 token：hover 显示删除 icon，点击后从输入中移除', (WidgetTester tester) async {
       final controller = MentionTextEditingController(text: '@users$_me');
 

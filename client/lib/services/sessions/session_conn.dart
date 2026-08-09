@@ -61,11 +61,19 @@ class SessionConnsServices extends _$SessionConnsServices {
     return ref.read(sessionConnRepoProvider).queryStream(connId, query);
   }
 
+  Future<BaseQueryResult?> explain(ConnId connId, String query) async {
+    return ref.read(sessionConnRepoProvider).explain(connId, query);
+  }
+
   Future<void> killQuery(ConnId connId) async {
     await ref.read(sessionConnRepoProvider).killQuery(connId);
   }
 
   bool supportsKillQuery(ConnId connId) {
     return ref.read(sessionConnRepoProvider).supportsKillQuery(connId);
+  }
+
+  bool supportsExplain(ConnId connId) {
+    return ref.read(sessionConnRepoProvider).supportsExplain(connId);
   }
 }

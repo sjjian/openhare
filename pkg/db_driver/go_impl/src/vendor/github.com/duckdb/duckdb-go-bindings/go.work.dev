@@ -1,0 +1,14 @@
+// Local development workspace template
+// To use it: cp go.work.dev go.work
+
+go 1.24
+
+use .
+
+replace (
+	github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64 => ./lib/darwin-amd64
+	github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64 => ./lib/darwin-arm64
+	github.com/duckdb/duckdb-go-bindings/lib/linux-amd64 => ./lib/linux-amd64
+	github.com/duckdb/duckdb-go-bindings/lib/linux-arm64 => ./lib/linux-arm64
+	github.com/duckdb/duckdb-go-bindings/lib/windows-amd64 => ./lib/windows-amd64
+)

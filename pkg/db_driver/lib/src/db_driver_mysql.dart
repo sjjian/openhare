@@ -10,12 +10,23 @@ import 'package:db_driver/src/db_driver_conn_meta.dart';
 class MySQLConnection extends GoImplConnection {
   MySQLConnection(super._conn);
 
+  static const bool supportsExplainCapability = true;
+
+  @override
+  bool get supportsExplain => supportsExplainCapability;
+
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.databaseMode;
 
   @override
   sp.SQLDefiner parser(String sql) => sp.parser(sp.DialectType.mysql, sql);
+
+  @override
+  Future<BaseQueryResult> explain(String sql) {
+    sql = parser(sql).trimDelimiter(sql);
+    return query('EXPLAIN $sql');
+  }
 
   static Future<BaseConnection> open(
       {required ConnectValue meta, DatabaseRef? schema}) async {

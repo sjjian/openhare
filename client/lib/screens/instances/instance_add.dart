@@ -516,7 +516,15 @@ class _DatabaseTypeCardState extends State<DatabaseTypeCard> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(kSpacingTiny, kSpacingSmall, kSpacingTiny, kSpacingTiny),
-                child: Image.asset(widget.logoPath),
+                child: SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: Image.asset(
+                    widget.logoPath,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.medium,
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(kSpacingTiny, kSpacingTiny, kSpacingTiny, kSpacingSmall),

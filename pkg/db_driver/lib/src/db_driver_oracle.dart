@@ -11,12 +11,25 @@ import 'db_driver_metadata.dart';
 class OracleConnection extends GoImplConnection {
   OracleConnection(super._conn);
 
+  static const bool supportsExplainCapability = true;
+
+  @override
+  bool get supportsExplain => supportsExplainCapability;
+
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.databaseMode;
 
   @override
   sp.SQLDefiner parser(String sql) => sp.parser(sp.DialectType.oracle, sql);
+
+  /// Oracle 的 EXPLAIN PLAN FOR 只写入计划表，需再查 DBMS_XPLAN 才能拿到可读结果。
+  @override
+  Future<BaseQueryResult> explain(String sql) async {
+    sql = parser(sql).trimDelimiter(sql);
+    await query('EXPLAIN PLAN FOR $sql');
+    return query("SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY())");
+  }
 
   static Future<BaseConnection> open(
       {required ConnectValue meta, DatabaseRef? schema}) async {
@@ -112,14 +125,15 @@ ORDER BY
 
     final databaseNodes = <MetaDataNode>[];
     for (final database in databaseList) {
-      final databaseNode = MetaDataNode(MetaType.database, database.databaseName());
+      final databaseNode =
+          MetaDataNode(MetaType.database, database.databaseName());
       databaseNodes.add(databaseNode);
 
       final tableNodes = <MetaDataNode>[];
       final tableRows = databaseRows[database.databaseName()];
       if (tableRows != null) {
-        final byTable = tableRows
-            .groupListsBy((result) => result.getString("TABLE_NAME")!);
+        final byTable =
+            tableRows.groupListsBy((result) => result.getString("TABLE_NAME")!);
         for (final table in byTable.keys) {
           final tableNode = MetaDataNode(MetaType.table, table);
           tableNodes.add(tableNode);

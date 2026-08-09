@@ -119,9 +119,85 @@ class SQLResultsServices extends _$SQLResultsServices {
     }
   }
 
+  Future<void> _explain(ResultId resultId, String query) async {
+    final repo = ref.read(sqlResultsRepoProvider);
+    SQLResultController.removeSQLResultController(resultId);
+
+    final sessionModel = ref.read(sessionsServicesProvider.notifier).getSession(resultId.sessionId);
+    final connServices = ref.read(sessionConnsServicesProvider.notifier);
+    final ConnId? connId = sessionModel?.connId;
+    final bool canKill = connId != null && connServices.supportsKillQuery(connId);
+
+    repo.updateSQLResult(
+      resultId,
+      SQLResultDetailModel(
+        resultId: resultId,
+        query: query,
+        state: SQLExecuteState.init,
+        connId: connId,
+        canKill: canKill,
+      ),
+    );
+    ref.invalidateSelf();
+
+    try {
+      DateTime start = DateTime.now();
+      BaseQueryResult? queryResult = await connServices.explain(
+        sessionModel!.connId!,
+        query,
+      );
+      DateTime end = DateTime.now();
+      await Future.delayed(const Duration(milliseconds: 100));
+      repo.updateSQLResult(
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          queryId: queryResult?.queryId,
+          data: queryResult,
+          executeTime: end.difference(start),
+          state: SQLExecuteState.done,
+          connId: connId,
+          canKill: canKill,
+        ),
+      );
+    } on QueryCancelledException {
+      repo.updateSQLResult(
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          state: SQLExecuteState.cancel,
+          connId: connId,
+          canKill: canKill,
+        ),
+      );
+    } catch (e) {
+      repo.updateSQLResult(
+        resultId,
+        SQLResultDetailModel(
+          resultId: resultId,
+          query: query,
+          state: SQLExecuteState.error,
+          error: e.toString(),
+          connId: connId,
+          canKill: canKill,
+        ),
+      );
+    } finally {
+      ref.invalidateSelf();
+    }
+  }
+
   Future<ResultId> queryAddResult(SessionId sessionId, String query) async {
     final resultModel = addSQLResult(sessionId);
     await _query(resultModel.resultId, query);
+    return resultModel.resultId;
+  }
+
+  Future<ResultId> explainAddResult(SessionId sessionId, String query) async {
+    final resultModel = addSQLResult(sessionId);
+    await _explain(resultModel.resultId, query);
     return resultModel.resultId;
   }
 

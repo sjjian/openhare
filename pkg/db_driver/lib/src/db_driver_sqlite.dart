@@ -9,12 +9,23 @@ import 'db_driver_metadata.dart';
 class SQLiteConnection extends GoImplConnection {
   SQLiteConnection(super._conn);
 
+  static const bool supportsExplainCapability = true;
+
+  @override
+  bool get supportsExplain => supportsExplainCapability;
+
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>
       DatabaseModeType.singleMode;
 
   @override
   sp.SQLDefiner parser(String sql) => sp.parser(sp.DialectType.sqlite, sql);
+
+  @override
+  Future<BaseQueryResult> explain(String sql) {
+    sql = parser(sql).trimDelimiter(sql);
+    return query('EXPLAIN QUERY PLAN $sql');
+  }
 
   static Future<BaseConnection> open(
       {required ConnectValue meta, DatabaseRef? schema}) async {

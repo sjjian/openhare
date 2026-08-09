@@ -14,6 +14,7 @@ import 'package:client/widgets/menu.dart';
 import 'package:client/widgets/dialog.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/divider.dart';
+import 'package:client/widgets/empty.dart';
 import 'package:client/widgets/loading.dart';
 import 'package:client/widgets/sql_highlight.dart';
 import 'package:client/utils/time_format.dart';
@@ -161,8 +162,16 @@ void sessionOpBarExplain({
   }
   String query = sessionOpBarGetQuery(codeController, model);
   if (query.isNotEmpty) {
-    ref.read(sQLResultsServicesProvider.notifier).queryAddResult(model.sessionId, "explain $query");
+    ref.read(sQLResultsServicesProvider.notifier).explainAddResult(model.sessionId, query);
   }
+}
+
+bool sessionOpBarSupportsExplain(SessionOpBarModel model) {
+  final dbType = model.dbType;
+  if (dbType == null) {
+    return false;
+  }
+  return ConnectionWrapper.supportsExplainOf(dbType);
 }
 
 void sessionOpBarExportDownload({
@@ -425,7 +434,7 @@ class SessionOpBar extends ConsumerWidget {
           // execute
           executeWidget(context, ref, model),
           executeAddWidget(context, ref, model),
-          explainWidget(context, ref, model),
+          if (sessionOpBarSupportsExplain(model)) explainWidget(context, ref, model),
           exportDataWidget(context, ref, model),
           taskOverviewWidget(context, ref, model),
           SessionConfigBar(model: model),
@@ -491,17 +500,19 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
     return refs.where((r) => r.toString().toLowerCase().contains(lower)).toList();
   }
 
-  Widget _schemaBarTriggerContent(BuildContext context) {
+  Widget _schemaBarTriggerContent(BuildContext context, {required bool disable}) {
+    // disable 时仍正常展示，只是外层不挂 OverlayMenu，不能下拉
+    final canOpen = !disable;
     return Padding(
       padding: const EdgeInsets.all(kSpacingTiny),
       child: MouseRegion(
-        onEnter: (_) => setState(() => isEnter = true),
-        onExit: (_) => setState(() => isEnter = false),
+        onEnter: canOpen ? (_) => setState(() => isEnter = true) : null,
+        onExit: canOpen ? (_) => setState(() => isEnter = false) : null,
         child: Container(
           height: 26,
           padding: const EdgeInsets.fromLTRB(kSpacingTiny, 0, kSpacingTiny, 0),
           decoration: BoxDecoration(
-            color: isEnter ? Theme.of(context).colorScheme.surfaceContainerLow : null, // schema 框鼠标移入的颜色
+            color: (canOpen && isEnter) ? Theme.of(context).colorScheme.surfaceContainerLow : null, // schema 框鼠标移入的颜色
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: Theme.of(context).colorScheme.outlineVariant,
@@ -539,24 +550,47 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
     );
   }
 
-  /// database / schema 模式共用：一级列表，标签为 [DatabaseRef.toString]。
-  Widget _buildSchemaBarRefMenu(BuildContext context, SelectedSessionSchemaModel data) {
-    final searchText = _schemaSearchController.text;
-    final filtered = _filteredDatabaseRefs(data.schemas, searchText);
-    final List<OverlayMenuItem> tabs;
-    if (filtered.isEmpty) {
-      tabs = [
-        OverlayMenuItem(
-          height: 36,
+  /// 与任务概览空态一致：居中 inbox 图标 + 文案（空列表 / 错误共用）。
+  List<OverlayMenuItem> _placeholderSchemaTabs(BuildContext context, String message) {
+    const itemHeight = 62.0;
+    return [
+      OverlayMenuItem(
+        height: itemHeight * 4,
+        child: EmptyPage(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kSpacingSmall),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.display_msg_no_data),
+            padding: const EdgeInsets.symmetric(horizontal: kSpacingMedium),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),
-      ];
+      ),
+    ];
+  }
+
+  /// database / schema 模式、loading、error 共用入口。
+  Widget _buildSchemaBarRefMenu(
+    BuildContext context, {
+    List<DatabaseRef> schemas = const [],
+    String? error,
+    bool disable = false,
+  }) {
+    final isDisabled = widget.disable || disable;
+    final schemaBarContent = _schemaBarTriggerContent(context, disable: isDisabled);
+    if (isDisabled) {
+      return schemaBarContent;
+    }
+
+    final filtered = _filteredDatabaseRefs(schemas, _schemaSearchController.text);
+    final List<OverlayMenuItem> tabs;
+    if (error != null && error.isNotEmpty) {
+      tabs = _placeholderSchemaTabs(context, error);
+    } else if (filtered.isEmpty) {
+      tabs = _placeholderSchemaTabs(context, AppLocalizations.of(context)!.display_msg_no_data);
     } else {
       tabs = filtered.map((schemaRef) {
         final label = schemaRef.toString();
@@ -597,19 +631,6 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
       }).toList();
     }
 
-    return _buildSchemaBarOverlay(context, tabs);
-  }
-
-  Widget _buildSchemaBarOverlay(
-    BuildContext context,
-    List<OverlayMenuItem> tabs,
-  ) {
-    final schemaBarContent = _schemaBarTriggerContent(context);
-
-    if (widget.disable) {
-      return schemaBarContent;
-    }
-
     final header = OverlayMenuHeader(
       height: 42,
       child: Padding(
@@ -647,7 +668,7 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
           child: RectangleIconButton.small(
             tooltip: AppLocalizations.of(context)!.button_tooltip_refresh_metadata,
             icon: Icons.refresh,
-            onPressed: () async {
+            onPressed: () {
               ref.read(selectedSessionMetadataProvider.notifier).refreshMetadata();
             },
           ),
@@ -666,10 +687,6 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
     );
   }
 
-  Widget _buildSchemaBarSingleMode() {
-    return const SizedBox.shrink();
-  }
-
   @override
   Widget build(BuildContext context) {
     if (widget.instanceId == null) {
@@ -678,27 +695,14 @@ class _SchemaBarState extends ConsumerState<SchemaBar> {
 
     final schemasAsync = ref.watch(selectedSessionSchemaProvider);
     return schemasAsync.when(
+      loading: () => _buildSchemaBarRefMenu(context, disable: true),
+      error: (e, _) => _buildSchemaBarRefMenu(context, error: e.toString()),
       data: (data) {
-        switch (data.databaseMode) {
-          case DatabaseModeType.singleMode:
-            return _buildSchemaBarSingleMode();
-          case DatabaseModeType.databaseMode:
-          case DatabaseModeType.schemaMode:
-            return _buildSchemaBarRefMenu(context, data);
+        if (data.databaseMode == DatabaseModeType.singleMode) {
+          return const SizedBox.shrink();
         }
+        return _buildSchemaBarRefMenu(context, schemas: data.schemas);
       },
-      loading: () => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: SizedBox(
-          height: 24,
-          width: 132,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Loading.medium(),
-          ),
-        ),
-      ),
-      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }

@@ -116,25 +116,28 @@ func (c *mssqlConn) KillQuery() error {
 }
 
 func (c *mssqlConn) OpenQuery(sqlText string) (rowCursor, error) {
+	// 注意：不能 defer cancel()。go-mssqldb 把 ctx 保留到 Rows/tokenProcessor，
+	// NextRow 期间还要靠它读行并响应 KillQuery；cancel 由 cur.Close 调用。
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	c.streamMu.Lock()
 	c.streamCancel = cancel
 	c.streamMu.Unlock()
 
-	var cur rowCursor
-	var err error
-	cur, err = c.openQuery(ctx, sqlText)
+	cur, err := c.openQuery(ctx, sqlText)
 	if err != nil {
+		c.streamMu.Lock()
+		c.streamCancel = nil
+		c.streamMu.Unlock()
+		cancel()
 		if errors.Is(err, context.Canceled) {
-			err = newStreamQueryCancelled(err)
+			return nil, newStreamQueryCancelled(err)
 		}
+		return nil, err
 	}
-	c.streamMu.Lock()
-	c.streamCancel = nil
-	c.streamMu.Unlock()
-	return cur, err
+	cur.parent = c
+	cur.cancel = cancel
+	return cur, nil
 }
 
 func (c *mssqlConn) openQuery(ctx context.Context, sqlText string) (*mssqlCur, error) {
@@ -177,11 +180,22 @@ func (c *mssqlConn) openQuery(ctx context.Context, sqlText string) (*mssqlCur, e
 }
 
 type mssqlCur struct {
+	parent  *mssqlConn
+	cancel  context.CancelFunc
 	rows    *mssql.Rows
 	columns []dbQueryColumn
 }
 
 func (q *mssqlCur) Close() error {
+	if q.cancel != nil {
+		if q.parent != nil {
+			q.parent.streamMu.Lock()
+			q.parent.streamCancel = nil
+			q.parent.streamMu.Unlock()
+		}
+		q.cancel()
+		q.cancel = nil
+	}
 	return q.rows.Close()
 }
 
@@ -197,6 +211,9 @@ func (q *mssqlCur) NextRow() (*dbQueryRow, bool, error) {
 	if err := q.rows.Next(dest); err != nil {
 		if errors.Is(err, io.EOF) {
 			return nil, false, nil
+		}
+		if errors.Is(err, context.Canceled) {
+			return nil, false, newStreamQueryCancelled(err)
 		}
 		return nil, false, err
 	}
