@@ -80,9 +80,12 @@ class MSSQLConnection extends GoImplConnection {
 
   @override
   Future<List<DatabaseRef>> schemas() async {
+    // HAS_DBACCESS：无权限库仍会出现在 sys.databases，但跨库读元数据会失败；
+    // 只列当前主体可访问的库（issue #112）。
     final results = await query(
       'SELECT name AS SCHEMA_NAME FROM sys.databases '
-      'WHERE LOWER(name) NOT IN (${_mssqlSystemDatabasesNotInSql()}) ORDER BY name;',
+      'WHERE HAS_DBACCESS(name) = 1 '
+      'AND LOWER(name) NOT IN (${_mssqlSystemDatabasesNotInSql()}) ORDER BY name;',
     );
     return results.rows
         .map((r) => r.getString("SCHEMA_NAME") ?? "")
