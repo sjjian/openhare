@@ -56,4 +56,4 @@ Database drivers are implemented in [`pkg/db_driver/go_impl`](./pkg/db_driver/go
 4. Storage: [ObjectBox](https://objectbox.io/)
 
 ## Star History
-[![Star History Chart](https://api.star-history.com/svg?repos=sjjian/openhare&type=date&legend=top-left)](https://www.star-history.com/#sjjian/openhare&type=date&legend=top-left)
+[![Star History Chart](https://star-history.dera.page/svg?repos=sjjian/openhare&type=date&legend=top-left)](https://star-history.dera.page/#sjjian/openhare&type=date&legend=top-left)
