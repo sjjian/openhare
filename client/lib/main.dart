@@ -1,5 +1,7 @@
 import 'package:client/repositories/repo.dart';
 import 'package:client/screens/app.dart';
+import 'package:client/services/security/credential_migration.dart';
+import 'package:client/services/security/vault_service.dart';
 import 'package:client/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +41,11 @@ void main(List<String> args) async {
     log.i('objectbox initializing');
     await initObjectbox();
     log.i('objectbox initialized');
+
+    log.i('secure vault initializing');
+    await initVaultService();
+    await migrateCredentialsToObjectBoxVault(defaultObjectBox, defaultVaultService);
+    log.i('secure vault initialized and credentials migrated');
 
     log.i('window manager initializing');
     await windowManager.ensureInitialized();

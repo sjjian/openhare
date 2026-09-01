@@ -1,5 +1,6 @@
 import 'package:client/models/ai.dart';
 import 'package:client/repositories/repo.dart';
+import 'package:client/services/security/vault_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 // ignore: unnecessary_import
 import 'package:objectbox/objectbox.dart'; // 必须引入, 不然objectbox不能正常使用
@@ -14,7 +15,7 @@ class LLMApiSettingStorage {
 
   String name;
   String baseUrl;
-  String apiKey;
+  String apiKey; // Kept empty in ObjectBox; managed by secure vault
   String modelName;
 
   @Property(type: PropertyType.dateNano)
@@ -37,10 +38,13 @@ class LLMApiSettingStorage {
 
 class LLMAgentRepoImpl implements LLMAgentRepo {
   final ObjectBox ob;
+  final SecureVaultService _vault;
   final Box<LLMApiSettingStorage> _llmAgentSettingBox;
   final Map<LLMAgentId, LLMAgentStatusModel> _status = {};
 
-  LLMAgentRepoImpl(this.ob) : _llmAgentSettingBox = ob.store.box();
+  LLMAgentRepoImpl(this.ob, {SecureVaultService? vault})
+      : _vault = vault ?? defaultVaultService,
+        _llmAgentSettingBox = ob.store.box();
 
   LLMAgentStatusModel _getStatus(LLMAgentId id) {
     if (!_status.containsKey(id)) {
@@ -50,12 +54,14 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
   }
 
   LLMAgentModel _toModel(LLMApiSettingStorage setting) {
+    final apiKey = _vault.getSync(SecureVaultService.aiApiKey(setting.id)) ??
+        (setting.apiKey.isNotEmpty ? setting.apiKey : "");
     return LLMAgentModel(
       id: LLMAgentId(value: setting.id),
       setting: LLMAgentSettingModel(
         name: setting.name,
         baseUrl: setting.baseUrl,
-        apiKey: setting.apiKey,
+        apiKey: apiKey,
         modelName: setting.modelName,
       ),
       status: _getStatus(
@@ -95,21 +101,26 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
 
   @override
   void create(LLMAgentSettingModel setting) {
-    final model = _llmAgentSettingBox.put(
+    final modelId = _llmAgentSettingBox.put(
       LLMApiSettingStorage(
         name: setting.name,
         baseUrl: setting.baseUrl,
-        apiKey: setting.apiKey,
+        apiKey: "", // Never store API key in plaintext in ObjectBox
         modelName: setting.modelName,
       ),
     );
 
-    _status[LLMAgentId(value: model)] = const LLMAgentStatusModel(state: LLMAgentState.unknown);
+    if (setting.apiKey.isNotEmpty) {
+      _vault.write(SecureVaultService.aiApiKey(modelId), setting.apiKey);
+    }
+
+    _status[LLMAgentId(value: modelId)] = const LLMAgentStatusModel(state: LLMAgentState.unknown);
   }
 
   @override
   void delete(LLMAgentId id) {
     _llmAgentSettingBox.remove(id.value);
+    _vault.delete(SecureVaultService.aiApiKey(id.value));
     _status.remove(id);
   }
 
@@ -134,10 +145,16 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
         id: id.value,
         name: setting.name,
         baseUrl: setting.baseUrl,
-        apiKey: setting.apiKey,
+        apiKey: "", // Never store API key in plaintext in ObjectBox
         modelName: setting.modelName,
       ),
     );
+
+    if (setting.apiKey.isNotEmpty) {
+      _vault.write(SecureVaultService.aiApiKey(id.value), setting.apiKey);
+    } else {
+      _vault.delete(SecureVaultService.aiApiKey(id.value));
+    }
 
     // 更新setting后，状态重置为unknown
     _status[id] = const LLMAgentStatusModel(state: LLMAgentState.unknown);
@@ -147,5 +164,6 @@ class LLMAgentRepoImpl implements LLMAgentRepo {
 @Riverpod(keepAlive: true)
 LLMAgentRepo lLMAgentRepo(Ref ref) {
   ObjectBox ob = ref.watch(objectboxProvider);
-  return LLMAgentRepoImpl(ob);
+  final vault = ref.watch(secureVaultServiceProvider);
+  return LLMAgentRepoImpl(ob, vault: vault);
 }
