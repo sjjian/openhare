@@ -4,6 +4,7 @@ import 'package:client/repositories/instances/session_conn.dart';
 import 'package:objectbox/objectbox.dart'; // 必须引入, 不然objectbox不能正常使用
 import 'package:client/repositories/objectbox.g.dart';
 import 'package:client/repositories/repo.dart';
+import 'package:client/services/security/vault_service.dart';
 import 'package:client/utils/active_set.dart';
 import 'package:db_driver/db_driver.dart';
 import 'dart:convert';
@@ -97,10 +98,12 @@ class InstanceStorage {
       dbType = model.dbType,
       name = model.name,
       targetJson = jsonEncode(model.connectValue.target.toJson()),
-      sshTunnelJson = model.sshTunnel != null ? jsonEncode(model.sshTunnel!.toJson()) : "",
+      sshTunnelJson = model.sshTunnel != null
+          ? jsonEncode(model.sshTunnel!.copyWith(password: null, privateKeyPassphrase: null).toJson())
+          : "",
       host = "deprecated",
       user = model.user,
-      password = model.password,
+      password = "", // Password stored exclusively in secure vault
       desc = model.desc,
       customJson = jsonEncode(model.custom),
       initQuerys = model.initQuerys,
@@ -123,27 +126,36 @@ class InstanceStorage {
     return ConnectTarget.network(host: "", port: 0);
   }
 
-  SshTunnelConfig? _parseSshTunnel() {
+  SshTunnelConfig? _parseSshTunnel({SecureVaultService? vault}) {
     if (sshTunnelJson.trim().isEmpty) {
       return null;
     }
     try {
-      return SshTunnelConfig.fromJson(Map<String, dynamic>.from(jsonDecode(sshTunnelJson)));
+      final config = SshTunnelConfig.fromJson(Map<String, dynamic>.from(jsonDecode(sshTunnelJson)));
+      final v = vault ?? defaultVaultService;
+      final sshPassword = v.getSync(SecureVaultService.instanceSshPasswordKey(id)) ?? config.password;
+      final sshPassphrase = v.getSync(SecureVaultService.instanceSshPassphraseKey(id)) ?? config.privateKeyPassphrase;
+      return config.copyWith(
+        password: sshPassword,
+        privateKeyPassphrase: sshPassphrase,
+      );
     } catch (_) {
       return null;
     }
   }
 
-  InstanceModel toModel() {
+  InstanceModel toModel({SecureVaultService? vault}) {
     final target = _parseTarget();
+    final v = vault ?? defaultVaultService;
+    final pwd = v.getSync(SecureVaultService.instancePasswordKey(id)) ?? (password.isNotEmpty ? password : "");
     return InstanceModel(
       id: InstanceId(value: id),
       dbType: dbType,
       name: name,
       target: target,
-      sshTunnel: _parseSshTunnel(),
+      sshTunnel: _parseSshTunnel(vault: v),
       user: user,
-      password: password,
+      password: pwd,
       desc: desc,
       custom: custom,
       initQuerys: initQuerys,
@@ -156,27 +168,58 @@ class InstanceStorage {
 
 class InstanceRepoImpl extends InstanceRepo {
   final ObjectBox ob;
+  final SecureVaultService _vault;
   final Box<InstanceStorage> _instanceBox;
 
   Map<InstanceId, InstanceMetadataModel> metadataCache = {};
 
-  InstanceRepoImpl(this.ob) : _instanceBox = ob.store.box();
+  InstanceRepoImpl(this.ob, {SecureVaultService? vault})
+      : _vault = vault ?? defaultVaultService,
+        _instanceBox = ob.store.box();
 
   @override
   void add(InstanceModel instance) {
-    _instanceBox.put(InstanceStorage.fromModel(instance));
+    final storage = InstanceStorage.fromModel(instance);
+    final assignedId = _instanceBox.put(storage);
+    final actualId = instance.id.value != 0 ? instance.id.value : assignedId;
+
+    if (instance.password.isNotEmpty) {
+      _vault.write(SecureVaultService.instancePasswordKey(actualId), instance.password);
+    }
+    if (instance.sshTunnel?.password != null && instance.sshTunnel!.password!.isNotEmpty) {
+      _vault.write(SecureVaultService.instanceSshPasswordKey(actualId), instance.sshTunnel!.password!);
+    }
+    if (instance.sshTunnel?.privateKeyPassphrase != null && instance.sshTunnel!.privateKeyPassphrase!.isNotEmpty) {
+      _vault.write(SecureVaultService.instanceSshPassphraseKey(actualId), instance.sshTunnel!.privateKeyPassphrase!);
+    }
   }
 
   @override
   void update(InstanceModel instance) {
     _instanceBox.put(InstanceStorage.fromModel(instance));
     metadataCache.remove(instance.id);
+
+    _vault.write(SecureVaultService.instancePasswordKey(instance.id.value), instance.password);
+    if (instance.sshTunnel?.password != null && instance.sshTunnel!.password!.isNotEmpty) {
+      _vault.write(SecureVaultService.instanceSshPasswordKey(instance.id.value), instance.sshTunnel!.password!);
+    } else {
+      _vault.delete(SecureVaultService.instanceSshPasswordKey(instance.id.value));
+    }
+    if (instance.sshTunnel?.privateKeyPassphrase != null && instance.sshTunnel!.privateKeyPassphrase!.isNotEmpty) {
+      _vault.write(SecureVaultService.instanceSshPassphraseKey(instance.id.value), instance.sshTunnel!.privateKeyPassphrase!);
+    } else {
+      _vault.delete(SecureVaultService.instanceSshPassphraseKey(instance.id.value));
+    }
   }
 
   @override
   void delete(InstanceId id) {
     _instanceBox.remove(id.value);
     metadataCache.remove(id);
+
+    _vault.delete(SecureVaultService.instancePasswordKey(id.value));
+    _vault.delete(SecureVaultService.instanceSshPasswordKey(id.value));
+    _vault.delete(SecureVaultService.instanceSshPassphraseKey(id.value));
   }
 
   @override
@@ -190,13 +233,13 @@ class InstanceRepoImpl extends InstanceRepo {
   // todo: aync
   InstanceModel? getInstanceByName(String name) {
     final build = _instanceBox.query(InstanceStorage_.name.equals(name)).build();
-    return build.findFirst()?.toModel();
+    return build.findFirst()?.toModel(vault: _vault);
   }
 
   @override
   // todo: 替换 getInstance
   InstanceModel? getInstanceById(InstanceId id) {
-    return _instanceBox.get(id.value)?.toModel();
+    return _instanceBox.get(id.value)?.toModel(vault: _vault);
   }
 
   @override
@@ -231,7 +274,7 @@ class InstanceRepoImpl extends InstanceRepo {
     dataQuery.close();
 
     return InstanceListModel(
-      instances: instanceList.map((e) => e.toModel()).toList(),
+      instances: instanceList.map((e) => e.toModel(vault: _vault)).toList(),
       count: allCount,
       filteredCount: filteredCount,
     );
@@ -244,7 +287,7 @@ class InstanceRepoImpl extends InstanceRepo {
         .order(InstanceStorage_.latestOpenAt, flags: Order.descending)
         .build();
     build.limit = top;
-    return build.find().map((e) => e.toModel()).toList();
+    return build.find().map((e) => e.toModel(vault: _vault)).toList();
   }
 
   @override
@@ -303,7 +346,7 @@ class InstanceRepoImpl extends InstanceRepo {
     if (instance == null) {
       throw Exception("Instance not found");
     }
-    final newMetadata = await _getMetadata(instance.toModel());
+    final newMetadata = await _getMetadata(instance.toModel(vault: _vault));
     metadataCache[instanceId] = newMetadata;
     return newMetadata;
   }
@@ -314,7 +357,7 @@ class InstanceRepoImpl extends InstanceRepo {
     if (instance == null) {
       throw Exception("Instance not found");
     }
-    final newMetadata = await _getMetadata(instance.toModel());
+    final newMetadata = await _getMetadata(instance.toModel(vault: _vault));
     metadataCache[instanceId] = newMetadata;
   }
 }
@@ -322,5 +365,6 @@ class InstanceRepoImpl extends InstanceRepo {
 @Riverpod(keepAlive: true)
 InstanceRepo instanceRepo(Ref ref) {
   ObjectBox ob = ref.watch(objectboxProvider);
-  return InstanceRepoImpl(ob);
+  final vault = ref.watch(secureVaultServiceProvider);
+  return InstanceRepoImpl(ob, vault: vault);
 }

@@ -8,6 +8,7 @@ import 'objectbox.g.dart';
 part 'repo.g.dart';
 
 late ObjectBox _objectbox;
+ObjectBox get defaultObjectBox => _objectbox;
 
 Future<void> initObjectbox() async {
   _objectbox = await ObjectBox.create();
