@@ -68,6 +68,13 @@ github.com/duckdb/duckdb-go-bindings/lib/windows-amd64
 github.com/duckdb/duckdb-go/v2
 github.com/duckdb/duckdb-go/v2/arrowmapping
 github.com/duckdb/duckdb-go/v2/mapping
+# github.com/go-db2/go-db2 v0.0.0-20260902010738-efdb29f75ec3
+## explicit; go 1.22
+github.com/go-db2/go-db2
+github.com/go-db2/go-db2/converters
+github.com/go-db2/go-db2/network
+github.com/go-db2/go-db2/network/security
+github.com/go-db2/go-db2/types
 # github.com/go-sql-driver/mysql v1.9.3
 ## explicit; go 1.21.0
 github.com/go-sql-driver/mysql
