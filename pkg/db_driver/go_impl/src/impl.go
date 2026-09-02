@@ -27,6 +27,7 @@ typedef enum {
   GO_IMPL_DB_REDIS = 5,
   GO_IMPL_DB_MONGODB = 6,
   GO_IMPL_DB_DUCKDB = 7,
+  GO_IMPL_DB_DB2 = 8,
 } go_impl_db_type_t;
 
 typedef enum {
@@ -328,6 +329,8 @@ func go_impl_conn_open(dbType C.int32_t, dsn *C.char, dartPort C.int64_t) {
 		conn, err = openMongoConn(C.GoString(dsn))
 	case C.GO_IMPL_DB_DUCKDB:
 		conn, err = openDuckdbConn(C.GoString(dsn))
+	case C.GO_IMPL_DB_DB2:
+		conn, err = openDb2Conn(C.GoString(dsn))
 	default:
 		err = fmt.Errorf("unsupported db type: %d", dbType)
 	}

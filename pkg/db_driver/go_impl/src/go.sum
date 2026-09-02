@@ -77,6 +77,10 @@ github.com/ebitengine/purego v0.10.0 h1:QIw4xfpWT6GWTzaW5XEKy3HXoqrJGx1ijYHzTF0/
 github.com/ebitengine/purego v0.10.0/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2Wg=
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
+github.com/go-db2/go-db2 v0.0.0-20260831230123-be0607b5ab92 h1:xjGFb0HoYFKs5ybveHiUt1WU1OVRjba2J5uTSYGEo8Q=
+github.com/go-db2/go-db2 v0.0.0-20260831230123-be0607b5ab92/go.mod h1:Pprjgai+gEyBEjRo2sWcU99LQovT7ZxcZiK2wnjNb+E=
+github.com/go-db2/go-db2 v0.0.0-20260902010738-efdb29f75ec3 h1:8ZbkDJUKWecbY0/8JF4XKlsnI5kTFKMYQeWesB0zrEk=
+github.com/go-db2/go-db2 v0.0.0-20260902010738-efdb29f75ec3/go.mod h1:Pprjgai+gEyBEjRo2sWcU99LQovT7ZxcZiK2wnjNb+E=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=

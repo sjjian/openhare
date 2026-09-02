@@ -12,6 +12,7 @@ import 'db_driver_pg.dart';
 import 'db_driver_redis.dart';
 import 'db_driver_mongodb.dart';
 import 'db_driver_duckdb.dart';
+import 'db_driver_db2.dart';
 
 /// 封装具体 [BaseConnection]，并统一管理 SSH 隧道生命周期。
 class ConnectionWrapper extends BaseConnection {
@@ -77,6 +78,8 @@ class ConnectionWrapper extends BaseConnection {
           await MongoConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.duckdb =>
           await DuckDBConnection.open(meta: wireMeta, schema: schema),
+        DatabaseType.db2 =>
+          await Db2Connection.open(meta: wireMeta, schema: schema),
       };
       final opened = ConnectionWrapper(inner, sshTunnel: tunnel);
       opened.listen(onSchemaChangedCallback: onSchemaChangedCallback);
@@ -105,6 +108,7 @@ class ConnectionWrapper extends BaseConnection {
       DatabaseType.redis => RedisConnection.supportsExplainCapability,
       DatabaseType.mongodb => MongoConnection.supportsExplainCapability,
       DatabaseType.duckdb => DuckDBConnection.supportsExplainCapability,
+      DatabaseType.db2 => Db2Connection.supportsExplainCapability,
     };
   }
 
@@ -392,6 +396,41 @@ The connection driver uses mongosh-compatible shell syntax and leverages the gom
       NameMeta(),
       TargetDBFileMeta(),
       DescMeta(),
+    ],
+    initQuerys: const [],
+  ),
+  ConnectionMeta(
+    displayName: "IBM Db2",
+    type: DatabaseType.db2,
+    logoAssertPath: "assets/icons/db2_icon.png",
+    description: "IBM Db2 relational database connected via pure Go DRDA protocol driver.",
+    connMeta: [
+      NameMeta(),
+      TargetNetworkMeta(defaultPort: "50000"),
+      SshTunnelMeta(group: settingMetaGroupSshTunnel),
+      UserMeta(),
+      PasswordMeta(),
+      DescMeta(),
+      CustomMeta(
+        name: "database",
+        type: SettingMetaType.text,
+        group: settingMetaGroupBase,
+        isRequired: true,
+        defaultValue: "SAMPLE",
+      ),
+      CustomMeta(
+        name: "ssl",
+        type: SettingMetaType.enumValue,
+        group: settingMetaGroupParams,
+        defaultValue: "false",
+        enumValues: ['true', 'false'],
+      ),
+      CustomMeta(
+        name: "timeout",
+        type: SettingMetaType.text,
+        group: settingMetaGroupParams,
+        defaultValue: "15",
+      ),
     ],
     initQuerys: const [],
   ),

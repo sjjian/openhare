@@ -112,6 +112,7 @@ else()
   list(APPEND _go_impl_build_commands
     COMMAND "${CMAKE_COMMAND}" -E env CGO_ENABLED=1
             "${GO_EXECUTABLE}" build -buildmode=c-shared
+            -ldflags "-extldflags -Wl,-soname,libgo_impl.so"
             -o "${GO_IMPL_SHARED_LIB}" .)
 endif()
 
