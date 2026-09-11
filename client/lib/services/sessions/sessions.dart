@@ -165,6 +165,18 @@ class SessionsServices extends _$SessionsServices {
     _invalidateSelf();
   }
 
+  Future<void> setSessionSchema(SessionId sessionId, DatabaseRef schema) async {
+    final session = ref.read(sessionRepoProvider).getSession(sessionId);
+    if (session == null) {
+      return;
+    }
+    ref.read(sessionRepoProvider).updateSession(sessionId, currentSchema: schema);
+    if (session.connId != null) {
+      await ref.read(sessionConnsServicesProvider.notifier).setCurrentSchema(session.connId!, schema);
+    }
+    _invalidateSelf();
+  }
+
   void saveCode(SessionId sessionId) {
     final controller = SessionController.getSessionController(sessionId);
     if (controller == null) {

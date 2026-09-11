@@ -471,14 +471,15 @@ class _ChatInputFieldWidgetState extends ConsumerState<ChatInputFieldWidget> {
     if (widget.model.metadata == null || widget.model.currentSchema == null) {
       return [];
     }
-    final tableNodes = getNodeByDatabaseRef(
+    final schemaNode = getNodeByDatabaseRef(
       widget.model.metadata!.metadata,
       widget.model.currentSchema!,
-    )?.getChildren(MetaType.table);
-    if (tableNodes == null) {
+    );
+    if (schemaNode == null) {
       return [];
     }
-    return tableNodes.map((e) => e.value).toList();
+    final tables = schemaNode.getChildren(MetaType.table);
+    return tables.map((e) => e.value).toList();
   }
 
   List<String> _filterAndSortTables(List<String> allTables, String query) {

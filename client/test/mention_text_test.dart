@@ -154,6 +154,26 @@ void main() {
       expect(c2.segments.length, len);
     });
 
+    testWidgets('appendMention 追加且去重', (WidgetTester tester) async {
+      final controller = MentionTextEditingController(text: 'hello');
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: MentionTextField(controller: controller)),
+        ),
+      );
+
+      expect(controller.appendMention('users'), isTrue);
+      await tester.pump();
+      expect(controller.segments.whereType<MentionSegment>().map((s) => s.label), ['users']);
+      expect(controller.displayText.contains('@users'), isTrue);
+
+      expect(controller.appendMention('users'), isFalse);
+      expect(controller.segments.whereType<MentionSegment>().length, 1);
+
+      expect(controller.appendMention('orders'), isTrue);
+      expect(controller.segments.whereType<MentionSegment>().map((s) => s.label), ['users', 'orders']);
+    });
+
     testWidgets('mentionState 触发与清除', (WidgetTester tester) async {
       final controller = MentionTextEditingController(text: 'Hello');
       await tester.pumpWidget(

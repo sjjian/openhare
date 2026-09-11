@@ -21,6 +21,7 @@ class SessionController {
   final SplitViewController editorResultSplitViewCtrl;
   final SplitViewController rightSidebarSplitViewCtrl;
   final SplitViewController leftSidebarSplitViewCtrl;
+  final SplitViewController metadataDetailSplitViewCtrl;
 
   // sql editor
   final CodeLineEditingController sqlEditorController;
@@ -34,11 +35,13 @@ class SessionController {
 
   // drawer
   final KeepOffestScrollController metadataTreeScrollController;
+  final TextEditingController metadataSearchController;
 
   SessionController({
     required this.editorResultSplitViewCtrl,
     required this.rightSidebarSplitViewCtrl,
     required this.leftSidebarSplitViewCtrl,
+    required this.metadataDetailSplitViewCtrl,
     required this.aiChatSearchTextController,
     required this.aiChatModelSearchTextController,
     required this.chatInputController,
@@ -46,6 +49,7 @@ class SessionController {
     required this.sqlEditorController,
     required this.sqlEditorScrollController,
     required this.metadataTreeScrollController,
+    required this.metadataSearchController,
   });
 
   static Map<SessionId, SessionController> cache = {};
@@ -65,6 +69,12 @@ class SessionController {
       editorResultSplitViewCtrl: SplitViewController(secondSize: 500, firstMinSize: 100, secondMinSize: 140),
       rightSidebarSplitViewCtrl: SplitViewController(secondSize: 400, firstMinSize: 300, secondMinSize: 360),
       leftSidebarSplitViewCtrl: SplitViewController(secondSize: 220, firstMinSize: 720, secondMinSize: 200),
+      metadataDetailSplitViewCtrl: SplitViewController(
+        secondSize: 0,
+        firstMinSize: 80,
+        secondMinSize: 96,
+        initialSecondRatio: 0.5,
+      ),
       // sql editor
       sqlEditorController: sqlEditorController,
       sqlEditorScrollController: CodeScrollController(
@@ -79,6 +89,7 @@ class SessionController {
 
       // drawer
       metadataTreeScrollController: KeepOffestScrollController(),
+      metadataSearchController: TextEditingController(),
     );
     cache[sessionId] = controller;
     return controller;
@@ -93,6 +104,7 @@ class SessionController {
       cache[sessionId]!.editorResultSplitViewCtrl.dispose();
       cache[sessionId]!.rightSidebarSplitViewCtrl.dispose();
       cache[sessionId]!.leftSidebarSplitViewCtrl.dispose();
+      cache[sessionId]!.metadataDetailSplitViewCtrl.dispose();
       // sql editor
       cache[sessionId]!.sqlEditorScrollController.verticalScroller.dispose();
       cache[sessionId]!.sqlEditorScrollController.horizontalScroller.dispose();
@@ -103,6 +115,7 @@ class SessionController {
       cache[sessionId]!.chatScrollController.dispose();
       // drawer
       cache[sessionId]!.metadataTreeScrollController.dispose();
+      cache[sessionId]!.metadataSearchController.dispose();
       // remove cache
       cache.remove(sessionId);
     }

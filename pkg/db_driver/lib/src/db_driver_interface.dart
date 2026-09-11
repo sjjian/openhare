@@ -172,6 +172,21 @@ class DatabaseMode implements DatabaseRef {
   }
 }
 
+String qualifyRelation(
+  String Function(String ident) quoteIdent, {
+  required String name,
+  String? database,
+  String? schema,
+}) {
+  final prefix = (schema != null && schema.isNotEmpty)
+      ? schema
+      : (database != null && database.isNotEmpty)
+          ? database
+          : null;
+  if (prefix == null) return quoteIdent(name);
+  return '${quoteIdent(prefix)}.${quoteIdent(name)}';
+}
+
 abstract class BaseConnection {
   void Function(DatabaseRef)? onSchemaChangedCallback;
 
@@ -182,6 +197,12 @@ abstract class BaseConnection {
 
   /// 是否支持 explain
   bool get supportsExplain => true;
+
+  /// 是否支持生成 SELECT SQL（查看数据）
+  bool get supportsSelectSql => true;
+
+  /// 是否支持生成 INSERT SQL（INSERT 模板）
+  bool get supportsInsertSql => true;
 
   Future<void> ping();
   Future<void> killQuery();

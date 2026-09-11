@@ -108,11 +108,141 @@ class ConnectionWrapper extends BaseConnection {
     };
   }
 
+  static bool supportsSelectSqlOf(DatabaseType type) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.supportsSelectSqlCapability,
+      DatabaseType.pg => PGConnection.supportsSelectSqlCapability,
+      DatabaseType.oracle => OracleConnection.supportsSelectSqlCapability,
+      DatabaseType.mssql => MSSQLConnection.supportsSelectSqlCapability,
+      DatabaseType.sqlite => SQLiteConnection.supportsSelectSqlCapability,
+      DatabaseType.redis => RedisConnection.supportsSelectSqlCapability,
+      DatabaseType.mongodb => MongoConnection.supportsSelectSqlCapability,
+      DatabaseType.duckdb => DuckDBConnection.supportsSelectSqlCapability,
+    };
+  }
+
+  static bool supportsInsertSqlOf(DatabaseType type) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.supportsInsertSqlCapability,
+      DatabaseType.pg => PGConnection.supportsInsertSqlCapability,
+      DatabaseType.oracle => OracleConnection.supportsInsertSqlCapability,
+      DatabaseType.mssql => MSSQLConnection.supportsInsertSqlCapability,
+      DatabaseType.sqlite => SQLiteConnection.supportsInsertSqlCapability,
+      DatabaseType.redis => RedisConnection.supportsInsertSqlCapability,
+      DatabaseType.mongodb => MongoConnection.supportsInsertSqlCapability,
+      DatabaseType.duckdb => DuckDBConnection.supportsInsertSqlCapability,
+    };
+  }
+
+  static String buildSelectSqlOf(
+    DatabaseType type, {
+    required String name,
+    String? database,
+    String? schema,
+    List<String> columns = const [],
+  }) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.pg => PGConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.oracle => OracleConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.mssql => MSSQLConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.sqlite => SQLiteConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.redis || DatabaseType.mongodb =>
+        throw UnsupportedError('$type does not support SelectSql'),
+      DatabaseType.duckdb => DuckDBConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+    };
+  }
+
+  static String buildInsertSqlOf(
+    DatabaseType type, {
+    required String name,
+    String? database,
+    String? schema,
+    List<String> columns = const [],
+  }) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.pg => PGConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.oracle => OracleConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.mssql => MSSQLConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.sqlite => SQLiteConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.redis || DatabaseType.mongodb =>
+        throw UnsupportedError('$type does not support InsertSql'),
+      DatabaseType.duckdb => DuckDBConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+    };
+  }
+
   @override
   bool get supportsKillQuery => _inner.supportsKillQuery;
 
   @override
   bool get supportsExplain => _inner.supportsExplain;
+
+  @override
+  bool get supportsSelectSql => _inner.supportsSelectSql;
+
+  @override
+  bool get supportsInsertSql => _inner.supportsInsertSql;
 
   @override
   void listen({

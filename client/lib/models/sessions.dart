@@ -2,7 +2,6 @@ import 'package:client/models/ai.dart';
 import 'package:client/models/instances.dart';
 import 'package:client/widgets/data_tree.dart';
 import 'package:db_driver/db_driver.dart';
-import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sql_editor/re_editor.dart';
 import 'package:client/widgets/split_view.dart';
@@ -365,6 +364,6 @@ abstract class SelectedSessionSchemaModel with _$SelectedSessionSchemaModel {
 abstract class SessionMetadataTreeModel with _$SessionMetadataTreeModel {
   const factory SessionMetadataTreeModel({
     required SessionId sessionId,
-    required TreeController<DataNode> metadataTreeCtrl,
+    required DataTreeController metadataTreeCtrl,
   }) = _SessionMetadataTreeModel;
 }
