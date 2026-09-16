@@ -100,6 +100,7 @@ void main() {
         DatabaseType.oracle,
         DatabaseType.sqlite,
         DatabaseType.duckdb,
+        DatabaseType.clickhouse,
       ]) {
         expect(ConnectionWrapper.supportsSelectSqlOf(type), isTrue, reason: '$type');
         expect(ConnectionWrapper.supportsInsertSqlOf(type), isTrue, reason: '$type');
@@ -111,6 +112,26 @@ void main() {
         expect(ConnectionWrapper.supportsSelectSqlOf(type), isFalse, reason: '$type');
         expect(ConnectionWrapper.supportsInsertSqlOf(type), isFalse, reason: '$type');
       }
+    });
+  });
+
+  group('ClickHouseConnection', () {
+    test('SELECT 用反引号', () {
+      expect(
+        ClickHouseConnection.buildSelectSql(name: 'events', database: 'analytics'),
+        'SELECT\n  *\nFROM `analytics`.`events`;',
+      );
+    });
+
+    test('INSERT 占位符为 ?', () {
+      expect(
+        ClickHouseConnection.buildInsertSql(
+          name: 't',
+          database: 'db',
+          columns: ['id', 'name'],
+        ),
+        'INSERT INTO `db`.`t` (`id`, `name`)\nVALUES (?, ?);',
+      );
     });
   });
 }

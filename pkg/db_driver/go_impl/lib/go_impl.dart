@@ -77,6 +77,8 @@ final class ImplConnection {
 
   static Future<ImplConnection> openDuckdb(String dsn) => open(go_impl_db_type_t.GO_IMPL_DB_DUCKDB, dsn);
 
+  static Future<ImplConnection> openClickhouse(String dsn) => open(go_impl_db_type_t.GO_IMPL_DB_CLICKHOUSE, dsn);
+
   Stream<DbQueryEvent> streamQuery(String sql) async* {
     final port = ReceivePort();
     final sqlPtr = sql.toNativeUtf8();

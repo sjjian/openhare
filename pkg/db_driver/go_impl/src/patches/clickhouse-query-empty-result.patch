@@ -1,0 +1,33 @@
+--- a/vendor/github.com/ClickHouse/clickhouse-go/v2/conn_query.go
++++ b/vendor/github.com/ClickHouse/clickhouse-go/v2/conn_query.go
+@@ -2,6 +2,7 @@
+ 
+ import (
+ 	"context"
++	"io"
+ 	"log/slog"
+ 
+ 	"github.com/ClickHouse/clickhouse-go/v2/lib/proto"
+@@ -29,6 +30,22 @@
+ 	init, err := c.firstBlock(ctx, onProcess)
+ 
+ 	if err != nil {
++		// TRUNCATE/DDL/INSERT 等无结果集语句：服务端只回 EndOfStream。
++		// 按成功空结果归还连接，避免把会话连接关掉。
++		if err == io.EOF {
++			release(c, nil)
++			stream := make(chan *proto.Block)
++			errs := make(chan error)
++			close(stream)
++			close(errs)
++			return &rows{
++				block:     &proto.Block{},
++				stream:    stream,
++				errors:    errs,
++				columns:   []string{},
++				structMap: c.structMap,
++			}, nil
++		}
+ 		c.logger.Error("failed to get first block", slog.Any("error", err))
+ 		release(c, err)
+ 		return nil, err

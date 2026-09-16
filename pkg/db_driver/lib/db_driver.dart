@@ -15,3 +15,4 @@ export 'src/db_driver_pg.dart';
 export 'src/db_driver_redis.dart';
 export 'src/db_driver_mongodb.dart';
 export 'src/db_driver_duckdb.dart';
+export 'src/db_driver_clickhouse.dart';
