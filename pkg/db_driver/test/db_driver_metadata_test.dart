@@ -192,6 +192,15 @@ void main() {
         same(sch),
       );
     });
+
+    test('DatabaseMode：database 下直挂 table 时可列出表（ClickHouse / MySQL）', () {
+      final users = MetaDataNode(MetaType.table, 'users');
+      final queryLog = MetaDataNode(MetaType.table, 'query_log');
+      final db = MetaDataNode(MetaType.database, 'system', items: [users, queryLog]);
+      final node = getNodeByDatabaseRef([db], DatabaseMode(database: 'system'));
+      expect(node, same(db));
+      expect(node!.getChildren(MetaType.table).map((e) => e.value), ['users', 'query_log']);
+    });
   });
 
   group('toString', () {

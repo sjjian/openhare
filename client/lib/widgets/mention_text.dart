@@ -684,10 +684,14 @@ class _MentionTextFieldState extends State<MentionTextField> {
     }
   }
 
+  bool _isComposing() {
+    final composing = widget.controller.value.composing;
+    return composing.isValid && !composing.isCollapsed;
+  }
+
   bool handleEnter() {
     // IME 组字确认依赖 Enter，组字中不抢键，否则会出现回车无响应/内容被清掉。
-    final composing = widget.controller.value.composing;
-    if (composing.isValid && !composing.isCollapsed) {
+    if (_isComposing()) {
       return false;
     }
     if (_overlayVisible && _candidates.isNotEmpty) {
@@ -779,7 +783,13 @@ class _MentionTextFieldState extends State<MentionTextField> {
           enabled: widget.enabled ?? true,
           readOnly: widget.readOnly,
           textInputAction: widget.textInputAction,
-          onSubmitted: widget.onSubmitted == null ? null : (_) => widget.onSubmitted!(widget.controller.displayText),
+          onSubmitted: widget.onSubmitted == null
+              ? null
+              : (_) {
+                  // 组字中 TextField 也可能收到 performAction，不能当成发送。
+                  if (_isComposing()) return;
+                  widget.onSubmitted!(widget.controller.displayText);
+                },
         ),
       ),
     );
@@ -829,6 +839,7 @@ class _MentionTextFieldState extends State<MentionTextField> {
               if (_overlayController != null)
                 OverlayPortal(
                   controller: _overlayController!,
+                  overlayLocation: OverlayChildLocation.rootOverlay,
                   overlayChildBuilder: _buildOverlay,
                 ),
             ],
@@ -979,6 +990,14 @@ class _ArrowUpAction extends Action<_ArrowUpIntent> {
 class _EnterAction extends Action<_EnterIntent> {
   final _MentionTextFieldState _state;
   _EnterAction(this._state);
+
+  @override
+  bool isEnabled(_EnterIntent intent) {
+    // consumesKey 默认等于 isEnabled。组字中必须禁用，否则 Shortcuts 仍会吃掉 Enter，
+    // IME 候选无法上屏，表现为「文字消失但消息没发出去」。
+    if (_state._isComposing()) return false;
+    return true;
+  }
 
   @override
   Object? invoke(_EnterIntent intent) {
