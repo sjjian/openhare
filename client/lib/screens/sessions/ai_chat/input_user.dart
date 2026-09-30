@@ -124,17 +124,24 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
   Future<void> _sendMessage(AIChatId chatId, SessionAIChatModel chatModel) async {
     final text = widget.controller.displayText;
     if (text.trim().isEmpty) return;
+    if (!chatModel.canSendMessage() || chatModel.chatOverviewModel.progress.contextHardStopped) {
+      return;
+    }
+    final agentId = chatModel.llmAgents.lastUsedLLMAgent?.id;
+    if (agentId == null) return;
 
     // 如果用户通过 @ 提及了表，则把表结构信息放到 ref 里
     final mentionedTables = widget.controller.segments.whereType<MentionSegment>().map((s) => s.label).toList();
     final refText = _buildTableRef(chatModel, mentionedTables);
+
+    widget.controller.clear();
 
     // 调用AIChatService的chat方法
     await ref
         .read(aIChatServiceProvider.notifier)
         .chat(
           chatId,
-          chatModel.llmAgents.lastUsedLLMAgent!.id,
+          agentId,
           genChatSystemPrompt(chatModel),
           message: text,
           refText: refText.isEmpty ? null : refText,
@@ -212,10 +219,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                         tooltip: AppLocalizations.of(context)!.button_tooltip_send_message,
                         icon: Icons.send,
                         onPressed: (widget.model.canSendMessage() && !hardStopped && _hasInputContent())
-                            ? () {
-                                _sendMessage(widget.model.chatOverviewModel.id, widget.model);
-                                widget.controller.clear();
-                              }
+                            ? () => _sendMessage(widget.model.chatOverviewModel.id, widget.model)
                             : null,
                       ),
               ],
@@ -580,12 +584,7 @@ class _ChatInputFieldWidgetState extends ConsumerState<ChatInputFieldWidget> {
       ),
       mentionCandidatesBuilder: _mentionCandidates,
       mentionItemBuilder: _mentionItemBuilder,
-      onSubmitted: widget.onSubmitted == null
-          ? null
-          : (_) {
-              widget.onSubmitted!();
-              widget.controller.clear();
-            },
+      onSubmitted: widget.onSubmitted == null ? null : (_) => widget.onSubmitted!(),
     );
   }
 }
