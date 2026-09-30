@@ -57,4 +57,11 @@ openhare 是一款 AI 驱动的跨平台桌面 SQL 客户端，支持多数据�
 4. 存储： [ObjectBox](https://objectbox.io/)
 
 ## Star 历史
-[![Star History Chart](https://api.star-history.com/svg?repos=sjjian/openhare&type=date&legend=top-left)](https://www.star-history.com/#sjjian/openhare&type=date&legend=top-left)
+
+<a href="https://www.star-history.com/?repos=sjjian%2Fopenhare&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=sjjian/openhare&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=sjjian/openhare&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=sjjian/openhare&type=date&legend=top-left" />
+ </picture>
+</a>
