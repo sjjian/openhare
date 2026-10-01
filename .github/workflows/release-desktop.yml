@@ -142,6 +142,8 @@ jobs:
     needs: [version, build-macos, build-windows]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -157,5 +159,5 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: release-assets/*
-          generate_release_notes: true
+          body_path: changelog_latest.md
           fail_on_unmatched_files: true
