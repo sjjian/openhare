@@ -107,16 +107,25 @@ jobs:
           choco install msys2 --no-progress -y
           $bash = "C:\tools\msys64\usr\bin\bash.exe"
           if (-not (Test-Path $bash)) { throw "msys2 bash not found at $bash" }
-          # Sync package db. A full -Syu can exit non-zero to request a shell restart.
-          & $bash -lc "pacman -Sy --noconfirm"
-          & $bash -lc "pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-gcc"
+          # First -Syu often exits so the shell can restart after upgrading pacman.
+          & $bash -lc "pacman --noconfirm -Syuu" | Out-Host
+          & $bash -lc "pacman --noconfirm -Syuu" | Out-Host
+          & $bash -lc "pacman --noconfirm -S --needed mingw-w64-ucrt-x86_64-gcc"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $gcc = "C:\tools\msys64\ucrt64\bin\gcc.exe"
+          if (-not (Test-Path $gcc)) { throw "ucrt64 gcc not found at $gcc" }
           Add-Content -Path $env:GITHUB_PATH -Value "C:\tools\msys64\ucrt64\bin"
 
       - name: Verify MinGW
         shell: pwsh
         run: |
+          $gcc = (Get-Command gcc).Source
+          Write-Host "gcc: $gcc"
+          if ($gcc -notlike "*\ucrt64\bin\gcc.exe") {
+            throw "expected UCRT64 gcc, found $gcc"
+          }
           gcc --version
+          gcc -dumpmachine
           g++ --version
 
       - uses: actions/setup-go@v5
@@ -151,6 +160,10 @@ jobs:
           GOFLAGS: -mod=vendor
         shell: pwsh
         run: |
+          # Runner images ship an older MinGW (Strawberry Perl) ahead of UCRT64.
+          # DuckDB's static libs must be linked with ucrt64 gcc.
+          $env:PATH = "C:\tools\msys64\ucrt64\bin;" + $env:PATH
+          Write-Host "gcc: $((Get-Command gcc).Source)"
           powershell -ExecutionPolicy Bypass -File .\windows_build.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
