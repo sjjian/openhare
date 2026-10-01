@@ -4,6 +4,7 @@ import 'package:client/models/sessions.dart';
 import 'package:client/services/ai/agent.dart';
 import 'package:client/services/ai/chat.dart';
 import 'package:client/services/ai/prompt.dart';
+import 'package:client/services/sessions/session_metadata.dart';
 import 'package:client/services/sessions/sessions.dart';
 import 'package:client/widgets/button.dart';
 import 'package:client/widgets/code_auto_complete.dart';
@@ -105,16 +106,13 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
   }
 
   String _buildTableRef(SessionAIChatModel chatModel, Iterable<String> mentionedTables) {
-    if (chatModel.metadata == null || chatModel.currentSchema == null) {
-      return '';
-    }
-    final schemaNode = getNodeByDatabaseRef(chatModel.metadata!.metadata, chatModel.currentSchema!);
-    if (schemaNode == null || mentionedTables.isEmpty) {
-      return '';
-    }
+    if (mentionedTables.isEmpty) return '';
+    final metadata = _liveMetadataNodes(ref, chatModel);
+    if (metadata == null || metadata.isEmpty) return '';
+    final roots = _mentionObjectRoots(metadata, chatModel.currentSchema);
     final b = StringBuffer();
     for (final tableName in mentionedTables) {
-      final tableNode = schemaNode.getNode(MetaType.table, tableName);
+      final tableNode = _findTableNode(roots, tableName);
       // 直接复用 MetaDataNode.toString() 的 JSON 序列化（见 db_driver_metadata.dart）
       if (tableNode != null) {
         b.writeln(tableNode.toString());
@@ -126,17 +124,24 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
   Future<void> _sendMessage(AIChatId chatId, SessionAIChatModel chatModel) async {
     final text = widget.controller.displayText;
     if (text.trim().isEmpty) return;
+    if (!chatModel.canSendMessage() || chatModel.chatOverviewModel.progress.contextHardStopped) {
+      return;
+    }
+    final agentId = chatModel.llmAgents.lastUsedLLMAgent?.id;
+    if (agentId == null) return;
 
     // 如果用户通过 @ 提及了表，则把表结构信息放到 ref 里
     final mentionedTables = widget.controller.segments.whereType<MentionSegment>().map((s) => s.label).toList();
     final refText = _buildTableRef(chatModel, mentionedTables);
+
+    widget.controller.clear();
 
     // 调用AIChatService的chat方法
     await ref
         .read(aIChatServiceProvider.notifier)
         .chat(
           chatId,
-          chatModel.llmAgents.lastUsedLLMAgent!.id,
+          agentId,
           genChatSystemPrompt(chatModel),
           message: text,
           refText: refText.isEmpty ? null : refText,
@@ -168,7 +173,9 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
             ChatInputFieldWidget(
               model: widget.model,
               controller: widget.controller,
-              onSubmitted: (widget.model.canSendMessage() && !hardStopped && _hasInputContent())
+              // 是否有内容在提交时由 _sendMessage 判断，避免 build 时条件为 false
+              // 导致回车仍被消费并清空，但实际没有发送。
+              onSubmitted: (widget.model.canSendMessage() && !hardStopped)
                   ? () => _sendMessage(widget.model.chatOverviewModel.id, widget.model)
                   : null,
               enabled: !hardStopped,
@@ -212,10 +219,7 @@ class _SessionChatInputCardState extends ConsumerState<SessionChatInputCard> {
                         tooltip: AppLocalizations.of(context)!.button_tooltip_send_message,
                         icon: Icons.send,
                         onPressed: (widget.model.canSendMessage() && !hardStopped && _hasInputContent())
-                            ? () {
-                                _sendMessage(widget.model.chatOverviewModel.id, widget.model);
-                                widget.controller.clear();
-                              }
+                            ? () => _sendMessage(widget.model.chatOverviewModel.id, widget.model)
                             : null,
                       ),
               ],
@@ -468,17 +472,11 @@ class ChatInputFieldWidget extends ConsumerStatefulWidget {
 
 class _ChatInputFieldWidgetState extends ConsumerState<ChatInputFieldWidget> {
   List<String> _getTableNames() {
-    if (widget.model.metadata == null || widget.model.currentSchema == null) {
+    final metadata = _liveMetadataNodes(ref, widget.model);
+    if (metadata == null || metadata.isEmpty) {
       return [];
     }
-    final tableNodes = getNodeByDatabaseRef(
-      widget.model.metadata!.metadata,
-      widget.model.currentSchema!,
-    )?.getChildren(MetaType.table);
-    if (tableNodes == null) {
-      return [];
-    }
-    return tableNodes.map((e) => e.value).toList();
+    return _collectTableNames(metadata, widget.model.currentSchema);
   }
 
   List<String> _filterAndSortTables(List<String> allTables, String query) {
@@ -566,6 +564,10 @@ class _ChatInputFieldWidgetState extends ConsumerState<ChatInputFieldWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // 与左侧元数据树同源；避免 chat model 里 metadata 尚未对齐时 @ 候选为空。
+    if (widget.model.metadata != null || widget.model.connId != null) {
+      ref.watch(selectedSessionMetadataProvider);
+    }
     return MentionTextField(
       controller: widget.controller,
       style: Theme.of(context).textTheme.bodyMedium,
@@ -582,10 +584,55 @@ class _ChatInputFieldWidgetState extends ConsumerState<ChatInputFieldWidget> {
       ),
       mentionCandidatesBuilder: _mentionCandidates,
       mentionItemBuilder: _mentionItemBuilder,
-      onSubmitted: (_) {
-        widget.onSubmitted?.call();
-        widget.controller.clear();
-      },
+      onSubmitted: widget.onSubmitted == null ? null : (_) => widget.onSubmitted!(),
     );
   }
+}
+
+List<MetaDataNode>? _liveMetadataNodes(WidgetRef ref, SessionAIChatModel chatModel) {
+  try {
+    final live = ref.read(selectedSessionMetadataProvider).value?.metadata;
+    if (live != null && live.isNotEmpty) return live;
+  } catch (_) {
+    // 无实例/元数据 provider 不可用时回退到 chat model。
+  }
+  return chatModel.metadata?.metadata;
+}
+
+/// 与 SQL 补全 `_objectRoots` 一致：当前库/schema 找不到时回退到整棵元数据树。
+List<MetaDataNode> _mentionObjectRoots(List<MetaDataNode> metadata, DatabaseRef? currentSchema) {
+  if (currentSchema == null) return metadata;
+  final node = getNodeByDatabaseRef(metadata, currentSchema);
+  if (node == null) return metadata;
+  final children = node.items;
+  if (children != null && children.isNotEmpty) return children;
+  return [node];
+}
+
+List<String> _collectTableNames(List<MetaDataNode> metadata, DatabaseRef? currentSchema) {
+  final names = <String>[];
+  for (final root in _mentionObjectRoots(metadata, currentSchema)) {
+    if (root.type == MetaType.table) {
+      names.add(root.value);
+      continue;
+    }
+    root.visitor((node, parent) {
+      if (node.type == MetaType.table) {
+        names.add(node.value);
+      }
+      return true;
+    });
+  }
+  return names;
+}
+
+MetaDataNode? _findTableNode(List<MetaDataNode> roots, String tableName) {
+  for (final root in roots) {
+    if (root.type == MetaType.table && root.value == tableName) {
+      return root;
+    }
+    final found = root.getNode(MetaType.table, tableName);
+    if (found != null) return found;
+  }
+  return null;
 }

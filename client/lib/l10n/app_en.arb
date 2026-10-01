@@ -769,6 +769,54 @@
   "@metadata_tree_instance": {
     "description": "Metadata tree instance"
   },
+  "metadata_tree_clear_search": "Clear search",
+  "@metadata_tree_clear_search": {
+    "description": "Clear metadata tree search"
+  },
+  "metadata_tree_no_match": "No matching objects",
+  "@metadata_tree_no_match": {
+    "description": "Metadata tree empty search result"
+  },
+  "metadata_tree_action_view_data": "View data",
+  "@metadata_tree_action_view_data": {
+    "description": "Query table and show result"
+  },
+  "metadata_tree_action_use": "Use",
+  "@metadata_tree_action_use": {
+    "description": "Set as current database or schema"
+  },
+  "metadata_tree_action_copy": "Copy table name",
+  "@metadata_tree_action_copy": {
+    "description": "Copy table name"
+  },
+  "metadata_tree_action_more": "More actions",
+  "@metadata_tree_action_more": {
+    "description": "More metadata tree actions"
+  },
+  "metadata_tree_action_insert_tpl": "INSERT template",
+  "@metadata_tree_action_insert_tpl": {
+    "description": "Copy INSERT template to clipboard"
+  },
+  "metadata_tree_action_pin_ai": "Pin to AI",
+  "@metadata_tree_action_pin_ai": {
+    "description": "Pin table to AI chat input"
+  },
+  "metadata_tree_copy_name": "Table name",
+  "@metadata_tree_copy_name": {
+    "description": "Copy table name without database prefix"
+  },
+  "metadata_tree_copy_column": "Copy column name",
+  "@metadata_tree_copy_column": {
+    "description": "Copy column name to clipboard"
+  },
+  "metadata_tree_copy_qualified": "Full name",
+  "@metadata_tree_copy_qualified": {
+    "description": "Copy database or schema prefixed object name"
+  },
+  "metadata_scope_empty": "No objects in current scope",
+  "@metadata_scope_empty": {
+    "description": "Empty metadata list for current schema"
+  },
   "display_msg_no_result": "No SQL result selected",
   "@display_msg_no_result": {
     "description": "No SQL result selected"

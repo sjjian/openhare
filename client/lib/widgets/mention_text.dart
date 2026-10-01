@@ -195,6 +195,38 @@ class MentionTextController extends TextEditingController {
     );
   }
 
+  /// 在输入末尾追加 mention（不依赖正在输入的 `@`），已存在同名 mention 时跳过。
+  /// 返回是否实际写入。
+  bool appendMention(String label) {
+    if (label.isEmpty) return false;
+    if (_segments.any((s) => s is MentionSegment && s.label == label)) {
+      return false;
+    }
+
+    final segs = List<Segment>.from(_segments);
+    if (segs.isEmpty) {
+      segs.add(TextSegment(''));
+    } else if (segs.last is TextSegment) {
+      final last = segs.last as TextSegment;
+      if (last.value.isNotEmpty && !last.value.endsWith(' ') && !last.value.endsWith('\n')) {
+        segs[segs.length - 1] = TextSegment('${last.value} ');
+      }
+    } else {
+      segs.add(TextSegment(' '));
+    }
+    segs.add(MentionSegment(label: label));
+    segs.add(TextSegment(''));
+    _segments = segs;
+    final driver = _segmentsToDriverString();
+    super.value = TextEditingValue(
+      text: driver,
+      selection: TextSelection.collapsed(offset: driver.length),
+      composing: TextRange.empty,
+    );
+    _updateMentionState();
+    return true;
+  }
+
   /// 复制时输出“接近 displayText”的可见文本，同时在 mention 后附加零宽元数据，
   /// 以便粘贴回本输入框时能还原 mention。
   Future<void> copySelectionToClipboard() async {
@@ -652,10 +684,14 @@ class _MentionTextFieldState extends State<MentionTextField> {
     }
   }
 
+  bool _isComposing() {
+    final composing = widget.controller.value.composing;
+    return composing.isValid && !composing.isCollapsed;
+  }
+
   bool handleEnter() {
     // IME 组字确认依赖 Enter，组字中不抢键，否则会出现回车无响应/内容被清掉。
-    final composing = widget.controller.value.composing;
-    if (composing.isValid && !composing.isCollapsed) {
+    if (_isComposing()) {
       return false;
     }
     if (_overlayVisible && _candidates.isNotEmpty) {
@@ -747,7 +783,13 @@ class _MentionTextFieldState extends State<MentionTextField> {
           enabled: widget.enabled ?? true,
           readOnly: widget.readOnly,
           textInputAction: widget.textInputAction,
-          onSubmitted: widget.onSubmitted == null ? null : (_) => widget.onSubmitted!(widget.controller.displayText),
+          onSubmitted: widget.onSubmitted == null
+              ? null
+              : (_) {
+                  // 组字中 TextField 也可能收到 performAction，不能当成发送。
+                  if (_isComposing()) return;
+                  widget.onSubmitted!(widget.controller.displayText);
+                },
         ),
       ),
     );
@@ -797,6 +839,7 @@ class _MentionTextFieldState extends State<MentionTextField> {
               if (_overlayController != null)
                 OverlayPortal(
                   controller: _overlayController!,
+                  overlayLocation: OverlayChildLocation.rootOverlay,
                   overlayChildBuilder: _buildOverlay,
                 ),
             ],
@@ -947,6 +990,14 @@ class _ArrowUpAction extends Action<_ArrowUpIntent> {
 class _EnterAction extends Action<_EnterIntent> {
   final _MentionTextFieldState _state;
   _EnterAction(this._state);
+
+  @override
+  bool isEnabled(_EnterIntent intent) {
+    // consumesKey 默认等于 isEnabled。组字中必须禁用，否则 Shortcuts 仍会吃掉 Enter，
+    // IME 候选无法上屏，表现为「文字消失但消息没发出去」。
+    if (_state._isComposing()) return false;
+    return true;
+  }
 
   @override
   Object? invoke(_EnterIntent intent) {

@@ -12,6 +12,7 @@ import 'db_driver_pg.dart';
 import 'db_driver_redis.dart';
 import 'db_driver_mongodb.dart';
 import 'db_driver_duckdb.dart';
+import 'db_driver_clickhouse.dart';
 
 /// 封装具体 [BaseConnection]，并统一管理 SSH 隧道生命周期。
 class ConnectionWrapper extends BaseConnection {
@@ -77,6 +78,8 @@ class ConnectionWrapper extends BaseConnection {
           await MongoConnection.open(meta: wireMeta, schema: schema),
         DatabaseType.duckdb =>
           await DuckDBConnection.open(meta: wireMeta, schema: schema),
+        DatabaseType.clickhouse =>
+          await ClickHouseConnection.open(meta: wireMeta, schema: schema),
       };
       final opened = ConnectionWrapper(inner, sshTunnel: tunnel);
       opened.listen(onSchemaChangedCallback: onSchemaChangedCallback);
@@ -105,6 +108,145 @@ class ConnectionWrapper extends BaseConnection {
       DatabaseType.redis => RedisConnection.supportsExplainCapability,
       DatabaseType.mongodb => MongoConnection.supportsExplainCapability,
       DatabaseType.duckdb => DuckDBConnection.supportsExplainCapability,
+      DatabaseType.clickhouse => ClickHouseConnection.supportsExplainCapability,
+    };
+  }
+
+  static bool supportsSelectSqlOf(DatabaseType type) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.supportsSelectSqlCapability,
+      DatabaseType.pg => PGConnection.supportsSelectSqlCapability,
+      DatabaseType.oracle => OracleConnection.supportsSelectSqlCapability,
+      DatabaseType.mssql => MSSQLConnection.supportsSelectSqlCapability,
+      DatabaseType.sqlite => SQLiteConnection.supportsSelectSqlCapability,
+      DatabaseType.redis => RedisConnection.supportsSelectSqlCapability,
+      DatabaseType.mongodb => MongoConnection.supportsSelectSqlCapability,
+      DatabaseType.duckdb => DuckDBConnection.supportsSelectSqlCapability,
+      DatabaseType.clickhouse => ClickHouseConnection.supportsSelectSqlCapability,
+    };
+  }
+
+  static bool supportsInsertSqlOf(DatabaseType type) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.supportsInsertSqlCapability,
+      DatabaseType.pg => PGConnection.supportsInsertSqlCapability,
+      DatabaseType.oracle => OracleConnection.supportsInsertSqlCapability,
+      DatabaseType.mssql => MSSQLConnection.supportsInsertSqlCapability,
+      DatabaseType.sqlite => SQLiteConnection.supportsInsertSqlCapability,
+      DatabaseType.redis => RedisConnection.supportsInsertSqlCapability,
+      DatabaseType.mongodb => MongoConnection.supportsInsertSqlCapability,
+      DatabaseType.duckdb => DuckDBConnection.supportsInsertSqlCapability,
+      DatabaseType.clickhouse => ClickHouseConnection.supportsInsertSqlCapability,
+    };
+  }
+
+  static String buildSelectSqlOf(
+    DatabaseType type, {
+    required String name,
+    String? database,
+    String? schema,
+    List<String> columns = const [],
+  }) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.pg => PGConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.oracle => OracleConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.mssql => MSSQLConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.sqlite => SQLiteConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.redis || DatabaseType.mongodb =>
+        throw UnsupportedError('$type does not support SelectSql'),
+      DatabaseType.duckdb => DuckDBConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.clickhouse => ClickHouseConnection.buildSelectSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+    };
+  }
+
+  static String buildInsertSqlOf(
+    DatabaseType type, {
+    required String name,
+    String? database,
+    String? schema,
+    List<String> columns = const [],
+  }) {
+    return switch (type) {
+      DatabaseType.mysql => MySQLConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.pg => PGConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.oracle => OracleConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.mssql => MSSQLConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.sqlite => SQLiteConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.redis || DatabaseType.mongodb =>
+        throw UnsupportedError('$type does not support InsertSql'),
+      DatabaseType.duckdb => DuckDBConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
+      DatabaseType.clickhouse => ClickHouseConnection.buildInsertSql(
+          name: name,
+          database: database,
+          schema: schema,
+          columns: columns,
+        ),
     };
   }
 
@@ -113,6 +255,12 @@ class ConnectionWrapper extends BaseConnection {
 
   @override
   bool get supportsExplain => _inner.supportsExplain;
+
+  @override
+  bool get supportsSelectSql => _inner.supportsSelectSql;
+
+  @override
+  bool get supportsInsertSql => _inner.supportsInsertSql;
 
   @override
   void listen({
@@ -392,6 +540,55 @@ The connection driver uses mongosh-compatible shell syntax and leverages the gom
       NameMeta(),
       TargetDBFileMeta(),
       DescMeta(),
+    ],
+    initQuerys: const [],
+  ),
+  ConnectionMeta(
+    displayName: "ClickHouse",
+    type: DatabaseType.clickhouse,
+    logoAssertPath: "assets/icons/clickhouse_icon.png",
+    description:
+        "ClickHouse is a column-oriented OLAP database. Native TCP (port 9000) is the default; switch protocol to HTTP and use 8123/8443 when connecting through a proxy or ClickHouse Cloud HTTPS.",
+    connMeta: [
+      NameMeta(),
+      TargetNetworkMeta(defaultPort: "9000"),
+      SshTunnelMeta(group: settingMetaGroupSshTunnel),
+      UserMeta(),
+      PasswordMeta(),
+      DescMeta(),
+      CustomMeta(
+          name: "database",
+          type: SettingMetaType.text,
+          group: settingMetaGroupBase,
+          isRequired: true,
+          defaultValue: "default"),
+      CustomMeta(
+        name: "protocol",
+        type: SettingMetaType.enumValue,
+        group: settingMetaGroupParams,
+        defaultValue: "native",
+        enumValues: ['native', 'http'],
+      ),
+      CustomMeta(
+        name: "secure",
+        type: SettingMetaType.enumValue,
+        group: settingMetaGroupParams,
+        defaultValue: "false",
+        enumValues: ['true', 'false'],
+      ),
+      CustomMeta(
+        name: "compress",
+        type: SettingMetaType.enumValue,
+        group: settingMetaGroupParams,
+        defaultValue: "lz4",
+        enumValues: ['lz4', 'zstd', 'none'],
+      ),
+      CustomMeta(
+        name: "connectTimeout",
+        type: SettingMetaType.text,
+        group: settingMetaGroupParams,
+        defaultValue: "10",
+      ),
     ],
     initQuerys: const [],
   ),

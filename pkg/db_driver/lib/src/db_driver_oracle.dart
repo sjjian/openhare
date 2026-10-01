@@ -12,9 +12,58 @@ class OracleConnection extends GoImplConnection {
   OracleConnection(super._conn);
 
   static const bool supportsExplainCapability = true;
+  static const bool supportsSelectSqlCapability = true;
+  static const bool supportsInsertSqlCapability = true;
+
+  static String quoteIdent(String ident) =>
+      '"${ident.replaceAll('"', '""')}"';
+  static String placeholder(int index) => ':$index';
+
+  static String buildSelectSql({
+    required String name,
+    String? database,
+    String? schema,
+    List<String> columns = const [],
+  }) {
+    final relation = qualifyRelation(
+      quoteIdent,
+      name: name,
+      database: database,
+      schema: schema,
+    );
+    final colList =
+        columns.isEmpty ? '*' : columns.map(quoteIdent).join(',\n  ');
+    return 'SELECT\n  $colList\nFROM $relation;';
+  }
+
+  static String buildInsertSql({
+    required String name,
+    String? database,
+    String? schema,
+    List<String> columns = const [],
+  }) {
+    final relation = qualifyRelation(
+      quoteIdent,
+      name: name,
+      database: database,
+      schema: schema,
+    );
+    if (columns.isEmpty) return 'INSERT INTO $relation;';
+    final colList = columns.map(quoteIdent).join(', ');
+    final placeholders = [
+      for (var i = 1; i <= columns.length; i++) placeholder(i),
+    ].join(', ');
+    return 'INSERT INTO $relation ($colList)\nVALUES ($placeholders);';
+  }
 
   @override
   bool get supportsExplain => supportsExplainCapability;
+
+  @override
+  bool get supportsSelectSql => supportsSelectSqlCapability;
+
+  @override
+  bool get supportsInsertSql => supportsInsertSqlCapability;
 
   @override
   Future<DatabaseModeType> getDatabaseMode() async =>

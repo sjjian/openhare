@@ -190,7 +190,8 @@ enum go_impl_db_type_t {
   GO_IMPL_DB_SQLITE(4),
   GO_IMPL_DB_REDIS(5),
   GO_IMPL_DB_MONGODB(6),
-  GO_IMPL_DB_DUCKDB(7)
+  GO_IMPL_DB_DUCKDB(7),
+  GO_IMPL_DB_CLICKHOUSE(8)
   ;
 
   final int value;
@@ -205,6 +206,7 @@ enum go_impl_db_type_t {
     5 => GO_IMPL_DB_REDIS,
     6 => GO_IMPL_DB_MONGODB,
     7 => GO_IMPL_DB_DUCKDB,
+    8 => GO_IMPL_DB_CLICKHOUSE,
     _ => throw ArgumentError("Unknown value for go_impl_db_type_t: $value"),
   };
 }

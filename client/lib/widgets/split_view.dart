@@ -13,8 +13,12 @@ class SplitViewController extends ChangeNotifier {
   /// 分割条厚度（与 [SplitView] 中分割条一致）
   final double dividerThickness;
 
+  /// 首次获得有效 totalSize 时按比例设置 second 高度；之后只 clamp，不因选中切换重置。
+  final double? initialSecondRatio;
+
   /// 当前 second 区域的大小（拖拽时可能改变）
   double _secondSize;
+  bool _initializedFromLayout = false;
 
   double get secondSize => _secondSize;
 
@@ -23,14 +27,20 @@ class SplitViewController extends ChangeNotifier {
     this.firstMinSize = 0,
     this.secondMinSize = 0,
     this.dividerThickness = 5.0,
+    this.initialSecondRatio,
   }) : _secondSize = secondSize;
 
   void syncSecondToLayoutTotalSize(double totalSize) {
+    if (!_initializedFromLayout && initialSecondRatio != null && totalSize > 0) {
+      _secondSize = (totalSize - dividerThickness) * initialSecondRatio!;
+      _initializedFromLayout = true;
+    }
     _secondSize = _applySecondPanDelta(totalSize, 0);
     // 无需更新订阅, 这个函数在build内调用, 后续会读到新的secondSize.
   }
 
   void applyPanSecondDelta(double totalSize, double delta) {
+    _initializedFromLayout = true;
     _secondSize = _applySecondPanDelta(totalSize, delta);
     notifyListeners();
   }

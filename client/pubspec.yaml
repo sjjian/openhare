@@ -41,7 +41,6 @@ dependencies:
   path: ^1.9.1
   json_annotation: ^4.9.0
   hugeicons: ^0.0.7
-  flutter_fancy_tree_view: ^1.6.0
   google_fonts: ^6.2.1
   file_picker: ^10.3.7
   csv: ^6.0.0
