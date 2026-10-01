@@ -13,17 +13,6 @@ dart_gen_code:
 
 	cd pkg/db_driver/impl/mysql && flutter_rust_bridge_codegen generate
 
-APP_NAME := openhare
-VERSION := $(shell grep '^version:' client/pubspec.yaml | sed 's/version: *//')
-DMG_NAME := $(APP_NAME)-$(VERSION)-macos-arm64.dmg
-
 build_macos:
 	cd client && flutter build macos --release
-	rm -f $(DMG_NAME)
-	/opt/homebrew/bin/create-dmg \
-		--volname "$(APP_NAME)" \
-		--window-size 600 400 \
-		--icon-size 100 \
-		--app-drop-link 450 150 \
-		$(DMG_NAME) \
-		client/build/macos/Build/Products/Release/$(APP_NAME).app
+	scripts/package_macos_dmg.sh

@@ -1,0 +1,161 @@
+name: Release Desktop
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: 3.38.4
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          PUBSPEC_VERSION="$(sed -n 's/^version:[[:space:]]*\([0-9.]*\).*/\1/p' client/pubspec.yaml | head -n1)"
+          if [[ -z "${PUBSPEC_VERSION}" ]]; then
+            echo "error: version not found in client/pubspec.yaml" >&2
+            exit 1
+          fi
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [[ "${TAG_VERSION}" != "${PUBSPEC_VERSION}" ]]; then
+              echo "error: tag ${GITHUB_REF_NAME} does not match client/pubspec.yaml version ${PUBSPEC_VERSION}" >&2
+              exit 1
+            fi
+          fi
+          echo "version=${PUBSPEC_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: ${PUBSPEC_VERSION}"
+
+  build-macos:
+    needs: version
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cmake
+        run: brew install cmake
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: pkg/db_driver/go_impl/src/go.mod
+          cache: false
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Enable macOS desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Resolve dependencies
+        working-directory: client
+        run: flutter pub get
+
+      - name: Build macOS release
+        working-directory: client
+        env:
+          GOFLAGS: -mod=vendor
+        run: flutter build macos --release
+
+      - name: Package DMG
+        run: |
+          chmod +x scripts/package_macos_dmg.sh
+          scripts/package_macos_dmg.sh "${{ needs.version.outputs.version }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openhare-macos
+          path: dist/openhare-macos-arm64-${{ needs.version.outputs.version }}.dmg
+          if-no-files-found: error
+
+  build-windows:
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW-w64 UCRT64
+        shell: pwsh
+        run: |
+          choco install msys2 --no-progress -y
+          $bash = "C:\tools\msys64\usr\bin\bash.exe"
+          if (-not (Test-Path $bash)) { throw "msys2 bash not found at $bash" }
+          # Sync package db. A full -Syu can exit non-zero to request a shell restart.
+          & $bash -lc "pacman -Sy --noconfirm"
+          & $bash -lc "pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-gcc"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Add-Content -Path $env:GITHUB_PATH -Value "C:\tools\msys64\ucrt64\bin"
+
+      - name: Verify MinGW
+        shell: pwsh
+        run: |
+          gcc --version
+          g++ --version
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: pkg/db_driver/go_impl/src/go.mod
+          cache: false
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build Windows release and installer
+        env:
+          GOFLAGS: -mod=vendor
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\windows_build.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openhare-windows
+          path: openhare-${{ needs.version.outputs.version }}-windows-x64-setup.exe
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [version, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect release assets
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          cp artifacts/openhare-macos/*.dmg release-assets/
+          cp artifacts/openhare-windows/*.exe release-assets/
+          ls -la release-assets
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true

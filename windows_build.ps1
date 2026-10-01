@@ -9,8 +9,33 @@ $InnoScriptName = "windows_setup.iss"
 
 # Path configuration
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$VCLibsPath = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.38.33130\x64\Microsoft.VC143.CRT"
 $PubspecPath = Join-Path $ProjectRoot "client\pubspec.yaml"
+
+function Resolve-VCLibsPath {
+    $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+    if (!(Test-Path $vswhere)) {
+        throw "vswhere.exe not found at: $vswhere"
+    }
+
+    $vsRoot = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($vsRoot)) {
+        throw "Visual Studio C++ toolset not found"
+    }
+
+    $redistRoot = Join-Path $vsRoot.Trim() "VC\Redist\MSVC"
+    $candidates = Get-ChildItem -Path $redistRoot -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending
+    foreach ($dir in $candidates) {
+        $crt = Join-Path $dir.FullName "x64\Microsoft.VC143.CRT"
+        if (Test-Path (Join-Path $crt "vcruntime140.dll")) {
+            return $crt
+        }
+    }
+
+    throw "Microsoft.VC143.CRT not found under $redistRoot"
+}
+
+$VCLibsPath = Resolve-VCLibsPath
+Write-Host "Using VC runtime: $VCLibsPath" -ForegroundColor Green
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Building Flutter Windows Application" -ForegroundColor Cyan
@@ -34,6 +59,8 @@ if (!$VersionMatch.Success) {
 $AppVersion = $VersionMatch.Groups[1].Value.Trim()
 $AppVersion = $AppVersion.Trim("'")
 $AppVersion = $AppVersion.Trim('"')
+# Installer version matches the release tag: v0.13.0 <-> 0.13.0 or 0.13.0+1.
+$AppVersion = ($AppVersion -split '\+', 2)[0]
 Write-Host "Detected app version: $AppVersion" -ForegroundColor Green
 Write-Host ""
 
