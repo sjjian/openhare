@@ -72,6 +72,9 @@ jobs:
         run: |
           dart run build_runner build --delete-conflicting-outputs
           flutter gen-l10n
+          cd ../pkg/db_driver
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
 
       - name: Build macOS release
         working-directory: client
@@ -139,6 +142,9 @@ jobs:
           flutter pub get
           dart run build_runner build --delete-conflicting-outputs
           flutter gen-l10n
+          cd ../pkg/db_driver
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
 
       - name: Build Windows release and installer
         env:
