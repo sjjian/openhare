@@ -69,7 +69,9 @@ jobs:
 
       - name: Generate Dart code
         working-directory: client
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: |
+          dart run build_runner build --delete-conflicting-outputs
+          flutter gen-l10n
 
       - name: Build macOS release
         working-directory: client
@@ -136,6 +138,7 @@ jobs:
         run: |
           flutter pub get
           dart run build_runner build --delete-conflicting-outputs
+          flutter gen-l10n
 
       - name: Build Windows release and installer
         env:
