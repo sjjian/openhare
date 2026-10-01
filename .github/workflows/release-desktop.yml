@@ -67,6 +67,10 @@ jobs:
         working-directory: client
         run: flutter pub get
 
+      - name: Generate Dart code
+        working-directory: client
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Build macOS release
         working-directory: client
         env:
@@ -126,6 +130,12 @@ jobs:
 
       - name: Install Inno Setup
         run: choco install innosetup --no-progress -y
+
+      - name: Generate Dart code
+        working-directory: client
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
 
       - name: Build Windows release and installer
         env:
