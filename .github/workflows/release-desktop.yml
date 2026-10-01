@@ -70,11 +70,11 @@ jobs:
       - name: Generate Dart code
         working-directory: client
         run: |
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build --delete-conflicting-outputs --force-jit
           flutter gen-l10n
           cd ../pkg/db_driver
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build --delete-conflicting-outputs --force-jit
 
       - name: Build macOS release
         working-directory: client
@@ -140,11 +140,11 @@ jobs:
         working-directory: client
         run: |
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build --delete-conflicting-outputs --force-jit
           flutter gen-l10n
           cd ../pkg/db_driver
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build --delete-conflicting-outputs --force-jit
 
       - name: Build Windows release and installer
         env:
