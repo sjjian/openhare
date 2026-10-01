@@ -52,7 +52,7 @@ LicenseFile={#LicensePath}
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 OutputDir={#ProjectRoot}
-OutputBaseFilename=openhare-{#MyAppVersion}-windows-arm64-setup
+OutputBaseFilename=openhare-{#MyAppVersion}-windows-x64-setup
 SetupIconFile={#IconPath}
 SolidCompression=yes
 WizardStyle=modern
