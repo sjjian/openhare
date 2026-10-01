@@ -41,3 +41,5 @@ src/libgo_impl.h
 src/go_impl
 *.a
 *.o
+# DuckDB prebuilt static libs are required to link go_impl.
+!src/vendor/github.com/duckdb/**/*.a
