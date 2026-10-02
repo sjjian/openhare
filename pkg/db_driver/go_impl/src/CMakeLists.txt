@@ -21,9 +21,10 @@ endif()
 set(GO_IMPL_SHARED_HEADER "${CMAKE_CURRENT_BINARY_DIR}/libgo_impl.h")
 
 # Shared c-shared build for Linux / Windows / macOS (podspec invokes this via cmake).
-# On Windows, duckdb-go only ships windows-amd64 MinGW static libs
-# (#cgo LDFLAGS: -lstdc++ --static -lws2_32 …); Flutter's MSVC toolchain cannot
-# link them, so force MinGW gcc/g++ and GOARCH=amd64. c-shared embeds those libs.
+# On Windows, duckdb-go only ships windows-amd64 MinGW static libs built with
+# MinGW-Builds GCC 14.2.0 posix-seh. Flutter's MSVC toolchain cannot link them,
+# and MSYS2 UCRT gcc is not ABI-compatible, so force that MinGW gcc/g++ and
+# GOARCH=amd64. c-shared embeds those libs.
 set(_go_impl_build_commands)
 
 if(WIN32)

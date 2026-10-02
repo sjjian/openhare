@@ -101,30 +101,30 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install MinGW-w64 UCRT64
+      - name: Install MinGW 14.2.0
         shell: pwsh
         run: |
-          choco install msys2 --no-progress -y
-          $bash = "C:\tools\msys64\usr\bin\bash.exe"
-          if (-not (Test-Path $bash)) { throw "msys2 bash not found at $bash" }
-          # First -Syu often exits so the shell can restart after upgrading pacman.
-          & $bash -lc "pacman --noconfirm -Syuu" | Out-Host
-          & $bash -lc "pacman --noconfirm -Syuu" | Out-Host
-          & $bash -lc "pacman --noconfirm -S --needed mingw-w64-ucrt-x86_64-gcc"
+          # Vendored DuckDB windows libs were built with MinGW-Builds GCC 14.2.0
+          # posix-seh, the same package DuckDB's static-lib workflow installs.
+          # MSYS2 UCRT gcc is not ABI-compatible with those libraries.
+          choco install mingw --version 14.2.0 --no-progress -y
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $gcc = "C:\tools\msys64\ucrt64\bin\gcc.exe"
-          if (-not (Test-Path $gcc)) { throw "ucrt64 gcc not found at $gcc" }
-          Add-Content -Path $env:GITHUB_PATH -Value "C:\tools\msys64\ucrt64\bin"
+          $gcc = "C:\ProgramData\mingw64\mingw64\bin\gcc.exe"
+          if (-not (Test-Path $gcc)) { throw "mingw 14.2.0 gcc not found at $gcc" }
+          Add-Content -Path $env:GITHUB_PATH -Value "C:\ProgramData\mingw64\mingw64\bin"
 
       - name: Verify MinGW
         shell: pwsh
         run: |
           $gcc = (Get-Command gcc).Source
           Write-Host "gcc: $gcc"
-          if ($gcc -notlike "*\ucrt64\bin\gcc.exe") {
-            throw "expected UCRT64 gcc, found $gcc"
+          if ($gcc -notlike "*\mingw64\bin\gcc.exe") {
+            throw "expected MinGW-Builds gcc, found $gcc"
           }
           gcc --version
+          if (-not (gcc --version | Select-String "14.2.0")) {
+            throw "expected GCC 14.2.0"
+          }
           gcc -dumpmachine
           g++ --version
 
@@ -160,9 +160,8 @@ jobs:
           GOFLAGS: -mod=vendor
         shell: pwsh
         run: |
-          # Runner images ship an older MinGW (Strawberry Perl) ahead of UCRT64.
-          # DuckDB's static libs must be linked with ucrt64 gcc.
-          $env:PATH = "C:\tools\msys64\ucrt64\bin;" + $env:PATH
+          # Keep MinGW-Builds 14.2.0 ahead of any other gcc on the runner.
+          $env:PATH = "C:\ProgramData\mingw64\mingw64\bin;" + $env:PATH
           Write-Host "gcc: $((Get-Command gcc).Source)"
           powershell -ExecutionPolicy Bypass -File .\windows_build.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
